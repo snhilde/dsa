@@ -2,7 +2,6 @@ package hlist
 
 import (
 	"testing"
-	"fmt"
 )
 
 
@@ -524,7 +523,7 @@ func TestSortStr(t *testing.T) {
 
 // HELPERS
 func checkString(t *testing.T, list *Hlist, want string) {
-	if fmt.Sprintf("%v", list) != want {
+	if list.String() != want {
 		t.Error("List contents are incorrect")
 		t.Log("Expected:", want)
 		t.Log("Received:", list)
