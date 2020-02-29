@@ -9,7 +9,7 @@ import (
 
 
 // --- PACKAGE TYPES ---
-// Hlist is the main type for this package. It holds the information about the list.
+// Hlist is the main type for this package. It holds the internal information about the list.
 type Hlist struct {
 	head   *hnode
 	length  int
