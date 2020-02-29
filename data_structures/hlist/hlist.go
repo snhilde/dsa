@@ -319,7 +319,7 @@ func (list *Hlist) SortStr() error {
 }
 
 
-// --- Helper Functions ---
+// --- HELPER FUNCTIONS ---
 // internal convenience function for creating a new node
 func newNode(value interface{}) *hnode {
 	node := new(hnode)
