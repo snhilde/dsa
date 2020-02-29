@@ -8,32 +8,28 @@ import (
 )
 
 
+// --- PACKAGE TYPES ---
 // Hlist is the main type for this package. It holds the information about the list.
 type Hlist struct {
 	head   *hnode
 	length  int
 }
 
-// Internal type for an individual node in the list.
+// internal type for an individual node in the list
 type hnode struct {
 	next  *hnode
 	value  interface{}
 }
 
 
+// --- ENTRY FUNCTIONS ---
 // Create a new linked list.
 func New() *Hlist {
 	return new(Hlist)
 }
 
-// Internal convenience function for creating a new node.
-func newNode(value interface{}) *hnode {
-	node := new(hnode)
-	node.value = value
 
-	return node
-}
-
+// --- Hlist METHODS ---
 func (list *Hlist) String() string {
 	var b strings.Builder
 
@@ -323,7 +319,14 @@ func (list *Hlist) SortStr() error {
 }
 
 
-// Helper Functions
+// --- Helper Functions ---
+// internal convenience function for creating a new node
+func newNode(value interface{}) *hnode {
+	node := new(hnode)
+	node.value = value
+
+	return node
+}
 
 // integer equality callback for SortInt() method
 func eqInt(left, right interface{}) int {
