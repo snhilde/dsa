@@ -29,7 +29,7 @@ func New() *Hlist {
 }
 
 
-// --- Hlist METHODS ---
+// --- HLIST METHODS ---
 func (list *Hlist) String() string {
 	var b strings.Builder
 
