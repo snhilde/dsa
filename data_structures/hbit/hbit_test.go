@@ -1,0 +1,5 @@
+package hbit
+
+import (
+	"testing"
+)
