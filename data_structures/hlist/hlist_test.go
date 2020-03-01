@@ -143,6 +143,41 @@ func TestInsert(t *testing.T) {
 	checkLength(t, bad_list, -1)
 }
 
+func TestClear(t *testing.T) {
+	list := New()
+
+	// Add some items to the list.
+	list.Append(5)
+	list.Append("bronto", "stego", 65e6)
+	list.Append("t. rex", 0x0C)
+	checkString(t, list, "5, bronto, stego, 6.5e+07, t. rex, 12")
+	checkLength(t, list, 6)
+	return
+
+	// Test clearing out the items.
+	list.Clear()
+	checkString(t, list, "<empty>")
+	checkLength(t, list, 0)
+
+	// Test clearing a bad list.
+	var bad_list *List
+	checkString(t, bad_list, "<nil>")
+	checkLength(t, bad_list, -1)
+
+	bad_list.Clear()
+	checkString(t, bad_list, "<nil>")
+	checkLength(t, bad_list, -1)
+
+	// Test clearing a backdoor list.
+	var backdoor List
+	checkString(t, &backdoor, "<empty>")
+	checkLength(t, &backdoor, 0)
+
+	backdoor.Clear()
+	checkString(t, &backdoor, "<empty>")
+	checkLength(t, &backdoor, 0)
+}
+
 func TestPop(t *testing.T) {
 	list := New()
 	list.Append(1)
