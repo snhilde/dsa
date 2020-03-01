@@ -9,8 +9,8 @@ import (
 
 
 // --- PACKAGE TYPES ---
-// Hlist is the main type for this package. It holds the internal information about the list.
-type Hlist struct {
+// List is the main type for this package. It holds the internal information about the list.
+type List struct {
 	head   *hnode
 	length  int
 }
@@ -24,13 +24,13 @@ type hnode struct {
 
 // --- ENTRY FUNCTIONS ---
 // Create a new linked list.
-func New() *Hlist {
-	return new(Hlist)
+func New() *List {
+	return new(List)
 }
 
 
-// --- HLIST METHODS ---
-func (list *Hlist) String() string {
+// --- LIST METHODS ---
+func (list *List) String() string {
 	var b strings.Builder
 
 	if list == nil {
@@ -50,7 +50,7 @@ func (list *Hlist) String() string {
 }
 
 // Get the number of nodes in the list, or -1 if list hasn't been created yet.
-func (list *Hlist) Length() int {
+func (list *List) Length() int {
 	if list == nil {
 		return -1
 	}
@@ -59,7 +59,7 @@ func (list *Hlist) Length() int {
 }
 
 // Insert a value into the list at the specified index.
-func (list *Hlist) Insert(value interface{}, index int) error {
+func (list *List) Insert(value interface{}, index int) error {
 	if index < 0 {
 		return errors.New("Invalid index")
 	} else if list.Length() < index {
@@ -86,7 +86,7 @@ func (list *Hlist) Insert(value interface{}, index int) error {
 }
 
 // Add a value to the end of the list.
-func (list *Hlist) Append(value interface{}) error {
+func (list *List) Append(value interface{}) error {
 	if list == nil {
 		return errors.New("List must be created with New() first")
 	}
@@ -108,7 +108,7 @@ func (list *Hlist) Append(value interface{}) error {
 }
 
 // Remove an item for the list and return its value.
-func (list *Hlist) Pop(index int) interface{} {
+func (list *List) Pop(index int) interface{} {
 	if list == nil || index < 0 || index >= list.Length() {
 		return nil
 	}
@@ -132,7 +132,7 @@ func (list *Hlist) Pop(index int) interface{} {
 }
 
 // Find an item by matching value and remove it from the list.
-func (list *Hlist) PopMatch(value interface{}) bool {
+func (list *List) PopMatch(value interface{}) bool {
 	if list == nil {
 		return false
 	}
@@ -161,7 +161,7 @@ func (list *Hlist) PopMatch(value interface{}) bool {
 }
 
 // Get the index of the first matching node, if any.
-func (list *Hlist) Index(value interface{}) int {
+func (list *List) Index(value interface{}) int {
 	if list == nil {
 		return -1
 	}
@@ -180,7 +180,7 @@ func (list *Hlist) Index(value interface{}) int {
 }
 
 // Check whether or not the value exists in the list.
-func (list *Hlist) Exists(value interface{}) bool {
+func (list *List) Exists(value interface{}) bool {
 	if list == nil {
 		return false
 	}
@@ -198,7 +198,7 @@ func (list *Hlist) Exists(value interface{}) bool {
 }
 
 // Append new list to current list. For safety, this will copy over the new list.
-func (list *Hlist) Merge(addition *Hlist) error {
+func (list *List) Merge(addition *List) error {
 	if list == nil {
 		return errors.New("List must be created with New() first")
 	} else if addition == nil {
@@ -219,7 +219,7 @@ func (list *Hlist) Merge(addition *Hlist) error {
 
 // Sort the list using a modified merge algorithm.
 // equality_cb should return a negative value if left should be sorted first or a positive value if right should be sorted first.
-func (list *Hlist) Sort(equality_cb func(left, right interface{}) int) error {
+func (list *List) Sort(equality_cb func(left, right interface{}) int) error {
 	// We are going to use the merge sort algorithm here. However, because length operations are not constant-time, we
 	// are not going to divide the list into progressively smaller blocks. Instead, we are going to assume a block size
 	// of 2 and iteratively merge-sort blocks of greater and greater size until the list is fully sorted.
@@ -308,13 +308,13 @@ func (list *Hlist) Sort(equality_cb func(left, right interface{}) int) error {
 
 // Sort the list using a modified merge algorithm.
 // Note: all values in the list must be of type int.
-func (list *Hlist) SortInt() error {
+func (list *List) SortInt() error {
 	return list.Sort(eqInt)
 }
 
 // Sort the list using a modified merge algorithm.
 // Note: all values in the list must be of type string.
-func (list *Hlist) SortStr() error {
+func (list *List) SortStr() error {
 	return list.Sort(eqStr)
 }
 

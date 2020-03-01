@@ -14,7 +14,7 @@ func TestNew(t *testing.T) {
 	}
 
 	// Test the incorrect way to create a new linked list.
-	var bad_list *Hlist
+	var bad_list *List
 	if bad_list != nil {
 		t.Error("Unexpectedly created invalid list")
 	}
@@ -92,7 +92,7 @@ func TestInsert(t *testing.T) {
 	checkString(t, list, "bananas, [3.14 1.23], 5")
 	checkLength(t, list, 3)
 
-	var bad_list *Hlist
+	var bad_list *List
 	err = bad_list.Insert("shouldn't work", 0)
 	if err == nil {
 		t.Error("Unexpectedly passed invalid list test")
@@ -144,7 +144,7 @@ func TestPop(t *testing.T) {
 	checkLength(t, list, 3)
 
 	// Try the pop operation on an invalid list.
-	var bad_list *Hlist
+	var bad_list *List
 	value = bad_list.Pop(0)
 	if value != nil {
 		t.Error("Unexpectedly passed invalid list test")
@@ -206,7 +206,7 @@ func TestPopMatch(t *testing.T) {
 	checkLength(t, list, 1)
 
 	// Try the pop operation on an invalid list.
-	var bad_list *Hlist
+	var bad_list *List
 	ret = bad_list.PopMatch(1)
 	if ret {
 		t.Error("Unexpectedly passed invalid list test")
@@ -256,7 +256,7 @@ func TestIndex(t *testing.T) {
 	}
 
 	// Try the Index() operation on an invalid list.
-	var bad_list *Hlist
+	var bad_list *List
 	index = bad_list.Index(1)
 	if index != -1 {
 		t.Error("Unexpectedly passed invalid list test")
@@ -300,7 +300,7 @@ func TestExists(t *testing.T) {
 	}
 
 	// Try the Exists() operation on an invalid list.
-	var bad_list *Hlist
+	var bad_list *List
 	ret = bad_list.PopMatch(1)
 	if ret {
 		t.Error("Unexpectedly passed invalid list test")
@@ -339,7 +339,7 @@ func TestMerge(t *testing.T) {
 	checkString(t, list, "0, 1, 2, 3, 4")
 	checkLength(t, list, 5)
 
-	var bad_list *Hlist
+	var bad_list *List
 	checkString(t, bad_list, "<nil>")
 	checkLength(t, bad_list, -1)
 
@@ -351,7 +351,7 @@ func TestMerge(t *testing.T) {
 	checkLength(t, list, 5)
 
 	// Test merging a bad list with a good list.
-	// var bad_list *Hlist
+	// var bad_list *List
 	checkString(t, bad_list, "<nil>")
 	checkLength(t, bad_list, -1)
 
@@ -450,7 +450,7 @@ func TestSortInt(t *testing.T) {
 	checkString(t, list, "<empty>")
 	checkLength(t, list, 0)
 
-	var bad_list *Hlist
+	var bad_list *List
 	checkString(t, bad_list, "<nil>")
 	checkLength(t, bad_list, -1)
 	err = bad_list.SortInt()
@@ -520,9 +520,8 @@ func TestSortStr(t *testing.T) {
 }
 
 
-
 // HELPERS
-func checkString(t *testing.T, list *Hlist, want string) {
+func checkString(t *testing.T, list *List, want string) {
 	if list.String() != want {
 		t.Error("List contents are incorrect")
 		t.Log("Expected:", want)
@@ -530,7 +529,7 @@ func checkString(t *testing.T, list *Hlist, want string) {
 	}
 }
 
-func checkLength(t *testing.T, list *Hlist, want int) {
+func checkLength(t *testing.T, list *List, want int) {
 	if list.Length() != want {
 		t.Error("Incorrect length")
 		t.Log("Expected:", want)
