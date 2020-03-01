@@ -85,25 +85,30 @@ func (list *List) Insert(value interface{}, index int) error {
 	return nil
 }
 
-// Add a value to the end of the list.
-func (list *List) Append(value interface{}) error {
+// Add one or more values to the end of the list.
+func (list *List) Append(values ...interface{}) error {
 	if list == nil {
 		return errors.New("List must be created with New() first")
+	} else if len(values) == 0 {
+		return nil
 	}
 
-	tail := newNode(value)
-
-	if list.head == nil {
-		list.head = tail
-	} else {
-		node := list.head
-		for node.next != nil {
+	tmp_list := New()
+	node := tmp_list.head
+	for _, v := range values {
+		if tmp_list.head == nil {
+			tmp_list.head = newNode(v)
+			tmp_list.length++
+			node = tmp_list.head
+		} else {
+			node.next = newNode(v)
 			node = node.next
+			tmp_list.length++
 		}
-		node.next = tail
 	}
 
-	list.length++
+	list.Merge(tmp_list)
+
 	return nil
 }
 
@@ -197,7 +202,7 @@ func (list *List) Exists(value interface{}) bool {
 	return false
 }
 
-// Append new list to current list. For safety, this will copy over the new list.
+// Append new list to current list. The current list will take ownership of all nodes.
 func (list *List) Merge(addition *List) error {
 	if list == nil {
 		return errors.New("List must be created with New() first")
@@ -205,16 +210,32 @@ func (list *List) Merge(addition *List) error {
 		return nil
 	}
 
-	for addition.Length() > 0 {
-		value := addition.Pop(0)
-		err := list.Append(value)
-		if err != nil {
-			return err
+	// Find the end of the list.
+	if list.head == nil {
+		list.head = addition.head
+		list.length = addition.length
+	} else {
+		node := list.head
+		for node.next != nil {
+			node = node.next
 		}
-		list.length++
+		node.next = addition.head
+		list.length += addition.length
 	}
 
+	addition.Clear()
+
 	return nil
+}
+
+// Clear the list to its inital state.
+func (list *List) Clear() {
+	if list == nil {
+		return
+	}
+
+	list.head = nil
+	list.length = 0
 }
 
 // Sort the list using a modified merge algorithm.
