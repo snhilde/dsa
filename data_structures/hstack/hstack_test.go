@@ -16,12 +16,12 @@ func TestNew(t *testing.T) {
 	checkCount(t, stack, 0)
 
 	// Test out making a stack pointer to nothing.
-	var stack_ptr *Hstack
+	var stack_ptr *Stack
 	checkString(t, stack_ptr, "<nil>")
 	checkCount(t, stack_ptr, -1)
 
 	// Test out the backdoor method.
-	var backdoor Hstack
+	var backdoor Stack
 	checkString(t, &backdoor, "<empty>")
 	checkCount(t, &backdoor, 0)
 }
@@ -54,7 +54,7 @@ func TestAdd(t *testing.T) {
 	checkCount(t, stack, 3)
 
 	// Test out adding to a bad stack.
-	var bad_stack *Hstack
+	var bad_stack *Stack
 	checkString(t, bad_stack, "<nil>")
 	checkCount(t, bad_stack, -1)
 
@@ -66,7 +66,7 @@ func TestAdd(t *testing.T) {
 	checkCount(t, bad_stack, -1)
 
 	// Test out adding to a backdoor stack.
-	var backdoor Hstack
+	var backdoor Stack
 	checkString(t, &backdoor, "<empty>")
 	checkCount(t, &backdoor, 0)
 
@@ -138,7 +138,7 @@ func TestPop(t *testing.T) {
 	checkCount(t, stack, 0)
 
 	// Test out popping from a bad stack.
-	var bad_stack *Hstack
+	var bad_stack *Stack
 	checkString(t, bad_stack, "<nil>")
 	checkCount(t, bad_stack, -1)
 
@@ -150,7 +150,7 @@ func TestPop(t *testing.T) {
 	checkCount(t, bad_stack, -1)
 
 	// Test out popping from a backdoor stack.
-	var backdoor Hstack
+	var backdoor Stack
 	checkString(t, &backdoor, "<empty>")
 	checkCount(t, &backdoor, 0)
 
@@ -208,7 +208,7 @@ func TestClear(t *testing.T) {
 	checkCount(t, stack, 0)
 
 	// Test out clearing a backdoor stack.
-	var backdoor Hstack
+	var backdoor Stack
 	checkString(t, &backdoor, "<empty>")
 	checkCount(t, &backdoor, 0)
 
@@ -253,7 +253,7 @@ func TestMerge(t *testing.T) {
 	checkCount(t, tmp, 0)
 
 	// Test merging a bad stack on top of a good one.
-	var bad_stack *Hstack
+	var bad_stack *Stack
 	checkString(t, bad_stack, "<nil>")
 	checkCount(t, bad_stack, -1)
 
@@ -268,7 +268,7 @@ func TestMerge(t *testing.T) {
 	checkCount(t, bad_stack, -1)
 
 	// Test merging a good stack on top of a bad one.
-	var nil_stack *Hstack
+	var nil_stack *Stack
 	checkString(t, nil_stack, "<nil>")
 	checkCount(t, nil_stack, -1)
 
@@ -285,7 +285,7 @@ func TestMerge(t *testing.T) {
 
 
 // HELPERS
-func checkString(t *testing.T, stack *Hstack, want string) {
+func checkString(t *testing.T, stack *Stack, want string) {
 	if stack.String() != want {
 		t.Error("stack contents are incorrect")
 		t.Log("Expected:", want)
@@ -293,7 +293,7 @@ func checkString(t *testing.T, stack *Hstack, want string) {
 	}
 }
 
-func checkCount(t *testing.T, stack *Hstack, want int) {
+func checkCount(t *testing.T, stack *Stack, want int) {
 	if stack.Count() != want {
 		t.Error("Incorrect length")
 		t.Log("Expected:", want)

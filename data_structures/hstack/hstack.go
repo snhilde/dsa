@@ -9,8 +9,8 @@ import (
 
 
 // --- PACKAGE TYPES ---
-// Hstack is the main type for this package. It holds the internal information about the stack.
-type Hstack struct {
+// Stack is the main type for this package. It holds the internal information about the stack.
+type Stack struct {
 	head   *hnode
 	length  int
 }
@@ -24,14 +24,14 @@ type hnode struct {
 
 // --- ENTRY FUNCTIONS ---
 // Create a new stack.
-func New() *Hstack {
-	return new(Hstack)
+func New() *Stack {
+	return new(Stack)
 }
 
 
-// --- HSTACK METHODS ---
+// --- STACK METHODS ---
 // Add a new node to the top of the stack.
-func (stack *Hstack) Add(value interface{}) error {
+func (stack *Stack) Add(value interface{}) error {
 	if stack == nil {
 		return errors.New("Must create stack with New() first")
 	}
@@ -45,7 +45,7 @@ func (stack *Hstack) Add(value interface{}) error {
 }
 
 // Pop the top item from the stack.
-func (stack *Hstack) Pop() interface{} {
+func (stack *Stack) Pop() interface{} {
 	if stack == nil || stack.head == nil {
 		return nil
 	}
@@ -58,7 +58,7 @@ func (stack *Hstack) Pop() interface{} {
 }
 
 // Get the current number of items in the stack.
-func (stack *Hstack) Count() int {
+func (stack *Stack) Count() int {
 	if stack == nil {
 		return -1
 	}
@@ -67,7 +67,7 @@ func (stack *Hstack) Count() int {
 }
 
 // Reset the stack to a new state.
-func (stack *Hstack) Clear() error {
+func (stack *Stack) Clear() error {
 	if stack == nil {
 		return errors.New("Stack does not exist")
 	}
@@ -79,7 +79,7 @@ func (stack *Hstack) Clear() error {
 }
 
 // Add a stack on top of the current stack, preserving order. This will clear the new stack.
-func (stack *Hstack) Merge(new_stack *Hstack) error {
+func (stack *Stack) Merge(new_stack *Stack) error {
 	// For efficiency, we're going to reverse the order of the new stack and then run through it and add the items to
 	// the current stack.
 	if stack == nil {
@@ -106,7 +106,7 @@ func (stack *Hstack) Merge(new_stack *Hstack) error {
 }
 
 // Display stack contents, with left being the top.
-func (stack *Hstack) String() string {
+func (stack *Stack) String() string {
 	var b strings.Builder
 
 	if stack == nil {
