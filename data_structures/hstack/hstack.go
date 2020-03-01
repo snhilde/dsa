@@ -80,8 +80,7 @@ func (stack *Stack) Clear() error {
 
 // Add a stack on top of the current stack, preserving order. This will clear the new stack.
 func (stack *Stack) Merge(new_stack *Stack) error {
-	// For efficiency, we're going to reverse the order of the new stack and then run through it and add the items to
-	// the current stack.
+	// For efficiency, we're going to link the new stack in on top of the current stack.
 	if stack == nil {
 		return errors.New("Current stack does not exist")
 	} else if new_stack == nil || new_stack.Count() == 0 {
@@ -89,17 +88,18 @@ func (stack *Stack) Merge(new_stack *Stack) error {
 		return nil
 	}
 
-	// Reverse the order of the new stack.
-	tmp_stack := New()
-	for new_stack.Count() > 0 {
-		value := new_stack.Pop()
-		tmp_stack.Add(value)
-	}
-
-	// Reverse again while adding the items to properly concatenate the stacks.
-	for tmp_stack.Count() > 0 {
-		value := tmp_stack.Pop()
-		stack.Add(value)
+	// Find the bottom of the new stack and put it on top of the current stack.
+	if stack.head == nil {
+		stack.head = new_stack.head
+		stack.length = new_stack.length
+	} else {
+		node := new_stack.head
+		for node.next != nil {
+			node = node.next
+		}
+		node.next = stack.head
+		stack.head = new_stack.head
+		stack.length += new_stack.length
 	}
 
 	return new_stack.Clear()
