@@ -11,7 +11,7 @@ import (
 // --- PACKAGE TYPES ---
 // Stack is the main type for this package. It holds the internal information about the stack.
 type Stack struct {
-	head   *hnode
+	top    *hnode
 	length  int
 }
 
@@ -37,8 +37,8 @@ func (stack *Stack) Add(value interface{}) error {
 	}
 
 	node := newNode(value)
-	node.next = stack.head
-	stack.head = node
+	node.next = stack.top
+	stack.top = node
 	stack.length++
 
 	return nil
@@ -46,12 +46,12 @@ func (stack *Stack) Add(value interface{}) error {
 
 // Pop the top item from the stack.
 func (stack *Stack) Pop() interface{} {
-	if stack == nil || stack.head == nil {
+	if stack == nil || stack.top == nil {
 		return nil
 	}
 
-	pop := stack.head
-	stack.head = pop.next
+	pop := stack.top
+	stack.top = pop.next
 	stack.length--
 
 	return pop.value
@@ -72,7 +72,7 @@ func (stack *Stack) Clear() error {
 		return errors.New("Stack does not exist")
 	}
 
-	stack.head = nil
+	stack.top = nil
 	stack.length = 0
 
 	return nil
@@ -89,16 +89,16 @@ func (stack *Stack) Merge(new_stack *Stack) error {
 	}
 
 	// Find the bottom of the new stack and put it on top of the current stack.
-	if stack.head == nil {
-		stack.head = new_stack.head
+	if stack.top == nil {
+		stack.top = new_stack.top
 		stack.length = new_stack.length
 	} else {
-		node := new_stack.head
+		node := new_stack.top
 		for node.next != nil {
 			node = node.next
 		}
-		node.next = stack.head
-		stack.head = new_stack.head
+		node.next = stack.top
+		stack.top = new_stack.top
 		stack.length += new_stack.length
 	}
 
@@ -115,7 +115,7 @@ func (stack *Stack) String() string {
 		return "<empty>"
 	}
 
-	node := stack.head
+	node := stack.top
 	b.WriteString(fmt.Sprintf("%v", node.value))
 	node = node.next
 	for node != nil {
