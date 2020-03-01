@@ -51,6 +51,48 @@ func TestAppend(t *testing.T) {
 	checkLength(t, list, 3)
 }
 
+func TestAppend_mult(t *testing.T) {
+	list := New()
+	if list == nil {
+		t.Error("Failed to create new list")
+	}
+	checkString(t, list, "<empty>")
+	checkLength(t, list, 0)
+
+	// Test adding nothing.
+	err := list.Append()
+	if err != nil {
+		t.Error(err)
+	}
+	checkString(t, list, "<empty>")
+	checkLength(t, list, 0)
+
+	// Test adding one item.
+	err = list.Append(5)
+	if err != nil {
+		t.Error(err)
+	}
+	checkString(t, list, "5")
+	checkLength(t, list, 1)
+
+	// Test adding multiple items.
+	err = list.Append("bananas", "grapes", 42.9)
+	if err != nil {
+		t.Error(err)
+	}
+	checkString(t, list, "5, bananas, grapes, 42.9")
+	checkLength(t, list, 4)
+	return
+
+	// Add another item. Test that item was added successfully and that list is displayed correctly.
+	err = list.Append([]float64{3.14, 1.23})
+	if err != nil {
+		t.Error(err)
+	}
+	checkString(t, list, "5, bananas, [3.14 1.23]")
+	checkLength(t, list, 3)
+}
+
 func TestInsert(t *testing.T) {
 	// First, test correct usage.
 	list := New()
