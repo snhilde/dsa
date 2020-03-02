@@ -34,7 +34,7 @@ func New() *Buffer {
 
 // Get length of internal buffer, or -1 on invalid object.
 func (b *Buffer) Len() int {
-	if b == nil {
+	if !sanityCheck(b) {
 		return -1
 	}
 
@@ -43,7 +43,7 @@ func (b *Buffer) Len() int {
 
 // Get capacity of internal buffer, or -1 on invalid object.
 func (b *Buffer) Cap() int {
-	if b == nil {
+	if !sanityCheck(b) {
 		return -1
 	}
 
@@ -52,7 +52,7 @@ func (b *Buffer) Cap() int {
 
 // Get number of bits in buffer, or -1 on invalid object.
 func (b *Buffer) Bits() int {
-	if b == nil {
+	if !sanityCheck(b) {
 		return -1
 	}
 
@@ -74,7 +74,7 @@ func (b *Buffer) Bits() int {
 
 // Reset the bit buffer to its initial state.
 func (b *Buffer) Reset() error {
-	if b == nil {
+	if !sanityCheck(b) {
 		return errors.New("Must create bit buffer with New() first")
 	}
 
@@ -91,7 +91,7 @@ func (b *Buffer) Reset() error {
 func (b *Buffer) String() string {
 	var sb strings.Builder
 
-	if b == nil {
+	if !sanityCheck(b) {
 		return "<nil>"
 	} else if b.Bits() == 0 {
 		return "<empty>"
@@ -127,7 +127,7 @@ func (b *Buffer) String() string {
 // --- METHODS FOR ADDING AND REMOVING BITS ---
 // Add a bit to the end of the buffer.
 func (b *Buffer) AddBit(bit byte) error {
-	if b == nil {
+	if !sanityCheck(b) {
 		return errors.New("Must create bit buffer with New() first")
 	} else if bit != 0 && bit != 1 {
 		return errors.New("Invalid bit")
@@ -153,7 +153,7 @@ func (b *Buffer) AddBit(bit byte) error {
 func (b *Buffer) AddByte(nb byte) error {
 	var err error
 
-	if b == nil {
+	if !sanityCheck(b) {
 		return errors.New("Must create bit buffer with New() first")
 	}
 
@@ -203,6 +203,18 @@ func checkBit(b byte, bit int) bool {
 	}
 
 	return false
+}
+
+func sanityCheck(b *Buffer) bool {
+	// Check if Buffer was probably created with New() or not. If we only have a pointer and no underlying structure or
+	// the internal buffer has not been created yet, then the Buffer was not created with New().
+	if b == nil {
+		return false
+	} else if b.buf == nil {
+		return false
+	}
+
+	return true
 }
 
 func (b *Buffer) checkSpace() {
