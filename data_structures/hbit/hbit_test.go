@@ -53,12 +53,76 @@ func TestNew(t *testing.T) {
 	}
 }
 
-func TestBad(t *testing.T) {
+func TestBadPtr(t *testing.T) {
 	// Make sure that a Buffer not created with New() is handled properly.
 	var buf *Buffer
 	var num  int
 	var err  error
 	var s    string
+
+	// Test Len()
+	num = buf.Len()
+	if num != -1 {
+		t.Error("Incorrect result from bad Buffer test for Len()")
+		t.Log("\tExpected: -1")
+		t.Log("\tReceived:", num)
+	}
+
+	// Test Cap()
+	num = buf.Cap()
+	if num != -1 {
+		t.Error("Incorrect result from bad Buffer test for Cap()")
+		t.Log("\tExpected: -1")
+		t.Log("\tReceived:", num)
+	}
+
+	// Test Bits()
+	num = buf.Bits()
+	if num != -1 {
+		t.Error("Incorrect result from bad Buffer test for Bits()")
+		t.Log("\tExpected: -1")
+		t.Log("\tReceived:", num)
+	}
+
+	// Test Reset()
+	err = buf.Reset()
+	if err == nil {
+		t.Error("unexpectedly passed bad Buffer test for Reset()")
+	}
+
+	// Test String()
+	s = buf.String()
+	if s != "<nil>" {
+		t.Error("Incorrect result from bad Buffer test for String()")
+		t.Log("\tExpected: <nil>")
+		t.Log("\tReceived:", s)
+	}
+
+	// Test AddBit()
+	err = buf.AddBit(1)
+	if err == nil {
+		t.Error("Unexpectedly passed bad Buffer test for AddBit()")
+	}
+
+	// Test AddByte()
+	err = buf.AddByte(0x0C)
+	if err == nil {
+		t.Error("Unexpectedly passed bad Buffer test for AddByte()")
+	}
+
+	// Test AddBytes()
+	err = buf.AddBytes([]byte{0x0C, 0xFF})
+	if err == nil {
+		t.Error("Unexpectedly passed bad Buffer test for AddBytes()")
+	}
+}
+
+func TestBadStruct(t *testing.T) {
+	// Make sure that a Buffer not created with New() is handled properly.
+	var buf Buffer
+	var num int
+	var err error
+	var s   string
 
 	// Test Len()
 	num = buf.Len()
