@@ -321,12 +321,78 @@ func TestAdvance(t *testing.T) {
 	checkBits(t, buf, 22)
 }
 
+func TestDisplay(t *testing.T) {
+	buf := New()
+	checkString(t, buf, "<empty>")
+	checkBits(t, buf, 0)
+	checkDisplay(t, buf, "<empty>")
+
+	buf = New()
+	buf.AddBit(1)
+	buf.AddBit(1)
+	checkString(t, buf, "11")
+	checkBits(t, buf, 2)
+	checkDisplay(t, buf, "11")
+
+	buf.Advance(1)
+	checkString(t, buf, "1")
+	checkBits(t, buf, 1)
+	checkDisplay(t, buf, "1")
+
+	buf = New()
+	buf.AddByte(0x00)
+	buf.AddBit(1)
+	buf.AddBit(1)
+	checkString(t, buf, "0000000011")
+	checkBits(t, buf, 10)
+	checkDisplay(t, buf, "0000 0000  11")
+
+	buf.Advance(9)
+	checkString(t, buf, "1")
+	checkBits(t, buf, 1)
+	checkDisplay(t, buf, "1")
+
+	buf = New()
+	buf.AddBytes([]byte{0xF0, 0x0F})
+	checkString(t, buf, "0000111111110000")
+	checkBits(t, buf, 16)
+	checkDisplay(t, buf, "0000 1111  1111 0000")
+
+	buf.Advance(8)
+	checkString(t, buf, "11110000")
+	checkBits(t, buf, 8)
+	checkDisplay(t, buf, "1111 0000")
+
+	buf = New()
+	buf.AddBytes([]byte{0xF0, 0x0F})
+	buf.AddBytes([]byte{0xFA, 0x0A})
+	buf.AddBit(1)
+	buf.AddBit(1)
+	checkString(t, buf, "0000111111110000010111110101000011")
+	checkBits(t, buf, 34)
+	checkDisplay(t, buf, "0000 1111  1111 0000  0101 1111  0101 0000  11")
+
+	buf.Advance(12)
+	checkString(t, buf, "0000010111110101000011")
+	checkBits(t, buf, 22)
+	checkDisplay(t, buf, "0000  0101 1111  0101 0000  11")
+}
+
 
 // HELPERS
 func checkString(t *testing.T, buf *Buffer, want string) {
 	s := buf.String()
 	if s != want {
 		t.Error("Incorrect string")
+		t.Log("\tExpected:", want)
+		t.Log("\tReceived:", s)
+	}
+}
+
+func checkDisplay(t *testing.T, buf *Buffer, want string) {
+	s := buf.Display()
+	if s != want {
+		t.Error("Incorrect display")
 		t.Log("\tExpected:", want)
 		t.Log("\tReceived:", s)
 	}
