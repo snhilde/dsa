@@ -181,6 +181,52 @@ func TestBadStruct(t *testing.T) {
 	}
 }
 
+func TestAddBit(t *testing.T) {
+	buf := New()
+	checkString(t, buf, "<empty>")
+	checkBits(t, buf, 0)
+
+	// Add one bit.
+	err := buf.AddBit(1)
+	if err != nil {
+		t.Error(err)
+	}
+	checkString(t, buf, "1")
+	checkBits(t, buf, 1)
+
+	// Add enough bits to fill the first byte.
+	if err = buf.AddBit(1); err != nil {
+		t.Error(err)
+	}
+	if err = buf.AddBit(0); err != nil {
+		t.Error(err)
+	}
+	if err = buf.AddBit(1); err != nil {
+		t.Error(err)
+	}
+	if err = buf.AddBit(0); err != nil {
+		t.Error(err)
+	}
+	if err = buf.AddBit(1); err != nil {
+		t.Error(err)
+	}
+	if err = buf.AddBit(1); err != nil {
+		t.Error(err)
+	}
+	if err = buf.AddBit(1); err != nil {
+		t.Error(err)
+	}
+	checkString(t, buf, "11010111")
+	checkBits(t, buf, 8)
+
+	// Overflow the first byte.
+	if err = buf.AddBit(0); err != nil {
+		t.Error(err)
+	}
+	checkString(t, buf, "110101110")
+	checkBits(t, buf, 9)
+}
+
 
 // HELPERS
 func checkString(t *testing.T, buf *Buffer, want string) {
