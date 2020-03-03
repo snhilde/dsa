@@ -89,38 +89,13 @@ func (b *Buffer) Reset() error {
 
 // Get a string representation of the binary data in the buffer.
 func (b *Buffer) String() string {
-	var sb strings.Builder
+	return b.string_int(false)
+}
 
-	if !sanityCheck(b) {
-		return "<nil>"
-	} else if b.Bits() == 0 {
-		return "<empty>"
-	}
-
-	for i := b.index_begin; i <= b.index_end; i++ {
-		low := 0
-		high := 8
-		if b.index_begin == b.index_end {
-			// If we're only printing the one byte, then we have to tweak the calculation.
-			low = b.offset
-			high = b.offset + b.end_bits
-		} else {
-			if i == b.index_begin {
-				low = b.offset
-			} else if i == b.index_end {
-				high = b.end_bits
-			}
-		}
-		for j := low; j < high; j++ {
-			if checkBit(b.buf[i], j) {
-				sb.WriteString("1")
-			} else {
-				sb.WriteString("0")
-			}
-		}
-	}
-
-	return sb.String()
+// Get a string representation of the binary data in the buffer, with a single space between nibbles and a double space
+// between bytes.
+func (b *Buffer) Display() string {
+	return b.string_int(true)
 }
 
 
@@ -272,4 +247,49 @@ func (b *Buffer) checkSpace() {
 			b.buf = s
 		}
 	}
+}
+
+// internal helper for printing string from data.
+func (b *Buffer) string_int(pretty bool) string {
+	var sb strings.Builder
+
+	if !sanityCheck(b) {
+		return "<nil>"
+	} else if b.Bits() == 0 {
+		return "<empty>"
+	}
+
+	for i := b.index_begin; i <= b.index_end; i++ {
+		low := 0
+		high := 8
+		if b.index_begin == b.index_end {
+			// If we're only printing the one byte, then we have to tweak the calculation.
+			low = b.offset
+			high = b.offset + b.end_bits
+		} else {
+			if i == b.index_begin {
+				low = b.offset
+			} else if i == b.index_end {
+				high = b.end_bits
+			}
+		}
+		for j := low; j < high; j++ {
+			if j == 0 && pretty {
+				sb.WriteString("  ")
+			} else if j == 4 && pretty {
+				sb.WriteString(" ")
+			}
+
+			if checkBit(b.buf[i], j) {
+				sb.WriteString("1")
+			} else {
+				sb.WriteString("0")
+			}
+		}
+	}
+
+	s := sb.String()
+	s = strings.Trim(sb.String(), " ")
+
+	return s
 }
