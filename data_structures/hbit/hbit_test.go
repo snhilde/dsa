@@ -204,6 +204,30 @@ func TestAddBit(t *testing.T) {
 	checkBits(t, buf, 9)
 }
 
+func TestAddByte(t *testing.T) {
+	buf := New()
+	checkString(t, buf, "<empty>")
+	checkBits(t, buf, 0)
+
+	// Add a byte within a byte boundary.
+	if err := buf.AddByte(0xF0); err != nil {
+		t.Error(err)
+	}
+	checkString(t, buf, "00001111")
+	checkBits(t, buf, 8)
+
+	// Add a byte across a byte boundary.
+	buf = New()
+	checkString(t, buf, "<empty>")
+	checkBits(t, buf, 0)
+
+	buf.AddBit(1)
+	buf.AddBit(1)
+	buf.AddByte(0xF0)
+	checkString(t, buf, "1100001111")
+	checkBits(t, buf, 10)
+}
+
 
 // HELPERS
 func checkString(t *testing.T, buf *Buffer, want string) {
