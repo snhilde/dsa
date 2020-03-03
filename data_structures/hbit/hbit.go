@@ -194,6 +194,47 @@ func (b *Buffer) AddBytes(nbs []byte) error {
 	return nil
 }
 
+// Move buffer forward a number of bits.
+func (b *Buffer) Advance(n int) error {
+	if !sanityCheck(b) {
+		return errors.New("Must create bit buffer with New() first")
+	}
+
+	// Calculate the big and small steps we'll have to take.
+	bytes := n / 8
+	bits := n % 8
+
+	// Take the big step forward.
+	b.index_begin += bytes
+
+	// Take the small step forward.
+	b.offset += bits
+	if b.offset >= 8 {
+		// Overflow to the next byte.
+		b.index_begin ++
+		b.offset -= 8
+	}
+
+	// Figure out if the end of the buffer was affected by this at all.
+	if b.index_begin > b.index_end {
+		// We blew past the end of the buffer. Let's line them up again.
+		b.index_end = b.index_begin
+		b.end_bits = 0
+	} else if b.index_begin == b.index_end {
+		// We're only using one byte in the buffer. Let's see if we have any bits left.
+		if b.offset >= b.end_bits {
+			b.end_bits = 0
+		} else {
+			b.end_bits -= b.offset
+		}
+	}
+
+	// Now, let's make sure our internal buffer is OK with all these changes.
+	b.checkSpace()
+
+	return nil
+}
+
 
 // --- HELPER FUNCTIONS ---
 // Check if certain bit in certain byte is set or not.
