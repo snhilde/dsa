@@ -218,18 +218,17 @@ func sanityCheck(b *Buffer) bool {
 }
 
 func (b *Buffer) checkSpace() {
-	if b.index_end == b.Len() {
-		// Let's add some more room in the buffer first.
-		if b.Cap() >= b.Len() * 2 {
+	if b.index_end >= b.Len() {
+		// We need more space in the buffer. We'll opt for twice as much room as we currently need.
+		l := b.index_end * 2
+		if b.Cap() >= l {
 			// We only have to reslice.
-			b.buf = b.buf[:b.Len()*2]
+			b.buf = b.buf[:l]
 		} else {
-			// Double the buffer size.
-			s := make([]byte, b.Len()*2)
-			b.buf = append(b.buf, s...)
+			// Grow our buffer to make room.
+			s := make([]byte, l)
+			copy(s, b.buf)
+			b.buf = s
 		}
-	} else if b.index_end > b.Len() {
-		// Uh oh. Not sure how this can happen. Let's panic so we can catch this bug now.
-		panic("Last index exceeds buffer size")
 	}
 }
