@@ -56,55 +56,52 @@ func TestNew(t *testing.T) {
 func TestBadPtr(t *testing.T) {
 	// Make sure that a Buffer not created with New() is handled properly.
 	var buf *Buffer
-	var num  int
-	var err  error
-	var s    string
 
 	// Test Len()
-	if num = buf.Len(); num != -1 {
+	if num := buf.Len(); num != -1 {
 		t.Error("Incorrect result from bad Buffer test for Len()")
 		t.Log("\tExpected: -1")
 		t.Log("\tReceived:", num)
 	}
 
 	// Test Cap()
-	if num = buf.Cap(); num != -1 {
+	if num := buf.Cap(); num != -1 {
 		t.Error("Incorrect result from bad Buffer test for Cap()")
 		t.Log("\tExpected: -1")
 		t.Log("\tReceived:", num)
 	}
 
 	// Test Bits()
-	if num = buf.Bits(); num != -1 {
+	if num := buf.Bits(); num != -1 {
 		t.Error("Incorrect result from bad Buffer test for Bits()")
 		t.Log("\tExpected: -1")
 		t.Log("\tReceived:", num)
 	}
 
 	// Test Reset()
-	if err = buf.Reset(); err == nil {
+	if err := buf.Reset(); err == nil {
 		t.Error("unexpectedly passed bad Buffer test for Reset()")
 	}
 
 	// Test String()
-	if s = buf.String(); s != "<nil>" {
+	if s := buf.String(); s != "<nil>" {
 		t.Error("Incorrect result from bad Buffer test for String()")
 		t.Log("\tExpected: <nil>")
 		t.Log("\tReceived:", s)
 	}
 
 	// Test AddBit()
-	if err = buf.AddBit(1); err == nil {
+	if err := buf.AddBit(1); err == nil {
 		t.Error("Unexpectedly passed bad Buffer test for AddBit()")
 	}
 
 	// Test AddByte()
-	if err = buf.AddByte(0x0C); err == nil {
+	if err := buf.AddByte(0x0C); err == nil {
 		t.Error("Unexpectedly passed bad Buffer test for AddByte()")
 	}
 
 	// Test AddBytes()
-	if err = buf.AddBytes([]byte{0x0C, 0xFF}); err == nil {
+	if err := buf.AddBytes([]byte{0x0C, 0xFF}); err == nil {
 		t.Error("Unexpectedly passed bad Buffer test for AddBytes()")
 	}
 }
@@ -112,55 +109,52 @@ func TestBadPtr(t *testing.T) {
 func TestBadStruct(t *testing.T) {
 	// Make sure that a Buffer not created with New() is handled properly.
 	var buf Buffer
-	var num int
-	var err error
-	var s   string
 
 	// Test Len()
-	if num = buf.Len(); num != -1 {
+	if num := buf.Len(); num != -1 {
 		t.Error("Incorrect result from bad Buffer test for Len()")
 		t.Log("\tExpected: -1")
 		t.Log("\tReceived:", num)
 	}
 
 	// Test Cap()
-	if num = buf.Cap(); num != -1 {
+	if num := buf.Cap(); num != -1 {
 		t.Error("Incorrect result from bad Buffer test for Cap()")
 		t.Log("\tExpected: -1")
 		t.Log("\tReceived:", num)
 	}
 
 	// Test Bits()
-	if num = buf.Bits(); num != -1 {
+	if num := buf.Bits(); num != -1 {
 		t.Error("Incorrect result from bad Buffer test for Bits()")
 		t.Log("\tExpected: -1")
 		t.Log("\tReceived:", num)
 	}
 
 	// Test Reset()
-	if err = buf.Reset(); err == nil {
+	if err := buf.Reset(); err == nil {
 		t.Error("unexpectedly passed bad Buffer test for Reset()")
 	}
 
 	// Test String()
-	if s = buf.String(); s != "<nil>" {
+	if s := buf.String(); s != "<nil>" {
 		t.Error("Incorrect result from bad Buffer test for String()")
 		t.Log("\tExpected: <nil>")
 		t.Log("\tReceived:", s)
 	}
 
 	// Test AddBit()
-	if err = buf.AddBit(1); err == nil {
+	if err := buf.AddBit(1); err == nil {
 		t.Error("Unexpectedly passed bad Buffer test for AddBit()")
 	}
 
 	// Test AddByte()
-	if err = buf.AddByte(0x0C); err == nil {
+	if err := buf.AddByte(0x0C); err == nil {
 		t.Error("Unexpectedly passed bad Buffer test for AddByte()")
 	}
 
 	// Test AddBytes()
-	if err = buf.AddBytes([]byte{0x0C, 0xFF}); err == nil {
+	if err := buf.AddBytes([]byte{0x0C, 0xFF}); err == nil {
 		t.Error("Unexpectedly passed bad Buffer test for AddBytes()")
 	}
 }
@@ -178,32 +172,32 @@ func TestAddBit(t *testing.T) {
 	checkBits(t, buf, 1)
 
 	// Add enough bits to fill the first byte.
-	if err = buf.AddBit(1); err != nil {
+	if err := buf.AddBit(1); err != nil {
 		t.Error(err)
 	}
-	if err = buf.AddBit(0); err != nil {
+	if err := buf.AddBit(0); err != nil {
 		t.Error(err)
 	}
-	if err = buf.AddBit(1); err != nil {
+	if err := buf.AddBit(1); err != nil {
 		t.Error(err)
 	}
-	if err = buf.AddBit(0); err != nil {
+	if err := buf.AddBit(0); err != nil {
 		t.Error(err)
 	}
-	if err = buf.AddBit(1); err != nil {
+	if err := buf.AddBit(1); err != nil {
 		t.Error(err)
 	}
-	if err = buf.AddBit(1); err != nil {
+	if err := buf.AddBit(1); err != nil {
 		t.Error(err)
 	}
-	if err = buf.AddBit(1); err != nil {
+	if err := buf.AddBit(1); err != nil {
 		t.Error(err)
 	}
 	checkString(t, buf, "11010111")
 	checkBits(t, buf, 8)
 
 	// Overflow the first byte.
-	if err = buf.AddBit(0); err != nil {
+	if err := buf.AddBit(0); err != nil {
 		t.Error(err)
 	}
 	checkString(t, buf, "110101110")
