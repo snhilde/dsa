@@ -182,7 +182,7 @@ func TestBit(t *testing.T) {
 	b.AddByte(0x0F)
 	if val := b.Bit(2); val != true {
 		t.Error("Incorrect result from Bit() test")
-		t.Log("\tExpected: false")
+		t.Log("\tExpected: true")
 		t.Log("\tReceived:", val)
 	}
 
@@ -191,6 +191,46 @@ func TestBit(t *testing.T) {
 		t.Error("Incorrect result from Bit() test")
 		t.Log("\tExpected: false")
 		t.Log("\tReceived:", val)
+	}
+}
+
+func TestBits(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	// Test before adding anything.
+	if n := b.Bits(); n != 0 {
+		t.Error("Incorrect result from Bits() test")
+		t.Log("\tExpected: 0")
+		t.Log("\tReceived:", n)
+	}
+
+	// Test after adding some bits.
+	b.AddBit(true)
+	b.AddBit(false)
+	b.AddBit(true)
+	if n := b.Bits(); n != 3 {
+		t.Error("Incorrect result from Bits() test")
+		t.Log("\tExpected: 3")
+		t.Log("\tReceived:", n)
+	}
+
+	// Test after adding a byte.
+	b.AddByte(0x00)
+	if n := b.Bits(); n != 11 {
+		t.Error("Incorrect result from Bits() test")
+		t.Log("\tExpected: 11")
+		t.Log("\tReceived:", n)
+	}
+
+	// Test after adding some bytes.
+	b.AddBytes([]byte{0x01, 0x02, 0x03, 0x04, 0x05, 0x06})
+	if n := b.Bits(); n != 59 {
+		t.Error("Incorrect result from Bits() test")
+		t.Log("\tExpected: 59")
+		t.Log("\tReceived:", n)
 	}
 }
 
