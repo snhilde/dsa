@@ -290,6 +290,9 @@ func TestCopy(t *testing.T) {
 	b.AddByte(0x0A)
 	checkBits(t, b, 8)
 	nb := b.Copy(b.Bits())
+	if nb == nil {
+		t.Error("Failed to create copy of buffer")
+	}
 	checkBits(t, nb, 8)
 
 	// Make sure that modifying one buffer does not modify the copy.
@@ -308,6 +311,9 @@ func TestCopy(t *testing.T) {
 
 	// Test copying part of a buffer.
 	nnb := nb.Copy(10)
+	if nnb == nil {
+		t.Error("Failed to create copy of buffer")
+	}
 	checkBits(t, nb, 32)
 	checkBits(t, nnb, 10)
 }
@@ -351,6 +357,44 @@ func TestRecalibrate(t *testing.T) {
 		t.Log("\tExpected: 0")
 		t.Log("\tReceived:", n)
 	}
+}
+
+func TestReset(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	// Test adding some bits and then resetting the buffer.
+	b.AddBit(false)
+	b.AddBit(false)
+	checkBits(t, b, 2)
+	if err := b.Reset(); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 0)
+
+	// Test adding some bits, advancing, and then resetting the buffer.
+	b.AddByte(0xFF)
+	checkBits(t, b, 8)
+	b.Advance(5)
+	checkBits(t, b, 3)
+	if err := b.Reset(); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 0)
+
+	// Test adding some bits, advancing, reversing, and then resetting the buffer.
+	b.AddByte(0xEE)
+	checkBits(t, b, 8)
+	b.Advance(4)
+	checkBits(t, b, 4)
+	b.Reverse(1)
+	checkBits(t, b, 5)
+	if err := b.Reset(); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 0)
 }
 
 
