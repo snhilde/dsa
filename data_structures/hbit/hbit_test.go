@@ -158,3 +158,29 @@ func TestBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad Buffer test or ShiftRight()")
 	}
 }
+
+
+// HELPERS
+func checkBits(t *testing.T, b *Buffer, want int) {
+	if n := b.Bits(); n != want {
+		t.Error("Incorrect number of bits")
+		t.Log("\tExpected:", want)
+		t.Log("\tReceived:", n)
+	}
+}
+
+func checkString(t *testing.T, b *Buffer, want string) {
+	if s := b.String(); s != want {
+		t.Error("Incorrect string")
+		t.Log("\tExpected:", want)
+		t.Log("\tReceived:", s)
+	}
+}
+
+func checkDisplay(t *testing.T, b *Buffer, want string) {
+	if s := b.Display(); s != want {
+		t.Error("Incorrect display")
+		t.Log("\tExpected:", want)
+		t.Log("\tReceived:", s)
+	}
+}
