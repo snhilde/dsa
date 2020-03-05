@@ -234,6 +234,52 @@ func TestBits(t *testing.T) {
 	}
 }
 
+func TestOffset(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	// Test before adding anything.
+	if n := b.Offset(); n != 0 {
+		t.Error("Incorrect result from Offset() test")
+		t.Log("\tExpected: 0")
+		t.Log("\tReceived:", n)
+	}
+
+	// Test after adding some bits.
+	b.AddBytes([]byte{0xFF, 0xFB})
+	if n := b.Offset(); n != 0 {
+		t.Error("Incorrect result from Offset() test")
+		t.Log("\tExpected: 0")
+		t.Log("\tReceived:", n)
+	}
+
+	// Test after moving the buffer forward some.
+	b.Advance(5)
+	if n := b.Offset(); n != 5 {
+		t.Error("Incorrect result from Offset() test")
+		t.Log("\tExpected: 5")
+		t.Log("\tReceived:", n)
+	}
+
+	// Test after moving the buffer back some.
+	b.Reverse(3)
+	if n := b.Offset(); n != 2 {
+		t.Error("Incorrect result from Offset() test")
+		t.Log("\tExpected: 2")
+		t.Log("\tReceived:", n)
+	}
+
+	// Test after wiping previous bits.
+	b.Recalibrate()
+	if n := b.Offset(); n != 0 {
+		t.Error("Incorrect result from Offset() test")
+		t.Log("\tExpected: 0")
+		t.Log("\tReceived:", n)
+	}
+}
+
 
 // HELPERS
 func checkBits(t *testing.T, b *Buffer, want int) {
