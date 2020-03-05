@@ -397,6 +397,66 @@ func TestReset(t *testing.T) {
 	checkBits(t, b, 0)
 }
 
+func TestStringAndDisplay(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	b.AddBit(true)
+	checkBits(t, b, 1)
+	checkString(t, b, "1")
+	checkDisplay(t, b, "1")
+
+	b.AddBit(false)
+	checkBits(t, b, 2)
+	checkString(t, b, "10")
+	checkDisplay(t, b, "10")
+
+	b.AddByte(0xFF)
+	checkBits(t, b, 10)
+	checkString(t, b, "1011111111")
+	checkDisplay(t, b, "1011 1111  11")
+
+	// Make sure that a single byte does not have any spaces around it.
+	b = New()
+	b.AddByte(0x00)
+	checkBits(t, b, 8)
+	checkString(t, b, "00000000")
+	checkDisplay(t, b, "0000 0000")
+
+	// Test out multiple bytes and bit order.
+	b = New()
+	b.AddBytes([]byte{0x1A, 0x2B, 0x3C})
+	checkBits(t, b, 24)
+	checkString(t, b, "010110001101010000111100")
+	checkDisplay(t, b, "0101 1000  1101 0100  0011 1100")
+
+	// Test out advancing.
+	b.Advance(10)
+	checkBits(t, b, 14)
+	checkString(t, b, "01010000111100")
+	checkDisplay(t, b, "0101 0000  1111 00")
+
+	// Test out reversing.
+	b.Reverse(5)
+	checkBits(t, b, 19)
+	checkString(t, b, "0001101010000111100")
+	checkDisplay(t, b, "0001 1010  1000 0111  100")
+
+	// Make sure recalibrating doesn't affect anything.
+	b.Recalibrate()
+	checkBits(t, b, 19)
+	checkString(t, b, "0001101010000111100")
+	checkDisplay(t, b, "0001 1010  1000 0111  100")
+
+	// Test out resetting the buffer.
+	b.Reset()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+}
+
 
 // HELPERS
 func checkBits(t *testing.T, b *Buffer, want int) {
