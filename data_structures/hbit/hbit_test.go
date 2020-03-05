@@ -159,6 +159,10 @@ func TestBadPtr(t *testing.T) {
 	}
 }
 
+func TestInvalidArgs(t *testing.T) {
+	// TODO
+}
+
 func TestBit(t *testing.T) {
 	b := New()
 	checkBits(t, b, 0)
@@ -685,6 +689,138 @@ func TestReverse(t *testing.T) {
 	checkBits(t, b, 8)
 	checkString(t, b, "11111111")
 	checkDisplay(t, b, "1111 1111")
+}
+
+func TestANDBit(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	b.AddByte(0x55)
+	checkBits(t, b, 8)
+	checkString(t, b, "10101010")
+	checkDisplay(t, b, "1010 1010")
+
+	// Test 0 & 0
+	if err := b.ANDBit(1, false); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 8)
+	checkString(t, b, "10101010")
+	checkDisplay(t, b, "1010 1010")
+
+	// Test 0 & 1
+	if err := b.ANDBit(1, true); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 8)
+	checkString(t, b, "10101010")
+	checkDisplay(t, b, "1010 1010")
+
+	// Test 1 & 0
+	if err := b.ANDBit(2, false); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 8)
+	checkString(t, b, "10001010")
+	checkDisplay(t, b, "1000 1010")
+
+	// Test 1 & 1
+	if err := b.ANDBit(0, true); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 8)
+	checkString(t, b, "10001010")
+	checkDisplay(t, b, "1000 1010")
+}
+
+func TestORBit(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	b.AddByte(0x55)
+	checkBits(t, b, 8)
+	checkString(t, b, "10101010")
+	checkDisplay(t, b, "1010 1010")
+
+	// Test 0 | 0
+	if err := b.ORBit(1, false); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 8)
+	checkString(t, b, "10101010")
+	checkDisplay(t, b, "1010 1010")
+
+	// Test 0 | 1
+	if err := b.ORBit(1, true); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 8)
+	checkString(t, b, "11101010")
+	checkDisplay(t, b, "1110 1010")
+
+	// Test 1 | 0
+	if err := b.ORBit(1, false); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 8)
+	checkString(t, b, "11101010")
+	checkDisplay(t, b, "1110 1010")
+
+	// Test 1 | 1
+	if err := b.ORBit(1, true); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 8)
+	checkString(t, b, "11101010")
+	checkDisplay(t, b, "1110 1010")
+}
+
+func TestXORBit(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	b.AddByte(0x55)
+	checkBits(t, b, 8)
+	checkString(t, b, "10101010")
+	checkDisplay(t, b, "1010 1010")
+
+	// Test 0 ^ 0
+	if err := b.XORBit(1, false); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 8)
+	checkString(t, b, "10101010")
+	checkDisplay(t, b, "1010 1010")
+
+	// Test 0 ^ 1
+	if err := b.XORBit(1, true); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 8)
+	checkString(t, b, "11101010")
+	checkDisplay(t, b, "1110 1010")
+
+	// Test 1 ^ 0
+	if err := b.XORBit(1, false); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 8)
+	checkString(t, b, "11101010")
+	checkDisplay(t, b, "1110 1010")
+
+	// Test 1 ^ 1
+	if err := b.XORBit(1, true); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 8)
+	checkString(t, b, "10101010")
+	checkDisplay(t, b, "1010 1010")
 }
 
 
