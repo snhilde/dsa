@@ -457,6 +457,50 @@ func TestStringAndDisplay(t *testing.T) {
 	checkDisplay(t, b, "<empty>")
 }
 
+func TestAddBit(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	// Test adding some bits.
+	b.AddBit(true)
+	checkBits(t, b, 1)
+	checkString(t, b, "1")
+	checkDisplay(t, b, "1")
+
+	b.AddBit(true)
+	checkBits(t, b, 2)
+	checkString(t, b, "11")
+	checkDisplay(t, b, "11")
+
+	b.AddBit(false)
+	checkBits(t, b, 3)
+	checkString(t, b, "110")
+	checkDisplay(t, b, "110")
+
+	// Test advancing and adding a bit.
+	b.Advance(2)
+	b.AddBit(true)
+	checkBits(t, b, 2)
+	checkString(t, b, "01")
+	checkDisplay(t, b, "01")
+
+	// Test reversing and adding a bit.
+	b.Reverse(1)
+	b.AddBit(false)
+	checkBits(t, b, 4)
+	checkString(t, b, "1010")
+	checkDisplay(t, b, "1010")
+
+	// Test resetting and adding a bit.
+	b.Reset()
+	b.AddBit(false)
+	checkBits(t, b, 1)
+	checkString(t, b, "0")
+	checkDisplay(t, b, "0")
+}
+
 
 // HELPERS
 func checkBits(t *testing.T, b *Buffer, want int) {
