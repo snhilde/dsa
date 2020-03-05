@@ -159,6 +159,41 @@ func TestBadPtr(t *testing.T) {
 	}
 }
 
+func TestBit(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	// Test an empty index.
+	if val := b.Bit(0); val != false {
+		t.Error("Incorrect result from Bit() test")
+		t.Log("\tExpected: false")
+		t.Log("\tReceived:", val)
+	}
+
+	// Test an index out of range.
+	if val := b.Bit(10); val != false {
+		t.Error("Incorrect result from Bit() test")
+		t.Log("\tExpected: false")
+		t.Log("\tReceived:", val)
+	}
+
+	b.AddByte(0x0F)
+	if val := b.Bit(2); val != true {
+		t.Error("Incorrect result from Bit() test")
+		t.Log("\tExpected: false")
+		t.Log("\tReceived:", val)
+	}
+
+	b.AddByte(0x0F)
+	if val := b.Bit(6); val != false {
+		t.Error("Incorrect result from Bit() test")
+		t.Log("\tExpected: false")
+		t.Log("\tReceived:", val)
+	}
+}
+
 
 // HELPERS
 func checkBits(t *testing.T, b *Buffer, want int) {
