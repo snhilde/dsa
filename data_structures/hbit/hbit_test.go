@@ -280,6 +280,38 @@ func TestOffset(t *testing.T) {
 	}
 }
 
+func TestCopy(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	// Test copying an entire buffer.
+	b.AddByte(0x0A)
+	checkBits(t, b, 8)
+	nb := b.Copy(b.Bits())
+	checkBits(t, nb, 8)
+
+	// Make sure that modifying one buffer does not modify the copy.
+	b.AddBit(true)
+	b.AddBit(false)
+	checkBits(t, b, 10)
+	checkBits(t, nb, 8)
+
+	b.Advance(5)
+	checkBits(t, b, 5)
+	checkBits(t, nb, 8)
+
+	nb.AddBytes([]byte{0xAA, 0xBB, 0xCC})
+	checkBits(t, b, 5)
+	checkBits(t, nb, 32)
+
+	// Test copying part of a buffer.
+	nnb := nb.Copy(10)
+	checkBits(t, nb, 32)
+	checkBits(t, nnb, 10)
+}
+
 
 // HELPERS
 func checkBits(t *testing.T, b *Buffer, want int) {
