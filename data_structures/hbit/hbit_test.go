@@ -57,7 +57,7 @@ func TestBadPtr(t *testing.T) {
 	// Test Copy().
 	if nb := b.Copy(20); nb != nil {
 		t.Error("Incorrect result from bad Buffer test for Copy()")
-		t.Log("\tExpected: nil")
+		t.Log("\tExpected: <nil>")
 		t.Log("\tReceived:", nb)
 	}
 
@@ -99,7 +99,7 @@ func TestBadPtr(t *testing.T) {
 	}
 
 	// Test Advance().
-	if err := b.Advance(10); err == nil {
+	if n, err := b.Advance(10); n != 0 || err == nil {
 		t.Error("Unexpectedly passed bad Buffer test for Advance()")
 	}
 
@@ -464,38 +464,50 @@ func TestAddBit(t *testing.T) {
 	checkDisplay(t, b, "<empty>")
 
 	// Test adding some bits.
-	b.AddBit(true)
+	if err := b.AddBit(true); err != nil {
+		t.Error(err)
+	}
 	checkBits(t, b, 1)
 	checkString(t, b, "1")
 	checkDisplay(t, b, "1")
 
-	b.AddBit(true)
+	if err := b.AddBit(true); err != nil {
+		t.Error(err)
+	}
 	checkBits(t, b, 2)
 	checkString(t, b, "11")
 	checkDisplay(t, b, "11")
 
-	b.AddBit(false)
+	if err := b.AddBit(false); err != nil {
+		t.Error(err)
+	}
 	checkBits(t, b, 3)
 	checkString(t, b, "110")
 	checkDisplay(t, b, "110")
 
 	// Test advancing and adding a bit.
 	b.Advance(2)
-	b.AddBit(true)
+	if err := b.AddBit(true); err != nil {
+		t.Error(err)
+	}
 	checkBits(t, b, 2)
 	checkString(t, b, "01")
 	checkDisplay(t, b, "01")
 
 	// Test reversing and adding a bit.
 	b.Reverse(1)
-	b.AddBit(false)
+	if err := b.AddBit(false); err != nil {
+		t.Error(err)
+	}
 	checkBits(t, b, 4)
 	checkString(t, b, "1010")
 	checkDisplay(t, b, "1010")
 
 	// Test resetting and adding a bit.
 	b.Reset()
-	b.AddBit(false)
+	if err := b.AddBit(false); err != nil {
+		t.Error(err)
+	}
 	checkBits(t, b, 1)
 	checkString(t, b, "0")
 	checkDisplay(t, b, "0")
@@ -508,33 +520,43 @@ func TestAddByte(t *testing.T) {
 	checkDisplay(t, b, "<empty>")
 
 	// Test adding some bytes.
-	b.AddByte(0xF0)
+	if err := b.AddByte(0xF0); err != nil {
+		t.Error(err)
+	}
 	checkBits(t, b, 8)
 	checkString(t, b, "00001111")
 	checkDisplay(t, b, "0000 1111")
 
-	b.AddByte(0x88)
+	if err := b.AddByte(0x88); err != nil {
+		t.Error(err)
+	}
 	checkBits(t, b, 16)
 	checkString(t, b, "0000111100010001")
 	checkDisplay(t, b, "0000 1111  0001 0001")
 
 	// Test advancing and adding a byte.
 	b.Advance(10)
-	b.AddByte(0x14)
+	if err := b.AddByte(0x14); err != nil {
+		t.Error(err)
+	}
 	checkBits(t, b, 14)
 	checkString(t, b, "01000100101000")
 	checkDisplay(t, b, "0100 0100  1010 00")
 
 	// Test reversing and adding a byte.
 	b.Reverse(3)
-	b.AddByte(0xA0)
+	if err := b.AddByte(0xA0); err != nil {
+		t.Error(err)
+	}
 	checkBits(t, b, 25)
 	checkString(t, b, "1000100010010100000000101")
 	checkDisplay(t, b, "1000 1000  1001 0100  0000 0010  1")
 
 	// Test resetting and adding a byte.
 	b.Reset()
-	b.AddByte(0x44)
+	if err := b.AddByte(0x44); err != nil {
+		t.Error(err)
+	}
 	checkBits(t, b, 8)
 	checkString(t, b, "00100010")
 	checkDisplay(t, b, "0010 0010")
@@ -547,37 +569,124 @@ func TestAddBytes(t *testing.T) {
 	checkDisplay(t, b, "<empty>")
 
 	// Test adding some bytes.
-	b.AddBytes([]byte{0x54, 1})
+	if err := b.AddBytes([]byte{0x54, 1}); err != nil {
+		t.Error(err)
+	}
 	checkBits(t, b, 16)
 	checkString(t, b, "0010101010000000")
 	checkDisplay(t, b, "0010 1010  1000 0000")
 
-	b.AddBytes([]byte{0xAA, 0xBB, 0xCC})
+	if err := b.AddBytes([]byte{0xAA, 0xBB, 0xCC}); err != nil {
+		t.Error(err)
+	}
 	checkBits(t, b, 40)
 	checkString(t, b, "0010101010000000010101011101110100110011")
 	checkDisplay(t, b, "0010 1010  1000 0000  0101 0101  1101 1101  0011 0011")
 
 	// Test advancing and adding some bytes.
 	b.Advance(30)
-	b.AddBytes([]byte{0x01, 0x02})
+	if err := b.AddBytes([]byte{0x01, 0x02}); err != nil {
+		t.Error(err)
+	}
 	checkBits(t, b, 26)
 	checkString(t, b, "01001100111000000001000000")
 	checkDisplay(t, b, "0100 1100  1110 0000  0001 0000  00")
 
 	// Test reversing and adding a byte.
 	b.Reverse(5)
-	b.AddBytes([]byte{0x08})
+	if err := b.AddBytes([]byte{0x08}); err != nil {
+		t.Error(err)
+	}
 	checkBits(t, b, 39)
 	checkString(t, b, "101110100110011100000000100000000010000")
 	checkDisplay(t, b, "1011 1010  0110 0111  0000 0000  1000 0000  0010 000")
 
 	// Test resetting and adding some bytes.
 	b.Reset()
-	b.AddBytes([]byte{0x98, 0x76})
+	if err := b.AddBytes([]byte{0x98, 0x76}); err != nil {
+		t.Error(err)
+	}
 	checkBits(t, b, 16)
 	checkString(t, b, "0001100101101110")
 	checkDisplay(t, b, "0001 1001  0110 1110")
 }
+
+func TestAdvance(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	// Test a normal advance.
+	b.AddByte(0xFF)
+	if n, err := b.Advance(5); n != 5 || err != nil {
+		t.Error("Incorrect result from Advance() test")
+		t.Log("\tExpected: 5, <nil>")
+		t.Log("\tReceived:", n, err)
+	}
+	checkBits(t, b, 3)
+	checkString(t, b, "111")
+	checkDisplay(t, b, "111")
+
+	// Test advancing past the buffer.
+	if n, err := b.Advance(10); n != 2 || err != nil {
+		t.Error("Incorrect result from Advance() test")
+		t.Log("\tExpected: 2, <nil>")
+		t.Log("\tReceived:", n, err)
+	}
+	checkBits(t, b, 1)
+	checkString(t, b, "1")
+	checkDisplay(t, b, "1")
+
+	// Reverse the buffer to make sure that we didn't overrun the end.
+	if n, err := b.Reverse(1); n != 1 || err != nil {
+		t.Error("Incorrect result from Reverse() test")
+		t.Log("\tExpected: 1, <nil>")
+		t.Log("\tReceived:", n, err)
+	}
+	checkBits(t, b, 2)
+	checkString(t, b, "11")
+	checkDisplay(t, b, "11")
+}
+
+func TestReverse(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	// Test advancing and reversing back to the starting point.
+	b.AddByte(0xFF)
+	b.Advance(5)
+	checkBits(t, b, 3)
+	checkString(t, b, "111")
+	checkDisplay(t, b, "111")
+
+	if n, err := b.Reverse(5); n != 5 || err != nil {
+		t.Error("Incorrect result from Reverse() test")
+		t.Log("\tExpected: 5, <nil>")
+		t.Log("\tReceived:", n, err)
+	}
+	checkBits(t, b, 8)
+	checkString(t, b, "11111111")
+	checkDisplay(t, b, "1111 1111")
+
+	// Test advancing and reversing past the starting point.
+	b.Advance(4)
+	checkBits(t, b, 4)
+	checkString(t, b, "1111")
+	checkDisplay(t, b, "1111")
+
+	if n, err := b.Reverse(6); n != 4 || err != nil {
+		t.Error("Incorrect result from Reverse() test")
+		t.Log("\tExpected: 4, <nil>")
+		t.Log("\tReceived:", n, err)
+	}
+	checkBits(t, b, 8)
+	checkString(t, b, "11111111")
+	checkDisplay(t, b, "1111 1111")
+}
+
 
 
 // HELPERS
