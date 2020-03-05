@@ -104,7 +104,7 @@ func TestBadPtr(t *testing.T) {
 	}
 
 	// Test Reverse().
-	if err := b.Reverse(10); err == nil {
+	if n, err := b.Reverse(10); n != 0 || err == nil {
 		t.Error("Unexpectedly passed bad Buffer test for Reverse()")
 	}
 
@@ -310,6 +310,47 @@ func TestCopy(t *testing.T) {
 	nnb := nb.Copy(10)
 	checkBits(t, nb, 32)
 	checkBits(t, nnb, 10)
+}
+
+func TestRecalibrate(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	// Test adding some bytes, advancing the buffer, and setting it back.
+	b.AddBytes([]byte{0x50, 0x60, 0x70})
+	checkBits(t, b, 24)
+	if n := b.Offset(); n != 0 {
+		t.Error("Incorrect result from Offset() test")
+		t.Log("\tExpected: 0")
+		t.Log("\tReceived:", n)
+	}
+
+	b.Advance(20)
+	checkBits(t, b, 4)
+	if n := b.Offset(); n != 20 {
+		t.Error("Incorrect result from Offset() test")
+		t.Log("\tExpected: 20")
+		t.Log("\tReceived:", n)
+	}
+
+	if err := b.Recalibrate(); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 4)
+	if n := b.Offset(); n != 0 {
+		t.Error("Incorrect result from Offset() test")
+		t.Log("\tExpected: 0")
+		t.Log("\tReceived:", n)
+	}
+
+	// Test that we can no longer reverse the buffer.
+	if n, err := b.Reverse(10); n != 0 || err != nil {
+		t.Error("Reverse() results unexpected")
+		t.Log("\tExpected: 0")
+		t.Log("\tReceived:", n)
+	}
 }
 
 
