@@ -540,6 +540,45 @@ func TestAddByte(t *testing.T) {
 	checkDisplay(t, b, "0010 0010")
 }
 
+func TestAddBytes(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	// Test adding some bytes.
+	b.AddBytes([]byte{0x54, 1})
+	checkBits(t, b, 16)
+	checkString(t, b, "0010101010000000")
+	checkDisplay(t, b, "0010 1010  1000 0000")
+
+	b.AddBytes([]byte{0xAA, 0xBB, 0xCC})
+	checkBits(t, b, 40)
+	checkString(t, b, "0010101010000000010101011101110100110011")
+	checkDisplay(t, b, "0010 1010  1000 0000  0101 0101  1101 1101  0011 0011")
+
+	// Test advancing and adding some bytes.
+	b.Advance(30)
+	b.AddBytes([]byte{0x01, 0x02})
+	checkBits(t, b, 26)
+	checkString(t, b, "01001100111000000001000000")
+	checkDisplay(t, b, "0100 1100  1110 0000  0001 0000  00")
+
+	// Test reversing and adding a byte.
+	b.Reverse(5)
+	b.AddBytes([]byte{0x08})
+	checkBits(t, b, 39)
+	checkString(t, b, "101110100110011100000000100000000010000")
+	checkDisplay(t, b, "1011 1010  0110 0111  0000 0000  1000 0000  0010 000")
+
+	// Test resetting and adding some bytes.
+	b.Reset()
+	b.AddBytes([]byte{0x98, 0x76})
+	checkBits(t, b, 16)
+	checkString(t, b, "0001100101101110")
+	checkDisplay(t, b, "0001 1001  0110 1110")
+}
+
 
 // HELPERS
 func checkBits(t *testing.T, b *Buffer, want int) {
