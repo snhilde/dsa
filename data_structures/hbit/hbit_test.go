@@ -357,6 +357,7 @@ func TestRecalibrate(t *testing.T) {
 
 	// Test that we can no longer reverse the buffer.
 	if n, err := b.Reverse(10); n != 0 || err != nil {
+		t.Error(err)
 		t.Error("Reverse() results unexpected")
 		t.Log("\tExpected: 0")
 		t.Log("\tReceived:", n)
@@ -624,6 +625,7 @@ func TestAdvance(t *testing.T) {
 	// Test a normal advance.
 	b.AddByte(0xFF)
 	if n, err := b.Advance(5); n != 5 || err != nil {
+		t.Error(err)
 		t.Error("Incorrect result from Advance() test")
 		t.Log("\tExpected: 5, <nil>")
 		t.Log("\tReceived:", n, err)
@@ -634,6 +636,7 @@ func TestAdvance(t *testing.T) {
 
 	// Test advancing past the buffer.
 	if n, err := b.Advance(10); n != 2 || err != nil {
+		t.Error(err)
 		t.Error("Incorrect result from Advance() test")
 		t.Log("\tExpected: 2, <nil>")
 		t.Log("\tReceived:", n, err)
@@ -644,6 +647,7 @@ func TestAdvance(t *testing.T) {
 
 	// Reverse the buffer to make sure that we didn't overrun the end.
 	if n, err := b.Reverse(1); n != 1 || err != nil {
+		t.Error(err)
 		t.Error("Incorrect result from Reverse() test")
 		t.Log("\tExpected: 1, <nil>")
 		t.Log("\tReceived:", n, err)
@@ -667,6 +671,7 @@ func TestReverse(t *testing.T) {
 	checkDisplay(t, b, "111")
 
 	if n, err := b.Reverse(5); n != 5 || err != nil {
+		t.Error(err)
 		t.Error("Incorrect result from Reverse() test")
 		t.Log("\tExpected: 5, <nil>")
 		t.Log("\tReceived:", n, err)
@@ -682,6 +687,7 @@ func TestReverse(t *testing.T) {
 	checkDisplay(t, b, "1111")
 
 	if n, err := b.Reverse(6); n != 4 || err != nil {
+		t.Error(err)
 		t.Error("Incorrect result from Reverse() test")
 		t.Log("\tExpected: 4, <nil>")
 		t.Log("\tReceived:", n, err)
@@ -989,6 +995,126 @@ func TestNOTBytes(t *testing.T) {
 	checkBits(t, b, 32)
 	checkString(t, b, "11111000111110000000000011111111")
 	checkDisplay(t, b, "1111 1000  1111 1000  0000 0000  1111 1111")
+}
+
+func TestShiftLeft(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	b.AddBytes([]byte{0xFF, 0x00, 0xFF, 0x00})
+	checkBits(t, b, 32)
+	checkString(t, b, "11111111000000001111111100000000")
+	checkDisplay(t, b, "1111 1111  0000 0000  1111 1111  0000 0000")
+
+	if err := b.ShiftLeft(10); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 32)
+	checkString(t, b, "00000011111111000000000000000000")
+	checkDisplay(t, b, "0000 0011  1111 1100  0000 0000  0000 0000")
+
+	// Make sure that bits before the starting point are not affected.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0x00, 0xFF, 0x00})
+	checkBits(t, b, 32)
+	checkString(t, b, "11111111000000001111111100000000")
+	checkDisplay(t, b, "1111 1111  0000 0000  1111 1111  0000 0000")
+
+	if n, err := b.Advance(5); n != 5 || err != nil {
+		t.Error(err)
+		t.Error("Incorrect result from Advance() test")
+		t.Log("\tExpected: 5, <nil>")
+		t.Log("\tReceived:", n, err)
+	}
+	if err := b.ShiftLeft(10); err != nil {
+		t.Error(err)
+	}
+	if n, err := b.Reverse(5); n != 5 || err != nil {
+		t.Error(err)
+		t.Error("Incorrect result from Reverse() test")
+		t.Log("\tExpected: 5, <nil>")
+		t.Log("\tReceived:", n, err)
+	}
+
+	checkBits(t, b, 32)
+	checkString(t, b, "11111011111111000000000000000000")
+	checkDisplay(t, b, "1111 1011  1111 1100  0000 0000  0000 0000")
+
+	// Test shifting if there's only 1 bit in the buffer.
+	b.Reset()
+	b.AddBit(true)
+	checkBits(t, b, 1)
+	checkString(t, b, "1")
+	checkDisplay(t, b, "1")
+
+	if err := b.ShiftLeft(10); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 1)
+	checkString(t, b, "0")
+	checkDisplay(t, b, "0")
+}
+
+func TestShiftRight(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	b.AddBytes([]byte{0xFF, 0x00, 0xFF, 0x00})
+	checkBits(t, b, 32)
+	checkString(t, b, "11111111000000001111111100000000")
+	checkDisplay(t, b, "1111 1111  0000 0000  1111 1111  0000 0000")
+
+	if err := b.ShiftRight(10); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 32)
+	checkString(t, b, "00000000001111111100000000111111")
+	checkDisplay(t, b, "0000 0000  0011 1111  1100 0000  0011 1111")
+
+	// Make sure that bits before the starting point are not affected.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0x00, 0xFF, 0x00})
+	checkBits(t, b, 32)
+	checkString(t, b, "11111111000000001111111100000000")
+	checkDisplay(t, b, "1111 1111  0000 0000  1111 1111  0000 0000")
+
+	if n, err := b.Advance(5); n != 5 || err != nil {
+		t.Error(err)
+		t.Error("Incorrect result from Advance() test")
+		t.Log("\tExpected: 5, <nil>")
+		t.Log("\tReceived:", n, err)
+	}
+	if err := b.ShiftRight(10); err != nil {
+		t.Error(err)
+	}
+	if n, err := b.Reverse(5); n != 5 || err != nil {
+		t.Error(err)
+		t.Error("Incorrect result from Reverse() test")
+		t.Log("\tExpected: 5, <nil>")
+		t.Log("\tReceived:", n, err)
+	}
+
+	checkBits(t, b, 32)
+	checkString(t, b, "11111000000000011100000000111111")
+	checkDisplay(t, b, "1111 1000  0000 0001  1100 0000  0011 1111")
+
+	// Test shifting if there's only 1 bit in the buffer.
+	b.Reset()
+	b.AddBit(true)
+	checkBits(t, b, 1)
+	checkString(t, b, "1")
+	checkDisplay(t, b, "1")
+
+	if err := b.ShiftRight(10); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 1)
+	checkString(t, b, "0")
+	checkDisplay(t, b, "0")
 }
 
 
