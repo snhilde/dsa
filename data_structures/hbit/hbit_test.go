@@ -851,6 +851,146 @@ func TestNOTBit(t *testing.T) {
 	checkDisplay(t, b, "1110 1000")
 }
 
+func TestANDBytes(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	b.AddBytes([]byte{0xFF, 0x00, 0xFF, 0x00})
+	checkBits(t, b, 32)
+	checkString(t, b, "11111111000000001111111100000000")
+	checkDisplay(t, b, "1111 1111  0000 0000  1111 1111  0000 0000")
+
+	if err := b.ANDBytes([]byte{0x0F, 0xFF}); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 32)
+	checkString(t, b, "11110000000000001111111100000000")
+	checkDisplay(t, b, "1111 0000  0000 0000  1111 1111  0000 0000")
+
+	// Test advancing, ANDing, and reversing.
+	b.Advance(5)
+	if err := b.ANDBytes([]byte{0x0C, 0x0F}); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 27)
+	checkString(t, b, "000000000001000011100000000")
+	checkDisplay(t, b, "0000 0000  0001 0000  1110 0000  000")
+
+	b.Reverse(5)
+	checkBits(t, b, 32)
+	checkString(t, b, "11110000000000001000011100000000")
+	checkDisplay(t, b, "1111 0000  0000 0000  1000 0111  0000 0000")
+}
+
+func TestORBytes(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	b.AddBytes([]byte{0xFF, 0x00, 0xFF, 0x00})
+	checkBits(t, b, 32)
+	checkString(t, b, "11111111000000001111111100000000")
+	checkDisplay(t, b, "1111 1111  0000 0000  1111 1111  0000 0000")
+
+	if err := b.ORBytes([]byte{0x0F, 0x0F}); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 32)
+	checkString(t, b, "11111111111100001111111100000000")
+	checkDisplay(t, b, "1111 1111  1111 0000  1111 1111  0000 0000")
+
+	// Test advancing, ORing, and reversing.
+	b.Advance(5)
+	if err := b.ORBytes([]byte{0x0C, 0x0F}); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 27)
+	checkString(t, b, "111111101111111111100000000")
+	checkDisplay(t, b, "1111 1110  1111 1111  1110 0000  000")
+
+	b.Reverse(5)
+	checkBits(t, b, 32)
+	checkString(t, b, "11111111111101111111111100000000")
+	checkDisplay(t, b, "1111 1111  1111 0111  1111 1111  0000 0000")
+}
+
+func TestXORBytes(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	b.AddBytes([]byte{0xFF, 0x00, 0xFF, 0x00})
+	checkBits(t, b, 32)
+	checkString(t, b, "11111111000000001111111100000000")
+	checkDisplay(t, b, "1111 1111  0000 0000  1111 1111  0000 0000")
+
+	if err := b.XORBytes([]byte{0x0D, 0xFF}); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 32)
+	checkString(t, b, "01001111111111111111111100000000")
+	checkDisplay(t, b, "0100 1111  1111 1111  1111 1111  0000 0000")
+
+	// Test advancing, XORing, and reversing.
+	b.Advance(5)
+	if err := b.XORBytes([]byte{0x0C, 0x0F}); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 27)
+	checkString(t, b, "110011110000111111100000000")
+	checkDisplay(t, b, "1100 1111  0000 1111  1110 0000  000")
+
+	b.Reverse(5)
+	checkBits(t, b, 32)
+	checkString(t, b, "01001110011110000111111100000000")
+	checkDisplay(t, b, "0100 1110  0111 1000  0111 1111  0000 0000")
+}
+
+func TestNOTBytes(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	b.AddBytes([]byte{0xFF, 0x00, 0xFF, 0x00})
+	checkBits(t, b, 32)
+	checkString(t, b, "11111111000000001111111100000000")
+	checkDisplay(t, b, "1111 1111  0000 0000  1111 1111  0000 0000")
+
+	if err := b.NOTBytes(2); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 32)
+	checkString(t, b, "00000000111111111111111100000000")
+	checkDisplay(t, b, "0000 0000  1111 1111  1111 1111  0000 0000")
+
+	// Test advancing, NOTing, and reversing.
+	b.Advance(5)
+	if err := b.NOTBytes(1); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 27)
+	checkString(t, b, "111000001111111111100000000")
+	checkDisplay(t, b, "1110 0000  1111 1111  1110 0000  000")
+
+	b.Reverse(5)
+	checkBits(t, b, 32)
+	checkString(t, b, "00000111000001111111111100000000")
+	checkDisplay(t, b, "0000 0111  0000 0111  1111 1111  0000 0000")
+
+	if err := b.NOTBytes(10); err != nil {
+		t.Error(err)
+	}
+	// Test overrunning the buffer.
+	checkBits(t, b, 32)
+	checkString(t, b, "11111000111110000000000011111111")
+	checkDisplay(t, b, "1111 1000  1111 1000  0000 0000  1111 1111")
+}
+
 
 // HELPERS
 func checkBits(t *testing.T, b *Buffer, want int) {
