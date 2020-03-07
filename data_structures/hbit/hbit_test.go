@@ -1530,7 +1530,36 @@ func TestShiftRight(t *testing.T) {
 }
 
 func TestWriteInt(t *testing.T) {
-	// TODO: write tests
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	// Test out a simple byte.
+	b.AddBytes([]byte{0x05})
+	if n := b.WriteInt(0); n != 5 {
+		t.Error("Incorrect result from WriteInt() test")
+		t.Log("\tExpected: 5")
+		t.Log("\tReceived:", n)
+	}
+
+	// Test out 4 bytes.
+	b.Reset()
+	b.AddBytes([]byte{0x05})
+	if n := b.WriteInt(0); n != 5 {
+		t.Error("Incorrect result from WriteInt() test")
+		t.Log("\tExpected: 5")
+		t.Log("\tReceived:", n)
+	}
+
+	// Test out a negative number.
+	b.Reset()
+	b.AddBytes([]byte{0xF0, 0xFF, 0xFF, 0xFF})
+	if n := b.WriteInt(0); n != -16 {
+		t.Error("Incorrect result from WriteInt() test")
+		t.Log("\tExpected: -16")
+		t.Log("\tReceived:", n)
+	}
 }
 
 
