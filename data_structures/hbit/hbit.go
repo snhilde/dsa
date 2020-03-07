@@ -104,7 +104,7 @@ func (b *Buffer) Copy(num int) *Buffer {
 		}
 
 		// It's safe. Move on to the next node.
-		node.appendNode(nil, ref.val)
+		node.appendNodeVal(nil, ref.val)
 		node = node.next
 	}
 
@@ -160,7 +160,7 @@ func (b *Buffer) AddBit(val bool) error {
 		b.node = new(bnode)
 		b.node.val = val
 	} else {
-		end.appendNode(nil, val)
+		end.appendNodeVal(nil, val)
 	}
 
 	return nil
@@ -180,13 +180,13 @@ func (b *Buffer) AddByte(nb byte) error {
 		b.node.val = val
 		end = b.node
 	} else {
-		end.appendNode(nil, val)
+		end.appendNodeVal(nil, val)
 		end = end.next
 	}
 
 	for i := 1; i < 8; i++ {
 		val := bitOn(nb, i)
-		end.appendNode(nil, val)
+		end.appendNodeVal(nil, val)
 		end = end.next
 	}
 
@@ -232,6 +232,10 @@ func (b *Buffer) RemoveBit(index int) error {
 // Cut out the bits at the index.
 func (b *Buffer) RemoveBits(index, n int) error {
 	// TODO: should removing all bits to the end also remove all offset bits before the start of the buffer?
+	if n < 1 {
+		return nil
+	}
+
 	start, err := b.getNode(index)
 	if err != nil {
 		return err
@@ -345,11 +349,17 @@ func (b *Buffer) Merge(nb *Buffer) error {
 		return err
 	}
 
+	// Sanity check the new buffer.
+	if nb == nil || nb.node == nil {
+		// Nothing to add.
+		return nil
+	}
+
 	if end == nil {
 		// This means the buffer is empty.
 		b.node = nb.node
 	} else {
-		end.appendNode(nb.node, nb.node.val)
+		end.appendNode(nb.node)
 	}
 
 	nb.node = nil
@@ -444,7 +454,7 @@ func (b *Buffer) ShiftLeft(n int) error {
 
 	for i := 0; i < n; i++ {
 		// Add a false bit at the end of the buffer.
-		end.appendNode(nil, false)
+		end.appendNode(nil)
 		end = end.next
 
 		// Pop the first bit.
@@ -494,11 +504,11 @@ func (b *Buffer) ShiftRight(n int) error {
 
 
 // --- METHODS FOR WRITING OUT BITS ---
-// Write out the 32-bit numerical representation of the bits at the index, or -1 on error.
+// Write out the 32-bit decimal representation of the bits at the index, or -1 on error.
 func (b *Buffer) WriteInt(index int) int {
 	node, err := b.getNode(index)
 	if err != nil {
-		return -1
+		return 0
 	}
 
 	var num int32
@@ -519,14 +529,18 @@ func (b *Buffer) WriteInt(index int) int {
 
 // --- HELPER FUNCTIONS ---
 // Create a new node and link it after the given node.
-func (bn *bnode) appendNode(node *bnode, val bool) {
+func (bn *bnode) appendNode(node *bnode) {
 	if node == nil {
 		node = new(bnode)
 	}
 	bn.next = node
 	node.prev = bn
+}
 
-	node.val = val
+// Same as appendNode(), but also assign a value to the new node.
+func (bn *bnode) appendNodeVal(node *bnode, val bool) {
+	bn.appendNode(node)
+	bn.next.val = val
 }
 
 // Check if a certain bit in a certain byte is set or not.
