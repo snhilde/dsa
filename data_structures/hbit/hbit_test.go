@@ -100,6 +100,26 @@ func TestBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad Buffer test for AddBytes()")
 	}
 
+	// Test RemoveBit().
+	if err := b.RemoveBit(5); err == nil {
+		t.Error("Unexpectedly passed bad Buffer test for RemoveBit()")
+	}
+
+	// Test RemoveBits().
+	if err := b.RemoveBits(2, 5); err == nil {
+		t.Error("Unexpectedly passed bad Buffer test for RemoveBits()")
+	}
+
+	// Test SetBit().
+	if err := b.SetBit(2, true); err == nil {
+		t.Error("Unexpectedly passed bad Buffer test for SetBit()")
+	}
+
+	// Test SetBytes().
+	if err := b.SetBytes(4, []byte{0xFF}); err == nil {
+		t.Error("Unexpectedly passed bad Buffer test for SetBytes()")
+	}
+
 	// Test Advance().
 	if n, err := b.Advance(10); n != 0 || err == nil {
 		t.Error("Unexpectedly passed bad Buffer test for Advance()")
@@ -110,14 +130,14 @@ func TestBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad Buffer test for Rewind()")
 	}
 
+	// Test Merge().
+	if err := b.Merge(New()); err == nil {
+		t.Error("Unexpectedly passed bad Buffer test for Merge()")
+	}
+
 	// Test ANDBit().
 	if err := b.ANDBit(10, true); err == nil {
 		t.Error("Unexpectedly passed bad Buffer test or ANDBit()")
-	}
-
-	// Test ANDBytes().
-	if err := b.ANDBytes([]byte{0xFF, 0xEE}); err == nil {
-		t.Error("Unexpectedly passed bad Buffer test or ANDBytes()")
 	}
 
 	// Test ORBit().
@@ -125,24 +145,29 @@ func TestBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad Buffer test or ORBit()")
 	}
 
-	// Test ORBytes().
-	if err := b.ORBytes([]byte{0xFF, 0xEE}); err == nil {
-		t.Error("Unexpectedly passed bad Buffer test or ORBytes()")
-	}
-
 	// Test XORBit().
 	if err := b.XORBit(10, true); err == nil {
 		t.Error("Unexpectedly passed bad Buffer test or XORBit()")
 	}
 
-	// Test XORBytes().
-	if err := b.XORBytes([]byte{0xFF, 0xEE}); err == nil {
-		t.Error("Unexpectedly passed bad Buffer test or XORBytes()")
-	}
-
 	// Test NOTBit().
 	if err := b.NOTBit(10); err == nil {
 		t.Error("Unexpectedly passed bad Buffer test or NOTBit()")
+	}
+
+	// Test ANDBytes().
+	if err := b.ANDBytes([]byte{0xFF, 0xEE}); err == nil {
+		t.Error("Unexpectedly passed bad Buffer test or ANDBytes()")
+	}
+
+	// Test ORBytes().
+	if err := b.ORBytes([]byte{0xFF, 0xEE}); err == nil {
+		t.Error("Unexpectedly passed bad Buffer test or ORBytes()")
+	}
+
+	// Test XORBytes().
+	if err := b.XORBytes([]byte{0xFF, 0xEE}); err == nil {
+		t.Error("Unexpectedly passed bad Buffer test or XORBytes()")
 	}
 
 	// Test NOTBytes().
@@ -158,6 +183,11 @@ func TestBadPtr(t *testing.T) {
 	// Test ShiftRight().
 	if err := b.ShiftRight(6); err == nil {
 		t.Error("Unexpectedly passed bad Buffer test or ShiftRight()")
+	}
+
+	// Test WriteInt().
+	if n := b.WriteInt(6); n != -1 {
+		t.Error("Unexpectedly passed bad Buffer test or WriteInt()")
 	}
 }
 
