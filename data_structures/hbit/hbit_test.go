@@ -12,7 +12,7 @@ func TestNew(t *testing.T) {
 		t.Error("Unexpectedly failed New() test")
 	}
 
-	if b.n != nil {
+	if b.node != nil {
 		t.Error("Somehow created a node")
 	}
 
@@ -1073,6 +1073,10 @@ func TestRewind(t *testing.T) {
 	checkDisplay(t, b, "1111 1111")
 }
 
+func TestMerge(t *testing.T) {
+	// TODO: test merging the same buffer onto itself.
+}
+
 func TestANDBit(t *testing.T) {
 	b := New()
 	checkBits(t, b, 0)
@@ -1491,6 +1495,10 @@ func TestShiftRight(t *testing.T) {
 	checkBits(t, b, 1)
 	checkString(t, b, "0")
 	checkDisplay(t, b, "0")
+}
+
+func TestWriteInt(t *testing.T) {
+	// TODO: write tests
 }
 
 
