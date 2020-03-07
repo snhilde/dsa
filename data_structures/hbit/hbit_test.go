@@ -67,7 +67,9 @@ func TestBadPtr(t *testing.T) {
 	}
 
 	// Test Reset().
-	b.Reset()
+	if err := b.Reset(); err == nil {
+		t.Error("Unexpectedly passed bad Buffer test for Reset()")
+	}
 
 	// Test String().
 	if s := b.String(); s != "<nil>" {
