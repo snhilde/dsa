@@ -186,13 +186,319 @@ func TestBadPtr(t *testing.T) {
 	}
 
 	// Test WriteInt().
-	if n := b.WriteInt(6); n != -1 {
+	if n := b.WriteInt(6); n != 0 {
 		t.Error("Unexpectedly passed bad Buffer test or WriteInt()")
 	}
 }
 
 func TestInvalidArgs(t *testing.T) {
-	// TODO
+	// Make sure that every method is capable of handling bad arguments.
+	b := New()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+
+	// Test Bit() - negative index.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if val := b.Bit(-1); val != false {
+		t.Error("Incorrect result from negative index test for Bit()")
+		t.Log("\tExpected: false")
+		t.Log("\tReceived:", val)
+	}
+
+	// Test Bit() - out-of-range index.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if val := b.Bit(100); val != false {
+		t.Error("Incorrect result from out-of-range index test for Bit()")
+		t.Log("\tExpected: false")
+		t.Log("\tReceived:", val)
+	}
+
+	// Test Copy() - negative value.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if nb := b.Copy(-1); nb.String() != "<empty>" {
+		t.Error("Incorrect result from negative value test for Copy()")
+		t.Log("\tExpected: <empty>")
+		t.Log("\tReceived:", nb)
+	}
+
+	// Test Copy() - out-of-range value.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if nb := b.Copy(100); nb.String() != "111111110111011110111011" {
+		t.Error("Incorrect result from out-of-range value test for Copy()")
+		t.Log("\tExpected: 111111110111011110111011")
+		t.Log("\tReceived:", nb)
+	}
+
+	// Test RemoveBit() - negative index.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.RemoveBit(-1); err == nil {
+		t.Error("Unexpectedly passed negative index test for RemoveBit()")
+	}
+
+	// Test RemoveBit() - out-of-range index.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.RemoveBit(100); err == nil {
+		t.Error("Unexpectedly passed out-of-range index test for RemoveBit()")
+	}
+
+	// Test RemoveBits() - negative index.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.RemoveBits(-1, 5); err == nil {
+		t.Error("Unexpectedly passed negative index test for RemoveBits()")
+	}
+
+	// Test RemoveBits() - negative number.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.RemoveBits(1, -1); err != nil {
+		t.Error("Unexpectedly failed negative number test for RemoveBits()")
+		t.Error(err)
+	}
+
+	// Test RemoveBits() - out-of-range index.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.RemoveBits(100, 5); err == nil {
+		t.Error("Unexpectedly passed out-of-range index test for RemoveBits()")
+	}
+
+	// Test RemoveBits() - out-of-range number.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.RemoveBits(0, 100); err != nil {
+		t.Error("Unexpectedly failed out-of-range number test for RemoveBits()")
+		t.Error(err)
+	}
+
+	// Test RemoveBits() - no numbers.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.RemoveBits(1, 0); err != nil {
+		t.Error("Unexpectedly failed no number test for RemoveBits()")
+		t.Error(err)
+	}
+
+	// Test SetBit() - negative index.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.SetBit(-1, true); err == nil {
+		t.Error("Unexpectedly passed negative index test for SetBit()")
+	}
+
+	// Test SetBit() - out-of-range index.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.SetBit(100, true); err == nil {
+		t.Error("Unexpectedly passed out-of-range index test for SetBit()")
+	}
+
+	// Test SetBytes() - negative index.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.SetBytes(-1, []byte{0xFF}); err == nil {
+		t.Error("Unexpectedly passed negative index test for SetBytes()")
+	}
+
+	// Test SetBytes() - out-of-range index.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.SetBytes(100, []byte{0xFF}); err == nil {
+		t.Error("Unexpectedly passed out-of-range index test for SetBytes()")
+	}
+
+	// Test SetBytes() - empty reference bytes.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.SetBytes(4, []byte{}); err != nil {
+		t.Error("Unexpectedly failed empty bytes test for SetBytes()")
+		t.Error(err)
+	}
+
+	// Test Advance() - negative index.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if n, err := b.Advance(-1); n != 0 || err == nil {
+		t.Error("Unexpectedly passed negative index test for Advance()")
+	}
+
+	// Test Advance() - out-of-range index.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if n, err := b.Advance(100); n == 0 || err != nil {
+		t.Error("Unexpectedly failed out-of-range index test for Advance()")
+		t.Error(err)
+	}
+
+	// Test Rewind() - negative index.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if n, err := b.Rewind(-1); n != 0 || err == nil {
+		t.Error("Unexpectedly passed negative index test for Rewind()")
+	}
+
+	// Test Rewind() - out-of-range index.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.Advance(10)
+	if n, err := b.Rewind(100); n == 0 || err != nil {
+		t.Error("Unexpectedly failed out-of-range index test for Rewind()")
+		t.Error(err)
+	}
+
+	// Test Merge() - empty buffer.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.Merge(nil); err != nil {
+		t.Error("Unexpectedly failed empty buffer test for Merge()")
+		t.Error(err)
+	}
+
+	// Test ANDBit() - negative index.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.ANDBit(-1, true); err == nil {
+		t.Error("Unexpectedly passed negative index test or ANDBit()")
+	}
+
+	// Test ANDBit() - out-of-range index.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.ANDBit(100, true); err == nil {
+		t.Error("Unexpectedly passed out-of-range index test or ANDBit()")
+	}
+
+	// Test ORBit() - negative index.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.ORBit(-1, true); err == nil {
+		t.Error("Unexpectedly passed negative index test or ORBit()")
+	}
+
+	// Test ORBit() - out-of-range index.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.ORBit(100, true); err == nil {
+		t.Error("Unexpectedly passed out-of-range index test or ORBit()")
+	}
+
+	// Test XORBit() - negative index.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.XORBit(-1, true); err == nil {
+		t.Error("Unexpectedly passed negative index test or XORBit()")
+	}
+
+	// Test XORBit() - out-of-range index.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.XORBit(100, true); err == nil {
+		t.Error("Unexpectedly passed out-of-range index test or XORBit()")
+	}
+
+	// Test NOTBit() - negative index.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.NOTBit(-1); err == nil {
+		t.Error("Unexpectedly passed negative index test or NOTBit()")
+	}
+
+	// Test NOTBit() - out-of-range index.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.NOTBit(100); err == nil {
+		t.Error("Unexpectedly passed out-of-range index test or NOTBit()")
+	}
+
+	// Test ANDBytes() - empty reference bytes.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.ANDBytes([]byte{}); err != nil {
+		t.Error("Unexpectedly failed empty bytes test or ANDBytes()")
+		t.Error(err)
+	}
+
+	// Test ORBytes() - empty reference bytes.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.ORBytes([]byte{}); err != nil {
+		t.Error("Unexpectedly failed empty bytes test or ORBytes()")
+		t.Error(err)
+	}
+
+	// Test XORBytes() - empty reference bytes.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.XORBytes([]byte{}); err != nil {
+		t.Error("Unexpectedly failed empty bytes test or XORBytes()")
+		t.Error(err)
+	}
+
+	// Test NOTBytes() - negative number.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.NOTBytes(-1); err == nil {
+		t.Error("Unexpectedly passed negative number test or NOTBytes()")
+	}
+
+	// Test NOTBytes() - out-of-range number.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.NOTBytes(100); err != nil {
+		t.Error("Unexpectedly failed out-of-range number test or NOTBytes()")
+		t.Error(err)
+	}
+
+	// Test ShiftLeft() - negative number.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.ShiftLeft(-1); err != nil {
+		t.Error("Unexpectedly failed negative number test or ShiftLeft()")
+		t.Error(err)
+	}
+
+	// Test ShiftLeft() - out-of-range number.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.ShiftLeft(100); err != nil {
+		t.Error("Unexpectedly failed out-of-range number test or ShiftLeft()")
+		t.Error(err)
+	}
+
+	// Test ShiftRight() - negative number.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.ShiftRight(-1); err != nil {
+		t.Error("Unexpectedly failed negative number test or ShiftRight()")
+		t.Error(err)
+	}
+
+	// Test ShiftRight() - out-of-range number.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.ShiftRight(100); err != nil {
+		t.Error("Unexpectedly failed out-of-range number test or ShiftRight()")
+		t.Error(err)
+	}
+
+	// Test WriteInt() - negative index.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if n := b.WriteInt(-1); n != 0 {
+		t.Error("Unexpectedly passed negative index test or WriteInt()")
+	}
+
+	// Test WriteInt() - out-of-range index.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if n := b.WriteInt(100); n != 0 {
+		t.Error("Unexpectedly passed out-of-range index test or WriteInt()")
+	}
 }
 
 func TestBit(t *testing.T) {
@@ -1106,7 +1412,130 @@ func TestRewind(t *testing.T) {
 }
 
 func TestMerge(t *testing.T) {
-	// TODO: test merging the same buffer onto itself.
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	// Test merging an empty buffer with a full buffer.
+	b.AddBytes([]byte{0x11, 0x22, 0x33})
+	checkBits(t, b, 24)
+	checkString(t, b, "100010000100010011001100")
+	checkDisplay(t, b, "1000 1000  0100 0100  1100 1100")
+
+	nb := New()
+	checkBits(t, nb, 0)
+	checkString(t, nb, "<empty>")
+	checkDisplay(t, nb, "<empty>")
+
+	if err := b.Merge(nb); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 24)
+	checkString(t, b, "100010000100010011001100")
+	checkDisplay(t, b, "1000 1000  0100 0100  1100 1100")
+
+	checkBits(t, nb, 0)
+	checkString(t, nb, "<empty>")
+	checkDisplay(t, nb, "<empty>")
+
+	// Test merging a full buffer with an empty one.
+	b.Reset()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	nb.Reset()
+	nb.AddBytes([]byte{0x11, 0x22, 0x33})
+	checkBits(t, nb, 24)
+	checkString(t, nb, "100010000100010011001100")
+	checkDisplay(t, nb, "1000 1000  0100 0100  1100 1100")
+
+	if err := b.Merge(nb); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 24)
+	checkString(t, b, "100010000100010011001100")
+	checkDisplay(t, b, "1000 1000  0100 0100  1100 1100")
+
+	checkBits(t, nb, 0)
+	checkString(t, nb, "<empty>")
+	checkDisplay(t, nb, "<empty>")
+
+	// Test merging two empty buffers.
+	b.Reset()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	nb.Reset()
+	checkBits(t, nb, 0)
+	checkString(t, nb, "<empty>")
+	checkDisplay(t, nb, "<empty>")
+
+	if err := b.Merge(nb); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	checkBits(t, nb, 0)
+	checkString(t, nb, "<empty>")
+	checkDisplay(t, nb, "<empty>")
+
+	// Test merging two full buffers.
+	b.Reset()
+	b.AddBytes([]byte{0x11, 0x22, 0x33})
+	checkBits(t, b, 24)
+	checkString(t, b, "100010000100010011001100")
+	checkDisplay(t, b, "1000 1000  0100 0100  1100 1100")
+
+	nb.Reset()
+	nb.AddBytes([]byte{0x44, 0x55, 0x66})
+	checkBits(t, nb, 24)
+	checkString(t, nb, "001000101010101001100110")
+	checkDisplay(t, nb, "0010 0010  1010 1010  0110 0110")
+
+	if err := b.Merge(nb); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 48)
+	checkString(t, b, "100010000100010011001100001000101010101001100110")
+	checkDisplay(t, b, "1000 1000  0100 0100  1100 1100  0010 0010  1010 1010  0110 0110")
+
+	checkBits(t, nb, 0)
+	checkString(t, nb, "<empty>")
+	checkDisplay(t, nb, "<empty>")
+
+	// Test merging the same buffer onto itself (shouldn't work).
+	b.Reset()
+	b.AddBytes([]byte{0x11, 0x22, 0x33})
+	checkBits(t, b, 24)
+	checkString(t, b, "100010000100010011001100")
+	checkDisplay(t, b, "1000 1000  0100 0100  1100 1100")
+
+	if err := b.Merge(b); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	// Test copying a buffer and merging it back onto the original buffer.
+	b.Reset()
+	b.AddBytes([]byte{0x11, 0x22, 0x33})
+	checkBits(t, b, 24)
+	checkString(t, b, "100010000100010011001100")
+	checkDisplay(t, b, "1000 1000  0100 0100  1100 1100")
+
+	nb = b.Copy(b.Bits())
+	if err := b.Merge(nb); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 48)
+	checkString(t, b, "100010000100010011001100100010000100010011001100")
+	checkDisplay(t, b, "1000 1000  0100 0100  1100 1100  1000 1000  0100 0100  1100 1100")
 }
 
 func TestANDBit(t *testing.T) {
