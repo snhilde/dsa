@@ -516,7 +516,29 @@ func (b *Buffer) NOTBits(n int) error {
 
 
 // --- METHODS FOR WRITING OUT BITS ---
-// Write out the 32-bit decimal representation of the bits at the index.
+// Write out one byte of bits at the index. This will not advance the buffer.
+func (b *Buffer) WriteByte(index int) byte {
+	node, err := b.getNode(index)
+	if err != nil {
+		return 0
+	}
+
+	var bt byte
+	for i := 0; i < 8; i++ {
+		if node == nil {
+			break
+		}
+
+		if node.val {
+			bt |= (1 << uint(i))
+		}
+		node = node.next
+	}
+
+	return bt
+}
+
+// Write out the 32-bit decimal representation of the bits at the index. This will not advance the buffer.
 func (b *Buffer) WriteInt(index int) int {
 	node, err := b.getNode(index)
 	if err != nil {
