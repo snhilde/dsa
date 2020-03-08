@@ -204,6 +204,11 @@ func TestBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad Buffer test or NOTBits()")
 	}
 
+	// Test WriteByte().
+	if n := b.WriteByte(4); n != 0 {
+		t.Error("Unexpectedly passed bad Buffer test or WriteByte()")
+	}
+
 	// Test WriteInt().
 	if n := b.WriteInt(6); n != 0 {
 		t.Error("Unexpectedly passed bad Buffer test or WriteInt()")
@@ -525,6 +530,20 @@ func TestInvalidArgs(t *testing.T) {
 	if err := b.NOTBits(100); err != nil {
 		t.Error("Unexpectedly failed out-of-range number test or NOTBits()")
 		t.Error(err)
+	}
+
+	// Test WriteByte() - negative index.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if n := b.WriteByte(-1); n != 0 {
+		t.Error("Unexpectedly passed negative index test or WriteByte()")
+	}
+
+	// Test WriteByte() - out-of-range index.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if n := b.WriteByte(100); n != 0 {
+		t.Error("Unexpectedly passed out-of-range index test or WriteByte()")
 	}
 
 	// Test WriteInt() - negative index.
@@ -2176,13 +2195,61 @@ func TestNOTBits(t *testing.T) {
 	checkDisplay(t, b, "1111 1000  1111 1000  0000 0000  1111 1111")
 }
 
+func TestWriteByte(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	// Test out one bit.
+	b.AddBit(true)
+	if n := b.WriteByte(0); n != 0x01 {
+		t.Error("Incorrect result from WriteByte() test")
+		t.Log("\tExpected: 1")
+		t.Log("\tReceived:", n)
+	}
+
+	// Test out a simple byte.
+	b.Reset()
+	b.AddBytes([]byte{0x05})
+	if n := b.WriteByte(0); n != 0x05 {
+		t.Error("Incorrect result from WriteByte() test")
+		t.Log("\tExpected: 5")
+		t.Log("\tReceived:", n)
+	}
+
+	// Test out 4 bytes.
+	b.Reset()
+	b.AddBytes([]byte{0x0F, 0xF0, 0xFF, 0x08})
+	if n := b.WriteByte(0); n != 15 {
+		t.Error("Incorrect result from WriteByte() test")
+		t.Log("\tExpected: 15")
+		t.Log("\tReceived:", n)
+	}
+
+	if n := b.WriteByte(16); n != 255 {
+		t.Error("Incorrect result from WriteByte() test")
+		t.Log("\tExpected: 255")
+		t.Log("\tReceived:", n)
+	}
+}
+
 func TestWriteInt(t *testing.T) {
 	b := New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
 
+	// Test out one bit.
+	b.AddBit(true)
+	if n := b.WriteInt(0); n != 1 {
+		t.Error("Incorrect result from WriteInt() test")
+		t.Log("\tExpected: 1")
+		t.Log("\tReceived:", n)
+	}
+
 	// Test out a simple byte.
+	b.Reset()
 	b.AddBytes([]byte{0x05})
 	if n := b.WriteInt(0); n != 5 {
 		t.Error("Incorrect result from WriteInt() test")
@@ -2192,10 +2259,10 @@ func TestWriteInt(t *testing.T) {
 
 	// Test out 4 bytes.
 	b.Reset()
-	b.AddBytes([]byte{0x05})
-	if n := b.WriteInt(0); n != 5 {
+	b.AddBytes([]byte{0x0F, 0xFF, 0xFF, 0xFF})
+	if n := b.WriteInt(0); n != -241 {
 		t.Error("Incorrect result from WriteInt() test")
-		t.Log("\tExpected: 5")
+		t.Log("\tExpected: -241")
 		t.Log("\tReceived:", n)
 	}
 
