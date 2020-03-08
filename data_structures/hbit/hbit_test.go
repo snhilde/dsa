@@ -1806,6 +1806,183 @@ func TestXORBytes(t *testing.T) {
 	checkDisplay(t, b, "0100 1110  0111 1000  0111 1111  0000 0000")
 }
 
+func TestANDBuffer(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	b.AddBytes([]byte{0xFF, 0x00, 0xFF, 0x00})
+	checkBits(t, b, 32)
+	checkString(t, b, "11111111000000001111111100000000")
+	checkDisplay(t, b, "1111 1111  0000 0000  1111 1111  0000 0000")
+
+	ref := New()
+	checkBits(t, ref, 0)
+	checkString(t, ref, "<empty>")
+	checkDisplay(t, ref, "<empty>")
+
+	ref.AddBytes([]byte{0xF0, 0xF0, 0x0F, 0x0F})
+	checkBits(t, ref, 32)
+	checkString(t, ref, "00001111000011111111000011110000")
+	checkDisplay(t, ref, "0000 1111  0000 1111  1111 0000  1111 0000")
+
+	if err := b.ANDBuffer(ref); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 32)
+	checkString(t, b, "00001111000000001111000000000000")
+	checkDisplay(t, b, "0000 1111  0000 0000  1111 0000  0000 0000")
+	checkBits(t, ref, 32)
+	checkString(t, ref, "00001111000011111111000011110000")
+	checkDisplay(t, ref, "0000 1111  0000 1111  1111 0000  1111 0000")
+
+	// Test advancing, ANDing, and reversing.
+	b.Advance(5)
+	if err := b.ANDBuffer(ref); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 27)
+	checkString(t, b, "000000000000111000000000000")
+	checkDisplay(t, b, "0000 0000  0000 1110  0000 0000  000")
+
+	b.Rewind(5)
+	checkBits(t, b, 32)
+	checkString(t, b, "00001000000000000111000000000000")
+	checkDisplay(t, b, "0000 1000  0000 0000  0111 0000  0000 0000")
+
+	// Test buffers of different sizes.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0x00, 0xFF, 0x00})
+	ref.Reset()
+	ref.AddBytes([]byte{0xF0, 0xF0})
+
+	if err := b.ANDBuffer(ref); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 32)
+	checkString(t, b, "00001111000000001111111100000000")
+	checkDisplay(t, b, "0000 1111  0000 0000  1111 1111  0000 0000")
+}
+
+func TestORBuffer(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	b.AddBytes([]byte{0xFF, 0x00, 0xFF, 0x00})
+	checkBits(t, b, 32)
+	checkString(t, b, "11111111000000001111111100000000")
+	checkDisplay(t, b, "1111 1111  0000 0000  1111 1111  0000 0000")
+
+	ref := New()
+	checkBits(t, ref, 0)
+	checkString(t, ref, "<empty>")
+	checkDisplay(t, ref, "<empty>")
+
+	ref.AddBytes([]byte{0xF0, 0xF0, 0x0F, 0x0F})
+	checkBits(t, ref, 32)
+	checkString(t, ref, "00001111000011111111000011110000")
+	checkDisplay(t, ref, "0000 1111  0000 1111  1111 0000  1111 0000")
+
+	if err := b.ORBuffer(ref); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 32)
+	checkString(t, b, "11111111000011111111111111110000")
+	checkDisplay(t, b, "1111 1111  0000 1111  1111 1111  1111 0000")
+	checkBits(t, ref, 32)
+	checkString(t, ref, "00001111000011111111000011110000")
+	checkDisplay(t, ref, "0000 1111  0000 1111  1111 0000  1111 0000")
+
+	// Test advancing, ANDing, and reversing.
+	b.Advance(5)
+	if err := b.ORBuffer(ref); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 27)
+	checkString(t, b, "111011111111111111111110111")
+	checkDisplay(t, b, "1110 1111  1111 1111  1111 1110  111")
+
+	b.Rewind(5)
+	checkBits(t, b, 32)
+	checkString(t, b, "11111111011111111111111111110111")
+	checkDisplay(t, b, "1111 1111  0111 1111  1111 1111  1111 0111")
+
+	// Test buffers of different sizes.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0x00, 0xFF, 0x00})
+	ref.Reset()
+	ref.AddBytes([]byte{0xF0, 0xF0})
+
+	if err := b.ORBuffer(ref); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 32)
+	checkString(t, b, "11111111000011111111111100000000")
+	checkDisplay(t, b, "1111 1111  0000 1111  1111 1111  0000 0000")
+}
+
+func TestXORBuffer(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	b.AddBytes([]byte{0xFF, 0x00, 0xFF, 0x00})
+	checkBits(t, b, 32)
+	checkString(t, b, "11111111000000001111111100000000")
+	checkDisplay(t, b, "1111 1111  0000 0000  1111 1111  0000 0000")
+
+	ref := New()
+	checkBits(t, ref, 0)
+	checkString(t, ref, "<empty>")
+	checkDisplay(t, ref, "<empty>")
+
+	ref.AddBytes([]byte{0xF0, 0xF0, 0x0F, 0x0F})
+	checkBits(t, ref, 32)
+	checkString(t, ref, "00001111000011111111000011110000")
+	checkDisplay(t, ref, "0000 1111  0000 1111  1111 0000  1111 0000")
+
+	if err := b.XORBuffer(ref); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 32)
+	checkString(t, b, "11110000000011110000111111110000")
+	checkDisplay(t, b, "1111 0000  0000 1111  0000 1111  1111 0000")
+	checkBits(t, ref, 32)
+	checkString(t, ref, "00001111000011111111000011110000")
+	checkDisplay(t, ref, "0000 1111  0000 1111  1111 0000  1111 0000")
+
+	// Test advancing, ANDing, and reversing.
+	b.Advance(5)
+	if err := b.XORBuffer(ref); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 27)
+	checkString(t, b, "000011101110111000001110111")
+	checkDisplay(t, b, "0000 1110  1110 1110  0000 1110  111")
+
+	b.Rewind(5)
+	checkBits(t, b, 32)
+	checkString(t, b, "11110000011101110111000001110111")
+	checkDisplay(t, b, "1111 0000  0111 0111  0111 0000  0111 0111")
+
+	// Test buffers of different sizes.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0x00, 0xFF, 0x00})
+	ref.Reset()
+	ref.AddBytes([]byte{0xF0, 0xF0})
+
+	if err := b.XORBuffer(ref); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 32)
+	checkString(t, b, "11110000000011111111111100000000")
+	checkDisplay(t, b, "1111 0000  0000 1111  1111 1111  0000 0000")
+}
+
 func TestShiftLeft(t *testing.T) {
 	b := New()
 	checkBits(t, b, 0)
