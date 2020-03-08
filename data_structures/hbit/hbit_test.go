@@ -150,11 +150,6 @@ func TestBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad Buffer test or XORBit()")
 	}
 
-	// Test NOTBit().
-	if err := b.NOTBit(10); err == nil {
-		t.Error("Unexpectedly passed bad Buffer test or NOTBit()")
-	}
-
 	// Test ANDBytes().
 	if err := b.ANDBytes([]byte{0xFF, 0xEE}); err == nil {
 		t.Error("Unexpectedly passed bad Buffer test or ANDBytes()")
@@ -170,11 +165,6 @@ func TestBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad Buffer test or XORBytes()")
 	}
 
-	// Test NOTBytes().
-	if err := b.NOTBytes(20); err == nil {
-		t.Error("Unexpectedly passed bad Buffer test or NOTBytes()")
-	}
-
 	// Test ShiftLeft().
 	if err := b.ShiftLeft(5); err == nil {
 		t.Error("Unexpectedly passed bad Buffer test or ShiftLeft()")
@@ -185,12 +175,23 @@ func TestBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad Buffer test or ShiftRight()")
 	}
 
+	// Test NOTBit().
+	if err := b.NOTBit(10); err == nil {
+		t.Error("Unexpectedly passed bad Buffer test or NOTBit()")
+	}
+
+	// Test NOTBits().
+	if err := b.NOTBits(20); err == nil {
+		t.Error("Unexpectedly passed bad Buffer test or NOTBits()")
+	}
+
 	// Test WriteInt().
 	if n := b.WriteInt(6); n != 0 {
 		t.Error("Unexpectedly passed bad Buffer test or WriteInt()")
 	}
 }
 
+// TODO: make sure all these tests are really checking what we want them to check
 func TestInvalidArgs(t *testing.T) {
 	// Make sure that every method is capable of handling bad arguments.
 	b := New()
@@ -401,20 +402,6 @@ func TestInvalidArgs(t *testing.T) {
 		t.Error("Unexpectedly passed out-of-range index test or XORBit()")
 	}
 
-	// Test NOTBit() - negative index.
-	b.Reset()
-	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
-	if err := b.NOTBit(-1); err == nil {
-		t.Error("Unexpectedly passed negative index test or NOTBit()")
-	}
-
-	// Test NOTBit() - out-of-range index.
-	b.Reset()
-	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
-	if err := b.NOTBit(100); err == nil {
-		t.Error("Unexpectedly passed out-of-range index test or NOTBit()")
-	}
-
 	// Test ANDBytes() - empty reference bytes.
 	b.Reset()
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
@@ -436,21 +423,6 @@ func TestInvalidArgs(t *testing.T) {
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
 	if err := b.XORBytes([]byte{}); err != nil {
 		t.Error("Unexpectedly failed empty bytes test or XORBytes()")
-		t.Error(err)
-	}
-
-	// Test NOTBytes() - negative number.
-	b.Reset()
-	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
-	if err := b.NOTBytes(-1); err == nil {
-		t.Error("Unexpectedly passed negative number test or NOTBytes()")
-	}
-
-	// Test NOTBytes() - out-of-range number.
-	b.Reset()
-	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
-	if err := b.NOTBytes(100); err != nil {
-		t.Error("Unexpectedly failed out-of-range number test or NOTBytes()")
 		t.Error(err)
 	}
 
@@ -483,6 +455,35 @@ func TestInvalidArgs(t *testing.T) {
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
 	if err := b.ShiftRight(100); err != nil {
 		t.Error("Unexpectedly failed out-of-range number test or ShiftRight()")
+		t.Error(err)
+	}
+
+	// Test NOTBit() - negative index.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.NOTBit(-1); err == nil {
+		t.Error("Unexpectedly passed negative index test or NOTBit()")
+	}
+
+	// Test NOTBit() - out-of-range index.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.NOTBit(100); err == nil {
+		t.Error("Unexpectedly passed out-of-range index test or NOTBit()")
+	}
+
+	// Test NOTBits() - negative number.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.NOTBits(-1); err == nil {
+		t.Error("Unexpectedly passed negative number test or NOTBits()")
+	}
+
+	// Test NOTBits() - out-of-range number.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.NOTBits(100); err != nil {
+		t.Error("Unexpectedly failed out-of-range number test or NOTBits()")
 		t.Error(err)
 	}
 
@@ -1670,34 +1671,6 @@ func TestXORBit(t *testing.T) {
 	checkDisplay(t, b, "1010 1010")
 }
 
-func TestNOTBit(t *testing.T) {
-	b := New()
-	checkBits(t, b, 0)
-	checkString(t, b, "<empty>")
-	checkDisplay(t, b, "<empty>")
-
-	b.AddByte(0x55)
-	checkBits(t, b, 8)
-	checkString(t, b, "10101010")
-	checkDisplay(t, b, "1010 1010")
-
-	// Test ~0
-	if err := b.NOTBit(1); err != nil {
-		t.Error(err)
-	}
-	checkBits(t, b, 8)
-	checkString(t, b, "11101010")
-	checkDisplay(t, b, "1110 1010")
-
-	// Test ~1
-	if err := b.XORBit(6, true); err != nil {
-		t.Error(err)
-	}
-	checkBits(t, b, 8)
-	checkString(t, b, "11101000")
-	checkDisplay(t, b, "1110 1000")
-}
-
 func TestANDBytes(t *testing.T) {
 	b := New()
 	checkBits(t, b, 0)
@@ -1795,47 +1768,6 @@ func TestXORBytes(t *testing.T) {
 	checkBits(t, b, 32)
 	checkString(t, b, "01001110011110000111111100000000")
 	checkDisplay(t, b, "0100 1110  0111 1000  0111 1111  0000 0000")
-}
-
-func TestNOTBytes(t *testing.T) {
-	b := New()
-	checkBits(t, b, 0)
-	checkString(t, b, "<empty>")
-	checkDisplay(t, b, "<empty>")
-
-	b.AddBytes([]byte{0xFF, 0x00, 0xFF, 0x00})
-	checkBits(t, b, 32)
-	checkString(t, b, "11111111000000001111111100000000")
-	checkDisplay(t, b, "1111 1111  0000 0000  1111 1111  0000 0000")
-
-	if err := b.NOTBytes(2); err != nil {
-		t.Error(err)
-	}
-	checkBits(t, b, 32)
-	checkString(t, b, "00000000111111111111111100000000")
-	checkDisplay(t, b, "0000 0000  1111 1111  1111 1111  0000 0000")
-
-	// Test advancing, NOTing, and reversing.
-	b.Advance(5)
-	if err := b.NOTBytes(1); err != nil {
-		t.Error(err)
-	}
-	checkBits(t, b, 27)
-	checkString(t, b, "111000001111111111100000000")
-	checkDisplay(t, b, "1110 0000  1111 1111  1110 0000  000")
-
-	b.Rewind(5)
-	checkBits(t, b, 32)
-	checkString(t, b, "00000111000001111111111100000000")
-	checkDisplay(t, b, "0000 0111  0000 0111  1111 1111  0000 0000")
-
-	if err := b.NOTBytes(10); err != nil {
-		t.Error(err)
-	}
-	// Test overrunning the buffer.
-	checkBits(t, b, 32)
-	checkString(t, b, "11111000111110000000000011111111")
-	checkDisplay(t, b, "1111 1000  1111 1000  0000 0000  1111 1111")
 }
 
 func TestShiftLeft(t *testing.T) {
@@ -1956,6 +1888,75 @@ func TestShiftRight(t *testing.T) {
 	checkBits(t, b, 1)
 	checkString(t, b, "0")
 	checkDisplay(t, b, "0")
+}
+
+func TestNOTBit(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	b.AddByte(0x55)
+	checkBits(t, b, 8)
+	checkString(t, b, "10101010")
+	checkDisplay(t, b, "1010 1010")
+
+	// Test ~0
+	if err := b.NOTBit(1); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 8)
+	checkString(t, b, "11101010")
+	checkDisplay(t, b, "1110 1010")
+
+	// Test ~1
+	if err := b.XORBit(6, true); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 8)
+	checkString(t, b, "11101000")
+	checkDisplay(t, b, "1110 1000")
+}
+
+func TestNOTBits(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	b.AddBytes([]byte{0xFF, 0x00, 0xFF, 0x00})
+	checkBits(t, b, 32)
+	checkString(t, b, "11111111000000001111111100000000")
+	checkDisplay(t, b, "1111 1111  0000 0000  1111 1111  0000 0000")
+
+	if err := b.NOTBits(2); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 32)
+	checkString(t, b, "00000000111111111111111100000000")
+	checkDisplay(t, b, "0000 0000  1111 1111  1111 1111  0000 0000")
+
+	// Test advancing, NOTing, and reversing.
+	b.Advance(5)
+	if err := b.NOTBits(1); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 27)
+	checkString(t, b, "111000001111111111100000000")
+	checkDisplay(t, b, "1110 0000  1111 1111  1110 0000  000")
+
+	b.Rewind(5)
+	checkBits(t, b, 32)
+	checkString(t, b, "00000111000001111111111100000000")
+	checkDisplay(t, b, "0000 0111  0000 0111  1111 1111  0000 0000")
+
+	if err := b.NOTBits(10); err != nil {
+		t.Error(err)
+	}
+	// Test overrunning the buffer.
+	checkBits(t, b, 32)
+	checkString(t, b, "11111000111110000000000011111111")
+	checkDisplay(t, b, "1111 1000  1111 1000  0000 0000  1111 1111")
 }
 
 func TestWriteInt(t *testing.T) {
