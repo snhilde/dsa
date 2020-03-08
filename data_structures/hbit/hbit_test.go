@@ -441,6 +441,27 @@ func TestInvalidArgs(t *testing.T) {
 		t.Error(err)
 	}
 
+	// Test ANDBuffer() - empty reference buffer.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.ANDBuffer(nil); err == nil {
+		t.Error("Unexpectedly passed empty bytes test or ANDBuffer()")
+	}
+
+	// Test ORBuffer() - empty reference buffer.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.ORBuffer(nil); err == nil {
+		t.Error("Unexpectedly passed empty bytes test or ORBuffer()")
+	}
+
+	// Test XORBuffer() - empty reference buffer.
+	b.Reset()
+	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.XORBuffer(nil); err == nil {
+		t.Error("Unexpectedly passed empty bytes test or XORBuffer()")
+	}
+
 	// Test ShiftLeft() - negative number.
 	b.Reset()
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
