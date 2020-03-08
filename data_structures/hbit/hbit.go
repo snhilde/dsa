@@ -398,16 +398,6 @@ func (b *Buffer) XORBit(index int, ref bool) error {
 	return opBit(node, ref, token.XOR)
 }
 
-// Negate the specified bit. This is equivalent to the bitwise operation '~'.
-func (b *Buffer) NOTBit(index int) error {
-	node, err := b.getNode(index)
-	if err != nil {
-		return err
-	}
-
-	return opBit(node, false, token.NOT)
-}
-
 // AND the buffer against the reference bytes. This is equivalent to the bitwise operation '&'.
 func (b *Buffer) ANDBytes(ref []byte) error {
 	return b.opBytes(ref, token.AND)
@@ -423,22 +413,20 @@ func (b *Buffer) XORBytes(ref []byte) error {
 	return b.opBytes(ref, token.XOR)
 }
 
-// Negate the first n bits in the buffer. This is equivalent to the bitwise operation '~'.
-func (b *Buffer) NOTBytes(n int) error {
-	if n < 0 {
-		return errors.New("Invalid range")
-	}
-	ref := make([]byte, n)
-	return b.opBytes(ref, token.NOT)
+// AND the buffer against the reference buffer. This is equivalent to the bitwise operation '&'.
+func (b *Buffer) ANDBuffer(ref *Buffer) error {
+	return b.opBuf(ref, token.AND)
 }
 
-// TODO: ANDBuf
+// OR the buffer against the reference buffer. This is equivalent to the bitwise operation '|'.
+func (b *Buffer) ORBuffer(ref *Buffer) error {
+	return b.opBuf(ref, token.OR)
+}
 
-// TODO: ORBuf
-
-// TODO: XORBuf
-
-// TODO: NOTBuf
+// XOR the buffer against the reference buffer. This is equivalent to the bitwise operation '^'.
+func (b *Buffer) XORBuffer(ref *Buffer) error {
+	return b.opBuf(ref, token.XOR)
+}
 
 // Shift the bits in the buffer to the left. This is equivalent to the bitwise operation '<<'.
 func (b *Buffer) ShiftLeft(n int) error {
@@ -500,6 +488,25 @@ func (b *Buffer) ShiftRight(n int) error {
 	}
 
 	return nil
+}
+
+// Negate the specified bit. This is equivalent to the bitwise operation '~'.
+func (b *Buffer) NOTBit(index int) error {
+	node, err := b.getNode(index)
+	if err != nil {
+		return err
+	}
+
+	return opBit(node, false, token.NOT)
+}
+
+// Negate the first n bits in the buffer. This is equivalent to the bitwise operation '~'.
+func (b *Buffer) NOTBits(n int) error {
+	if n < 0 {
+		return errors.New("Invalid range")
+	}
+	ref := make([]byte, n)
+	return b.opBytes(ref, token.NOT)
 }
 
 
@@ -649,7 +656,24 @@ func (b *Buffer) opBytes(ref []byte, t token.Token) error {
 	return nil
 }
 
-// Print string from data..
+// Perform a bitwise operation using another buffer as the reference.
+func (b *Buffer) opBuf(ref *Buffer, t token.Token) error {
+	if b == nil || ref == nil {
+		return bufErr()
+	}
+
+	node := b.node
+	refNode := ref.node
+	for node != nil && refNode != nil {
+		if err := opBit(node, refNode.val, t); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// Print string from data.
 func (b *Buffer) string_int(pretty bool) string {
 	var sb strings.Builder
 
