@@ -11,7 +11,8 @@ import (
 // --- PACKAGE TYPES ---
 // Buffer is the main type for this package. It holds the internal information about the bit buffer.
 type Buffer struct {
-	node *bnode
+	head *bnode
+	tail *bnode
 }
 
 type bnode struct {
@@ -44,7 +45,7 @@ func (b *Buffer) Bits() int {
 	}
 
 	cnt := 0
-	node := b.node
+	node := b.head
 	for node != nil {
 		cnt++
 		node = node.next
@@ -59,14 +60,9 @@ func (b *Buffer) Offset() int {
 		return -1
 	}
 
-	// If the buffer is empty, then we don't have any offset.
-	if b.node == nil {
-		return 0
-	}
-
 	cnt := 0
-	node := b.node
-	for node.prev != nil {
+	node := b.tail
+	for node != nil {
 		cnt++
 		node = node.prev
 	}
@@ -81,18 +77,18 @@ func (b *Buffer) Copy(num int) *Buffer {
 	}
 
 	// We will copy these reference values over ...
-	ref := b.node
+	ref := b.head
 	// ... into this new buffer.
 	nb := New()
 
 	// If the buffer is empty or no nodes were requested, then we don't have anything to copy.
-	if b.node == nil || num < 1 {
+	if b.head == nil || num < 1 {
 		return nb
 	}
 
 	// Set up the start of the buffer.
-	nb.node = new(bnode)
-	node := nb.node
+	nb.head = new(bnode)
+	node := nb.head
 	node.val = ref.val
 
 	// Go through the rest of the nodes in the original buffer.
@@ -117,10 +113,8 @@ func (b *Buffer) Recalibrate() error {
 		return bufErr()
 	}
 
-	// If we have anything in the buffer, remove the offset.
-	if b.node != nil {
-		b.node.prev = nil
-	}
+	// All we have to do is cut off the tail.
+	b.tail = nil
 
 	return nil
 }
@@ -131,7 +125,9 @@ func (b *Buffer) Reset() error {
 		return bufErr()
 	}
 
-	b.node = nil
+	b.head = nil
+	b.tail = nil
+
 	return nil
 }
 
@@ -157,8 +153,8 @@ func (b *Buffer) AddBit(val bool) error {
 
 	if end == nil {
 		// This means the buffer is empty.
-		b.node = new(bnode)
-		b.node.val = val
+		b.head = new(bnode)
+		b.head.val = val
 	} else {
 		end.appendNodeVal(nil, val)
 	}
@@ -176,9 +172,9 @@ func (b *Buffer) AddByte(nb byte) error {
 	val := bitOn(nb, 0)
 	if end == nil {
 		// This means the buffer is empty.
-		b.node = new(bnode)
-		b.node.val = val
-		end = b.node
+		b.head = new(bnode)
+		b.head.val = val
+		end = b.head
 	} else {
 		end.appendNodeVal(nil, val)
 		end = end.next
@@ -223,7 +219,7 @@ func (b *Buffer) RemoveBit(index int) error {
 
 	// If the first bit was specified, then we have to move the start of the buffer forward.
 	if index == 0 {
-		b.node = next
+		b.head = next
 	}
 
 	return nil
@@ -255,7 +251,7 @@ func (b *Buffer) RemoveBits(index, n int) error {
 
 	// If the first bit was specified, then we have to move the start of the buffer forward.
 	if index == 0 {
-		b.node = end
+		b.head = end
 	}
 
 	return nil
@@ -293,7 +289,7 @@ func (b *Buffer) SetBytes(index int, ref []byte) error {
 	return nil
 }
 
-// Move start of buffer forward a number of bits. This will not go past the last bit in the buffer.
+// Move start of buffer forward a number of bits.
 // Returns the number of bits moved.
 func (b *Buffer) Advance(n int) (int, error) {
 	if b == nil {
@@ -302,16 +298,25 @@ func (b *Buffer) Advance(n int) (int, error) {
 		return 0, errors.New("Invalid number")
 	}
 
-	if b.node == nil {
-		return 0, nil
-	}
-
-	var i int
+	i := 0
 	for i = 0; i < n; i++ {
-		if b.node.next == nil {
+		node := b.head
+		if node == nil {
 			break
 		}
-		b.node = b.node.next
+
+		// Move the start of the head forward one.
+		b.head = b.head.next
+		if b.head != nil {
+			b.head.prev = nil
+		}
+
+		// Move the node from the head to the tail.
+		if b.tail != nil {
+			b.tail.appendNode(node)
+		}
+		b.tail = node
+		b.tail.next = nil
 	}
 
 	return i, nil
@@ -326,16 +331,25 @@ func (b *Buffer) Rewind(n int) (int, error) {
 		return 0, errors.New("Invalid number")
 	}
 
-	if b.node == nil {
-		return 0, nil
-	}
-
-	var i int
+	i := 0
 	for i = 0; i < n; i++ {
-		if b.node.prev == nil {
+		node := b.tail
+		if node == nil {
 			break
 		}
-		b.node = b.node.prev
+
+		// Move the start of the tail back one.
+		b.tail = node.prev
+		if b.tail != nil {
+			b.tail.next = nil
+		}
+
+		// Move the node from the tail to the head.
+		if b.head != nil {
+			node.appendNode(b.head)
+		}
+		b.head = node
+		b.head.prev = nil
 	}
 
 	return i, nil
@@ -350,19 +364,19 @@ func (b *Buffer) Merge(nb *Buffer) error {
 	}
 
 	// Sanity check the new buffer.
-	if nb == nil || nb.node == nil {
+	if nb == nil || nb.head == nil {
 		// Nothing to add.
 		return nil
 	}
 
 	if end == nil {
 		// This means the buffer is empty.
-		b.node = nb.node
+		b.head = nb.head
 	} else {
-		end.appendNode(nb.node)
+		end.appendNode(nb.head)
 	}
 
-	nb.node = nil
+	nb.head = nil
 	return nil
 }
 
@@ -446,13 +460,9 @@ func (b *Buffer) ShiftLeft(n int) error {
 		end = end.next
 
 		// Pop the first bit.
-		next := b.node.next
-		prev := b.node.prev
-		next.prev = prev
-		if prev != nil {
-			prev.next = next
-		}
-		b.node = next
+		next := b.head.next
+		b.head = next
+		b.head.prev = nil
 	}
 
 	return nil
@@ -473,16 +483,10 @@ func (b *Buffer) ShiftRight(n int) error {
 	for i := 0; i < n; i++ {
 		// Insert a false bit into the beginning of the buffer.
 		node := new(bnode)
-		next := b.node
-		prev := b.node.prev
-		node.next = next
-		node.prev = prev
-		next.prev = node
-		if prev != nil {
-			prev.next = node
-		}
-		b.node = node
+		node.appendNode(b.head)
+		b.head = node
 
+		// Cut off the last bit.
 		end = end.prev
 		end.next = nil
 	}
@@ -505,13 +509,14 @@ func (b *Buffer) NOTBits(n int) error {
 	if n < 0 {
 		return errors.New("Invalid range")
 	}
+
 	ref := make([]byte, n)
 	return b.opBytes(ref, token.NOT)
 }
 
 
 // --- METHODS FOR WRITING OUT BITS ---
-// Write out the 32-bit decimal representation of the bits at the index, or -1 on error.
+// Write out the 32-bit decimal representation of the bits at the index.
 func (b *Buffer) WriteInt(index int) int {
 	node, err := b.getNode(index)
 	if err != nil {
@@ -568,11 +573,11 @@ func bufErr() error {
 func (b *Buffer) getEnd() (*bnode, error) {
 	if b == nil {
 		return nil, bufErr()
-	} else if b.node == nil {
+	} else if b.head == nil {
 		return nil, nil
 	}
 
-	node := b.node
+	node := b.head
 	for node.next != nil {
 		node = node.next
 	}
@@ -588,7 +593,7 @@ func (b *Buffer) getNode(index int) (*bnode, error) {
 		return nil, errors.New("Invalid index")
 	}
 
-	node := b.node
+	node := b.head
 	for i := 0; i < index; i++ {
 		if node == nil {
 			break
@@ -637,12 +642,14 @@ func (b *Buffer) opBytes(ref []byte, t token.Token) error {
 		return bufErr()
 	}
 
-	node := b.node
+	node := b.head
 	for _, octet := range ref {
+		if node == nil {
+			break
+		}
 		for i := 0; i < 8; i++ {
 			if node == nil {
-				// We're out of bits to operate on in the buffer.
-				return nil
+				break
 			}
 
 			val := bitOn(octet, i)
@@ -662,8 +669,8 @@ func (b *Buffer) opBuf(ref *Buffer, t token.Token) error {
 		return bufErr()
 	}
 
-	node := b.node
-	refNode := ref.node
+	node := b.head
+	refNode := ref.head
 	for node != nil && refNode != nil {
 		if err := opBit(node, refNode.val, t); err != nil {
 			return err
@@ -681,11 +688,11 @@ func (b *Buffer) string_int(pretty bool) string {
 
 	if b == nil {
 		return "<nil>"
-	} else if b.node == nil {
+	} else if b.head == nil {
 		return "<empty>"
 	}
 
-	node := b.node
+	node := b.head
 	cnt := 1
 	for node != nil {
 		if node.val {
