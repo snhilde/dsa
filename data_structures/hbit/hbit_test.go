@@ -12,8 +12,12 @@ func TestNew(t *testing.T) {
 		t.Error("Unexpectedly failed New() test")
 	}
 
-	if b.node != nil {
-		t.Error("Somehow created a node")
+	if b.head != nil {
+		t.Error("Somehow created a head")
+	}
+
+	if b.tail != nil {
+		t.Error("Somehow created a tail")
 	}
 
 	if num := b.Bits(); num != 0 {
@@ -1235,9 +1239,9 @@ func TestRemoveBits(t *testing.T) {
 	checkDisplay(t, b, "<empty>")
 
 	b.Rewind(3)
-	checkBits(t, b, 0)
-	checkString(t, b, "<empty>")
-	checkDisplay(t, b, "<empty>")
+	checkBits(t, b, 3)
+	checkString(t, b, "100")
+	checkDisplay(t, b, "100")
 	if n := b.Offset(); n != 0 {
 		t.Error("Incorrect result from Offset() test")
 		t.Log("\tExpected: 0")
@@ -1386,18 +1390,18 @@ func TestAdvance(t *testing.T) {
 	checkDisplay(t, b, "111")
 
 	// Test advancing past the buffer.
-	if n, err := b.Advance(10); n != 2 || err != nil {
+	if n, err := b.Advance(10); n != 3 || err != nil {
 		t.Error(err)
 		t.Error("Incorrect result from Advance() test")
-		t.Log("\tExpected: 2, <nil>")
+		t.Log("\tExpected: 3, <nil>")
 		t.Log("\tReceived:", n, err)
 	}
-	checkBits(t, b, 1)
-	checkString(t, b, "1")
-	checkDisplay(t, b, "1")
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
 
 	// Rewind the buffer to make sure that we didn't overrun the end.
-	if n, err := b.Rewind(1); n != 1 || err != nil {
+	if n, err := b.Rewind(2); n != 2 || err != nil {
 		t.Error(err)
 		t.Error("Incorrect result from Rewind() test")
 		t.Log("\tExpected: 1, <nil>")
