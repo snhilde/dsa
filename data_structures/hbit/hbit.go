@@ -668,6 +668,8 @@ func (b *Buffer) opBuf(ref *Buffer, t token.Token) error {
 		if err := opBit(node, refNode.val, t); err != nil {
 			return err
 		}
+		node = node.next
+		refNode = refNode.next
 	}
 
 	return nil
