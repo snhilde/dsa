@@ -165,6 +165,21 @@ func TestBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad Buffer test or XORBytes()")
 	}
 
+	// Test ANDBuffer().
+	if err := b.ANDBuffer(New()); err == nil {
+		t.Error("Unexpectedly passed bad Buffer test or ANDBuffer()")
+	}
+
+	// Test ORBuffer().
+	if err := b.ORBuffer(New()); err == nil {
+		t.Error("Unexpectedly passed bad Buffer test or ORBuffer()")
+	}
+
+	// Test XORBuffer().
+	if err := b.XORBuffer(New()); err == nil {
+		t.Error("Unexpectedly passed bad Buffer test or XORBuffer()")
+	}
+
 	// Test ShiftLeft().
 	if err := b.ShiftLeft(5); err == nil {
 		t.Error("Unexpectedly passed bad Buffer test or ShiftLeft()")
