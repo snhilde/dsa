@@ -213,6 +213,16 @@ func TestBadPtr(t *testing.T) {
 	if n := b.WriteInt(6); n != 0 {
 		t.Error("Unexpectedly passed bad Buffer test for WriteInt()")
 	}
+
+	// Test Read().
+	if n, err := b.Read([]byte{}); n != 0 || err == nil {
+		t.Error("Unexpectedly passed bad Buffer test for Read()")
+	}
+
+	// Test Write().
+	if n, err := b.Write([]byte{}); n != 0 || err == nil {
+		t.Error("Unexpectedly passed bad Buffer test for Write()")
+	}
 }
 
 // TODO: make sure all these tests are really checking what we want them to check
