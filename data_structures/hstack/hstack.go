@@ -8,7 +8,6 @@ import (
 )
 
 
-// --- PACKAGE TYPES ---
 // Stack is the main type for this package. It holds the internal information about the stack.
 type Stack struct {
 	top    *hnode
@@ -22,14 +21,12 @@ type hnode struct {
 }
 
 
-// --- ENTRY FUNCTIONS ---
 // Create a new stack.
 func New() *Stack {
 	return new(Stack)
 }
 
 
-// --- STACK METHODS ---
 // Add a new node to the top of the stack.
 func (stack *Stack) Add(value interface{}) error {
 	if stack == nil {
@@ -127,7 +124,6 @@ func (stack *Stack) String() string {
 }
 
 
-// --- HELPER FUNCTIONS ---
 // internal convenience function for creating a new node
 func newNode(value interface{}) *hnode {
 	node := new(hnode)
