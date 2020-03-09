@@ -8,7 +8,6 @@ import (
 )
 
 
-// --- PACKAGE TYPES ---
 // List is the main type for this package. It holds the internal information about the list.
 type List struct {
 	head   *hnode
@@ -22,14 +21,12 @@ type hnode struct {
 }
 
 
-// --- ENTRY FUNCTIONS ---
 // Create a new linked list.
 func New() *List {
 	return new(List)
 }
 
 
-// --- LIST METHODS ---
 func (list *List) String() string {
 	var b strings.Builder
 
@@ -340,7 +337,6 @@ func (list *List) SortStr() error {
 }
 
 
-// --- HELPER FUNCTIONS ---
 // internal convenience function for creating a new node
 func newNode(value interface{}) *hnode {
 	node := new(hnode)
