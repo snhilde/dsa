@@ -516,6 +516,73 @@ func (b *Buffer) NOTBits(n int) error {
 
 
 // --- METHODS FOR WRITING OUT BITS ---
+func (b *Buffer) Read(p []byte) (int, error) {
+	if b == nil {
+		return 0, bufErr()
+	}
+
+	length := len(p)
+	node := b.head
+	cnt := 0
+	for i := 0; i < length; i++ {
+		p[i] = 0
+		if node == nil {
+			break
+		}
+
+		for j := 0; j < 8; j++ {
+			if node == nil {
+				break
+			}
+
+			if node.val {
+				p[i] |= (1 << uint(i))
+			}
+			node = node.next
+			cnt++
+		}
+	}
+
+	// Note: The calculation (cnt+7)/8 ensures that we account for untouched (and therefore false) bits in the last byte.
+	if _, err := b.Advance(cnt); err != nil {
+		return (cnt+7)/8, err
+	}
+
+	return (cnt+7)/8, nil
+}
+
+func (b *Buffer) Write(p []byte) (int, error) {
+	end, err := b.getEnd()
+	if err != nil {
+		return 0, err
+	}
+
+	skip := false
+	if end == nil {
+		// This means the buffer is empty. We'll create a node now to make setup easy and then skip past it later.
+		b.head = new(bnode)
+		skip = true
+		end = b.head
+	}
+
+	length := len(p)
+	i := 0
+	for i = 0; i < length; i++ {
+		for j := 0; j < 8; j++ {
+			val := bitOn(p[i], j)
+			end.appendNodeVal(nil, val)
+			end = end.next
+		}
+	}
+
+	if skip {
+		// Skip past the dummy node we had to create earlier.
+		b.head = b.head.next
+	}
+
+	return i+1, nil
+}
+
 // Write out one byte of bits at the index. This will not advance the buffer.
 func (b *Buffer) WriteByte(index int) byte {
 	node, err := b.getNode(index)
