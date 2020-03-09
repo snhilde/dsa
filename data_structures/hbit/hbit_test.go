@@ -569,6 +569,16 @@ func TestInvalidArgs(t *testing.T) {
 	if n := b.WriteInt(100); n != 0 {
 		t.Error("Unexpectedly passed out-of-range index test for WriteInt()")
 	}
+
+	// Test Read() - empty argument.
+	if n, err := b.Read([]byte{}); n != 0 || err == nil {
+		t.Error("Unexpectedly passed empty argument test for Read()")
+	}
+
+	// Test Write() - empty argument.
+	if n, err := b.Write([]byte{}); n != 0 || err == nil {
+		t.Error("Unexpectedly passed empty argument test for Write()")
+	}
 }
 
 func TestBit(t *testing.T) {
