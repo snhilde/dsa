@@ -571,13 +571,15 @@ func TestInvalidArgs(t *testing.T) {
 	}
 
 	// Test Read() - empty argument.
-	if n, err := b.Read([]byte{}); n != 0 || err == nil {
-		t.Error("Unexpectedly passed empty argument test for Read()")
+	if _, err := b.Read([]byte{}); err != nil {
+		t.Error("Unexpectedly failed empty argument test for Read()")
+		t.Error(err)
 	}
 
 	// Test Write() - empty argument.
-	if n, err := b.Write([]byte{}); n != 0 || err == nil {
-		t.Error("Unexpectedly passed empty argument test for Write()")
+	if _, err := b.Write([]byte{}); err != nil {
+		t.Error("Unexpectedly failed empty argument test for Write()")
+		t.Error(err)
 	}
 }
 
