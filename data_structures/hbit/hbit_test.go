@@ -141,77 +141,77 @@ func TestBadPtr(t *testing.T) {
 
 	// Test ANDBit().
 	if err := b.ANDBit(10, true); err == nil {
-		t.Error("Unexpectedly passed bad Buffer test or ANDBit()")
+		t.Error("Unexpectedly passed bad Buffer test for ANDBit()")
 	}
 
 	// Test ORBit().
 	if err := b.ORBit(10, true); err == nil {
-		t.Error("Unexpectedly passed bad Buffer test or ORBit()")
+		t.Error("Unexpectedly passed bad Buffer test for ORBit()")
 	}
 
 	// Test XORBit().
 	if err := b.XORBit(10, true); err == nil {
-		t.Error("Unexpectedly passed bad Buffer test or XORBit()")
+		t.Error("Unexpectedly passed bad Buffer test for XORBit()")
 	}
 
 	// Test ANDBytes().
 	if err := b.ANDBytes([]byte{0xFF, 0xEE}); err == nil {
-		t.Error("Unexpectedly passed bad Buffer test or ANDBytes()")
+		t.Error("Unexpectedly passed bad Buffer test for ANDBytes()")
 	}
 
 	// Test ORBytes().
 	if err := b.ORBytes([]byte{0xFF, 0xEE}); err == nil {
-		t.Error("Unexpectedly passed bad Buffer test or ORBytes()")
+		t.Error("Unexpectedly passed bad Buffer test for ORBytes()")
 	}
 
 	// Test XORBytes().
 	if err := b.XORBytes([]byte{0xFF, 0xEE}); err == nil {
-		t.Error("Unexpectedly passed bad Buffer test or XORBytes()")
+		t.Error("Unexpectedly passed bad Buffer test for XORBytes()")
 	}
 
 	// Test ANDBuffer().
 	if err := b.ANDBuffer(New()); err == nil {
-		t.Error("Unexpectedly passed bad Buffer test or ANDBuffer()")
+		t.Error("Unexpectedly passed bad Buffer test for ANDBuffer()")
 	}
 
 	// Test ORBuffer().
 	if err := b.ORBuffer(New()); err == nil {
-		t.Error("Unexpectedly passed bad Buffer test or ORBuffer()")
+		t.Error("Unexpectedly passed bad Buffer test for ORBuffer()")
 	}
 
 	// Test XORBuffer().
 	if err := b.XORBuffer(New()); err == nil {
-		t.Error("Unexpectedly passed bad Buffer test or XORBuffer()")
+		t.Error("Unexpectedly passed bad Buffer test for XORBuffer()")
 	}
 
 	// Test ShiftLeft().
 	if err := b.ShiftLeft(5); err == nil {
-		t.Error("Unexpectedly passed bad Buffer test or ShiftLeft()")
+		t.Error("Unexpectedly passed bad Buffer test for ShiftLeft()")
 	}
 
 	// Test ShiftRight().
 	if err := b.ShiftRight(6); err == nil {
-		t.Error("Unexpectedly passed bad Buffer test or ShiftRight()")
+		t.Error("Unexpectedly passed bad Buffer test for ShiftRight()")
 	}
 
 	// Test NOTBit().
 	if err := b.NOTBit(10); err == nil {
-		t.Error("Unexpectedly passed bad Buffer test or NOTBit()")
+		t.Error("Unexpectedly passed bad Buffer test for NOTBit()")
 	}
 
 	// Test NOTBits().
 	if err := b.NOTBits(20); err == nil {
-		t.Error("Unexpectedly passed bad Buffer test or NOTBits()")
+		t.Error("Unexpectedly passed bad Buffer test for NOTBits()")
 	}
 
 	// Test WriteByte().
 	if n := b.WriteByte(4); n != 0 {
-		t.Error("Unexpectedly passed bad Buffer test or WriteByte()")
+		t.Error("Unexpectedly passed bad Buffer test for WriteByte()")
 	}
 
 	// Test WriteInt().
 	if n := b.WriteInt(6); n != 0 {
-		t.Error("Unexpectedly passed bad Buffer test or WriteInt()")
+		t.Error("Unexpectedly passed bad Buffer test for WriteInt()")
 	}
 }
 
@@ -388,49 +388,49 @@ func TestInvalidArgs(t *testing.T) {
 	b.Reset()
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
 	if err := b.ANDBit(-1, true); err == nil {
-		t.Error("Unexpectedly passed negative index test or ANDBit()")
+		t.Error("Unexpectedly passed negative index test for ANDBit()")
 	}
 
 	// Test ANDBit() - out-of-range index.
 	b.Reset()
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
 	if err := b.ANDBit(100, true); err == nil {
-		t.Error("Unexpectedly passed out-of-range index test or ANDBit()")
+		t.Error("Unexpectedly passed out-of-range index test for ANDBit()")
 	}
 
 	// Test ORBit() - negative index.
 	b.Reset()
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
 	if err := b.ORBit(-1, true); err == nil {
-		t.Error("Unexpectedly passed negative index test or ORBit()")
+		t.Error("Unexpectedly passed negative index test for ORBit()")
 	}
 
 	// Test ORBit() - out-of-range index.
 	b.Reset()
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
 	if err := b.ORBit(100, true); err == nil {
-		t.Error("Unexpectedly passed out-of-range index test or ORBit()")
+		t.Error("Unexpectedly passed out-of-range index test for ORBit()")
 	}
 
 	// Test XORBit() - negative index.
 	b.Reset()
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
 	if err := b.XORBit(-1, true); err == nil {
-		t.Error("Unexpectedly passed negative index test or XORBit()")
+		t.Error("Unexpectedly passed negative index test for XORBit()")
 	}
 
 	// Test XORBit() - out-of-range index.
 	b.Reset()
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
 	if err := b.XORBit(100, true); err == nil {
-		t.Error("Unexpectedly passed out-of-range index test or XORBit()")
+		t.Error("Unexpectedly passed out-of-range index test for XORBit()")
 	}
 
 	// Test ANDBytes() - empty reference bytes.
 	b.Reset()
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
 	if err := b.ANDBytes([]byte{}); err != nil {
-		t.Error("Unexpectedly failed empty bytes test or ANDBytes()")
+		t.Error("Unexpectedly failed empty bytes test for ANDBytes()")
 		t.Error(err)
 	}
 
@@ -438,7 +438,7 @@ func TestInvalidArgs(t *testing.T) {
 	b.Reset()
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
 	if err := b.ORBytes([]byte{}); err != nil {
-		t.Error("Unexpectedly failed empty bytes test or ORBytes()")
+		t.Error("Unexpectedly failed empty bytes test for ORBytes()")
 		t.Error(err)
 	}
 
@@ -446,7 +446,7 @@ func TestInvalidArgs(t *testing.T) {
 	b.Reset()
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
 	if err := b.XORBytes([]byte{}); err != nil {
-		t.Error("Unexpectedly failed empty bytes test or XORBytes()")
+		t.Error("Unexpectedly failed empty bytes test for XORBytes()")
 		t.Error(err)
 	}
 
@@ -454,28 +454,28 @@ func TestInvalidArgs(t *testing.T) {
 	b.Reset()
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
 	if err := b.ANDBuffer(nil); err == nil {
-		t.Error("Unexpectedly passed empty bytes test or ANDBuffer()")
+		t.Error("Unexpectedly passed empty bytes test for ANDBuffer()")
 	}
 
 	// Test ORBuffer() - empty reference buffer.
 	b.Reset()
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
 	if err := b.ORBuffer(nil); err == nil {
-		t.Error("Unexpectedly passed empty bytes test or ORBuffer()")
+		t.Error("Unexpectedly passed empty bytes test for ORBuffer()")
 	}
 
 	// Test XORBuffer() - empty reference buffer.
 	b.Reset()
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
 	if err := b.XORBuffer(nil); err == nil {
-		t.Error("Unexpectedly passed empty bytes test or XORBuffer()")
+		t.Error("Unexpectedly passed empty bytes test for XORBuffer()")
 	}
 
 	// Test ShiftLeft() - negative number.
 	b.Reset()
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
 	if err := b.ShiftLeft(-1); err != nil {
-		t.Error("Unexpectedly failed negative number test or ShiftLeft()")
+		t.Error("Unexpectedly failed negative number test for ShiftLeft()")
 		t.Error(err)
 	}
 
@@ -483,7 +483,7 @@ func TestInvalidArgs(t *testing.T) {
 	b.Reset()
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
 	if err := b.ShiftLeft(100); err != nil {
-		t.Error("Unexpectedly failed out-of-range number test or ShiftLeft()")
+		t.Error("Unexpectedly failed out-of-range number test for ShiftLeft()")
 		t.Error(err)
 	}
 
@@ -491,7 +491,7 @@ func TestInvalidArgs(t *testing.T) {
 	b.Reset()
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
 	if err := b.ShiftRight(-1); err != nil {
-		t.Error("Unexpectedly failed negative number test or ShiftRight()")
+		t.Error("Unexpectedly failed negative number test for ShiftRight()")
 		t.Error(err)
 	}
 
@@ -499,7 +499,7 @@ func TestInvalidArgs(t *testing.T) {
 	b.Reset()
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
 	if err := b.ShiftRight(100); err != nil {
-		t.Error("Unexpectedly failed out-of-range number test or ShiftRight()")
+		t.Error("Unexpectedly failed out-of-range number test for ShiftRight()")
 		t.Error(err)
 	}
 
@@ -507,28 +507,28 @@ func TestInvalidArgs(t *testing.T) {
 	b.Reset()
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
 	if err := b.NOTBit(-1); err == nil {
-		t.Error("Unexpectedly passed negative index test or NOTBit()")
+		t.Error("Unexpectedly passed negative index test for NOTBit()")
 	}
 
 	// Test NOTBit() - out-of-range index.
 	b.Reset()
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
 	if err := b.NOTBit(100); err == nil {
-		t.Error("Unexpectedly passed out-of-range index test or NOTBit()")
+		t.Error("Unexpectedly passed out-of-range index test for NOTBit()")
 	}
 
 	// Test NOTBits() - negative number.
 	b.Reset()
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
 	if err := b.NOTBits(-1); err == nil {
-		t.Error("Unexpectedly passed negative number test or NOTBits()")
+		t.Error("Unexpectedly passed negative number test for NOTBits()")
 	}
 
 	// Test NOTBits() - out-of-range number.
 	b.Reset()
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
 	if err := b.NOTBits(100); err != nil {
-		t.Error("Unexpectedly failed out-of-range number test or NOTBits()")
+		t.Error("Unexpectedly failed out-of-range number test for NOTBits()")
 		t.Error(err)
 	}
 
@@ -536,28 +536,28 @@ func TestInvalidArgs(t *testing.T) {
 	b.Reset()
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
 	if n := b.WriteByte(-1); n != 0 {
-		t.Error("Unexpectedly passed negative index test or WriteByte()")
+		t.Error("Unexpectedly passed negative index test for WriteByte()")
 	}
 
 	// Test WriteByte() - out-of-range index.
 	b.Reset()
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
 	if n := b.WriteByte(100); n != 0 {
-		t.Error("Unexpectedly passed out-of-range index test or WriteByte()")
+		t.Error("Unexpectedly passed out-of-range index test for WriteByte()")
 	}
 
 	// Test WriteInt() - negative index.
 	b.Reset()
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
 	if n := b.WriteInt(-1); n != 0 {
-		t.Error("Unexpectedly passed negative index test or WriteInt()")
+		t.Error("Unexpectedly passed negative index test for WriteInt()")
 	}
 
 	// Test WriteInt() - out-of-range index.
 	b.Reset()
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
 	if n := b.WriteInt(100); n != 0 {
-		t.Error("Unexpectedly passed out-of-range index test or WriteInt()")
+		t.Error("Unexpectedly passed out-of-range index test for WriteInt()")
 	}
 }
 
