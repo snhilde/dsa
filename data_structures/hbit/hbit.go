@@ -549,22 +549,22 @@ func (b *Buffer) Read(p []byte) (int, error) {
 			}
 			node = node.next
 			cnt++
+
+			if _, err := b.Advance(1); err != nil {
+				return (cnt+7)/8, err
+			}
 		}
 	}
 
 	// Note: The calculation (cnt+7)/8 ensures that we account for untouched (and therefore false) bits in the last byte.
-	if _, err := b.Advance(cnt); err != nil {
-		return (cnt+7)/8, err
-	}
-
 	return (cnt+7)/8, nil
 }
 
 // Read out one byte of bits at the index. This will not advance the buffer.
-func (b *Buffer) ReadByte(index int) byte {
+func (b *Buffer) ReadByte(index int) (byte, error) {
 	node, err := b.getNode(index)
 	if err != nil {
-		return 0
+		return 0, err
 	}
 
 	var bt byte
@@ -579,14 +579,14 @@ func (b *Buffer) ReadByte(index int) byte {
 		node = node.next
 	}
 
-	return bt
+	return bt, nil
 }
 
 // Read out the 32-bit decimal representation of the bits at the index. This will not advance the buffer.
-func (b *Buffer) ReadInt(index int) int {
+func (b *Buffer) ReadInt(index int) (int, error) {
 	node, err := b.getNode(index)
 	if err != nil {
-		return 0
+		return 0, nil
 	}
 
 	var num int32
@@ -601,7 +601,7 @@ func (b *Buffer) ReadInt(index int) int {
 		node = node.next
 	}
 
-	return int(num)
+	return int(num), nil
 }
 
 func (b *Buffer) Write(p []byte) (int, error) {
