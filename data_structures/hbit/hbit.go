@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strings"
 	"go/token"
+	"io"
 )
 
 
@@ -516,9 +517,17 @@ func (b *Buffer) NOTBits(n int) error {
 
 
 // --- METHODS FOR WRITING OUT BITS ---
+// Read len(p) bytes of bits from the buffer into p.
+// Returns number of bytes read into p, or io.EOF if the buffer is empty. If there are not enough bits to fill all of
+// the last byte, then the rest of the byte will be 0-filled.
 func (b *Buffer) Read(p []byte) (int, error) {
 	if b == nil {
 		return 0, bufErr()
+	}
+
+	// Check if our buffer has anything to read.
+	if b.head == nil {
+		return 0, io.EOF
 	}
 
 	length := len(p)
