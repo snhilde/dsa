@@ -586,7 +586,7 @@ func (b *Buffer) ReadByte(index int) (byte, error) {
 func (b *Buffer) ReadInt(index int) (int, error) {
 	node, err := b.getNode(index)
 	if err != nil {
-		return 0, nil
+		return 0, err
 	}
 
 	var num int32
