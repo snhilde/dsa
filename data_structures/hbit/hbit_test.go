@@ -205,12 +205,12 @@ func TestBadPtr(t *testing.T) {
 	}
 
 	// Test ReadByte().
-	if n := b.ReadByte(4); n != 0 {
+	if n, err := b.ReadByte(4); n != 0 || err == nil {
 		t.Error("Unexpectedly passed bad Buffer test for ReadByte()")
 	}
 
 	// Test ReadInt().
-	if n := b.ReadInt(6); n != 0 {
+	if n, err := b.ReadInt(6); n != 0 || err == nil {
 		t.Error("Unexpectedly passed bad Buffer test for ReadInt()")
 	}
 
@@ -545,28 +545,28 @@ func TestInvalidArgs(t *testing.T) {
 	// Test ReadByte() - negative index.
 	b.Reset()
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
-	if n := b.ReadByte(-1); n != 0 {
+	if n, err := b.ReadByte(-1); n != 0 || err == nil {
 		t.Error("Unexpectedly passed negative index test for ReadByte()")
 	}
 
 	// Test ReadByte() - out-of-range index.
 	b.Reset()
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
-	if n := b.ReadByte(100); n != 0 {
+	if n, err := b.ReadByte(100); n != 0 || err == nil {
 		t.Error("Unexpectedly passed out-of-range index test for ReadByte()")
 	}
 
 	// Test ReadInt() - negative index.
 	b.Reset()
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
-	if n := b.ReadInt(-1); n != 0 {
+	if n, err := b.ReadInt(-1); n != 0 || err == nil {
 		t.Error("Unexpectedly passed negative index test for ReadInt()")
 	}
 
 	// Test ReadInt() - out-of-range index.
 	b.Reset()
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
-	if n := b.ReadInt(100); n != 0 {
+	if n, err := b.ReadInt(100); n != 0 || err == nil {
 		t.Error("Unexpectedly passed out-of-range index test for ReadInt()")
 	}
 
@@ -2225,7 +2225,7 @@ func TestReadByte(t *testing.T) {
 
 	// Test out one bit.
 	b.AddBit(true)
-	if n := b.ReadByte(0); n != 0x01 {
+	if n, _ := b.ReadByte(0); n != 0x01 {
 		t.Error("Incorrect result from ReadByte() test")
 		t.Log("\tExpected: 1")
 		t.Log("\tReceived:", n)
@@ -2234,7 +2234,7 @@ func TestReadByte(t *testing.T) {
 	// Test out a simple byte.
 	b.Reset()
 	b.AddBytes([]byte{0x05})
-	if n := b.ReadByte(0); n != 0x05 {
+	if n, _ := b.ReadByte(0); n != 0x05 {
 		t.Error("Incorrect result from ReadByte() test")
 		t.Log("\tExpected: 5")
 		t.Log("\tReceived:", n)
@@ -2243,13 +2243,13 @@ func TestReadByte(t *testing.T) {
 	// Test out 4 bytes.
 	b.Reset()
 	b.AddBytes([]byte{0x0F, 0xF0, 0xFF, 0x08})
-	if n := b.ReadByte(0); n != 15 {
+	if n, _ := b.ReadByte(0); n != 15 {
 		t.Error("Incorrect result from ReadByte() test")
 		t.Log("\tExpected: 15")
 		t.Log("\tReceived:", n)
 	}
 
-	if n := b.ReadByte(16); n != 255 {
+	if n, _ := b.ReadByte(16); n != 255 {
 		t.Error("Incorrect result from ReadByte() test")
 		t.Log("\tExpected: 255")
 		t.Log("\tReceived:", n)
@@ -2264,7 +2264,7 @@ func TestReadInt(t *testing.T) {
 
 	// Test out one bit.
 	b.AddBit(true)
-	if n := b.ReadInt(0); n != 1 {
+	if n, _ := b.ReadInt(0); n != 1 {
 		t.Error("Incorrect result from ReadInt() test")
 		t.Log("\tExpected: 1")
 		t.Log("\tReceived:", n)
@@ -2273,7 +2273,7 @@ func TestReadInt(t *testing.T) {
 	// Test out a simple byte.
 	b.Reset()
 	b.AddBytes([]byte{0x05})
-	if n := b.ReadInt(0); n != 5 {
+	if n, _ := b.ReadInt(0); n != 5 {
 		t.Error("Incorrect result from ReadInt() test")
 		t.Log("\tExpected: 5")
 		t.Log("\tReceived:", n)
@@ -2282,7 +2282,7 @@ func TestReadInt(t *testing.T) {
 	// Test out 4 bytes.
 	b.Reset()
 	b.AddBytes([]byte{0x0F, 0xFF, 0xFF, 0xFF})
-	if n := b.ReadInt(0); n != -241 {
+	if n, _ := b.ReadInt(0); n != -241 {
 		t.Error("Incorrect result from ReadInt() test")
 		t.Log("\tExpected: -241")
 		t.Log("\tReceived:", n)
@@ -2291,7 +2291,7 @@ func TestReadInt(t *testing.T) {
 	// Test out a negative number.
 	b.Reset()
 	b.AddBytes([]byte{0xF0, 0xFF, 0xFF, 0xFF})
-	if n := b.ReadInt(0); n != -16 {
+	if n, _ := b.ReadInt(0); n != -16 {
 		t.Error("Incorrect result from ReadInt() test")
 		t.Log("\tExpected: -16")
 		t.Log("\tReceived:", n)
