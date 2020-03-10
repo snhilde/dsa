@@ -228,7 +228,6 @@ func (b *Buffer) RemoveBit(index int) error {
 
 // Cut out the bits at the index.
 func (b *Buffer) RemoveBits(index, n int) error {
-	// TODO: should removing all bits to the end also remove all offset bits before the start of the buffer?
 	if n < 1 {
 		return nil
 	}
@@ -701,7 +700,7 @@ func (b *Buffer) getNode(index int) (*bnode, error) {
 	}
 
 	if node == nil {
-		return nil, errors.New("Index out of range")
+		return nil, io.EOF
 	}
 
 	return node, nil
