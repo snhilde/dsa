@@ -2,6 +2,7 @@ package hbit
 
 import (
 	"testing"
+	"strings"
 )
 
 
@@ -204,6 +205,11 @@ func TestBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad Buffer test for NOTBits()")
 	}
 
+	// Test Read().
+	if n, err := b.Read([]byte{}); n != 0 || err == nil {
+		t.Error("Unexpectedly passed bad Buffer test for Read()")
+	}
+
 	// Test ReadByte().
 	if n, err := b.ReadByte(4); n != 0 || err == nil {
 		t.Error("Unexpectedly passed bad Buffer test for ReadByte()")
@@ -214,8 +220,8 @@ func TestBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad Buffer test for ReadInt()")
 	}
 
-	// Test Read().
-	if n, err := b.Read([]byte{}); n != 0 || err == nil {
+	// Test ReadFrom().
+	if n, err := b.ReadFrom(strings.NewReader("test")); n != 0 || err == nil {
 		t.Error("Unexpectedly passed bad Buffer test for Read()")
 	}
 
@@ -542,6 +548,12 @@ func TestInvalidArgs(t *testing.T) {
 		t.Error(err)
 	}
 
+	// Test Read() - empty argument.
+	if _, err := b.Read([]byte{}); err != nil {
+		t.Error("Unexpectedly failed empty argument test for Read()")
+		t.Error(err)
+	}
+
 	// Test ReadByte() - negative index.
 	b.Reset()
 	b.AddBytes([]byte{0xFF, 0xEE, 0xDD})
@@ -570,10 +582,9 @@ func TestInvalidArgs(t *testing.T) {
 		t.Error("Unexpectedly passed out-of-range index test for ReadInt()")
 	}
 
-	// Test Read() - empty argument.
-	if _, err := b.Read([]byte{}); err != nil {
-		t.Error("Unexpectedly failed empty argument test for Read()")
-		t.Error(err)
+	// Test ReadFrom() - empty argument.
+	if _, err := b.ReadFrom(nil); err == nil {
+		t.Error("Unexpectedly passed empty argument test for Read()")
 	}
 
 	// Test Write() - empty argument.
