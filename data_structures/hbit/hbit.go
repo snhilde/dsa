@@ -327,6 +327,11 @@ func (b *Buffer) WriteBytes(bytes ...byte) error {
 	return b.Join(buf)
 }
 
+// Write string bytes to the end of the buffer.
+func (b *Buffer) WriteString(s string) error {
+	return b.WriteBytes([]byte(s)...)
+}
+
 
 // Set the value of a particular bit in the buffer.
 func (b *Buffer) SetBit(index int, val bool) error {
