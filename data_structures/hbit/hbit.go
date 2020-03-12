@@ -322,9 +322,9 @@ func (b *Buffer) WriteByte(nb byte) error {
 }
 
 // Add bytes to the end of the buffer.
-func (b *Buffer) WriteBytes(nbs []byte) error {
+func (b *Buffer) WriteBytes(bytes ...byte) error {
 	buf := New()
-	for _, nb := range nbs {
+	for _, nb := range bytes {
 		if err := buf.WriteByte(nb); err != nil {
 			return err
 		}

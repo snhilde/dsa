@@ -126,7 +126,7 @@ func TestBadPtr(t *testing.T) {
 	}
 
 	// Test WriteBytes().
-	if err := b.WriteBytes([]byte{0x0C, 0xFF}); err == nil {
+	if err := b.WriteBytes(0x0C, 0xFF); err == nil {
 		t.Error("Unexpectedly passed bad Buffer test for WriteBytes()")
 	}
 
@@ -235,11 +235,11 @@ func TestBadPtr(t *testing.T) {
 func TestInvalidArgs(t *testing.T) {
 	// Make sure that every method is capable of handling bad arguments.
 	b := New()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 
 	// Test Bit() - negative index.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if val := b.Bit(-1); val != false {
 		t.Error("Incorrect result from negative index test for Bit()")
 		t.Log("\tExpected: false")
@@ -248,7 +248,7 @@ func TestInvalidArgs(t *testing.T) {
 
 	// Test Bit() - out-of-range index.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if val := b.Bit(100); val != false {
 		t.Error("Incorrect result from out-of-range index test for Bit()")
 		t.Log("\tExpected: false")
@@ -257,7 +257,7 @@ func TestInvalidArgs(t *testing.T) {
 
 	// Test Copy() - negative value.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if nb := b.Copy(-1); nb.String() != "<empty>" {
 		t.Error("Incorrect result from negative value test for Copy()")
 		t.Log("\tExpected: <empty>")
@@ -266,7 +266,7 @@ func TestInvalidArgs(t *testing.T) {
 
 	// Test Copy() - out-of-range value.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if nb := b.Copy(100); nb.String() != "111111110111011110111011" {
 		t.Error("Incorrect result from out-of-range value test for Copy()")
 		t.Log("\tExpected: 111111110111011110111011")
@@ -281,28 +281,28 @@ func TestInvalidArgs(t *testing.T) {
 
 	// Test ReadByte() - negative index.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if n, err := b.ReadByte(-1); n != 0 || err == nil {
 		t.Error("Unexpectedly passed negative index test for ReadByte()")
 	}
 
 	// Test ReadByte() - out-of-range index.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if n, err := b.ReadByte(100); n != 0 || err == nil {
 		t.Error("Unexpectedly passed out-of-range index test for ReadByte()")
 	}
 
 	// Test ReadInt() - negative index.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if n, err := b.ReadInt(-1); n != 0 || err == nil {
 		t.Error("Unexpectedly passed negative index test for ReadInt()")
 	}
 
 	// Test ReadInt() - out-of-range index.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if n, err := b.ReadInt(100); n != 0 || err == nil {
 		t.Error("Unexpectedly passed out-of-range index test for ReadInt()")
 	}
@@ -318,37 +318,43 @@ func TestInvalidArgs(t *testing.T) {
 		t.Error(err)
 	}
 
+	// Test WriteBytes() - empty argument.
+	if err := b.WriteBytes(); err != nil {
+		t.Error("Unexpectedly failed empty argument test for Write()")
+		t.Error(err)
+	}
+
 	// Test SetBit() - negative index.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.SetBit(-1, true); err == nil {
 		t.Error("Unexpectedly passed negative index test for SetBit()")
 	}
 
 	// Test SetBit() - out-of-range index.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.SetBit(100, true); err == nil {
 		t.Error("Unexpectedly passed out-of-range index test for SetBit()")
 	}
 
 	// Test SetBytes() - negative index.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.SetBytes(-1, []byte{0xFF}); err == nil {
 		t.Error("Unexpectedly passed negative index test for SetBytes()")
 	}
 
 	// Test SetBytes() - out-of-range index.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.SetBytes(100, []byte{0xFF}); err == nil {
 		t.Error("Unexpectedly passed out-of-range index test for SetBytes()")
 	}
 
 	// Test SetBytes() - empty reference bytes.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.SetBytes(4, []byte{}); err != nil {
 		t.Error("Unexpectedly failed empty bytes test for SetBytes()")
 		t.Error(err)
@@ -356,28 +362,28 @@ func TestInvalidArgs(t *testing.T) {
 
 	// Test RemoveBit() - negative index.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.RemoveBit(-1); err == nil {
 		t.Error("Unexpectedly passed negative index test for RemoveBit()")
 	}
 
 	// Test RemoveBit() - out-of-range index.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.RemoveBit(100); err == nil {
 		t.Error("Unexpectedly passed out-of-range index test for RemoveBit()")
 	}
 
 	// Test RemoveBits() - negative index.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.RemoveBits(-1, 5); err == nil {
 		t.Error("Unexpectedly passed negative index test for RemoveBits()")
 	}
 
 	// Test RemoveBits() - negative number.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.RemoveBits(1, -1); err != nil {
 		t.Error("Unexpectedly failed negative number test for RemoveBits()")
 		t.Error(err)
@@ -385,14 +391,14 @@ func TestInvalidArgs(t *testing.T) {
 
 	// Test RemoveBits() - out-of-range index.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.RemoveBits(100, 5); err == nil {
 		t.Error("Unexpectedly passed out-of-range index test for RemoveBits()")
 	}
 
 	// Test RemoveBits() - out-of-range number.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.RemoveBits(0, 100); err != nil {
 		t.Error("Unexpectedly failed out-of-range number test for RemoveBits()")
 		t.Error(err)
@@ -400,7 +406,7 @@ func TestInvalidArgs(t *testing.T) {
 
 	// Test RemoveBits() - no numbers.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.RemoveBits(1, 0); err != nil {
 		t.Error("Unexpectedly failed no number test for RemoveBits()")
 		t.Error(err)
@@ -408,14 +414,14 @@ func TestInvalidArgs(t *testing.T) {
 
 	// Test Advance() - negative index.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if n, err := b.Advance(-1); n != 0 || err == nil {
 		t.Error("Unexpectedly passed negative index test for Advance()")
 	}
 
 	// Test Advance() - out-of-range index.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if n, err := b.Advance(100); n == 0 || err != nil {
 		t.Error("Unexpectedly failed out-of-range index test for Advance()")
 		t.Error(err)
@@ -423,14 +429,14 @@ func TestInvalidArgs(t *testing.T) {
 
 	// Test Rewind() - negative index.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if n, err := b.Rewind(-1); n != 0 || err == nil {
 		t.Error("Unexpectedly passed negative index test for Rewind()")
 	}
 
 	// Test Rewind() - out-of-range index.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	b.Advance(10)
 	if n, err := b.Rewind(100); n == 0 || err != nil {
 		t.Error("Unexpectedly failed out-of-range index test for Rewind()")
@@ -439,7 +445,7 @@ func TestInvalidArgs(t *testing.T) {
 
 	// Test Merge() - empty buffer.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.Merge(nil); err != nil {
 		t.Error("Unexpectedly failed empty buffer test for Merge()")
 		t.Error(err)
@@ -447,49 +453,49 @@ func TestInvalidArgs(t *testing.T) {
 
 	// Test ANDBit() - negative index.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.ANDBit(-1, true); err == nil {
 		t.Error("Unexpectedly passed negative index test for ANDBit()")
 	}
 
 	// Test ANDBit() - out-of-range index.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.ANDBit(100, true); err == nil {
 		t.Error("Unexpectedly passed out-of-range index test for ANDBit()")
 	}
 
 	// Test ORBit() - negative index.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.ORBit(-1, true); err == nil {
 		t.Error("Unexpectedly passed negative index test for ORBit()")
 	}
 
 	// Test ORBit() - out-of-range index.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.ORBit(100, true); err == nil {
 		t.Error("Unexpectedly passed out-of-range index test for ORBit()")
 	}
 
 	// Test XORBit() - negative index.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.XORBit(-1, true); err == nil {
 		t.Error("Unexpectedly passed negative index test for XORBit()")
 	}
 
 	// Test XORBit() - out-of-range index.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.XORBit(100, true); err == nil {
 		t.Error("Unexpectedly passed out-of-range index test for XORBit()")
 	}
 
 	// Test ANDBytes() - empty reference bytes.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.ANDBytes([]byte{}); err != nil {
 		t.Error("Unexpectedly failed empty bytes test for ANDBytes()")
 		t.Error(err)
@@ -497,7 +503,7 @@ func TestInvalidArgs(t *testing.T) {
 
 	// Test ORBytes() - empty reference bytes.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.ORBytes([]byte{}); err != nil {
 		t.Error("Unexpectedly failed empty bytes test for ORBytes()")
 		t.Error(err)
@@ -505,7 +511,7 @@ func TestInvalidArgs(t *testing.T) {
 
 	// Test XORBytes() - empty reference bytes.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.XORBytes([]byte{}); err != nil {
 		t.Error("Unexpectedly failed empty bytes test for XORBytes()")
 		t.Error(err)
@@ -513,28 +519,28 @@ func TestInvalidArgs(t *testing.T) {
 
 	// Test ANDBuffer() - empty reference buffer.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.ANDBuffer(nil); err == nil {
 		t.Error("Unexpectedly passed empty bytes test for ANDBuffer()")
 	}
 
 	// Test ORBuffer() - empty reference buffer.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.ORBuffer(nil); err == nil {
 		t.Error("Unexpectedly passed empty bytes test for ORBuffer()")
 	}
 
 	// Test XORBuffer() - empty reference buffer.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.XORBuffer(nil); err == nil {
 		t.Error("Unexpectedly passed empty bytes test for XORBuffer()")
 	}
 
 	// Test ShiftLeft() - negative number.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.ShiftLeft(-1); err != nil {
 		t.Error("Unexpectedly failed negative number test for ShiftLeft()")
 		t.Error(err)
@@ -542,7 +548,7 @@ func TestInvalidArgs(t *testing.T) {
 
 	// Test ShiftLeft() - out-of-range number.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.ShiftLeft(100); err != nil {
 		t.Error("Unexpectedly failed out-of-range number test for ShiftLeft()")
 		t.Error(err)
@@ -550,7 +556,7 @@ func TestInvalidArgs(t *testing.T) {
 
 	// Test ShiftRight() - negative number.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.ShiftRight(-1); err != nil {
 		t.Error("Unexpectedly failed negative number test for ShiftRight()")
 		t.Error(err)
@@ -558,7 +564,7 @@ func TestInvalidArgs(t *testing.T) {
 
 	// Test ShiftRight() - out-of-range number.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.ShiftRight(100); err != nil {
 		t.Error("Unexpectedly failed out-of-range number test for ShiftRight()")
 		t.Error(err)
@@ -566,28 +572,28 @@ func TestInvalidArgs(t *testing.T) {
 
 	// Test NOTBit() - negative index.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.NOTBit(-1); err == nil {
 		t.Error("Unexpectedly passed negative index test for NOTBit()")
 	}
 
 	// Test NOTBit() - out-of-range index.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.NOTBit(100); err == nil {
 		t.Error("Unexpectedly passed out-of-range index test for NOTBit()")
 	}
 
 	// Test NOTBits() - negative number.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.NOTBits(-1); err == nil {
 		t.Error("Unexpectedly passed negative number test for NOTBits()")
 	}
 
 	// Test NOTBits() - out-of-range number.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.NOTBits(100); err != nil {
 		t.Error("Unexpectedly failed out-of-range number test for NOTBits()")
 		t.Error(err)
@@ -661,7 +667,7 @@ func TestBits(t *testing.T) {
 	}
 
 	// Test after adding some bytes.
-	b.WriteBytes([]byte{0x01, 0x02, 0x03, 0x04, 0x05, 0x06})
+	b.WriteBytes(0x01, 0x02, 0x03, 0x04, 0x05, 0x06)
 	if n := b.Bits(); n != 59 {
 		t.Error("Incorrect result from Bits() test")
 		t.Log("\tExpected: 59")
@@ -683,7 +689,7 @@ func TestOffset(t *testing.T) {
 	}
 
 	// Test after adding some bits.
-	b.WriteBytes([]byte{0xFF, 0xFB})
+	b.WriteBytes(0xFF, 0xFB)
 	if n := b.Offset(); n != 0 {
 		t.Error("Incorrect result from Offset() test")
 		t.Log("\tExpected: 0")
@@ -740,7 +746,7 @@ func TestCopy(t *testing.T) {
 	checkBits(t, b, 5)
 	checkBits(t, nb, 8)
 
-	nb.WriteBytes([]byte{0xAA, 0xBB, 0xCC})
+	nb.WriteBytes(0xAA, 0xBB, 0xCC)
 	checkBits(t, b, 5)
 	checkBits(t, nb, 32)
 
@@ -760,7 +766,7 @@ func TestRecalibrate(t *testing.T) {
 	checkDisplay(t, b, "<empty>")
 
 	// Test adding some bytes, advancing the buffer, and setting it back.
-	b.WriteBytes([]byte{0x50, 0x60, 0x70})
+	b.WriteBytes(0x50, 0x60, 0x70)
 	checkBits(t, b, 24)
 	if n := b.Offset(); n != 0 {
 		t.Error("Incorrect result from Offset() test")
@@ -863,7 +869,7 @@ func TestStringAndDisplay(t *testing.T) {
 
 	// Test out multiple bytes and bit order.
 	b = New()
-	b.WriteBytes([]byte{0x1A, 0x2B, 0x3C})
+	b.WriteBytes(0x1A, 0x2B, 0x3C)
 	checkBits(t, b, 24)
 	checkString(t, b, "010110001101010000111100")
 	checkDisplay(t, b, "0101 1000  1101 0100  0011 1100")
@@ -925,7 +931,7 @@ func TestReadByte(t *testing.T) {
 
 	// Test out a simple byte.
 	b.Reset()
-	b.WriteBytes([]byte{0x05})
+	b.WriteBytes(0x05)
 	if n, _ := b.ReadByte(0); n != 0x05 {
 		t.Error("Incorrect result from ReadByte() test")
 		t.Log("\tExpected: 5")
@@ -934,7 +940,7 @@ func TestReadByte(t *testing.T) {
 
 	// Test out 4 bytes.
 	b.Reset()
-	b.WriteBytes([]byte{0x0F, 0xF0, 0xFF, 0x08})
+	b.WriteBytes(0x0F, 0xF0, 0xFF, 0x08)
 	if n, _ := b.ReadByte(0); n != 15 {
 		t.Error("Incorrect result from ReadByte() test")
 		t.Log("\tExpected: 15")
@@ -964,7 +970,7 @@ func TestReadInt(t *testing.T) {
 
 	// Test out a simple byte.
 	b.Reset()
-	b.WriteBytes([]byte{0x05})
+	b.WriteBytes(0x05)
 	if n, _ := b.ReadInt(0); n != 5 {
 		t.Error("Incorrect result from ReadInt() test")
 		t.Log("\tExpected: 5")
@@ -973,7 +979,7 @@ func TestReadInt(t *testing.T) {
 
 	// Test out 4 bytes.
 	b.Reset()
-	b.WriteBytes([]byte{0x0F, 0xFF, 0xFF, 0xFF})
+	b.WriteBytes(0x0F, 0xFF, 0xFF, 0xFF)
 	if n, _ := b.ReadInt(0); n != -241 {
 		t.Error("Incorrect result from ReadInt() test")
 		t.Log("\tExpected: -241")
@@ -982,7 +988,7 @@ func TestReadInt(t *testing.T) {
 
 	// Test out a negative number.
 	b.Reset()
-	b.WriteBytes([]byte{0xF0, 0xFF, 0xFF, 0xFF})
+	b.WriteBytes(0xF0, 0xFF, 0xFF, 0xFF)
 	if n, _ := b.ReadInt(0); n != -16 {
 		t.Error("Incorrect result from ReadInt() test")
 		t.Log("\tExpected: -16")
@@ -1125,14 +1131,14 @@ func TestWriteBytes(t *testing.T) {
 	checkDisplay(t, b, "<empty>")
 
 	// Test adding some bytes.
-	if err := b.WriteBytes([]byte{0x54, 1}); err != nil {
+	if err := b.WriteBytes(0x54, 1); err != nil {
 		t.Error(err)
 	}
 	checkBits(t, b, 16)
 	checkString(t, b, "0010101010000000")
 	checkDisplay(t, b, "0010 1010  1000 0000")
 
-	if err := b.WriteBytes([]byte{0xAA, 0xBB, 0xCC}); err != nil {
+	if err := b.WriteBytes(0xAA, 0xBB, 0xCC); err != nil {
 		t.Error(err)
 	}
 	checkBits(t, b, 40)
@@ -1141,7 +1147,7 @@ func TestWriteBytes(t *testing.T) {
 
 	// Test advancing and adding some bytes.
 	b.Advance(30)
-	if err := b.WriteBytes([]byte{0x01, 0x02}); err != nil {
+	if err := b.WriteBytes(0x01, 0x02); err != nil {
 		t.Error(err)
 	}
 	checkBits(t, b, 26)
@@ -1150,7 +1156,7 @@ func TestWriteBytes(t *testing.T) {
 
 	// Test reversing and adding a byte.
 	b.Rewind(5)
-	if err := b.WriteBytes([]byte{0x08}); err != nil {
+	if err := b.WriteBytes(0x08); err != nil {
 		t.Error(err)
 	}
 	checkBits(t, b, 39)
@@ -1159,7 +1165,7 @@ func TestWriteBytes(t *testing.T) {
 
 	// Test resetting and adding some bytes.
 	b.Reset()
-	if err := b.WriteBytes([]byte{0x98, 0x76}); err != nil {
+	if err := b.WriteBytes(0x98, 0x76); err != nil {
 		t.Error(err)
 	}
 	checkBits(t, b, 16)
@@ -1631,7 +1637,7 @@ func TestMerge(t *testing.T) {
 	checkDisplay(t, b, "<empty>")
 
 	// Test merging an empty buffer with a full buffer.
-	b.WriteBytes([]byte{0x11, 0x22, 0x33})
+	b.WriteBytes(0x11, 0x22, 0x33)
 	checkBits(t, b, 24)
 	checkString(t, b, "100010000100010011001100")
 	checkDisplay(t, b, "1000 1000  0100 0100  1100 1100")
@@ -1659,7 +1665,7 @@ func TestMerge(t *testing.T) {
 	checkDisplay(t, b, "<empty>")
 
 	nb.Reset()
-	nb.WriteBytes([]byte{0x11, 0x22, 0x33})
+	nb.WriteBytes(0x11, 0x22, 0x33)
 	checkBits(t, nb, 24)
 	checkString(t, nb, "100010000100010011001100")
 	checkDisplay(t, nb, "1000 1000  0100 0100  1100 1100")
@@ -1699,13 +1705,13 @@ func TestMerge(t *testing.T) {
 
 	// Test merging two full buffers.
 	b.Reset()
-	b.WriteBytes([]byte{0x11, 0x22, 0x33})
+	b.WriteBytes(0x11, 0x22, 0x33)
 	checkBits(t, b, 24)
 	checkString(t, b, "100010000100010011001100")
 	checkDisplay(t, b, "1000 1000  0100 0100  1100 1100")
 
 	nb.Reset()
-	nb.WriteBytes([]byte{0x44, 0x55, 0x66})
+	nb.WriteBytes(0x44, 0x55, 0x66)
 	checkBits(t, nb, 24)
 	checkString(t, nb, "001000101010101001100110")
 	checkDisplay(t, nb, "0010 0010  1010 1010  0110 0110")
@@ -1723,7 +1729,7 @@ func TestMerge(t *testing.T) {
 
 	// Test merging the same buffer onto itself (shouldn't work).
 	b.Reset()
-	b.WriteBytes([]byte{0x11, 0x22, 0x33})
+	b.WriteBytes(0x11, 0x22, 0x33)
 	checkBits(t, b, 24)
 	checkString(t, b, "100010000100010011001100")
 	checkDisplay(t, b, "1000 1000  0100 0100  1100 1100")
@@ -1737,7 +1743,7 @@ func TestMerge(t *testing.T) {
 
 	// Test copying a buffer and merging it back onto the original buffer.
 	b.Reset()
-	b.WriteBytes([]byte{0x11, 0x22, 0x33})
+	b.WriteBytes(0x11, 0x22, 0x33)
 	checkBits(t, b, 24)
 	checkString(t, b, "100010000100010011001100")
 	checkDisplay(t, b, "1000 1000  0100 0100  1100 1100")
@@ -1889,7 +1895,7 @@ func TestANDBytes(t *testing.T) {
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
 
-	b.WriteBytes([]byte{0xFF, 0x00, 0xFF, 0x00})
+	b.WriteBytes(0xFF, 0x00, 0xFF, 0x00)
 	checkBits(t, b, 32)
 	checkString(t, b, "11111111000000001111111100000000")
 	checkDisplay(t, b, "1111 1111  0000 0000  1111 1111  0000 0000")
@@ -1922,7 +1928,7 @@ func TestORBytes(t *testing.T) {
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
 
-	b.WriteBytes([]byte{0xFF, 0x00, 0xFF, 0x00})
+	b.WriteBytes(0xFF, 0x00, 0xFF, 0x00)
 	checkBits(t, b, 32)
 	checkString(t, b, "11111111000000001111111100000000")
 	checkDisplay(t, b, "1111 1111  0000 0000  1111 1111  0000 0000")
@@ -1955,7 +1961,7 @@ func TestXORBytes(t *testing.T) {
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
 
-	b.WriteBytes([]byte{0xFF, 0x00, 0xFF, 0x00})
+	b.WriteBytes(0xFF, 0x00, 0xFF, 0x00)
 	checkBits(t, b, 32)
 	checkString(t, b, "11111111000000001111111100000000")
 	checkDisplay(t, b, "1111 1111  0000 0000  1111 1111  0000 0000")
@@ -1988,7 +1994,7 @@ func TestANDBuffer(t *testing.T) {
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
 
-	b.WriteBytes([]byte{0xFF, 0x00, 0xFF, 0x00})
+	b.WriteBytes(0xFF, 0x00, 0xFF, 0x00)
 	checkBits(t, b, 32)
 	checkString(t, b, "11111111000000001111111100000000")
 	checkDisplay(t, b, "1111 1111  0000 0000  1111 1111  0000 0000")
@@ -1998,7 +2004,7 @@ func TestANDBuffer(t *testing.T) {
 	checkString(t, ref, "<empty>")
 	checkDisplay(t, ref, "<empty>")
 
-	ref.WriteBytes([]byte{0xF0, 0xF0, 0x0F, 0x0F})
+	ref.WriteBytes(0xF0, 0xF0, 0x0F, 0x0F)
 	checkBits(t, ref, 32)
 	checkString(t, ref, "00001111000011111111000011110000")
 	checkDisplay(t, ref, "0000 1111  0000 1111  1111 0000  1111 0000")
@@ -2029,9 +2035,9 @@ func TestANDBuffer(t *testing.T) {
 
 	// Test buffers of different sizes.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0x00, 0xFF, 0x00})
+	b.WriteBytes(0xFF, 0x00, 0xFF, 0x00)
 	ref.Reset()
-	ref.WriteBytes([]byte{0xF0, 0xF0})
+	ref.WriteBytes(0xF0, 0xF0)
 
 	if err := b.ANDBuffer(ref); err != nil {
 		t.Error(err)
@@ -2047,7 +2053,7 @@ func TestORBuffer(t *testing.T) {
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
 
-	b.WriteBytes([]byte{0xFF, 0x00, 0xFF, 0x00})
+	b.WriteBytes(0xFF, 0x00, 0xFF, 0x00)
 	checkBits(t, b, 32)
 	checkString(t, b, "11111111000000001111111100000000")
 	checkDisplay(t, b, "1111 1111  0000 0000  1111 1111  0000 0000")
@@ -2057,7 +2063,7 @@ func TestORBuffer(t *testing.T) {
 	checkString(t, ref, "<empty>")
 	checkDisplay(t, ref, "<empty>")
 
-	ref.WriteBytes([]byte{0xF0, 0xF0, 0x0F, 0x0F})
+	ref.WriteBytes(0xF0, 0xF0, 0x0F, 0x0F)
 	checkBits(t, ref, 32)
 	checkString(t, ref, "00001111000011111111000011110000")
 	checkDisplay(t, ref, "0000 1111  0000 1111  1111 0000  1111 0000")
@@ -2088,9 +2094,9 @@ func TestORBuffer(t *testing.T) {
 
 	// Test buffers of different sizes.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0x00, 0xFF, 0x00})
+	b.WriteBytes(0xFF, 0x00, 0xFF, 0x00)
 	ref.Reset()
-	ref.WriteBytes([]byte{0xF0, 0xF0})
+	ref.WriteBytes(0xF0, 0xF0)
 
 	if err := b.ORBuffer(ref); err != nil {
 		t.Error(err)
@@ -2106,7 +2112,7 @@ func TestXORBuffer(t *testing.T) {
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
 
-	b.WriteBytes([]byte{0xFF, 0x00, 0xFF, 0x00})
+	b.WriteBytes(0xFF, 0x00, 0xFF, 0x00)
 	checkBits(t, b, 32)
 	checkString(t, b, "11111111000000001111111100000000")
 	checkDisplay(t, b, "1111 1111  0000 0000  1111 1111  0000 0000")
@@ -2116,7 +2122,7 @@ func TestXORBuffer(t *testing.T) {
 	checkString(t, ref, "<empty>")
 	checkDisplay(t, ref, "<empty>")
 
-	ref.WriteBytes([]byte{0xF0, 0xF0, 0x0F, 0x0F})
+	ref.WriteBytes(0xF0, 0xF0, 0x0F, 0x0F)
 	checkBits(t, ref, 32)
 	checkString(t, ref, "00001111000011111111000011110000")
 	checkDisplay(t, ref, "0000 1111  0000 1111  1111 0000  1111 0000")
@@ -2147,9 +2153,9 @@ func TestXORBuffer(t *testing.T) {
 
 	// Test buffers of different sizes.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0x00, 0xFF, 0x00})
+	b.WriteBytes(0xFF, 0x00, 0xFF, 0x00)
 	ref.Reset()
-	ref.WriteBytes([]byte{0xF0, 0xF0})
+	ref.WriteBytes(0xF0, 0xF0)
 
 	if err := b.XORBuffer(ref); err != nil {
 		t.Error(err)
@@ -2165,7 +2171,7 @@ func TestShiftLeft(t *testing.T) {
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
 
-	b.WriteBytes([]byte{0xFF, 0x00, 0xFF, 0x00})
+	b.WriteBytes(0xFF, 0x00, 0xFF, 0x00)
 	checkBits(t, b, 32)
 	checkString(t, b, "11111111000000001111111100000000")
 	checkDisplay(t, b, "1111 1111  0000 0000  1111 1111  0000 0000")
@@ -2179,7 +2185,7 @@ func TestShiftLeft(t *testing.T) {
 
 	// Make sure that bits before the starting point are not affected.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0x00, 0xFF, 0x00})
+	b.WriteBytes(0xFF, 0x00, 0xFF, 0x00)
 	checkBits(t, b, 32)
 	checkString(t, b, "11111111000000001111111100000000")
 	checkDisplay(t, b, "1111 1111  0000 0000  1111 1111  0000 0000")
@@ -2225,7 +2231,7 @@ func TestShiftRight(t *testing.T) {
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
 
-	b.WriteBytes([]byte{0xFF, 0x00, 0xFF, 0x00})
+	b.WriteBytes(0xFF, 0x00, 0xFF, 0x00)
 	checkBits(t, b, 32)
 	checkString(t, b, "11111111000000001111111100000000")
 	checkDisplay(t, b, "1111 1111  0000 0000  1111 1111  0000 0000")
@@ -2239,7 +2245,7 @@ func TestShiftRight(t *testing.T) {
 
 	// Make sure that bits before the starting point are not affected.
 	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0x00, 0xFF, 0x00})
+	b.WriteBytes(0xFF, 0x00, 0xFF, 0x00)
 	checkBits(t, b, 32)
 	checkString(t, b, "11111111000000001111111100000000")
 	checkDisplay(t, b, "1111 1111  0000 0000  1111 1111  0000 0000")
@@ -2313,7 +2319,7 @@ func TestNOTBits(t *testing.T) {
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
 
-	b.WriteBytes([]byte{0xFF, 0x00, 0xFF, 0x00})
+	b.WriteBytes(0xFF, 0x00, 0xFF, 0x00)
 	checkBits(t, b, 32)
 	checkString(t, b, "11111111000000001111111100000000")
 	checkDisplay(t, b, "1111 1111  0000 0000  1111 1111  0000 0000")
