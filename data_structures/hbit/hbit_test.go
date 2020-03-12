@@ -160,9 +160,9 @@ func TestBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad Buffer test for Rewind()")
 	}
 
-	// Test Merge().
-	if err := b.Merge(New()); err == nil {
-		t.Error("Unexpectedly passed bad Buffer test for Merge()")
+	// Test Join().
+	if err := b.Join(New()); err == nil {
+		t.Error("Unexpectedly passed bad Buffer test for Join()")
 	}
 
 	// Test ANDBit().
@@ -443,11 +443,11 @@ func TestInvalidArgs(t *testing.T) {
 		t.Error(err)
 	}
 
-	// Test Merge() - empty buffer.
+	// Test Join() - empty buffer.
 	b.Reset()
 	b.WriteBytes(0xFF, 0xEE, 0xDD)
-	if err := b.Merge(nil); err != nil {
-		t.Error("Unexpectedly failed empty buffer test for Merge()")
+	if err := b.Join(nil); err != nil {
+		t.Error("Unexpectedly failed empty buffer test for Join()")
 		t.Error(err)
 	}
 
@@ -1630,7 +1630,7 @@ func TestRewind(t *testing.T) {
 	checkDisplay(t, b, "1111 1111")
 }
 
-func TestMerge(t *testing.T) {
+func TestJoin(t *testing.T) {
 	b := New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
@@ -1647,7 +1647,7 @@ func TestMerge(t *testing.T) {
 	checkString(t, nb, "<empty>")
 	checkDisplay(t, nb, "<empty>")
 
-	if err := b.Merge(nb); err != nil {
+	if err := b.Join(nb); err != nil {
 		t.Error(err)
 	}
 	checkBits(t, b, 24)
@@ -1670,7 +1670,7 @@ func TestMerge(t *testing.T) {
 	checkString(t, nb, "100010000100010011001100")
 	checkDisplay(t, nb, "1000 1000  0100 0100  1100 1100")
 
-	if err := b.Merge(nb); err != nil {
+	if err := b.Join(nb); err != nil {
 		t.Error(err)
 	}
 	checkBits(t, b, 24)
@@ -1692,7 +1692,7 @@ func TestMerge(t *testing.T) {
 	checkString(t, nb, "<empty>")
 	checkDisplay(t, nb, "<empty>")
 
-	if err := b.Merge(nb); err != nil {
+	if err := b.Join(nb); err != nil {
 		t.Error(err)
 	}
 	checkBits(t, b, 0)
@@ -1716,7 +1716,7 @@ func TestMerge(t *testing.T) {
 	checkString(t, nb, "001000101010101001100110")
 	checkDisplay(t, nb, "0010 0010  1010 1010  0110 0110")
 
-	if err := b.Merge(nb); err != nil {
+	if err := b.Join(nb); err != nil {
 		t.Error(err)
 	}
 	checkBits(t, b, 48)
@@ -1734,7 +1734,7 @@ func TestMerge(t *testing.T) {
 	checkString(t, b, "100010000100010011001100")
 	checkDisplay(t, b, "1000 1000  0100 0100  1100 1100")
 
-	if err := b.Merge(b); err != nil {
+	if err := b.Join(b); err != nil {
 		t.Error(err)
 	}
 	checkBits(t, b, 0)
@@ -1749,7 +1749,7 @@ func TestMerge(t *testing.T) {
 	checkDisplay(t, b, "1000 1000  0100 0100  1100 1100")
 
 	nb = b.Copy(b.Bits())
-	if err := b.Merge(nb); err != nil {
+	if err := b.Join(nb); err != nil {
 		t.Error(err)
 	}
 	checkBits(t, b, 48)

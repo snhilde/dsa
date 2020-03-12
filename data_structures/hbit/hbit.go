@@ -330,7 +330,7 @@ func (b *Buffer) WriteBytes(bytes ...byte) error {
 		}
 	}
 
-	return b.Merge(buf)
+	return b.Join(buf)
 }
 
 
@@ -489,7 +489,7 @@ func (b *Buffer) Rewind(n int) (int, error) {
 
 // Append a different buffer to the end of the current one. For safety, the current buffer will take ownership of the
 // second buffer.
-func (b *Buffer) Merge(nb *Buffer) error {
+func (b *Buffer) Join(nb *Buffer) error {
 	end, err := b.getEnd()
 	if err != nil {
 		return err
