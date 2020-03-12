@@ -265,6 +265,7 @@ func (b *Buffer) Write(p []byte) (int, error) {
 	if skip {
 		// Skip past the dummy node we had to create earlier.
 		b.head = b.head.next
+		b.head.prev = nil
 	}
 
 	return length, nil
@@ -290,41 +291,13 @@ func (b *Buffer) WriteBit(val bool) error {
 
 // Append an octet to the end of the buffer. The bits will be added low to high.
 func (b *Buffer) WriteByte(nb byte) error {
-	end, err := b.getEnd()
-	if err != nil {
-		return err
-	}
-
-	val := bitOn(nb, 0)
-	if end == nil {
-		// This means the buffer is empty.
-		b.head = new(bnode)
-		b.head.val = val
-		end = b.head
-	} else {
-		end.appendNodeVal(nil, val)
-		end = end.next
-	}
-
-	for i := 1; i < 8; i++ {
-		val := bitOn(nb, i)
-		end.appendNodeVal(nil, val)
-		end = end.next
-	}
-
-	return nil
+	return b.WriteBytes(nb)
 }
 
 // Append bytes to the end of the buffer.
 func (b *Buffer) WriteBytes(bytes ...byte) error {
-	buf := New()
-	for _, nb := range bytes {
-		if err := buf.WriteByte(nb); err != nil {
-			return err
-		}
-	}
-
-	return b.Join(buf)
+	_, err := b.Write(bytes)
+	return err
 }
 
 // Append string bytes to the end of the buffer.
