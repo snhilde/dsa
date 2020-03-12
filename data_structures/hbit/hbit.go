@@ -519,6 +519,7 @@ func (b *Buffer) NOTBits(n int) error {
 // Read len(p) bytes of bits from the buffer into p.
 // Returns number of bytes read into p, or io.EOF if the buffer is empty. If there are not enough bits to fill all of
 // the last byte, then the rest of the byte will be 0-filled.
+// io.EOF will only be returned if the buffer is empty before any bytes have been read into p.
 func (b *Buffer) Read(p []byte) (int, error) {
 	if b == nil {
 		return 0, bufErr()
@@ -603,6 +604,7 @@ func (b *Buffer) ReadInt(index int) (int, error) {
 	return int(num), nil
 }
 
+// Append the entire contents of p to the buffer.
 func (b *Buffer) Write(p []byte) (int, error) {
 	end, err := b.getEnd()
 	if err != nil {
