@@ -90,14 +90,44 @@ func TestBadPtr(t *testing.T) {
 		t.Log("\tReceived:", s)
 	}
 
-	// Test RemoveBit().
-	if err := b.RemoveBit(5); err == nil {
-		t.Error("Unexpectedly passed bad Buffer test for RemoveBit()")
+	// Test Read().
+	if n, err := b.Read([]byte{}); n != 0 || err == nil {
+		t.Error("Unexpectedly passed bad Buffer test for Read()")
 	}
 
-	// Test RemoveBits().
-	if err := b.RemoveBits(2, 5); err == nil {
-		t.Error("Unexpectedly passed bad Buffer test for RemoveBits()")
+	// Test ReadByte().
+	if n, err := b.ReadByte(4); n != 0 || err == nil {
+		t.Error("Unexpectedly passed bad Buffer test for ReadByte()")
+	}
+
+	// Test ReadInt().
+	if n, err := b.ReadInt(6); n != 0 || err == nil {
+		t.Error("Unexpectedly passed bad Buffer test for ReadInt()")
+	}
+
+	// Test ReadFrom().
+	if n, err := b.ReadFrom(strings.NewReader("test")); n != 0 || err == nil {
+		t.Error("Unexpectedly passed bad Buffer test for Read()")
+	}
+
+	// Test Write().
+	if n, err := b.Write([]byte{}); n != 0 || err == nil {
+		t.Error("Unexpectedly passed bad Buffer test for Write()")
+	}
+
+	// Test WriteBit().
+	if err := b.WriteBit(true); err == nil {
+		t.Error("Unexpectedly passed bad Buffer test for WriteBit()")
+	}
+
+	// Test WriteByte().
+	if err := b.WriteByte(0x0C); err == nil {
+		t.Error("Unexpectedly passed bad Buffer test for WriteByte()")
+	}
+
+	// Test WriteBytes().
+	if err := b.WriteBytes([]byte{0x0C, 0xFF}); err == nil {
+		t.Error("Unexpectedly passed bad Buffer test for WriteBytes()")
 	}
 
 	// Test SetBit().
@@ -108,6 +138,16 @@ func TestBadPtr(t *testing.T) {
 	// Test SetBytes().
 	if err := b.SetBytes(4, []byte{0xFF}); err == nil {
 		t.Error("Unexpectedly passed bad Buffer test for SetBytes()")
+	}
+
+	// Test RemoveBit().
+	if err := b.RemoveBit(5); err == nil {
+		t.Error("Unexpectedly passed bad Buffer test for RemoveBit()")
+	}
+
+	// Test RemoveBits().
+	if err := b.RemoveBits(2, 5); err == nil {
+		t.Error("Unexpectedly passed bad Buffer test for RemoveBits()")
 	}
 
 	// Test Advance().
@@ -189,46 +229,6 @@ func TestBadPtr(t *testing.T) {
 	if err := b.NOTBits(20); err == nil {
 		t.Error("Unexpectedly passed bad Buffer test for NOTBits()")
 	}
-
-	// Test Read().
-	if n, err := b.Read([]byte{}); n != 0 || err == nil {
-		t.Error("Unexpectedly passed bad Buffer test for Read()")
-	}
-
-	// Test ReadByte().
-	if n, err := b.ReadByte(4); n != 0 || err == nil {
-		t.Error("Unexpectedly passed bad Buffer test for ReadByte()")
-	}
-
-	// Test ReadInt().
-	if n, err := b.ReadInt(6); n != 0 || err == nil {
-		t.Error("Unexpectedly passed bad Buffer test for ReadInt()")
-	}
-
-	// Test ReadFrom().
-	if n, err := b.ReadFrom(strings.NewReader("test")); n != 0 || err == nil {
-		t.Error("Unexpectedly passed bad Buffer test for Read()")
-	}
-
-	// Test Write().
-	if n, err := b.Write([]byte{}); n != 0 || err == nil {
-		t.Error("Unexpectedly passed bad Buffer test for Write()")
-	}
-
-	// Test WriteBit().
-	if err := b.WriteBit(true); err == nil {
-		t.Error("Unexpectedly passed bad Buffer test for WriteBit()")
-	}
-
-	// Test WriteByte().
-	if err := b.WriteByte(0x0C); err == nil {
-		t.Error("Unexpectedly passed bad Buffer test for WriteByte()")
-	}
-
-	// Test WriteBytes().
-	if err := b.WriteBytes([]byte{0x0C, 0xFF}); err == nil {
-		t.Error("Unexpectedly passed bad Buffer test for WriteBytes()")
-	}
 }
 
 // TODO: make sure all these tests are really checking what we want them to check
@@ -271,6 +271,87 @@ func TestInvalidArgs(t *testing.T) {
 		t.Error("Incorrect result from out-of-range value test for Copy()")
 		t.Log("\tExpected: 111111110111011110111011")
 		t.Log("\tReceived:", nb)
+	}
+
+	// Test Read() - empty argument.
+	if _, err := b.Read([]byte{}); err != nil {
+		t.Error("Unexpectedly failed empty argument test for Read()")
+		t.Error(err)
+	}
+
+	// Test ReadByte() - negative index.
+	b.Reset()
+	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	if n, err := b.ReadByte(-1); n != 0 || err == nil {
+		t.Error("Unexpectedly passed negative index test for ReadByte()")
+	}
+
+	// Test ReadByte() - out-of-range index.
+	b.Reset()
+	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	if n, err := b.ReadByte(100); n != 0 || err == nil {
+		t.Error("Unexpectedly passed out-of-range index test for ReadByte()")
+	}
+
+	// Test ReadInt() - negative index.
+	b.Reset()
+	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	if n, err := b.ReadInt(-1); n != 0 || err == nil {
+		t.Error("Unexpectedly passed negative index test for ReadInt()")
+	}
+
+	// Test ReadInt() - out-of-range index.
+	b.Reset()
+	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	if n, err := b.ReadInt(100); n != 0 || err == nil {
+		t.Error("Unexpectedly passed out-of-range index test for ReadInt()")
+	}
+
+	// Test ReadFrom() - empty argument.
+	if _, err := b.ReadFrom(nil); err == nil {
+		t.Error("Unexpectedly passed empty argument test for Read()")
+	}
+
+	// Test Write() - empty argument.
+	if _, err := b.Write([]byte{}); err != nil {
+		t.Error("Unexpectedly failed empty argument test for Write()")
+		t.Error(err)
+	}
+
+	// Test SetBit() - negative index.
+	b.Reset()
+	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.SetBit(-1, true); err == nil {
+		t.Error("Unexpectedly passed negative index test for SetBit()")
+	}
+
+	// Test SetBit() - out-of-range index.
+	b.Reset()
+	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.SetBit(100, true); err == nil {
+		t.Error("Unexpectedly passed out-of-range index test for SetBit()")
+	}
+
+	// Test SetBytes() - negative index.
+	b.Reset()
+	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.SetBytes(-1, []byte{0xFF}); err == nil {
+		t.Error("Unexpectedly passed negative index test for SetBytes()")
+	}
+
+	// Test SetBytes() - out-of-range index.
+	b.Reset()
+	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.SetBytes(100, []byte{0xFF}); err == nil {
+		t.Error("Unexpectedly passed out-of-range index test for SetBytes()")
+	}
+
+	// Test SetBytes() - empty reference bytes.
+	b.Reset()
+	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
+	if err := b.SetBytes(4, []byte{}); err != nil {
+		t.Error("Unexpectedly failed empty bytes test for SetBytes()")
+		t.Error(err)
 	}
 
 	// Test RemoveBit() - negative index.
@@ -322,42 +403,6 @@ func TestInvalidArgs(t *testing.T) {
 	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
 	if err := b.RemoveBits(1, 0); err != nil {
 		t.Error("Unexpectedly failed no number test for RemoveBits()")
-		t.Error(err)
-	}
-
-	// Test SetBit() - negative index.
-	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
-	if err := b.SetBit(-1, true); err == nil {
-		t.Error("Unexpectedly passed negative index test for SetBit()")
-	}
-
-	// Test SetBit() - out-of-range index.
-	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
-	if err := b.SetBit(100, true); err == nil {
-		t.Error("Unexpectedly passed out-of-range index test for SetBit()")
-	}
-
-	// Test SetBytes() - negative index.
-	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
-	if err := b.SetBytes(-1, []byte{0xFF}); err == nil {
-		t.Error("Unexpectedly passed negative index test for SetBytes()")
-	}
-
-	// Test SetBytes() - out-of-range index.
-	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
-	if err := b.SetBytes(100, []byte{0xFF}); err == nil {
-		t.Error("Unexpectedly passed out-of-range index test for SetBytes()")
-	}
-
-	// Test SetBytes() - empty reference bytes.
-	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
-	if err := b.SetBytes(4, []byte{}); err != nil {
-		t.Error("Unexpectedly failed empty bytes test for SetBytes()")
 		t.Error(err)
 	}
 
@@ -545,51 +590,6 @@ func TestInvalidArgs(t *testing.T) {
 	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
 	if err := b.NOTBits(100); err != nil {
 		t.Error("Unexpectedly failed out-of-range number test for NOTBits()")
-		t.Error(err)
-	}
-
-	// Test Read() - empty argument.
-	if _, err := b.Read([]byte{}); err != nil {
-		t.Error("Unexpectedly failed empty argument test for Read()")
-		t.Error(err)
-	}
-
-	// Test ReadByte() - negative index.
-	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
-	if n, err := b.ReadByte(-1); n != 0 || err == nil {
-		t.Error("Unexpectedly passed negative index test for ReadByte()")
-	}
-
-	// Test ReadByte() - out-of-range index.
-	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
-	if n, err := b.ReadByte(100); n != 0 || err == nil {
-		t.Error("Unexpectedly passed out-of-range index test for ReadByte()")
-	}
-
-	// Test ReadInt() - negative index.
-	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
-	if n, err := b.ReadInt(-1); n != 0 || err == nil {
-		t.Error("Unexpectedly passed negative index test for ReadInt()")
-	}
-
-	// Test ReadInt() - out-of-range index.
-	b.Reset()
-	b.WriteBytes([]byte{0xFF, 0xEE, 0xDD})
-	if n, err := b.ReadInt(100); n != 0 || err == nil {
-		t.Error("Unexpectedly passed out-of-range index test for ReadInt()")
-	}
-
-	// Test ReadFrom() - empty argument.
-	if _, err := b.ReadFrom(nil); err == nil {
-		t.Error("Unexpectedly passed empty argument test for Read()")
-	}
-
-	// Test Write() - empty argument.
-	if _, err := b.Write([]byte{}); err != nil {
-		t.Error("Unexpectedly failed empty argument test for Write()")
 		t.Error(err)
 	}
 }
@@ -893,6 +893,392 @@ func TestStringAndDisplay(t *testing.T) {
 	checkDisplay(t, b, "<empty>")
 }
 
+func TestRead(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	buf := []byte{0xFF}
+	if n, err := b.Write(buf); err != nil {
+		t.Error(err)
+		t.Log(n)
+	}
+	checkBits(t, b, 8)
+	checkString(t, b, "11111111")
+	checkDisplay(t, b, "1111 1111")
+}
+
+func TestReadByte(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	// Test out one bit.
+	b.WriteBit(true)
+	if n, _ := b.ReadByte(0); n != 0x01 {
+		t.Error("Incorrect result from ReadByte() test")
+		t.Log("\tExpected: 1")
+		t.Log("\tReceived:", n)
+	}
+
+	// Test out a simple byte.
+	b.Reset()
+	b.WriteBytes([]byte{0x05})
+	if n, _ := b.ReadByte(0); n != 0x05 {
+		t.Error("Incorrect result from ReadByte() test")
+		t.Log("\tExpected: 5")
+		t.Log("\tReceived:", n)
+	}
+
+	// Test out 4 bytes.
+	b.Reset()
+	b.WriteBytes([]byte{0x0F, 0xF0, 0xFF, 0x08})
+	if n, _ := b.ReadByte(0); n != 15 {
+		t.Error("Incorrect result from ReadByte() test")
+		t.Log("\tExpected: 15")
+		t.Log("\tReceived:", n)
+	}
+
+	if n, _ := b.ReadByte(16); n != 255 {
+		t.Error("Incorrect result from ReadByte() test")
+		t.Log("\tExpected: 255")
+		t.Log("\tReceived:", n)
+	}
+}
+
+func TestReadInt(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	// Test out one bit.
+	b.WriteBit(true)
+	if n, _ := b.ReadInt(0); n != 1 {
+		t.Error("Incorrect result from ReadInt() test")
+		t.Log("\tExpected: 1")
+		t.Log("\tReceived:", n)
+	}
+
+	// Test out a simple byte.
+	b.Reset()
+	b.WriteBytes([]byte{0x05})
+	if n, _ := b.ReadInt(0); n != 5 {
+		t.Error("Incorrect result from ReadInt() test")
+		t.Log("\tExpected: 5")
+		t.Log("\tReceived:", n)
+	}
+
+	// Test out 4 bytes.
+	b.Reset()
+	b.WriteBytes([]byte{0x0F, 0xFF, 0xFF, 0xFF})
+	if n, _ := b.ReadInt(0); n != -241 {
+		t.Error("Incorrect result from ReadInt() test")
+		t.Log("\tExpected: -241")
+		t.Log("\tReceived:", n)
+	}
+
+	// Test out a negative number.
+	b.Reset()
+	b.WriteBytes([]byte{0xF0, 0xFF, 0xFF, 0xFF})
+	if n, _ := b.ReadInt(0); n != -16 {
+		t.Error("Incorrect result from ReadInt() test")
+		t.Log("\tExpected: -16")
+		t.Log("\tReceived:", n)
+	}
+}
+
+func TestReadFrom(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	buf := []byte{0xFF}
+	if n, err := b.Write(buf); err != nil {
+		t.Error(err)
+		t.Log(n)
+	}
+	checkBits(t, b, 8)
+	checkString(t, b, "11111111")
+	checkDisplay(t, b, "1111 1111")
+}
+
+func TestWrite(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+}
+
+func TestWriteBit(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	// Test adding some bits.
+	if err := b.WriteBit(true); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 1)
+	checkString(t, b, "1")
+	checkDisplay(t, b, "1")
+
+	if err := b.WriteBit(true); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 2)
+	checkString(t, b, "11")
+	checkDisplay(t, b, "11")
+
+	if err := b.WriteBit(false); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 3)
+	checkString(t, b, "110")
+	checkDisplay(t, b, "110")
+
+	// Test advancing and adding a bit.
+	b.Advance(2)
+	if err := b.WriteBit(true); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 2)
+	checkString(t, b, "01")
+	checkDisplay(t, b, "01")
+
+	// Test reversing and adding a bit.
+	b.Rewind(1)
+	if err := b.WriteBit(false); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 4)
+	checkString(t, b, "1010")
+	checkDisplay(t, b, "1010")
+
+	// Test resetting and adding a bit.
+	b.Reset()
+	if err := b.WriteBit(false); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 1)
+	checkString(t, b, "0")
+	checkDisplay(t, b, "0")
+}
+
+func TestWriteByte(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	// Test adding some bytes.
+	if err := b.WriteByte(0xF0); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 8)
+	checkString(t, b, "00001111")
+	checkDisplay(t, b, "0000 1111")
+
+	if err := b.WriteByte(0x88); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 16)
+	checkString(t, b, "0000111100010001")
+	checkDisplay(t, b, "0000 1111  0001 0001")
+
+	// Test advancing and adding a byte.
+	b.Advance(10)
+	if err := b.WriteByte(0x14); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 14)
+	checkString(t, b, "01000100101000")
+	checkDisplay(t, b, "0100 0100  1010 00")
+
+	// Test reversing and adding a byte.
+	b.Rewind(3)
+	if err := b.WriteByte(0xA0); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 25)
+	checkString(t, b, "1000100010010100000000101")
+	checkDisplay(t, b, "1000 1000  1001 0100  0000 0010  1")
+
+	// Test resetting and adding a byte.
+	b.Reset()
+	if err := b.WriteByte(0x44); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 8)
+	checkString(t, b, "00100010")
+	checkDisplay(t, b, "0010 0010")
+}
+
+func TestWriteBytes(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	// Test adding some bytes.
+	if err := b.WriteBytes([]byte{0x54, 1}); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 16)
+	checkString(t, b, "0010101010000000")
+	checkDisplay(t, b, "0010 1010  1000 0000")
+
+	if err := b.WriteBytes([]byte{0xAA, 0xBB, 0xCC}); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 40)
+	checkString(t, b, "0010101010000000010101011101110100110011")
+	checkDisplay(t, b, "0010 1010  1000 0000  0101 0101  1101 1101  0011 0011")
+
+	// Test advancing and adding some bytes.
+	b.Advance(30)
+	if err := b.WriteBytes([]byte{0x01, 0x02}); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 26)
+	checkString(t, b, "01001100111000000001000000")
+	checkDisplay(t, b, "0100 1100  1110 0000  0001 0000  00")
+
+	// Test reversing and adding a byte.
+	b.Rewind(5)
+	if err := b.WriteBytes([]byte{0x08}); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 39)
+	checkString(t, b, "101110100110011100000000100000000010000")
+	checkDisplay(t, b, "1011 1010  0110 0111  0000 0000  1000 0000  0010 000")
+
+	// Test resetting and adding some bytes.
+	b.Reset()
+	if err := b.WriteBytes([]byte{0x98, 0x76}); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 16)
+	checkString(t, b, "0001100101101110")
+	checkDisplay(t, b, "0001 1001  0110 1110")
+}
+
+func testSetBit(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	b.WriteByte(0x50)
+	checkBits(t, b, 8)
+	checkString(t, b, "00001010")
+	checkDisplay(t, b, "0000 1010")
+
+	// Test setting the first bit.
+	if err := b.SetBit(0, true); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 8)
+	checkString(t, b, "10001010")
+	checkDisplay(t, b, "1000 1010")
+
+	// Test setting the last bit.
+	b.Reset()
+	b.WriteByte(0x50)
+	if err := b.SetBit(0, true); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 8)
+	checkString(t, b, "00001011")
+	checkDisplay(t, b, "0000 1011")
+
+	// Test setting a middle bit.
+	b.Reset()
+	b.WriteByte(0x50)
+	if err := b.SetBit(4, true); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 8)
+	checkString(t, b, "00000011")
+	checkDisplay(t, b, "0000 0011")
+
+	// Test advancing and setting a bit.
+	b.Reset()
+	b.WriteByte(0x51)
+	b.Advance(3)
+	checkBits(t, b, 5)
+	checkString(t, b, "01010")
+	checkDisplay(t, b, "0101 0")
+
+	if err := b.SetBit(0, false); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 4)
+	checkString(t, b, "0010")
+	checkDisplay(t, b, "0010")
+
+	b.Rewind(3)
+	checkBits(t, b, 7)
+	checkString(t, b, "1000010")
+	checkDisplay(t, b, "1000 010")
+}
+
+func testSetBytes(t *testing.T) {
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	b.WriteByte(0x50)
+	checkBits(t, b, 8)
+	checkString(t, b, "00001010")
+	checkDisplay(t, b, "0000 1010")
+
+	// Test setting the first byte.
+	if err := b.SetBytes(0, []byte{0xFF}); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 8)
+	checkString(t, b, "11111111")
+	checkDisplay(t, b, "1111 1111")
+
+	// Test setting too many bits.
+	b.Reset()
+	b.WriteByte(0x50)
+	if err := b.SetBytes(0, []byte{0x4C, 0xFF}); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 8)
+	checkString(t, b, "00110010")
+	checkDisplay(t, b, "0011 0010")
+
+	// Test advancing and setting a byte.
+	b.Reset()
+	b.WriteByte(0x51)
+	checkString(t, b, "10001010")
+	checkDisplay(t, b, "1000 1010")
+	b.Advance(3)
+	checkBits(t, b, 5)
+	checkString(t, b, "01010")
+	checkDisplay(t, b, "0101 0")
+
+	if err := b.SetBytes(0, []byte{0x00}); err != nil {
+		t.Error(err)
+	}
+	checkBits(t, b, 4)
+	checkString(t, b, "0000")
+	checkDisplay(t, b, "0000")
+
+	b.Rewind(5)
+	checkBits(t, b, 8)
+	checkString(t, b, "10000000")
+	checkDisplay(t, b, "1000 0000")
+}
+
 func TestRemoveBit(t *testing.T) {
 	b := New()
 	checkBits(t, b, 0)
@@ -1155,118 +1541,6 @@ func TestRemoveBits(t *testing.T) {
 	checkBits(t, b, 2)
 	checkString(t, b, "10")
 	checkDisplay(t, b, "10")
-}
-
-func testSetBit(t *testing.T) {
-	b := New()
-	checkBits(t, b, 0)
-	checkString(t, b, "<empty>")
-	checkDisplay(t, b, "<empty>")
-
-	b.WriteByte(0x50)
-	checkBits(t, b, 8)
-	checkString(t, b, "00001010")
-	checkDisplay(t, b, "0000 1010")
-
-	// Test setting the first bit.
-	if err := b.SetBit(0, true); err != nil {
-		t.Error(err)
-	}
-	checkBits(t, b, 8)
-	checkString(t, b, "10001010")
-	checkDisplay(t, b, "1000 1010")
-
-	// Test setting the last bit.
-	b.Reset()
-	b.WriteByte(0x50)
-	if err := b.SetBit(0, true); err != nil {
-		t.Error(err)
-	}
-	checkBits(t, b, 8)
-	checkString(t, b, "00001011")
-	checkDisplay(t, b, "0000 1011")
-
-	// Test setting a middle bit.
-	b.Reset()
-	b.WriteByte(0x50)
-	if err := b.SetBit(4, true); err != nil {
-		t.Error(err)
-	}
-	checkBits(t, b, 8)
-	checkString(t, b, "00000011")
-	checkDisplay(t, b, "0000 0011")
-
-	// Test advancing and setting a bit.
-	b.Reset()
-	b.WriteByte(0x51)
-	b.Advance(3)
-	checkBits(t, b, 5)
-	checkString(t, b, "01010")
-	checkDisplay(t, b, "0101 0")
-
-	if err := b.SetBit(0, false); err != nil {
-		t.Error(err)
-	}
-	checkBits(t, b, 4)
-	checkString(t, b, "0010")
-	checkDisplay(t, b, "0010")
-
-	b.Rewind(3)
-	checkBits(t, b, 7)
-	checkString(t, b, "1000010")
-	checkDisplay(t, b, "1000 010")
-}
-
-func testSetBytes(t *testing.T) {
-	b := New()
-	checkBits(t, b, 0)
-	checkString(t, b, "<empty>")
-	checkDisplay(t, b, "<empty>")
-
-	b.WriteByte(0x50)
-	checkBits(t, b, 8)
-	checkString(t, b, "00001010")
-	checkDisplay(t, b, "0000 1010")
-
-	// Test setting the first byte.
-	if err := b.SetBytes(0, []byte{0xFF}); err != nil {
-		t.Error(err)
-	}
-	checkBits(t, b, 8)
-	checkString(t, b, "11111111")
-	checkDisplay(t, b, "1111 1111")
-
-	// Test setting too many bits.
-	b.Reset()
-	b.WriteByte(0x50)
-	if err := b.SetBytes(0, []byte{0x4C, 0xFF}); err != nil {
-		t.Error(err)
-	}
-	checkBits(t, b, 8)
-	checkString(t, b, "00110010")
-	checkDisplay(t, b, "0011 0010")
-
-	// Test advancing and setting a byte.
-	b.Reset()
-	b.WriteByte(0x51)
-	checkString(t, b, "10001010")
-	checkDisplay(t, b, "1000 1010")
-	b.Advance(3)
-	checkBits(t, b, 5)
-	checkString(t, b, "01010")
-	checkDisplay(t, b, "0101 0")
-
-	if err := b.SetBytes(0, []byte{0x00}); err != nil {
-		t.Error(err)
-	}
-	checkBits(t, b, 4)
-	checkString(t, b, "0000")
-	checkDisplay(t, b, "0000")
-
-	b.Rewind(5)
-	checkBits(t, b, 8)
-	checkString(t, b, "10000000")
-	checkDisplay(t, b, "1000 0000")
 }
 
 func TestAdvance(t *testing.T) {
@@ -2072,280 +2346,6 @@ func TestNOTBits(t *testing.T) {
 	checkBits(t, b, 32)
 	checkString(t, b, "11111000111110000000000011111111")
 	checkDisplay(t, b, "1111 1000  1111 1000  0000 0000  1111 1111")
-}
-
-func TestRead(t *testing.T) {
-	b := New()
-	checkBits(t, b, 0)
-	checkString(t, b, "<empty>")
-	checkDisplay(t, b, "<empty>")
-
-	buf := []byte{0xFF}
-	if n, err := b.Write(buf); err != nil {
-		t.Error(err)
-		t.Log(n)
-	}
-	checkBits(t, b, 8)
-	checkString(t, b, "11111111")
-	checkDisplay(t, b, "1111 1111")
-}
-
-func TestReadByte(t *testing.T) {
-	b := New()
-	checkBits(t, b, 0)
-	checkString(t, b, "<empty>")
-	checkDisplay(t, b, "<empty>")
-
-	// Test out one bit.
-	b.WriteBit(true)
-	if n, _ := b.ReadByte(0); n != 0x01 {
-		t.Error("Incorrect result from ReadByte() test")
-		t.Log("\tExpected: 1")
-		t.Log("\tReceived:", n)
-	}
-
-	// Test out a simple byte.
-	b.Reset()
-	b.WriteBytes([]byte{0x05})
-	if n, _ := b.ReadByte(0); n != 0x05 {
-		t.Error("Incorrect result from ReadByte() test")
-		t.Log("\tExpected: 5")
-		t.Log("\tReceived:", n)
-	}
-
-	// Test out 4 bytes.
-	b.Reset()
-	b.WriteBytes([]byte{0x0F, 0xF0, 0xFF, 0x08})
-	if n, _ := b.ReadByte(0); n != 15 {
-		t.Error("Incorrect result from ReadByte() test")
-		t.Log("\tExpected: 15")
-		t.Log("\tReceived:", n)
-	}
-
-	if n, _ := b.ReadByte(16); n != 255 {
-		t.Error("Incorrect result from ReadByte() test")
-		t.Log("\tExpected: 255")
-		t.Log("\tReceived:", n)
-	}
-}
-
-func TestReadInt(t *testing.T) {
-	b := New()
-	checkBits(t, b, 0)
-	checkString(t, b, "<empty>")
-	checkDisplay(t, b, "<empty>")
-
-	// Test out one bit.
-	b.WriteBit(true)
-	if n, _ := b.ReadInt(0); n != 1 {
-		t.Error("Incorrect result from ReadInt() test")
-		t.Log("\tExpected: 1")
-		t.Log("\tReceived:", n)
-	}
-
-	// Test out a simple byte.
-	b.Reset()
-	b.WriteBytes([]byte{0x05})
-	if n, _ := b.ReadInt(0); n != 5 {
-		t.Error("Incorrect result from ReadInt() test")
-		t.Log("\tExpected: 5")
-		t.Log("\tReceived:", n)
-	}
-
-	// Test out 4 bytes.
-	b.Reset()
-	b.WriteBytes([]byte{0x0F, 0xFF, 0xFF, 0xFF})
-	if n, _ := b.ReadInt(0); n != -241 {
-		t.Error("Incorrect result from ReadInt() test")
-		t.Log("\tExpected: -241")
-		t.Log("\tReceived:", n)
-	}
-
-	// Test out a negative number.
-	b.Reset()
-	b.WriteBytes([]byte{0xF0, 0xFF, 0xFF, 0xFF})
-	if n, _ := b.ReadInt(0); n != -16 {
-		t.Error("Incorrect result from ReadInt() test")
-		t.Log("\tExpected: -16")
-		t.Log("\tReceived:", n)
-	}
-}
-
-func TestReadFrom(t *testing.T) {
-	b := New()
-	checkBits(t, b, 0)
-	checkString(t, b, "<empty>")
-	checkDisplay(t, b, "<empty>")
-
-	buf := []byte{0xFF}
-	if n, err := b.Write(buf); err != nil {
-		t.Error(err)
-		t.Log(n)
-	}
-	checkBits(t, b, 8)
-	checkString(t, b, "11111111")
-	checkDisplay(t, b, "1111 1111")
-}
-
-func TestWrite(t *testing.T) {
-	b := New()
-	checkBits(t, b, 0)
-	checkString(t, b, "<empty>")
-	checkDisplay(t, b, "<empty>")
-}
-
-func TestWriteBit(t *testing.T) {
-	b := New()
-	checkBits(t, b, 0)
-	checkString(t, b, "<empty>")
-	checkDisplay(t, b, "<empty>")
-
-	// Test adding some bits.
-	if err := b.WriteBit(true); err != nil {
-		t.Error(err)
-	}
-	checkBits(t, b, 1)
-	checkString(t, b, "1")
-	checkDisplay(t, b, "1")
-
-	if err := b.WriteBit(true); err != nil {
-		t.Error(err)
-	}
-	checkBits(t, b, 2)
-	checkString(t, b, "11")
-	checkDisplay(t, b, "11")
-
-	if err := b.WriteBit(false); err != nil {
-		t.Error(err)
-	}
-	checkBits(t, b, 3)
-	checkString(t, b, "110")
-	checkDisplay(t, b, "110")
-
-	// Test advancing and adding a bit.
-	b.Advance(2)
-	if err := b.WriteBit(true); err != nil {
-		t.Error(err)
-	}
-	checkBits(t, b, 2)
-	checkString(t, b, "01")
-	checkDisplay(t, b, "01")
-
-	// Test reversing and adding a bit.
-	b.Rewind(1)
-	if err := b.WriteBit(false); err != nil {
-		t.Error(err)
-	}
-	checkBits(t, b, 4)
-	checkString(t, b, "1010")
-	checkDisplay(t, b, "1010")
-
-	// Test resetting and adding a bit.
-	b.Reset()
-	if err := b.WriteBit(false); err != nil {
-		t.Error(err)
-	}
-	checkBits(t, b, 1)
-	checkString(t, b, "0")
-	checkDisplay(t, b, "0")
-}
-
-func TestWriteByte(t *testing.T) {
-	b := New()
-	checkBits(t, b, 0)
-	checkString(t, b, "<empty>")
-	checkDisplay(t, b, "<empty>")
-
-	// Test adding some bytes.
-	if err := b.WriteByte(0xF0); err != nil {
-		t.Error(err)
-	}
-	checkBits(t, b, 8)
-	checkString(t, b, "00001111")
-	checkDisplay(t, b, "0000 1111")
-
-	if err := b.WriteByte(0x88); err != nil {
-		t.Error(err)
-	}
-	checkBits(t, b, 16)
-	checkString(t, b, "0000111100010001")
-	checkDisplay(t, b, "0000 1111  0001 0001")
-
-	// Test advancing and adding a byte.
-	b.Advance(10)
-	if err := b.WriteByte(0x14); err != nil {
-		t.Error(err)
-	}
-	checkBits(t, b, 14)
-	checkString(t, b, "01000100101000")
-	checkDisplay(t, b, "0100 0100  1010 00")
-
-	// Test reversing and adding a byte.
-	b.Rewind(3)
-	if err := b.WriteByte(0xA0); err != nil {
-		t.Error(err)
-	}
-	checkBits(t, b, 25)
-	checkString(t, b, "1000100010010100000000101")
-	checkDisplay(t, b, "1000 1000  1001 0100  0000 0010  1")
-
-	// Test resetting and adding a byte.
-	b.Reset()
-	if err := b.WriteByte(0x44); err != nil {
-		t.Error(err)
-	}
-	checkBits(t, b, 8)
-	checkString(t, b, "00100010")
-	checkDisplay(t, b, "0010 0010")
-}
-
-func TestWriteBytes(t *testing.T) {
-	b := New()
-	checkBits(t, b, 0)
-	checkString(t, b, "<empty>")
-	checkDisplay(t, b, "<empty>")
-
-	// Test adding some bytes.
-	if err := b.WriteBytes([]byte{0x54, 1}); err != nil {
-		t.Error(err)
-	}
-	checkBits(t, b, 16)
-	checkString(t, b, "0010101010000000")
-	checkDisplay(t, b, "0010 1010  1000 0000")
-
-	if err := b.WriteBytes([]byte{0xAA, 0xBB, 0xCC}); err != nil {
-		t.Error(err)
-	}
-	checkBits(t, b, 40)
-	checkString(t, b, "0010101010000000010101011101110100110011")
-	checkDisplay(t, b, "0010 1010  1000 0000  0101 0101  1101 1101  0011 0011")
-
-	// Test advancing and adding some bytes.
-	b.Advance(30)
-	if err := b.WriteBytes([]byte{0x01, 0x02}); err != nil {
-		t.Error(err)
-	}
-	checkBits(t, b, 26)
-	checkString(t, b, "01001100111000000001000000")
-	checkDisplay(t, b, "0100 1100  1110 0000  0001 0000  00")
-
-	// Test reversing and adding a byte.
-	b.Rewind(5)
-	if err := b.WriteBytes([]byte{0x08}); err != nil {
-		t.Error(err)
-	}
-	checkBits(t, b, 39)
-	checkString(t, b, "101110100110011100000000100000000010000")
-	checkDisplay(t, b, "1011 1010  0110 0111  0000 0000  1000 0000  0010 000")
-
-	// Test resetting and adding some bytes.
-	b.Reset()
-	if err := b.WriteBytes([]byte{0x98, 0x76}); err != nil {
-		t.Error(err)
-	}
-	checkBits(t, b, 16)
-	checkString(t, b, "0001100101101110")
-	checkDisplay(t, b, "0001 1001  0110 1110")
 }
 
 

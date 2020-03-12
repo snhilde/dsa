@@ -144,7 +144,232 @@ func (b *Buffer) Display() string {
 }
 
 
+// --- METHODS FOR READING AND WRITING BITS ---
+// Read len(p) bytes of bits from the buffer into p.
+// Returns number of bytes read into p, or io.EOF if the buffer is empty. If there are not enough bits to fill all of
+// the last byte, then the rest of the byte will be 0-filled.
+// io.EOF will only be returned if the buffer is empty before any bytes have been read into p.
+func (b *Buffer) Read(p []byte) (int, error) {
+	if b == nil {
+		return 0, bufErr()
+	}
+
+	// Check if our buffer has anything to read.
+	if b.head == nil {
+		return 0, io.EOF
+	}
+
+	length := len(p)
+	node := b.head
+	cnt := 0
+	for i := 0; i < length; i++ {
+		p[i] = 0
+		if node == nil {
+			break
+		}
+
+		for j := 0; j < 8; j++ {
+			if node == nil {
+				break
+			}
+
+			if node.val {
+				p[i] |= (1 << uint(i))
+			}
+			node = node.next
+			cnt++
+
+			if _, err := b.Advance(1); err != nil {
+				return (cnt+7)/8, err
+			}
+		}
+	}
+
+	// Note: The calculation (cnt+7)/8 ensures that we account for untouched (and therefore false) bits in the last byte.
+	return (cnt+7)/8, nil
+}
+
+// Read out one byte of bits at the index. This will not advance the buffer.
+func (b *Buffer) ReadByte(index int) (byte, error) {
+	node, err := b.getNode(index)
+	if err != nil {
+		return 0, err
+	}
+
+	var bt byte
+	for i := 0; i < 8; i++ {
+		if node == nil {
+			break
+		}
+
+		if node.val {
+			bt |= (1 << uint(i))
+		}
+		node = node.next
+	}
+
+	return bt, nil
+}
+
+// Read out the 32-bit decimal representation of the bits at the index. This will not advance the buffer.
+func (b *Buffer) ReadInt(index int) (int, error) {
+	node, err := b.getNode(index)
+	if err != nil {
+		return 0, err
+	}
+
+	var num int32
+	for i := 0; i < 32; i++ {
+		if node == nil {
+			break
+		}
+
+		if node.val {
+			num |= (1 << uint(i))
+		}
+		node = node.next
+	}
+
+	return int(num), nil
+}
+
+// Read from r and append bytes to buffer.
+// Returns number of bytes read, and possibly an error.
+func (b *Buffer) ReadFrom(r io.Reader) (int, error) {
+	if b == nil {
+		return 0, bufErr()
+	} else if r == nil {
+		return 0, io.EOF
+	}
+
+	n, err := io.Copy(b, r)
+	return int(n), err
+}
+
+// Append the entire contents of p to the buffer.
+func (b *Buffer) Write(p []byte) (int, error) {
+	end, err := b.getEnd()
+	if err != nil {
+		return 0, err
+	}
+
+	skip := false
+	if end == nil {
+		// This means the buffer is empty. We'll create a node now to make setup easy and then skip past it later.
+		b.head = new(bnode)
+		skip = true
+		end = b.head
+	}
+
+	length := len(p)
+	i := 0
+	for i = 0; i < length; i++ {
+		for j := 0; j < 8; j++ {
+			val := bitOn(p[i], j)
+			end.appendNodeVal(nil, val)
+			end = end.next
+		}
+	}
+
+	if skip {
+		// Skip past the dummy node we had to create earlier.
+		b.head = b.head.next
+	}
+
+	return i+1, nil
+}
+
+// Add a bit to the end of the buffer.
+func (b *Buffer) WriteBit(val bool) error {
+	end, err := b.getEnd()
+	if err != nil {
+		return err
+	}
+
+	if end == nil {
+		// This means the buffer is empty.
+		b.head = new(bnode)
+		b.head.val = val
+	} else {
+		end.appendNodeVal(nil, val)
+	}
+
+	return nil
+}
+
+// Add an octet to the end of the buffer. The bits will be added low to high.
+func (b *Buffer) WriteByte(nb byte) error {
+	end, err := b.getEnd()
+	if err != nil {
+		return err
+	}
+
+	val := bitOn(nb, 0)
+	if end == nil {
+		// This means the buffer is empty.
+		b.head = new(bnode)
+		b.head.val = val
+		end = b.head
+	} else {
+		end.appendNodeVal(nil, val)
+		end = end.next
+	}
+
+	for i := 1; i < 8; i++ {
+		val := bitOn(nb, i)
+		end.appendNodeVal(nil, val)
+		end = end.next
+	}
+
+	return nil
+}
+
+// Add bytes to the end of the buffer.
+func (b *Buffer) WriteBytes(nbs []byte) error {
+	buf := New()
+	for _, nb := range nbs {
+		if err := buf.WriteByte(nb); err != nil {
+			return err
+		}
+	}
+
+	return b.Merge(buf)
+}
+
+
 // --- METHODS FOR ADDING AND REMOVING BITS ---
+// Set the value of a particular bit in the buffer.
+func (b *Buffer) SetBit(index int, val bool) error {
+	node, err := b.getNode(index)
+	if err != nil {
+		return err
+	}
+
+	node.val = val
+
+	return nil
+}
+
+// Set the value of a range of bits in the buffer.
+func (b *Buffer) SetBytes(index int, ref []byte) error {
+	node, err := b.getNode(index)
+	if err != nil {
+		return err
+	}
+
+	for _, octet := range ref {
+		for i := 0; i < 8; i++ {
+			if node == nil {
+				return nil
+			}
+			node.val = bitOn(octet, i)
+			node = node.next
+		}
+	}
+
+	return nil
+}
+
 // Cut out the bit at the index.
 func (b *Buffer) RemoveBit(index int) error {
 	node, err := b.getNode(index)
@@ -195,38 +420,6 @@ func (b *Buffer) RemoveBits(index, n int) error {
 	// If the first bit was specified, then we have to move the start of the buffer forward.
 	if index == 0 {
 		b.head = end
-	}
-
-	return nil
-}
-
-// Set the value of a particular bit in the buffer.
-func (b *Buffer) SetBit(index int, val bool) error {
-	node, err := b.getNode(index)
-	if err != nil {
-		return err
-	}
-
-	node.val = val
-
-	return nil
-}
-
-// Set the value of a range of bits in the buffer.
-func (b *Buffer) SetBytes(index int, ref []byte) error {
-	node, err := b.getNode(index)
-	if err != nil {
-		return err
-	}
-
-	for _, octet := range ref {
-		for i := 0; i < 8; i++ {
-			if node == nil {
-				return nil
-			}
-			node.val = bitOn(octet, i)
-			node = node.next
-		}
 	}
 
 	return nil
@@ -455,199 +648,6 @@ func (b *Buffer) NOTBits(n int) error {
 
 	ref := make([]byte, n)
 	return b.opBytes(ref, token.NOT)
-}
-
-
-// --- METHODS FOR WRITING OUT BITS ---
-// Read len(p) bytes of bits from the buffer into p.
-// Returns number of bytes read into p, or io.EOF if the buffer is empty. If there are not enough bits to fill all of
-// the last byte, then the rest of the byte will be 0-filled.
-// io.EOF will only be returned if the buffer is empty before any bytes have been read into p.
-func (b *Buffer) Read(p []byte) (int, error) {
-	if b == nil {
-		return 0, bufErr()
-	}
-
-	// Check if our buffer has anything to read.
-	if b.head == nil {
-		return 0, io.EOF
-	}
-
-	length := len(p)
-	node := b.head
-	cnt := 0
-	for i := 0; i < length; i++ {
-		p[i] = 0
-		if node == nil {
-			break
-		}
-
-		for j := 0; j < 8; j++ {
-			if node == nil {
-				break
-			}
-
-			if node.val {
-				p[i] |= (1 << uint(i))
-			}
-			node = node.next
-			cnt++
-
-			if _, err := b.Advance(1); err != nil {
-				return (cnt+7)/8, err
-			}
-		}
-	}
-
-	// Note: The calculation (cnt+7)/8 ensures that we account for untouched (and therefore false) bits in the last byte.
-	return (cnt+7)/8, nil
-}
-
-// Read out one byte of bits at the index. This will not advance the buffer.
-func (b *Buffer) ReadByte(index int) (byte, error) {
-	node, err := b.getNode(index)
-	if err != nil {
-		return 0, err
-	}
-
-	var bt byte
-	for i := 0; i < 8; i++ {
-		if node == nil {
-			break
-		}
-
-		if node.val {
-			bt |= (1 << uint(i))
-		}
-		node = node.next
-	}
-
-	return bt, nil
-}
-
-// Read out the 32-bit decimal representation of the bits at the index. This will not advance the buffer.
-func (b *Buffer) ReadInt(index int) (int, error) {
-	node, err := b.getNode(index)
-	if err != nil {
-		return 0, err
-	}
-
-	var num int32
-	for i := 0; i < 32; i++ {
-		if node == nil {
-			break
-		}
-
-		if node.val {
-			num |= (1 << uint(i))
-		}
-		node = node.next
-	}
-
-	return int(num), nil
-}
-
-// Read from r and append bytes to buffer.
-// Returns number of bytes read, and possibly an error.
-func (b *Buffer) ReadFrom(r io.Reader) (int, error) {
-	if b == nil {
-		return 0, bufErr()
-	} else if r == nil {
-		return 0, io.EOF
-	}
-
-	n, err := io.Copy(b, r)
-	return int(n), err
-}
-
-// Append the entire contents of p to the buffer.
-func (b *Buffer) Write(p []byte) (int, error) {
-	end, err := b.getEnd()
-	if err != nil {
-		return 0, err
-	}
-
-	skip := false
-	if end == nil {
-		// This means the buffer is empty. We'll create a node now to make setup easy and then skip past it later.
-		b.head = new(bnode)
-		skip = true
-		end = b.head
-	}
-
-	length := len(p)
-	i := 0
-	for i = 0; i < length; i++ {
-		for j := 0; j < 8; j++ {
-			val := bitOn(p[i], j)
-			end.appendNodeVal(nil, val)
-			end = end.next
-		}
-	}
-
-	if skip {
-		// Skip past the dummy node we had to create earlier.
-		b.head = b.head.next
-	}
-
-	return i+1, nil
-}
-
-// Add a bit to the end of the buffer.
-func (b *Buffer) WriteBit(val bool) error {
-	end, err := b.getEnd()
-	if err != nil {
-		return err
-	}
-
-	if end == nil {
-		// This means the buffer is empty.
-		b.head = new(bnode)
-		b.head.val = val
-	} else {
-		end.appendNodeVal(nil, val)
-	}
-
-	return nil
-}
-
-// Add an octet to the end of the buffer. The bits will be added low to high.
-func (b *Buffer) WriteByte(nb byte) error {
-	end, err := b.getEnd()
-	if err != nil {
-		return err
-	}
-
-	val := bitOn(nb, 0)
-	if end == nil {
-		// This means the buffer is empty.
-		b.head = new(bnode)
-		b.head.val = val
-		end = b.head
-	} else {
-		end.appendNodeVal(nil, val)
-		end = end.next
-	}
-
-	for i := 1; i < 8; i++ {
-		val := bitOn(nb, i)
-		end.appendNodeVal(nil, val)
-		end = end.next
-	}
-
-	return nil
-}
-
-// Add bytes to the end of the buffer.
-func (b *Buffer) WriteBytes(nbs []byte) error {
-	buf := New()
-	for _, nb := range nbs {
-		if err := buf.WriteByte(nb); err != nil {
-			return err
-		}
-	}
-
-	return b.Merge(buf)
 }
 
 
