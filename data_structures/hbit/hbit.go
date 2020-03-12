@@ -235,6 +235,9 @@ func (b *Buffer) ReadFrom(r io.Reader) (int, error) {
 	}
 
 	n, err := io.Copy(b, r)
+	if n == 0 && err == nil {
+		err = io.ErrNoProgress
+	}
 	return int(n), err
 }
 
