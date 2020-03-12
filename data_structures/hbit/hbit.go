@@ -604,6 +604,19 @@ func (b *Buffer) ReadInt(index int) (int, error) {
 	return int(num), nil
 }
 
+// Read from r and append bytes to buffer.
+// Returns number of bytes read, and possibly an error.
+func (b *Buffer) ReadFrom(r io.Reader) (int, error) {
+	if b == nil {
+		return 0, bufErr()
+	} else if r == nil {
+		return 0, io.EOF
+	}
+
+	n, err := io.Copy(b, r)
+	return int(n), err
+}
+
 // Append the entire contents of p to the buffer.
 func (b *Buffer) Write(p []byte) (int, error) {
 	end, err := b.getEnd()
