@@ -402,11 +402,10 @@ func (b *Buffer) Advance(n int) (int, error) {
 		return 0, errors.New("Invalid number")
 	}
 
-	i := 0
-	for i = 0; i < n; i++ {
+	for i := 0; i < n; i++ {
 		node := b.head
 		if node == nil {
-			break
+			return i, nil
 		}
 
 		// Move the start of the head forward one.
@@ -423,7 +422,7 @@ func (b *Buffer) Advance(n int) (int, error) {
 		b.tail.next = nil
 	}
 
-	return i, nil
+	return n, nil
 }
 
 // Move start of buffer back a number of bits, or to the initial start.
@@ -435,11 +434,10 @@ func (b *Buffer) Rewind(n int) (int, error) {
 		return 0, errors.New("Invalid number")
 	}
 
-	i := 0
-	for i = 0; i < n; i++ {
+	for i := 0; i < n; i++ {
 		node := b.tail
 		if node == nil {
-			break
+			return i, nil
 		}
 
 		// Move the start of the tail back one.
@@ -456,7 +454,7 @@ func (b *Buffer) Rewind(n int) (int, error) {
 		b.head.prev = nil
 	}
 
-	return i, nil
+	return n, nil
 }
 
 // Append a different buffer to the end of the current one. For safety, the current buffer will take ownership of the
@@ -722,12 +720,9 @@ func (b *Buffer) opBytes(ref []byte, t token.Token) error {
 
 	node := b.head
 	for _, octet := range ref {
-		if node == nil {
-			break
-		}
 		for i := 0; i < 8; i++ {
 			if node == nil {
-				break
+				return nil
 			}
 
 			val := bitOn(octet, i)
