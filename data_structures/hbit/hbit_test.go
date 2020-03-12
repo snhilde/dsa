@@ -130,6 +130,11 @@ func TestBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad Buffer test for WriteBytes()")
 	}
 
+	// Test WriteString().
+	if err := b.WriteString("test string"); err == nil {
+		t.Error("Unexpectedly passed bad Buffer test for WriteString()")
+	}
+
 	// Test SetBit().
 	if err := b.SetBit(2, true); err == nil {
 		t.Error("Unexpectedly passed bad Buffer test for SetBit()")
@@ -309,7 +314,7 @@ func TestInvalidArgs(t *testing.T) {
 
 	// Test ReadFrom() - empty argument.
 	if _, err := b.ReadFrom(nil); err == nil {
-		t.Error("Unexpectedly passed empty argument test for Read()")
+		t.Error("Unexpectedly passed empty argument test for ReadFrom()")
 	}
 
 	// Test Write() - empty argument.
@@ -320,7 +325,13 @@ func TestInvalidArgs(t *testing.T) {
 
 	// Test WriteBytes() - empty argument.
 	if err := b.WriteBytes(); err != nil {
-		t.Error("Unexpectedly failed empty argument test for Write()")
+		t.Error("Unexpectedly failed empty argument test for WriteBytes()")
+		t.Error(err)
+	}
+
+	// Test WriteString() - empty argument.
+	if err := b.WriteString(""); err != nil {
+		t.Error("Unexpectedly failed empty argument test for WriteString()")
 		t.Error(err)
 	}
 
@@ -913,6 +924,8 @@ func TestRead(t *testing.T) {
 	checkBits(t, b, 8)
 	checkString(t, b, "11111111")
 	checkDisplay(t, b, "1111 1111")
+
+	// TODO
 }
 
 func TestReadByte(t *testing.T) {
@@ -1010,6 +1023,8 @@ func TestReadFrom(t *testing.T) {
 	checkBits(t, b, 8)
 	checkString(t, b, "11111111")
 	checkDisplay(t, b, "1111 1111")
+
+	// TODO
 }
 
 func TestWrite(t *testing.T) {
@@ -1017,6 +1032,8 @@ func TestWrite(t *testing.T) {
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
+
+	// TODO
 }
 
 func TestWriteBit(t *testing.T) {
@@ -1171,6 +1188,10 @@ func TestWriteBytes(t *testing.T) {
 	checkBits(t, b, 16)
 	checkString(t, b, "0001100101101110")
 	checkDisplay(t, b, "0001 1001  0110 1110")
+}
+
+func TestWriteString(t *testing.T) {
+	// TODO
 }
 
 func testSetBit(t *testing.T) {
