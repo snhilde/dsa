@@ -270,7 +270,7 @@ func (b *Buffer) Write(p []byte) (int, error) {
 	return length, nil
 }
 
-// Add a bit to the end of the buffer.
+// Append a bit to the end of the buffer.
 func (b *Buffer) WriteBit(val bool) error {
 	end, err := b.getEnd()
 	if err != nil {
@@ -288,7 +288,7 @@ func (b *Buffer) WriteBit(val bool) error {
 	return nil
 }
 
-// Add an octet to the end of the buffer. The bits will be added low to high.
+// Append an octet to the end of the buffer. The bits will be added low to high.
 func (b *Buffer) WriteByte(nb byte) error {
 	end, err := b.getEnd()
 	if err != nil {
@@ -315,7 +315,7 @@ func (b *Buffer) WriteByte(nb byte) error {
 	return nil
 }
 
-// Add bytes to the end of the buffer.
+// Append bytes to the end of the buffer.
 func (b *Buffer) WriteBytes(bytes ...byte) error {
 	buf := New()
 	for _, nb := range bytes {
@@ -327,7 +327,7 @@ func (b *Buffer) WriteBytes(bytes ...byte) error {
 	return b.Join(buf)
 }
 
-// Write string bytes to the end of the buffer.
+// Append string bytes to the end of the buffer.
 func (b *Buffer) WriteString(s string) error {
 	return b.WriteBytes([]byte(s)...)
 }
