@@ -9,7 +9,6 @@ import (
 )
 
 
-// --- PACKAGE TYPES ---
 // Buffer is the main type for this package. It holds the internal information about the bit buffer.
 type Buffer struct {
 	head *bnode
@@ -23,7 +22,6 @@ type bnode struct {
 }
 
 
-// --- ENTRY FUNCTIONS AND OVERVIEW METHODS ---
 // Create a new bit buffer.
 func New() *Buffer {
 	return new(Buffer)
@@ -144,7 +142,6 @@ func (b *Buffer) Display() string {
 }
 
 
-// --- METHODS FOR READING AND WRITING BITS ---
 // Read len(p) bytes of bits from the buffer into p.
 // Returns number of bytes read into p, or io.EOF if the buffer is empty. If there are not enough bits to fill all of
 // the last byte, then the rest of the byte will be 0-filled.
@@ -337,7 +334,6 @@ func (b *Buffer) WriteBytes(nbs []byte) error {
 }
 
 
-// --- METHODS FOR ADDING AND REMOVING BITS ---
 // Set the value of a particular bit in the buffer.
 func (b *Buffer) SetBit(index int, val bool) error {
 	node, err := b.getNode(index)
@@ -517,7 +513,6 @@ func (b *Buffer) Merge(nb *Buffer) error {
 }
 
 
-// --- METHODS FOR BITWISE OPERATIONS ---
 // AND the specified bit with the reference bit. This is equivalent to the bitwise operation '&'.
 func (b *Buffer) ANDBit(index int, ref bool) error {
 	node, err := b.getNode(index)
@@ -651,7 +646,6 @@ func (b *Buffer) NOTBits(n int) error {
 }
 
 
-// --- HELPER FUNCTIONS ---
 // Create a new node and link it after the given node.
 func (bn *bnode) appendNode(node *bnode) {
 	if node == nil {
