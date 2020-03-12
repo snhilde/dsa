@@ -144,7 +144,8 @@ func (b *Buffer) Display() string {
 
 // Read len(p) bytes of bits from the buffer into p.
 // Returns number of bytes read into p, or io.EOF if the buffer is empty. If there are not enough bits to fill all of
-// the last byte, then the rest of the byte will be 0-filled.
+// the last byte, then the rest of the byte will be false bits. In the same vein, the returned number of bytes does not
+// guarantee that the last bytes is full.
 // io.EOF will only be returned if the buffer is empty before any bytes have been read into p.
 func (b *Buffer) Read(p []byte) (int, error) {
 	if b == nil {
@@ -158,32 +159,26 @@ func (b *Buffer) Read(p []byte) (int, error) {
 
 	length := len(p)
 	node := b.head
-	cnt := 0
 	for i := 0; i < length; i++ {
 		p[i] = 0
-		if node == nil {
-			break
-		}
-
 		for j := 0; j < 8; j++ {
 			if node == nil {
-				break
+				return i+1, nil // +1 to convert from index to count
 			}
 
 			if node.val {
 				p[i] |= (1 << uint(i))
 			}
 			node = node.next
-			cnt++
 
 			if _, err := b.Advance(1); err != nil {
-				return (cnt+7)/8, err
+				return i+1, err // +1 to convert from index to count
 			}
 		}
 	}
 
 	// Note: The calculation (cnt+7)/8 ensures that we account for untouched (and therefore false) bits in the last byte.
-	return (cnt+7)/8, nil
+	return length, nil
 }
 
 // Read out one byte of bits at the index. This will not advance the buffer.
@@ -254,13 +249,12 @@ func (b *Buffer) Write(p []byte) (int, error) {
 	if end == nil {
 		// This means the buffer is empty. We'll create a node now to make setup easy and then skip past it later.
 		b.head = new(bnode)
-		skip = true
 		end = b.head
+		skip = true
 	}
 
 	length := len(p)
-	i := 0
-	for i = 0; i < length; i++ {
+	for i := 0; i < length; i++ {
 		for j := 0; j < 8; j++ {
 			val := bitOn(p[i], j)
 			end.appendNodeVal(nil, val)
@@ -273,7 +267,7 @@ func (b *Buffer) Write(p []byte) (int, error) {
 		b.head = b.head.next
 	}
 
-	return i+1, nil
+	return length, nil
 }
 
 // Add a bit to the end of the buffer.
