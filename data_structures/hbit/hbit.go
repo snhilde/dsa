@@ -145,63 +145,6 @@ func (b *Buffer) Display() string {
 
 
 // --- METHODS FOR ADDING AND REMOVING BITS ---
-// Add a bit to the end of the buffer.
-func (b *Buffer) AddBit(val bool) error {
-	end, err := b.getEnd()
-	if err != nil {
-		return err
-	}
-
-	if end == nil {
-		// This means the buffer is empty.
-		b.head = new(bnode)
-		b.head.val = val
-	} else {
-		end.appendNodeVal(nil, val)
-	}
-
-	return nil
-}
-
-// Add an octet to the end of the buffer. The bits will be added low to high.
-func (b *Buffer) AddByte(nb byte) error {
-	end, err := b.getEnd()
-	if err != nil {
-		return err
-	}
-
-	val := bitOn(nb, 0)
-	if end == nil {
-		// This means the buffer is empty.
-		b.head = new(bnode)
-		b.head.val = val
-		end = b.head
-	} else {
-		end.appendNodeVal(nil, val)
-		end = end.next
-	}
-
-	for i := 1; i < 8; i++ {
-		val := bitOn(nb, i)
-		end.appendNodeVal(nil, val)
-		end = end.next
-	}
-
-	return nil
-}
-
-// Add bytes to the end of the buffer.
-func (b *Buffer) AddBytes(nbs []byte) error {
-	buf := New()
-	for _, nb := range nbs {
-		if err := buf.AddByte(nb); err != nil {
-			return err
-		}
-	}
-
-	return b.Merge(buf)
-}
-
 // Cut out the bit at the index.
 func (b *Buffer) RemoveBit(index int) error {
 	node, err := b.getNode(index)
@@ -650,6 +593,62 @@ func (b *Buffer) Write(p []byte) (int, error) {
 	return i+1, nil
 }
 
+// Add a bit to the end of the buffer.
+func (b *Buffer) WriteBit(val bool) error {
+	end, err := b.getEnd()
+	if err != nil {
+		return err
+	}
+
+	if end == nil {
+		// This means the buffer is empty.
+		b.head = new(bnode)
+		b.head.val = val
+	} else {
+		end.appendNodeVal(nil, val)
+	}
+
+	return nil
+}
+
+// Add an octet to the end of the buffer. The bits will be added low to high.
+func (b *Buffer) WriteByte(nb byte) error {
+	end, err := b.getEnd()
+	if err != nil {
+		return err
+	}
+
+	val := bitOn(nb, 0)
+	if end == nil {
+		// This means the buffer is empty.
+		b.head = new(bnode)
+		b.head.val = val
+		end = b.head
+	} else {
+		end.appendNodeVal(nil, val)
+		end = end.next
+	}
+
+	for i := 1; i < 8; i++ {
+		val := bitOn(nb, i)
+		end.appendNodeVal(nil, val)
+		end = end.next
+	}
+
+	return nil
+}
+
+// Add bytes to the end of the buffer.
+func (b *Buffer) WriteBytes(nbs []byte) error {
+	buf := New()
+	for _, nb := range nbs {
+		if err := buf.WriteByte(nb); err != nil {
+			return err
+		}
+	}
+
+	return b.Merge(buf)
+}
 
 
 // --- HELPER FUNCTIONS ---
