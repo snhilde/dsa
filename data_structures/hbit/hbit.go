@@ -297,7 +297,8 @@ func (b *Buffer) WriteBit(val bool) error {
 
 // Append an octet to the end of the buffer. The bits will be added low to high.
 func (b *Buffer) WriteByte(nb byte) error {
-	return b.WriteBytes(nb)
+	_, err := b.Write([]byte{nb})
+	return err
 }
 
 // Append bytes to the end of the buffer.
@@ -308,7 +309,8 @@ func (b *Buffer) WriteBytes(bytes ...byte) error {
 
 // Append string bytes to the end of the buffer.
 func (b *Buffer) WriteString(s string) error {
-	return b.WriteBytes([]byte(s)...)
+	_, err := b.Write([]byte(s))
+	return err
 }
 
 
