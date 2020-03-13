@@ -159,26 +159,29 @@ func (b *Buffer) Read(p []byte) (int, error) {
 
 	length := len(p)
 	node := b.head
+	cnt := 0
 	for i := 0; i < length; i++ {
+		if node == nil {
+			break
+		}
 		p[i] = 0
+
 		for j := 0; j < 8; j++ {
 			if node == nil {
-				return i+1, nil // +1 to convert from index to count
+				break
 			}
 
 			if node.val {
-				p[i] |= (1 << uint(i))
+				p[i] |= (1 << uint(j))
 			}
 			node = node.next
-
-			if _, err := b.Advance(1); err != nil {
-				return i+1, err // +1 to convert from index to count
-			}
+			cnt++
 		}
 	}
 
 	// Note: The calculation (cnt+7)/8 ensures that we account for untouched (and therefore false) bits in the last byte.
-	return length, nil
+	_, err := b.Advance(cnt)
+	return (cnt+7)/8, err
 }
 
 // Read out one byte of bits at the index. This will not advance the buffer.
