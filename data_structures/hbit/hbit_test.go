@@ -3,6 +3,7 @@ package hbit
 import (
 	"testing"
 	"strings"
+	"io"
 )
 
 
@@ -916,16 +917,127 @@ func TestRead(t *testing.T) {
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
 
-	buf := []byte{0xFF}
-	if n, err := b.Write(buf); err != nil {
-		t.Error(err)
-		t.Log(n)
-	}
+	// Test reading out one byte of all true bits. */
+	b.WriteBytes(0xFF)
 	checkBits(t, b, 8)
 	checkString(t, b, "11111111")
 	checkDisplay(t, b, "1111 1111")
 
-	// TODO
+	buf := make([]byte, 1)
+	if n, err := b.Read(buf); n != 1 || err != nil {
+		t.Error(err)
+		t.Log(n)
+	}
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	if buf[0] != 0xFF {
+		t.Error("Incorrect result from ReadByte() test")
+		t.Log("\tExpected: 0xFF")
+		t.Log("\tReceived:", buf[0])
+	}
+
+	// Test reading out one byte of all false bits. */
+	b.Reset()
+	b.WriteBytes(0x00)
+	checkBits(t, b, 8)
+	checkString(t, b, "00000000")
+	checkDisplay(t, b, "0000 0000")
+
+	buf = make([]byte, 1)
+	if n, err := b.Read(buf); n != 1 || err != nil {
+		t.Error(err)
+		t.Log(n)
+	}
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	if buf[0] != 0x00 {
+		t.Error("Incorrect result from ReadByte() test")
+		t.Log("\tExpected: 0x00")
+		t.Log("\tReceived:", buf[0])
+	}
+
+	// Test reading out part of a byte.
+	b.Reset()
+	b.WriteBit(true)
+	b.WriteBit(false)
+	b.WriteBit(true)
+	b.WriteBit(false)
+	checkBits(t, b, 4)
+	checkString(t, b, "1010")
+	checkDisplay(t, b, "1010")
+
+	buf = make([]byte, 1)
+	if n, err := b.Read(buf); n != 1 || err != nil {
+		t.Error(err)
+		t.Log(n)
+	}
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	if buf[0] != 0x05 {
+		t.Error("Incorrect result from ReadByte() test")
+		t.Log("\tExpected: 0x05")
+		t.Log("\tReceived:", buf[0])
+	}
+
+	// Test reading out a full byte with part of a byte remaining.
+	b.Reset()
+	b.WriteByte(0xC4)
+	b.WriteBit(true)
+	b.WriteBit(false)
+	b.WriteBit(true)
+	b.WriteBit(false)
+	checkBits(t, b, 12)
+	checkString(t, b, "001000111010")
+	checkDisplay(t, b, "0010 0011  1010")
+
+	buf = make([]byte, 1)
+	if n, err := b.Read(buf); n != 1 || err != nil {
+		t.Error(err)
+		t.Log(n)
+	}
+	checkBits(t, b, 4)
+	checkString(t, b, "1010")
+	checkDisplay(t, b, "1010")
+
+	if buf[0] != 0xC4 {
+		t.Error("Incorrect result from ReadByte() test")
+		t.Log("\tExpected: 0xC4")
+		t.Log("\tReceived:", buf[0])
+	}
+
+	// Test reading with a 2-byte arg on a 1-byte buffer.
+	b.Reset()
+	b.WriteBytes(0x33)
+	checkBits(t, b, 8)
+	checkString(t, b, "11001100")
+	checkDisplay(t, b, "1100 1100")
+
+	buf = make([]byte, 2)
+	if n, err := b.Read(buf); n != 1 || err != nil {
+		t.Error(err)
+		t.Log(n)
+	}
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	if buf[0] != 0x33 {
+		t.Error("Incorrect result from ReadByte() test")
+		t.Log("\tExpected: 0x33")
+		t.Log("\tReceived:", buf[0])
+	}
+
+	// Now make sure a subsequent read returns io.EOF.
+	if n, err := b.Read(buf); n != 0 || err != io.EOF {
+		t.Error(err)
+		t.Log(n)
+	}
 }
 
 func TestReadByte(t *testing.T) {
