@@ -4,6 +4,7 @@ import (
 	"testing"
 	"strings"
 	"io"
+	"bytes"
 )
 
 
@@ -1144,16 +1145,34 @@ func TestReadFrom(t *testing.T) {
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
 
-	buf := []byte{0xFF}
-	if n, err := b.Write(buf); err != nil {
+	r := strings.NewReader("test string")
+	if n, err := b.ReadFrom(r); n != 11 || err != nil {
+		t.Error("Unexpectedly failed ReadFrom() test")
 		t.Error(err)
-		t.Log(n)
+	}
+	checkBits(t, b, 88)
+	checkString(t, b, "0010111010100110110011100010111000000100110011100010111001001110100101100111011011100110")
+	checkDisplay(t, b, "0010 1110  1010 0110  1100 1110  0010 1110  0000 0100  1100 1110  0010 1110  0100 1110  1001 0110  0111 0110  1110 0110")
+
+	b.Reset()
+	r = strings.NewReader("A")
+	if n, err := b.ReadFrom(r); n != 1 || err != nil {
+		t.Error("Unexpectedly failed ReadFrom() test")
+		t.Error(err)
 	}
 	checkBits(t, b, 8)
-	checkString(t, b, "11111111")
-	checkDisplay(t, b, "1111 1111")
+	checkString(t, b, "10000010")
+	checkDisplay(t, b, "1000 0010")
 
-	// TODO
+	b.Reset()
+	br := bytes.NewReader([]byte{0x11, 0x22, 0x33})
+	if n, err := b.ReadFrom(br); n != 3 || err != nil {
+		t.Error("Unexpectedly failed ReadFrom() test")
+		t.Error(err)
+	}
+	checkBits(t, b, 24)
+	checkString(t, b, "100010000100010011001100")
+	checkDisplay(t, b, "1000 1000  0100 0100  1100 1100")
 }
 
 func TestWrite(t *testing.T) {
