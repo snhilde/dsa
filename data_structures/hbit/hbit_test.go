@@ -1361,7 +1361,31 @@ func TestWriteBytes(t *testing.T) {
 }
 
 func TestWriteString(t *testing.T) {
-	// TODO
+	b := New()
+	checkBits(t, b, 0)
+	checkString(t, b, "<empty>")
+	checkDisplay(t, b, "<empty>")
+
+	// Add a string.
+	b.Reset()
+	s := "test string"
+	if n, err := b.Write([]byte(s)); n != 11 || err != nil {
+		t.Error("Unexpectedly failed Write() test")
+		t.Error(err)
+	}
+	checkBits(t, b, 88)
+	checkString(t, b, "0010111010100110110011100010111000000100110011100010111001001110100101100111011011100110")
+	checkDisplay(t, b, "0010 1110  1010 0110  1100 1110  0010 1110  0000 0100  1100 1110  0010 1110  0100 1110  1001 0110  0111 0110  1110 0110")
+
+	// Add another string after that.
+	s = "ok"
+	if n, err := b.Write([]byte(s)); n != 2 || err != nil {
+		t.Error("Unexpectedly failed Write() test")
+		t.Error(err)
+	}
+	checkBits(t, b, 104)
+	checkString(t, b, "00101110101001101100111000101110000001001100111000101110010011101001011001110110111001101111011011010110")
+	checkDisplay(t, b, "0010 1110  1010 0110  1100 1110  0010 1110  0000 0100  1100 1110  0010 1110  0100 1110  1001 0110  0111 0110  1110 0110  1111 0110  1101 0110")
 }
 
 func testSetBit(t *testing.T) {
