@@ -1077,6 +1077,23 @@ func TestReadByte(t *testing.T) {
 		t.Log("\tExpected: 255")
 		t.Log("\tReceived:", n)
 	}
+
+	// Test out advancing, reading out, and rewinding.
+	b.Reset()
+	b.WriteBytes(0x0F, 0xF0, 0xFF, 0x08)
+	b.Advance(10)
+	if n, _ := b.ReadByte(0); n != 252 {
+		t.Error("Incorrect result from ReadByte() test")
+		t.Log("\tExpected: 252")
+		t.Log("\tReceived:", n)
+	}
+
+	b.Rewind(10)
+	if n, _ := b.ReadByte(1); n != 7 {
+		t.Error("Incorrect result from ReadByte() test")
+		t.Log("\tExpected: 7")
+		t.Log("\tReceived:", n)
+	}
 }
 
 func TestReadInt(t *testing.T) {
