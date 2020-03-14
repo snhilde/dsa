@@ -238,7 +238,6 @@ func TestBadPtr(t *testing.T) {
 	}
 }
 
-// TODO: make sure all these tests are really checking what we want them to check
 func TestInvalidArgs(t *testing.T) {
 	// Make sure that every method is capable of handling bad arguments.
 	b := New()
@@ -315,7 +314,7 @@ func TestInvalidArgs(t *testing.T) {
 	}
 
 	// Test ReadFrom() - empty argument.
-	if _, err := b.ReadFrom(nil); err == nil {
+	if _, err := b.ReadFrom(nil); err != io.EOF {
 		t.Error("Unexpectedly passed empty argument test for ReadFrom()")
 	}
 
@@ -394,19 +393,19 @@ func TestInvalidArgs(t *testing.T) {
 		t.Error("Unexpectedly passed negative index test for RemoveBits()")
 	}
 
+	// Test RemoveBits() - out-of-range index.
+	b.Reset()
+	b.WriteBytes(0xFF, 0xEE, 0xDD)
+	if err := b.RemoveBits(100, 5); err == nil {
+		t.Error("Unexpectedly passed out-of-range index test for RemoveBits()")
+	}
+
 	// Test RemoveBits() - negative number.
 	b.Reset()
 	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	if err := b.RemoveBits(1, -1); err != nil {
 		t.Error("Unexpectedly failed negative number test for RemoveBits()")
 		t.Error(err)
-	}
-
-	// Test RemoveBits() - out-of-range index.
-	b.Reset()
-	b.WriteBytes(0xFF, 0xEE, 0xDD)
-	if err := b.RemoveBits(100, 5); err == nil {
-		t.Error("Unexpectedly passed out-of-range index test for RemoveBits()")
 	}
 
 	// Test RemoveBits() - out-of-range number.
@@ -451,7 +450,7 @@ func TestInvalidArgs(t *testing.T) {
 	b.Reset()
 	b.WriteBytes(0xFF, 0xEE, 0xDD)
 	b.Advance(10)
-	if n, err := b.Rewind(100); n == 0 || err != nil {
+	if n, err := b.Rewind(100); n != 10 || err != nil {
 		t.Error("Unexpectedly failed out-of-range index test for Rewind()")
 		t.Error(err)
 	}
@@ -554,8 +553,8 @@ func TestInvalidArgs(t *testing.T) {
 	// Test ShiftLeft() - negative number.
 	b.Reset()
 	b.WriteBytes(0xFF, 0xEE, 0xDD)
-	if err := b.ShiftLeft(-1); err != nil {
-		t.Error("Unexpectedly failed negative number test for ShiftLeft()")
+	if err := b.ShiftLeft(-1); err == nil {
+		t.Error("Unexpectedly passed negative number test for ShiftLeft()")
 		t.Error(err)
 	}
 
@@ -570,8 +569,8 @@ func TestInvalidArgs(t *testing.T) {
 	// Test ShiftRight() - negative number.
 	b.Reset()
 	b.WriteBytes(0xFF, 0xEE, 0xDD)
-	if err := b.ShiftRight(-1); err != nil {
-		t.Error("Unexpectedly failed negative number test for ShiftRight()")
+	if err := b.ShiftRight(-1); err == nil {
+		t.Error("Unexpectedly passed negative number test for ShiftRight()")
 		t.Error(err)
 	}
 
