@@ -18,7 +18,7 @@ type Buffer struct {
 type bnode struct {
 	next *bnode
 	prev *bnode
-	val   bool
+	v     bool
 }
 
 
@@ -34,7 +34,7 @@ func (b *Buffer) Bit(index int) bool {
 		return false
 	}
 
-	return node.val
+	return node.v
 }
 
 // Get number of bits in buffer, or -1 on error.
@@ -70,7 +70,7 @@ func (b *Buffer) Offset() int {
 }
 
 // Create a new buffer with the first n bits of the original buffer.
-func (b *Buffer) Copy(num int) *Buffer {
+func (b *Buffer) Copy(n int) *Buffer {
 	if b == nil {
 		return nil
 	}
@@ -81,17 +81,17 @@ func (b *Buffer) Copy(num int) *Buffer {
 	nb := New()
 
 	// If the buffer is empty or no nodes were requested, then we don't have anything to copy.
-	if b.head == nil || num < 1 {
+	if b.head == nil || n < 1 {
 		return nb
 	}
 
 	// Set up the start of the buffer.
 	nb.head = new(bnode)
 	node := nb.head
-	node.val = ref.val
+	node.v = ref.v
 
 	// Go through the rest of the nodes in the original buffer.
-	for i := 1; i < num; i++ {
+	for i := 1; i < n; i++ {
 		// Check if it's safe to move on first.
 		ref = ref.next
 		if ref == nil {
@@ -99,7 +99,7 @@ func (b *Buffer) Copy(num int) *Buffer {
 		}
 
 		// It's safe. Move on to the next node.
-		node.appendNodeVal(nil, ref.val)
+		node.appendNodeVal(nil, ref.v)
 		node = node.next
 	}
 
@@ -171,7 +171,7 @@ func (b *Buffer) Read(p []byte) (int, error) {
 				break
 			}
 
-			if node.val {
+			if node.v {
 				p[i] |= (1 << uint(j))
 			}
 			node = node.next
@@ -197,7 +197,7 @@ func (b *Buffer) ReadByte(index int) (byte, error) {
 			break
 		}
 
-		if node.val {
+		if node.v {
 			bt |= (1 << uint(i))
 		}
 		node = node.next
@@ -213,19 +213,19 @@ func (b *Buffer) ReadInt(index int) (int, error) {
 		return 0, err
 	}
 
-	var num int32
+	var n int32
 	for i := 0; i < 32; i++ {
 		if node == nil {
 			break
 		}
 
-		if node.val {
-			num |= (1 << uint(i))
+		if node.v {
+			n |= (1 << uint(i))
 		}
 		node = node.next
 	}
 
-	return int(num), nil
+	return int(n), nil
 }
 
 // Read from r and append bytes to buffer.
@@ -262,8 +262,8 @@ func (b *Buffer) Write(p []byte) (int, error) {
 	length := len(p)
 	for i := 0; i < length; i++ {
 		for j := 0; j < 8; j++ {
-			val := bitOn(p[i], j)
-			end.appendNodeVal(nil, val)
+			v := bitOn(p[i], j)
+			end.appendNodeVal(nil, v)
 			end = end.next
 		}
 	}
@@ -278,7 +278,7 @@ func (b *Buffer) Write(p []byte) (int, error) {
 }
 
 // Append a bit to the end of the buffer.
-func (b *Buffer) WriteBit(val bool) error {
+func (b *Buffer) WriteBit(v bool) error {
 	end, err := b.getEnd()
 	if err != nil {
 		return err
@@ -287,9 +287,9 @@ func (b *Buffer) WriteBit(val bool) error {
 	if end == nil {
 		// This means the buffer is empty.
 		b.head = new(bnode)
-		b.head.val = val
+		b.head.v = v
 	} else {
-		end.appendNodeVal(nil, val)
+		end.appendNodeVal(nil, v)
 	}
 
 	return nil
@@ -315,13 +315,13 @@ func (b *Buffer) WriteString(s string) error {
 
 
 // Set the value of a particular bit in the buffer.
-func (b *Buffer) SetBit(index int, val bool) error {
+func (b *Buffer) SetBit(index int, v bool) error {
 	node, err := b.getNode(index)
 	if err != nil {
 		return err
 	}
 
-	node.val = val
+	node.v = v
 
 	return nil
 }
@@ -338,7 +338,7 @@ func (b *Buffer) SetBytes(index int, ref []byte) error {
 			if node == nil {
 				return nil
 			}
-			node.val = bitOn(octet, i)
+			node.v = bitOn(octet, i)
 			node = node.next
 		}
 	}
@@ -553,6 +553,10 @@ func (b *Buffer) XORBuffer(ref *Buffer) error {
 
 // Shift the bits in the buffer to the left. This is equivalent to the bitwise operation '<<'.
 func (b *Buffer) ShiftLeft(n int) error {
+	if n < 0 {
+		return errors.New("Invalid number")
+	}
+
 	end, err := b.getEnd()
 	if err != nil {
 		return err
@@ -579,6 +583,10 @@ func (b *Buffer) ShiftLeft(n int) error {
 
 // Shift the bits in the buffer to the right. This is equivalent to the bitwise operation '>>'.
 func (b *Buffer) ShiftRight(n int) error {
+	if n < 0 {
+		return errors.New("Invalid number")
+	}
+
 	end, err := b.getEnd()
 	if err != nil {
 		return err
@@ -634,9 +642,9 @@ func (bn *bnode) appendNode(node *bnode) {
 }
 
 // Same as appendNode(), but also assign a value to the new node.
-func (bn *bnode) appendNodeVal(node *bnode, val bool) {
+func (bn *bnode) appendNodeVal(node *bnode, v bool) {
 	bn.appendNode(node)
-	bn.next.val = val
+	bn.next.v = v
 }
 
 // Check if a certain bit in a certain byte is set or not.
@@ -696,23 +704,23 @@ func (b *Buffer) getNode(index int) (*bnode, error) {
 func opBit(bit *bnode, ref bool, t token.Token) error {
 	switch t {
 	case token.AND:
-		if bit.val && !ref {
-			bit.val = false
+		if bit.v && !ref {
+			bit.v = false
 		}
 	case token.OR:
 		if ref {
-			bit.val = true
+			bit.v = true
 		}
 	case token.XOR:
 		if ref {
-			if bit.val {
-				bit.val = false
+			if bit.v {
+				bit.v = false
 			} else {
-				bit.val = true
+				bit.v = true
 			}
 		}
 	case token.NOT:
-		bit.val = !bit.val
+		bit.v = !bit.v
 	default:
 		return errors.New("internal misuse of opBit method")
 	}
@@ -733,8 +741,8 @@ func (b *Buffer) opBytes(ref []byte, t token.Token) error {
 				return nil
 			}
 
-			val := bitOn(octet, i)
-			if err := opBit(node, val, t); err != nil {
+			v := bitOn(octet, i)
+			if err := opBit(node, v, t); err != nil {
 				return err
 			}
 			node = node.next
@@ -753,7 +761,7 @@ func (b *Buffer) opBuf(ref *Buffer, t token.Token) error {
 	node := b.head
 	refNode := ref.head
 	for node != nil && refNode != nil {
-		if err := opBit(node, refNode.val, t); err != nil {
+		if err := opBit(node, refNode.v, t); err != nil {
 			return err
 		}
 		node = node.next
@@ -776,7 +784,7 @@ func (b *Buffer) string_int(pretty bool) string {
 	node := b.head
 	cnt := 1
 	for node != nil {
-		if node.val {
+		if node.v {
 			sb.WriteString("1")
 		} else {
 			sb.WriteString("0")
