@@ -15,7 +15,7 @@ Data Structures and Algorithms
 * [Linked List (hlist)](#linked-list)
 * [Stack (hstack)](#stack)
 
-<a name="linked-list-hlist"/>
+<a name="linked-list-hlist"></a>
 ### Linked List (hlist)
 Usage guidelines and documentation can be found [at GoDoc here](https://godoc.org/github.com/snhilde/dsa/data_structures/hlist).
 
