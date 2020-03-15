@@ -5,10 +5,10 @@ Data Structures and Algorithms
 ## Current Packages #
 * [Data Structures](#data-structures)
 	* [Linked List (hlist)](#linked-list-hlist)
-	* [Stack (hstack)](#stack)
+	* [Stack (hstack)](#stack-hstack)
 * [Algorithms](#algorithms)
-	* [Search (hsearch)](#search)
-	* [Sort (hsort)](#sort)
+	* [Search (hsearch)](#search-hsearch)
+	* [Sort (hsort)](#sort-hsort)
 
 
 ## Data Structures
@@ -19,6 +19,7 @@ Data Structures and Algorithms
 ### Linked List (hlist)
 Usage guidelines and documentation can be found [at GoDoc here](https://godoc.org/github.com/snhilde/dsa/data_structures/hlist).
 
+<a name="stack-hstack"></a>
 ### Stack (hstack)
 Usage guidelines and documentation can be found [at GoDoc here](https://godoc.org/github.com/snhilde/dsa/data_structures/hstack).
 
@@ -27,9 +28,11 @@ Usage guidelines and documentation can be found [at GoDoc here](https://godoc.or
 * [Search (hsearch)](#search)
 * [Sort (hsort)](#sort)
 
+<a name="search-hsearch"></a>
 ### Search (hsearch)
 Usage guidelines and documentation can be found [at GoDoc here](https://godoc.org/github.com/snhilde/dsa/algorithms/hsearch).
 
+<a name="sort-hsort"></a>
 ### Sort (hsort)
 Usage guidelines and documentation can be found [at GoDoc here](https://godoc.org/github.com/snhilde/dsa/algorithms/hsort).
 
