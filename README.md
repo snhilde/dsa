@@ -6,6 +6,7 @@ Data Structures and Algorithms
 * [Data Structures](#data-structures)
 	* [Linked List (hlist)](#linked-list-hlist)
 	* [Stack (hstack)](#stack-hstack)
+	* [Binary Buffer (hbit)](#binay-buffer-hbit)
 * [Algorithms](#algorithms)
 	* [Search (hsearch)](#search-hsearch)
 	* [Sort (hsort)](#sort-hsort)
@@ -14,6 +15,7 @@ Data Structures and Algorithms
 ## Data Structures
 * [Linked List (hlist)](#linked-list-hlist)
 * [Stack (hstack)](#stack-hstack)
+* [Binary Buffer (hbit)](#binay-buffer-hbit)
 
 <a name="linked-list-hlist"></a>
 ### Linked List (hlist)
@@ -22,6 +24,10 @@ Usage guidelines and documentation can be found [at GoDoc here](https://godoc.or
 <a name="stack-hstack"></a>
 ### Stack (hstack)
 Usage guidelines and documentation can be found [at GoDoc here](https://godoc.org/github.com/snhilde/dsa/data_structures/hstack).
+
+<a name="binay-buffer-hbit"></a>
+### Binary Buffer (hbit)
+Usage guidelines and documentation can be found [at GoDoc here](https://godoc.org/github.com/snhilde/dsa/data_structures/hbit).
 
 
 ## Algorithms
