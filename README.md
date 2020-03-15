@@ -12,8 +12,8 @@ Data Structures and Algorithms
 
 
 ## Data Structures
-* [Linked List (hlist)](#linked-list)
-* [Stack (hstack)](#stack)
+* [Linked List (hlist)](#linked-list-hlist)
+* [Stack (hstack)](#stack-hstack)
 
 <a name="linked-list-hlist"></a>
 ### Linked List (hlist)
@@ -25,8 +25,8 @@ Usage guidelines and documentation can be found [at GoDoc here](https://godoc.or
 
 
 ## Algorithms
-* [Search (hsearch)](#search)
-* [Sort (hsort)](#sort)
+* [Search (hsearch)](#search-hsearch)
+* [Sort (hsort)](#sort-hsort)
 
 <a name="search-hsearch"></a>
 ### Search (hsearch)
