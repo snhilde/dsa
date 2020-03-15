@@ -6,7 +6,7 @@ Data Structures and Algorithms
 * [Data Structures](#data-structures)
 	* [Linked List (hlist)](#linked-list-hlist)
 	* [Stack (hstack)](#stack-hstack)
-	* [Binary Buffer (hbit)](#binay-buffer-hbit)
+	* [Binary Buffer (hbit)](#binary-buffer-hbit)
 * [Algorithms](#algorithms)
 	* [Search (hsearch)](#search-hsearch)
 	* [Sort (hsort)](#sort-hsort)
@@ -22,7 +22,7 @@ Usage guidelines and documentation can be found [at GoDoc here](https://godoc.or
 ### Stack (hstack)
 Usage guidelines and documentation can be found [at GoDoc here](https://godoc.org/github.com/snhilde/dsa/data_structures/hstack).
 
-<a name="binay-buffer-hbit"></a>
+<a name="binary-buffer-hbit"></a>
 ### Binary Buffer (hbit)
 Usage guidelines and documentation can be found [at GoDoc here](https://godoc.org/github.com/snhilde/dsa/data_structures/hbit).
 
