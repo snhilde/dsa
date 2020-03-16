@@ -16,8 +16,8 @@ type List struct {
 
 // internal type for an individual node in the list
 type hnode struct {
-	next *hnode
 	v     interface{}
+	next *hnode
 }
 
 
@@ -27,16 +27,16 @@ func New() *List {
 }
 
 
-func (list *List) String() string {
+func (l *List) String() string {
 	var b strings.Builder
 
-	if list == nil {
+	if l == nil {
 		return "<nil>"
-	} else if list.head == nil {
+	} else if l.head == nil {
 		return "<empty>"
 	}
 
-	node := list.head
+	node := l.head
 	b.WriteString(fmt.Sprintf("%v", node.v))
 	for node.next != nil {
 		node = node.next
@@ -47,29 +47,29 @@ func (list *List) String() string {
 }
 
 // Get the number of nodes in the list, or -1 if list hasn't been created yet.
-func (list *List) Length() int {
-	if list == nil {
+func (l *List) Length() int {
+	if l == nil {
 		return -1
 	}
 
-	return list.length
+	return l.length
 }
 
 // Insert a value into the list at the specified index.
-func (list *List) Insert(v interface{}, index int) error {
+func (l *List) Insert(v interface{}, index int) error {
 	if index < 0 {
 		return errors.New("Invalid index")
-	} else if list.Length() < index {
+	} else if l.Length() < index {
 		return errors.New("Out of bounds")
 	}
 
 	new_node := newNode(v)
 
 	if index == 0 {
-		new_node.next = list.head
-		list.head = new_node
+		new_node.next = l.head
+		l.head = new_node
 	} else {
-		node := list.head
+		node := l.head
 		for i := 1; i < index; i++ {
 			node = node.next
 		}
@@ -78,13 +78,13 @@ func (list *List) Insert(v interface{}, index int) error {
 		node.next = new_node
 	}
 
-	list.length++
+	l.length++
 	return nil
 }
 
 // Add one or more values to the end of the list.
-func (list *List) Append(values ...interface{}) error {
-	if list == nil {
+func (l *List) Append(values ...interface{}) error {
+	if l == nil {
 		return errors.New("List must be created with New() first")
 	} else if len(values) == 0 {
 		return nil
@@ -104,24 +104,24 @@ func (list *List) Append(values ...interface{}) error {
 		}
 	}
 
-	list.Merge(tmp_list)
+	l.Merge(tmp_list)
 
 	return nil
 }
 
 // Remove an item from the list and return its value.
-func (list *List) Pop(index int) interface{} {
-	if list == nil || index < 0 || index >= list.Length() {
+func (l *List) Pop(index int) interface{} {
+	if l == nil || index < 0 || index >= l.Length() {
 		return nil
 	}
 
 	var pop *hnode
 	if index == 0 {
 		// Handle the special case of popping the first node.
-		pop = list.head
-		list.head = pop.next
+		pop = l.head
+		l.head = pop.next
 	} else {
-		node := list.head
+		node := l.head
 		for i := 0; i < index-1; i++ {
 			node = node.next
 		}
@@ -129,30 +129,30 @@ func (list *List) Pop(index int) interface{} {
 		node.next = pop.next
 	}
 
-	list.length--
+	l.length--
 	return pop.v
 }
 
 // Find the first item with a matching value, and remove it from the list.
-func (list *List) PopMatch(v interface{}) error {
-	if list == nil {
+func (l *List) PopMatch(v interface{}) error {
+	if l == nil {
 		return errors.New("List must be created with New() first")
 	}
 
 	// Handle the special case of matching on the first node.
-	if list.head.v == v {
-		pop := list.head
-		list.head = pop.next
-		list.length--
+	if l.head.v == v {
+		pop := l.head
+		l.head = pop.next
+		l.length--
 		return nil
 	}
 
-	node := list.head
+	node := l.head
 	for node.next != nil {
 		if node.next.v == v {
 			pop := node.next
 			node.next = pop.next
-			list.length--
+			l.length--
 			break
 		}
 		node = node.next
@@ -162,13 +162,13 @@ func (list *List) PopMatch(v interface{}) error {
 }
 
 // Get the index of the first matching node, or -1 if not found.
-func (list *List) Index(v interface{}) int {
-	if list == nil {
+func (l *List) Index(v interface{}) int {
+	if l == nil {
 		return -1
 	}
 
-	length := list.Length()
-	node := list.head
+	length := l.Length()
+	node := l.head
 	for i := 0; i < length; i++ {
 		if node.v == v {
 			return i
@@ -181,12 +181,12 @@ func (list *List) Index(v interface{}) int {
 }
 
 // Check whether or not the value exists in the list.
-func (list *List) Exists(v interface{}) bool {
-	if list == nil {
+func (l *List) Exists(v interface{}) bool {
+	if l == nil {
 		return false
 	}
 
-	node := list.head
+	node := l.head
 	for node != nil {
 		if node.v == v {
 			return true
@@ -199,8 +199,8 @@ func (list *List) Exists(v interface{}) bool {
 }
 
 // Append new list to current list. The current list will take ownership of all nodes.
-func (list *List) Merge(addition *List) error {
-	if list == nil {
+func (l *List) Merge(addition *List) error {
+	if l == nil {
 		return errors.New("List must be created with New() first")
 	} else if addition == nil {
 		// Nothing to do.
@@ -208,16 +208,16 @@ func (list *List) Merge(addition *List) error {
 	}
 
 	// Find the end of the list.
-	if list.head == nil {
-		list.head = addition.head
-		list.length = addition.length
+	if l.head == nil {
+		l.head = addition.head
+		l.length = addition.length
 	} else {
-		node := list.head
+		node := l.head
 		for node.next != nil {
 			node = node.next
 		}
 		node.next = addition.head
-		list.length += addition.length
+		l.length += addition.length
 	}
 
 	addition.Clear()
@@ -226,26 +226,26 @@ func (list *List) Merge(addition *List) error {
 }
 
 // Clear the list to its inital state.
-func (list *List) Clear() {
-	if list == nil {
+func (l *List) Clear() {
+	if l == nil {
 		return
 	}
 
-	list.head = nil
-	list.length = 0
+	l.head = nil
+	l.length = 0
 }
 
 // Sort the list using a modified merge algorithm.
 // equality_cb should return a negative value if left should be sorted first or a positive value if right should be sorted first.
-func (list *List) Sort(equality_cb func(left, right interface{}) int) error {
+func (l *List) Sort(equality_cb func(left, right interface{}) int) error {
 	// We are going to use the merge sort algorithm here. However, because length operations are not constant-time, we
 	// are not going to divide the list into progressively smaller blocks. Instead, we are going to assume a block size
 	// of 2 and iteratively merge-sort blocks of greater and greater size until the list is fully sorted.
-	if list == nil {
+	if l == nil {
 		return errors.New("List must be created with New() first")
 	}
 
-	list_length := list.Length()
+	list_length := l.Length()
 	if list_length < 2 {
 		// Already sorted.
 		return nil
@@ -258,7 +258,7 @@ func (list *List) Sort(equality_cb func(left, right interface{}) int) error {
 	for stack_len := 1; stack_len < list_length; stack_len *= 2 {
 		block_len := stack_len * 2
 		tmp_list := New()
-		block := list.head
+		block := l.head
 		num_blocks := (list_length + block_len - 1) / block_len
 		for i := 0; i < num_blocks; i++ {
 			// Get the start of the left stack.
@@ -318,7 +318,7 @@ func (list *List) Sort(equality_cb func(left, right interface{}) int) error {
 		}
 
 		// Hold on to what we have so far.
-		list.head = tmp_list.head
+		l.head = tmp_list.head
 	}
 
 	return nil
@@ -326,14 +326,14 @@ func (list *List) Sort(equality_cb func(left, right interface{}) int) error {
 
 // Sort the list using a modified merge algorithm.
 // Note: all values in the list must be of type int.
-func (list *List) SortInt() error {
-	return list.Sort(eqInt)
+func (l *List) SortInt() error {
+	return l.Sort(eqInt)
 }
 
 // Sort the list using a modified merge algorithm.
 // Note: all values in the list must be of type string.
-func (list *List) SortStr() error {
-	return list.Sort(eqStr)
+func (l *List) SortStr() error {
+	return l.Sort(eqStr)
 }
 
 
