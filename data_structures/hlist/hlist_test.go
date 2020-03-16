@@ -243,49 +243,43 @@ func TestPopMatch(t *testing.T) {
 	checkLength(t, list, 5)
 
 	// Pop the "3".
-	ret := list.PopMatch(3)
-	if !ret {
-		t.Error("Error popping \"3\": no match")
+	if err := list.PopMatch(3); err != nil {
+		t.Error(err)
 	}
 	checkString(t, list, "1, apples, 4, 3.14")
 	checkLength(t, list, 4)
 
 	// Pop the "1".
-	ret = list.PopMatch(1)
-	if !ret {
-		t.Error("Error popping \"1\": no match")
+	if err := list.PopMatch(1); err != nil {
+		t.Error(err)
 	}
 	checkString(t, list, "apples, 4, 3.14")
 	checkLength(t, list, 3)
 
 	// Pop "apples".
-	ret = list.PopMatch("apples")
-	if !ret {
-		t.Error("Error popping \"apples\": no match")
+	if err := list.PopMatch("apples"); err != nil {
+		t.Error(err)
 	}
 	checkString(t, list, "4, 3.14")
 	checkLength(t, list, 2)
 
 	// Pop the "3.14".
-	ret = list.PopMatch(3.14)
-	if !ret {
-		t.Error("Error popping \"3.14\": no match")
+	if err := list.PopMatch(3.14); err != nil {
+		t.Error(err)
 	}
 	checkString(t, list, "4")
 	checkLength(t, list, 1)
 
 	// Try to pop a non-existant item.
-	ret = list.PopMatch(10)
-	if ret {
-		t.Error("Unexpectedly passed no-match test")
+	if err := list.PopMatch(10); err != nil {
+		t.Error(err)
 	}
 	checkString(t, list, "4")
 	checkLength(t, list, 1)
 
 	// Try the pop operation on an invalid list.
 	var bad_list *List
-	ret = bad_list.PopMatch(1)
-	if ret {
+	if err := bad_list.PopMatch(1); err == nil {
 		t.Error("Unexpectedly passed invalid list test")
 	}
 }
@@ -378,7 +372,7 @@ func TestExists(t *testing.T) {
 
 	// Try the Exists() operation on an invalid list.
 	var bad_list *List
-	ret = bad_list.PopMatch(1)
+	ret = bad_list.Exists(1)
 	if ret {
 		t.Error("Unexpectedly passed invalid list test")
 	}
