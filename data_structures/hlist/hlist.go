@@ -85,7 +85,7 @@ func (l *List) Insert(v interface{}, index int) error {
 // Add one or more values to the end of the list.
 func (l *List) Append(values ...interface{}) error {
 	if l == nil {
-		return errors.New("List must be created with New() first")
+		return lErr()
 	} else if len(values) == 0 {
 		return nil
 	}
@@ -136,7 +136,7 @@ func (l *List) Pop(index int) interface{} {
 // Find the first item with a matching value, and remove it from the list.
 func (l *List) PopMatch(v interface{}) error {
 	if l == nil {
-		return errors.New("List must be created with New() first")
+		return lErr()
 	}
 
 	// Handle the special case of matching on the first node.
@@ -201,7 +201,7 @@ func (l *List) Exists(v interface{}) bool {
 // Append new list to current list. The current list will take ownership of all nodes.
 func (l *List) Merge(addition *List) error {
 	if l == nil {
-		return errors.New("List must be created with New() first")
+		return lErr()
 	} else if addition == nil {
 		// Nothing to do.
 		return nil
@@ -242,7 +242,7 @@ func (l *List) Sort(equality_cb func(left, right interface{}) int) error {
 	// are not going to divide the list into progressively smaller blocks. Instead, we are going to assume a block size
 	// of 2 and iteratively merge-sort blocks of greater and greater size until the list is fully sorted.
 	if l == nil {
-		return errors.New("List must be created with New() first")
+		return lErr()
 	}
 
 	list_length := l.Length()
@@ -379,4 +379,9 @@ func eqStr(left, right interface{}) int {
 	// If we're here, then one of two things happened: either both values are the same or one value is a substring of
 	// another. We'll compare based on length to favor the shorter value.
 	return lLen - rLen
+}
+
+// helper to return standard error on bad list.
+func lErr() error {
+	return errors.New("List must be created with New() first")
 }
