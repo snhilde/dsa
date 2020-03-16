@@ -27,7 +27,7 @@ func New() *Buffer {
 	return new(Buffer)
 }
 
-// Get boolean status (on or off) of bit at provided index.
+// Get boolean status (set or unset) of bit at provided index.
 func (b *Buffer) Bit(index int) bool {
 	node, err := b.getNode(index)
 	if err != nil {
@@ -143,10 +143,9 @@ func (b *Buffer) Display() string {
 
 
 // Read len(p) bytes of bits from the buffer into p.
-// Returns number of bytes read into p, or io.EOF if the buffer is empty. If there are not enough bits to fill all of
-// the last byte, then the rest of the byte will be false bits. In the same vein, the returned number of bytes does not
-// guarantee that the last bytes is full.
-// io.EOF will only be returned if the buffer is empty before any bytes have been read into p.
+// Returns number of bytes read into p, or io.EOF if the buffer is empty. io.EOF will only be returned if the buffer is
+// empty before any bytes have been read into p. If there are not enough bits to fill all of the last byte, then the
+// rest of the byte will be false bits.
 func (b *Buffer) Read(p []byte) (int, error) {
 	if b == nil {
 		return 0, bufErr()
