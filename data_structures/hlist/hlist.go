@@ -16,8 +16,8 @@ type List struct {
 
 // internal type for an individual node in the list
 type hnode struct {
-	next  *hnode
-	value  interface{}
+	next *hnode
+	v     interface{}
 }
 
 
@@ -37,10 +37,10 @@ func (list *List) String() string {
 	}
 
 	node := list.head
-	b.WriteString(fmt.Sprintf("%v", node.value))
+	b.WriteString(fmt.Sprintf("%v", node.v))
 	for node.next != nil {
 		node = node.next
-		b.WriteString(fmt.Sprintf(", %v", node.value))
+		b.WriteString(fmt.Sprintf(", %v", node.v))
 	}
 
 	return b.String()
@@ -56,14 +56,14 @@ func (list *List) Length() int {
 }
 
 // Insert a value into the list at the specified index.
-func (list *List) Insert(value interface{}, index int) error {
+func (list *List) Insert(v interface{}, index int) error {
 	if index < 0 {
 		return errors.New("Invalid index")
 	} else if list.Length() < index {
 		return errors.New("Out of bounds")
 	}
 
-	new_node := newNode(value)
+	new_node := newNode(v)
 
 	if index == 0 {
 		new_node.next = list.head
@@ -130,17 +130,17 @@ func (list *List) Pop(index int) interface{} {
 	}
 
 	list.length--
-	return pop.value
+	return pop.v
 }
 
 // Find the first item with a matching value, and remove it from the list.
-func (list *List) PopMatch(value interface{}) error {
+func (list *List) PopMatch(v interface{}) error {
 	if list == nil {
 		return errors.New("List must be created with New() first")
 	}
 
 	// Handle the special case of matching on the first node.
-	if list.head.value == value {
+	if list.head.v == v {
 		pop := list.head
 		list.head = pop.next
 		list.length--
@@ -149,7 +149,7 @@ func (list *List) PopMatch(value interface{}) error {
 
 	node := list.head
 	for node.next != nil {
-		if node.next.value == value {
+		if node.next.v == v {
 			pop := node.next
 			node.next = pop.next
 			list.length--
@@ -162,7 +162,7 @@ func (list *List) PopMatch(value interface{}) error {
 }
 
 // Get the index of the first matching node, or -1 if not found.
-func (list *List) Index(value interface{}) int {
+func (list *List) Index(v interface{}) int {
 	if list == nil {
 		return -1
 	}
@@ -170,7 +170,7 @@ func (list *List) Index(value interface{}) int {
 	length := list.Length()
 	node := list.head
 	for i := 0; i < length; i++ {
-		if node.value == value {
+		if node.v == v {
 			return i
 		}
 		node = node.next
@@ -181,14 +181,14 @@ func (list *List) Index(value interface{}) int {
 }
 
 // Check whether or not the value exists in the list.
-func (list *List) Exists(value interface{}) bool {
+func (list *List) Exists(v interface{}) bool {
 	if list == nil {
 		return false
 	}
 
 	node := list.head
 	for node != nil {
-		if node.value == value {
+		if node.v == v {
 			return true
 		}
 		node = node.next
@@ -292,20 +292,20 @@ func (list *List) Sort(equality_cb func(left, right interface{}) int) error {
 			for j := 0; j < tmp_len; j++ {
 				if left_len == 0 {
 					// Only right stack still has nodes.
-					tmp_list.Append(right_stack.value)
+					tmp_list.Append(right_stack.v)
 					right_stack = right_stack.next
 					right_len--
 				} else if right_len == 0 {
 					// Only left stack still has nodes.
-					tmp_list.Append(left_stack.value)
+					tmp_list.Append(left_stack.v)
 					left_stack = left_stack.next
 					left_len--
-				} else if equality_cb(left_stack.value, right_stack.value) < 0 {
-					tmp_list.Append(left_stack.value)
+				} else if equality_cb(left_stack.v, right_stack.v) < 0 {
+					tmp_list.Append(left_stack.v)
 					left_stack = left_stack.next
 					left_len--
 				} else {
-					tmp_list.Append(right_stack.value)
+					tmp_list.Append(right_stack.v)
 					right_stack = right_stack.next
 					right_len--
 				}
@@ -338,9 +338,9 @@ func (list *List) SortStr() error {
 
 
 // internal convenience function for creating a new node
-func newNode(value interface{}) *hnode {
+func newNode(v interface{}) *hnode {
 	node := new(hnode)
-	node.value = value
+	node.v = v
 
 	return node
 }
