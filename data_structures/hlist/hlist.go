@@ -36,11 +36,11 @@ func (l *List) String() string {
 		return "<empty>"
 	}
 
-	node := l.head
-	b.WriteString(fmt.Sprintf("%v", node.v))
-	for node.next != nil {
-		node = node.next
-		b.WriteString(fmt.Sprintf(", %v", node.v))
+	n := l.head
+	b.WriteString(fmt.Sprintf("%v", n.v))
+	for n.next != nil {
+		n = n.next
+		b.WriteString(fmt.Sprintf(", %v", n.v))
 	}
 
 	return b.String()
@@ -69,13 +69,13 @@ func (l *List) Insert(v interface{}, index int) error {
 		new_node.next = l.head
 		l.head = new_node
 	} else {
-		node := l.head
+		n := l.head
 		for i := 1; i < index; i++ {
-			node = node.next
+			n = n.next
 		}
 
-		new_node.next = node.next
-		node.next = new_node
+		new_node.next = n.next
+		n.next = new_node
 	}
 
 	l.length++
@@ -91,15 +91,15 @@ func (l *List) Append(values ...interface{}) error {
 	}
 
 	tmp_list := New()
-	node := tmp_list.head
+	n := tmp_list.head
 	for _, v := range values {
 		if tmp_list.head == nil {
 			tmp_list.head = newNode(v)
 			tmp_list.length++
-			node = tmp_list.head
+			n = tmp_list.head
 		} else {
-			node.next = newNode(v)
-			node = node.next
+			n.next = newNode(v)
+			n = n.next
 			tmp_list.length++
 		}
 	}
@@ -121,12 +121,12 @@ func (l *List) Pop(index int) interface{} {
 		pop = l.head
 		l.head = pop.next
 	} else {
-		node := l.head
+		n := l.head
 		for i := 0; i < index-1; i++ {
-			node = node.next
+			n = n.next
 		}
-		pop = node.next
-		node.next = pop.next
+		pop = n.next
+		n.next = pop.next
 	}
 
 	l.length--
@@ -147,15 +147,15 @@ func (l *List) PopMatch(v interface{}) error {
 		return nil
 	}
 
-	node := l.head
-	for node.next != nil {
-		if node.next.v == v {
-			pop := node.next
-			node.next = pop.next
+	n := l.head
+	for n.next != nil {
+		if n.next.v == v {
+			pop := n.next
+			n.next = pop.next
 			l.length--
 			break
 		}
-		node = node.next
+		n = n.next
 	}
 
 	return nil
@@ -168,12 +168,12 @@ func (l *List) Index(v interface{}) int {
 	}
 
 	length := l.Length()
-	node := l.head
+	n := l.head
 	for i := 0; i < length; i++ {
-		if node.v == v {
+		if n.v == v {
 			return i
 		}
-		node = node.next
+		n = n.next
 	}
 
 	// If we're here, then we didn't find anything.
@@ -186,12 +186,12 @@ func (l *List) Exists(v interface{}) bool {
 		return false
 	}
 
-	node := l.head
-	for node != nil {
-		if node.v == v {
+	n := l.head
+	for n != nil {
+		if n.v == v {
 			return true
 		}
-		node = node.next
+		n = n.next
 	}
 
 	// If we're here, then we didn't find anything.
@@ -212,11 +212,11 @@ func (l *List) Merge(addition *List) error {
 		l.head = addition.head
 		l.length = addition.length
 	} else {
-		node := l.head
-		for node.next != nil {
-			node = node.next
+		n := l.head
+		for n.next != nil {
+			n = n.next
 		}
-		node.next = addition.head
+		n.next = addition.head
 		l.length += addition.length
 	}
 
@@ -339,10 +339,10 @@ func (l *List) SortStr() error {
 
 // internal convenience function for creating a new node
 func newNode(v interface{}) *hnode {
-	node := new(hnode)
-	node.v = v
+	n := new(hnode)
+	n.v = v
 
-	return node
+	return n
 }
 
 // integer equality callback for SortInt() method
