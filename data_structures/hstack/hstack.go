@@ -1,4 +1,4 @@
-// Package hstack provides a simple and lean stack.
+// Package hstack provides a simple and lean last-in/first-out stack.
 package hstack
 
 import (
