@@ -253,6 +253,7 @@ func HashInt(list []int) error {
 	return nil
 }
 
+// Sort the list of ints using a bubble algorithm.
 func BubbleInt(list []int) error {
 	// For this function, we're going to iterate through every item in the list. If an item has a greater value than its
 	// neighbor to the right, then we'll swap them. When we get to the end, we'll start again at the beginning and keep
