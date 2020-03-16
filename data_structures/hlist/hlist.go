@@ -31,9 +31,9 @@ func (list *List) String() string {
 	var b strings.Builder
 
 	if list == nil {
-		return fmt.Sprintf("<nil>")
+		return "<nil>"
 	} else if list.head == nil {
-		return fmt.Sprintf("<empty>")
+		return "<empty>"
 	}
 
 	node := list.head
@@ -109,15 +109,15 @@ func (list *List) Append(values ...interface{}) error {
 	return nil
 }
 
-// Remove an item for the list and return its value.
+// Remove an item from the list and return its value.
 func (list *List) Pop(index int) interface{} {
 	if list == nil || index < 0 || index >= list.Length() {
 		return nil
 	}
 
 	var pop *hnode
-	// Handle the special case of popping the first node.
 	if index == 0 {
+		// Handle the special case of popping the first node.
 		pop = list.head
 		list.head = pop.next
 	} else {
@@ -133,10 +133,10 @@ func (list *List) Pop(index int) interface{} {
 	return pop.value
 }
 
-// Find an item by matching value and remove it from the list.
-func (list *List) PopMatch(value interface{}) bool {
+// Find the first item with a matching value, and remove it from the list.
+func (list *List) PopMatch(value interface{}) error {
 	if list == nil {
-		return false
+		return errors.New("List must be created with New() first")
 	}
 
 	// Handle the special case of matching on the first node.
@@ -144,7 +144,7 @@ func (list *List) PopMatch(value interface{}) bool {
 		pop := list.head
 		list.head = pop.next
 		list.length--
-		return true
+		return nil
 	}
 
 	node := list.head
@@ -153,16 +153,15 @@ func (list *List) PopMatch(value interface{}) bool {
 			pop := node.next
 			node.next = pop.next
 			list.length--
-			return true
+			break
 		}
 		node = node.next
 	}
 
-	// If we're here, then we didn't find anything.
-	return false
+	return nil
 }
 
-// Get the index of the first matching node, if any.
+// Get the index of the first matching node, or -1 if not found.
 func (list *List) Index(value interface{}) int {
 	if list == nil {
 		return -1
@@ -204,6 +203,7 @@ func (list *List) Merge(addition *List) error {
 	if list == nil {
 		return errors.New("List must be created with New() first")
 	} else if addition == nil {
+		// Nothing to do.
 		return nil
 	}
 
