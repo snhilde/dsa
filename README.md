@@ -16,26 +16,21 @@ Data Structures and Algorithms
 
 <a name="linked-list-hlist"></a>
 ### [Linked List (hlist)](https://godoc.org/github.com/snhilde/dsa/data_structures/hlist)
-Usage guidelines and documentation can be found [at GoDoc here](https://godoc.org/github.com/snhilde/dsa/data_structures/hlist).
 
 <a name="stack-hstack"></a>
-### Stack (hstack)
-Usage guidelines and documentation can be found [at GoDoc here](https://godoc.org/github.com/snhilde/dsa/data_structures/hstack).
+### [Stack (hstack)](https://godoc.org/github.com/snhilde/dsa/data_structures/hstack)
 
 <a name="binary-buffer-hbit"></a>
-### Binary Buffer (hbit)
-Usage guidelines and documentation can be found [at GoDoc here](https://godoc.org/github.com/snhilde/dsa/data_structures/hbit).
+### [Binary Buffer (hbit)](https://godoc.org/github.com/snhilde/dsa/data_structures/hbit)
 
 
 ## Algorithms
 
 <a name="search-hsearch"></a>
-### Search (hsearch)
-Usage guidelines and documentation can be found [at GoDoc here](https://godoc.org/github.com/snhilde/dsa/algorithms/hsearch).
+### [Search (hsearch)](https://godoc.org/github.com/snhilde/dsa/algorithms/hsearch)
 
 <a name="sort-hsort"></a>
-### Sort (hsort)
-Usage guidelines and documentation can be found [at GoDoc here](https://godoc.org/github.com/snhilde/dsa/algorithms/hsort).
+### [Sort (hsort)](https://godoc.org/github.com/snhilde/dsa/algorithms/hsort)
 
 
 ## License ##
