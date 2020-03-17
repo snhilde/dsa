@@ -8,30 +8,29 @@ import (
 )
 
 
-// Sort the list of ints using an insertion algorithm.
-func InsertionInt(list []int) error {
+// Sort the list using an insertion algorithm. The list must be a slice or array of a uniform data type.
+func InsertionInt(list interface{}) error {
 	// We're going to follow this sequence for each item in the list:
 	// 1. Get the value at the current index.
-	// 2. For all previous items--starting from the current position and going down to the beginning--
-	//    if the item at the index has a greater value, then shift it one to the right.
-	// 3. Insert the value at the now-open index.
-	if len(list) < 1 {
-		return errors.New("Invalid list size")
+	// 2. While the value is less than the value to the left of it, swap the two values.
+	// 3. When the value is greater than the value to the left, it will also be greater than the value to the right and
+	//    therefore in sorted order for this portion of the list.
+	length, at, cmp, swap, err := initSort(list)
+	if err != nil {
+		return err
 	}
 
-	for i, v := range list {
-		for i > 0 {
-			// Scan down the section of the list that is now sorted.
-			previous := list[i-1]
-			if previous > v {
-				// Shift one to the right.
-				list[i] = previous
-				i--
+	for i := 0; i < length; i++ {
+		for j := i; j > 0; j-- {
+			// Scan down the section of the list that is now sorted until we find the insertion point.
+			curr := at(j)
+			prev := at(j-1)
+			if cmp(prev, curr) {
+				swap(j, j-1)
 			} else {
 				break
 			}
 		}
-		list[i] = v
 	}
 
 	return nil
