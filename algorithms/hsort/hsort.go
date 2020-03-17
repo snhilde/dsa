@@ -3,6 +3,8 @@ package hsort
 
 import (
 	"errors"
+	"reflect"
+	"fmt"
 )
 
 
@@ -280,4 +282,82 @@ func BubbleInt(list []int) error {
 	}
 
 	return nil
+}
+
+
+// Helper function that will set up all the variables and functions necessary for determining the list's underlying type
+// and acting on that type appropriately. This will return these values:
+// 1. The length of the list
+// 2. A function that will get the Value at the given index
+// 3. A function that will compare the two Values, return M_TRUE if the first is greater and M_FALSE if the second is greater.
+// 4. A function that will swap the two Values at the given indices.
+// 5. Any error that occurred along the way, or nil if no error occurred
+func initSort(list interface{}) (int, func(int) reflect.Value, func(i, j reflect.Value) bool, func(i, j int), error) {
+	// Pull out the first underlying Value, and make sure it's an array or slice.
+	v := reflect.ValueOf(list)
+	if v.Kind() != reflect.Slice && v.Kind() != reflect.Array {
+		return -1, nil, nil, nil, errors.New("List must be slice or array")
+	}
+
+	// Find out how long our list is.
+	l := v.Len()
+	if l < 1 {
+		return -1, nil, nil, nil, errors.New("Invalid list size")
+	}
+
+	// Make sure we have a type that we can work with.
+	var k reflect.Kind
+	switch v := v.Index(0).Kind(); v {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		k = reflect.Int64
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		k = reflect.Uint64
+	case reflect.Float32, reflect.Float64:
+		k = reflect.Float64
+	case reflect.Bool:
+		k = reflect.Bool
+	case reflect.String:
+		k = reflect.String
+	default:
+		return -1, nil, nil, nil, errors.New(fmt.Sprintf("Invalid underlying type (%s)", v))
+	}
+
+	// Construct the function that will return the Value at the given index.
+	at := func(i int) reflect.Value {
+		return v.Index(i)
+	}
+
+	// Construct the function that will compare the two Values.
+	cmp := func(i, j reflect.Value) bool {
+		switch k {
+		case reflect.Int64:
+			if i.Int() > j.Int() {
+				return true
+			}
+		case reflect.Uint64:
+			if i.Uint() > j.Uint() {
+				return true
+			}
+		case reflect.Float64:
+			if i.Float() > j.Float() {
+				return true
+			}
+		case reflect.Bool:
+			// experimental
+			if i.Bool() {
+				return true
+			}
+		case reflect.String:
+			if i.String() > j.String() {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	// Our swapping function is straight from the reflect library (thanks).
+	swap := reflect.Swapper(list)
+
+	return l, at, cmp, swap, nil
 }
