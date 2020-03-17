@@ -9,7 +9,7 @@ import (
 
 
 // Sort the list using an insertion algorithm. The list must be a slice or array of a uniform data type.
-func InsertionInt(list interface{}) error {
+func Insertion(list interface{}) error {
 	// We're going to follow this sequence for each item in the list:
 	// 1. Get the value at the current index.
 	// 2. While the value is less than the value to the left of it, swap the two values.
