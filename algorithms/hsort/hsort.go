@@ -36,27 +36,29 @@ func Insertion(list interface{}) error {
 	return nil
 }
 
-// Sort the list of ints using a selection algorithm.
-func SelectionInt(list []int) error {
+// Sort the list using a selection algorithm. The list must be a slice or array of a uniform data type.
+func Selection(list interface{}) error {
 	// We're going to follow this sequence for each item in the list:
 	// 1. Scan the entire list from the current position forward for the lowest value.
 	// 2. Swap the current value and the lowest value.
-	length := len(list)
-	if length < 1 {
-		return errors.New("Invalid list size")
+	length, at, cmp, swap, err := initSort(list)
+	if err != nil {
+		return err
 	}
 
-	for i := range list {
+	for i := 0; i < length; i++ {
 		pos := i
 		for j := i+1; j < length; j++ {
 			// Check each value to see if it's lower than our current lowest.
-			if list[j] < list[pos] {
+			low := at(pos)
+			try := at(j)
+			if cmp(low, try) {
 				// We found a value lower than we currently have. Select it.
 				pos = j
 			}
 		}
 		// Swap the selected value with the current value.
-		list[i], list[pos] = list[pos], list[i]
+		swap(i, pos)
 	}
 
 	return nil
