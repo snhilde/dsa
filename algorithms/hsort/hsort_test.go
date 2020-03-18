@@ -89,25 +89,28 @@ func testSortInt(t *testing.T, sortFunc func([]int) error, iters int, length int
 }
 
 func TestInsertionInt(t *testing.T) {
-	testSort(t, InsertionInt, 100, 10000, false)
+	testSort(t, Insertion, 100, 1000, false)
+	testSortInt(t, InsertionInt, 100, 1000, false)
 }
 
 func TestSelectionInt(t *testing.T) {
-	testSort(t, SelectionInt, 100, 10000, false)
+	testSort(t, Selection, 100, 1000, false)
+	testSortInt(t, SelectionInt, 100, 1000, false)
 }
 
 func TestMergeInt(t *testing.T) {
-	testSort(t, MergeInt, 100, 10000, false)
+	testSortInt(t, MergeInt, 100, 1000, false)
 }
 
 func TestMergeIntOptimized(t *testing.T) {
-	testSort(t, MergeIntOptimized, 100, 10000, false)
+	testSortInt(t, MergeIntOptimized, 100, 1000, false)
 }
 
 func TestHashInt(t *testing.T) {
-	testSort(t, HashInt, 100, 10000, true
+	testSortInt(t, HashInt, 100, 1000, true)
 }
 
 func TestBubbleInt(t *testing.T) {
-	testSort(t, BubbleInt, 100, 10000, false)
+	testSort(t, Bubble, 100, 1000, false)
+	testSortInt(t, BubbleInt, 100, 1000, false)
 }
