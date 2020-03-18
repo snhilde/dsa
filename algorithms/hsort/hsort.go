@@ -311,6 +311,37 @@ func HashInt(list []int) error {
 	return nil
 }
 
+// Sort the list using a bubble algorithm. The list must be a slice or array of a uniform data type.
+func Bubble(list interface{}) error {
+	// For this function, we're going to iterate through every item in the list. If an item has a greater value than its
+	// neighbor to the right, then we'll swap them. When we get to the end, we'll start again at the beginning and keep
+	// doing this until we have one pass with no swaps.
+	length, at, cmp, swap, err := initSort(list)
+	if err != nil {
+		return err
+	}
+
+	// At the beginning of every pass, we'll set clean to true. If we perform any operation during the pass, we'll
+	// toggle it false. When clean stays true the entire pass, everything is sorted.
+	clean := false
+	for !clean {
+		clean = true
+		for i := 0; i < length; i++ {
+			if i + 1 == length {
+				break
+			}
+			curr := at(i)
+			next := at(i+1)
+			if cmp(curr, next) {
+				swap(i, i+1)
+				clean = false
+			}
+		}
+	}
+
+	return nil
+}
+
 // Sort the list of ints using a bubble algorithm.
 func BubbleInt(list []int) error {
 	// For this function, we're going to iterate through every item in the list. If an item has a greater value than its
