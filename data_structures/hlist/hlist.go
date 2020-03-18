@@ -57,25 +57,19 @@ func (l *List) Length() int {
 
 // Insert a value into the list at the specified index.
 func (l *List) Insert(v interface{}, index int) error {
-	if index < 0 {
-		return errors.New("Invalid index")
-	} else if l.Length() < index {
-		return errors.New("Out of bounds")
+	n, err := l.getPrior(index)
+	if err != nil {
+		return err
 	}
 
-	new_node := newNode(v)
-
-	if index == 0 {
-		new_node.next = l.head
-		l.head = new_node
+	nn := newNode(v)
+	if n == nil {
+		// Handle the special case of inserting the first node.
+		nn.next = l.head
+		l.head = nn
 	} else {
-		n := l.head
-		for i := 1; i < index; i++ {
-			n = n.next
-		}
-
-		new_node.next = n.next
-		n.next = new_node
+		nn.next = n.next
+		n.next = nn
 	}
 
 	l.length++
@@ -86,45 +80,40 @@ func (l *List) Insert(v interface{}, index int) error {
 func (l *List) Append(values ...interface{}) error {
 	if l == nil {
 		return lErr()
-	} else if len(values) == 0 {
-		return nil
 	}
 
-	tmp_list := New()
-	n := tmp_list.head
+	tmp := New()
+	n := tmp.head
 	for _, v := range values {
-		if tmp_list.head == nil {
-			tmp_list.head = newNode(v)
-			tmp_list.length++
-			n = tmp_list.head
+		if tmp.head == nil {
+			tmp.head = newNode(v)
+			tmp.length++
+			n = tmp.head
 		} else {
 			n.next = newNode(v)
 			n = n.next
-			tmp_list.length++
+			tmp.length++
 		}
 	}
 
-	l.Merge(tmp_list)
+	l.Merge(tmp)
 
 	return nil
 }
 
 // Remove an item from the list and return its value.
 func (l *List) Pop(index int) interface{} {
-	if l == nil || index < 0 || index >= l.Length() {
+	n, err := l.getPrior(index)
+	if err != nil {
 		return nil
 	}
 
 	var pop *hnode
-	if index == 0 {
+	if n == nil {
 		// Handle the special case of popping the first node.
 		pop = l.head
-		l.head = pop.next
+		l.head = l.head.next
 	} else {
-		n := l.head
-		for i := 0; i < index-1; i++ {
-			n = n.next
-		}
 		pop = n.next
 		n.next = pop.next
 	}
@@ -139,23 +128,27 @@ func (l *List) PopMatch(v interface{}) error {
 		return lErr()
 	}
 
-	// Handle the special case of matching on the first node.
-	if l.head.v == v {
-		pop := l.head
-		l.head = pop.next
-		l.length--
+	if l.head == nil {
+		// Nothing to match.
 		return nil
 	}
 
-	n := l.head
-	for n.next != nil {
-		if n.next.v == v {
-			pop := n.next
-			n.next = pop.next
-			l.length--
-			break
+	if l.head.v == v {
+		// Handle the special case of matching on the first node.
+		pop := l.head
+		l.head = pop.next
+		l.length--
+	} else {
+		n := l.head
+		for n.next != nil {
+			if n.next.v == v {
+				pop := n.next
+				n.next = pop.next
+				l.length--
+				break
+			}
+			n = n.next
 		}
-		n = n.next
 	}
 
 	return nil
@@ -167,13 +160,14 @@ func (l *List) Index(v interface{}) int {
 		return -1
 	}
 
-	length := l.Length()
 	n := l.head
-	for i := 0; i < length; i++ {
+	i := 0
+	for n != nil {
 		if n.v == v {
 			return i
 		}
 		n = n.next
+		i++
 	}
 
 	// If we're here, then we didn't find anything.
@@ -202,26 +196,29 @@ func (l *List) Exists(v interface{}) bool {
 func (l *List) Merge(addition *List) error {
 	if l == nil {
 		return lErr()
-	} else if addition == nil {
+	}
+
+	if addition == nil {
 		// Nothing to do.
 		return nil
 	}
 
 	// Find the end of the list.
-	if l.head == nil {
+	n, err := l.getPrior(l.length)
+	if err != nil {
+		return err
+	}
+
+	if n == nil {
+		// List is empty.
 		l.head = addition.head
 		l.length = addition.length
 	} else {
-		n := l.head
-		for n.next != nil {
-			n = n.next
-		}
 		n.next = addition.head
 		l.length += addition.length
 	}
 
 	addition.Clear()
-
 	return nil
 }
 
@@ -384,4 +381,29 @@ func eqStr(left, right interface{}) int {
 // helper to return standard error on bad list.
 func lErr() error {
 	return errors.New("List must be created with New() first")
+}
+
+// helper to get the node immediately before the specified index.
+func (l *List) getPrior(index int) (*hnode, error) {
+	if l == nil {
+		return nil, lErr()
+	} else if index < 0 {
+		return nil, errors.New("Invalid index")
+	} else if l.length < index {
+		return nil, errors.New("Out of bounds")
+	}
+
+	if l.head == nil || index == 0 {
+		return nil, nil
+	}
+
+	n := l.head
+	for i := 0; i < index-1; i++ {
+		if n == nil {
+			return nil, errors.New("Error finding node at index")
+		}
+		n = n.next
+	}
+
+	return n, nil
 }
