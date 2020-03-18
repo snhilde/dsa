@@ -13,7 +13,8 @@ import (
 // sortFunc callback sort function
 // iters    num of iterations to run
 // length   length of slice to sort
-func testSort(t *testing.T, sortFunc func(interface{}) error, iters int, length int) {
+// isHash   if true, limit the range of random values to not overload a hashing algorithm
+func testSort(t *testing.T, sortFunc func(interface{}) error, iters int, length int, isHash bool) {
 	for i := 0; i < iters; i++ {
 		seed   := time.Now().UnixNano()
 		source := rand.NewSource(seed)
@@ -22,7 +23,11 @@ func testSort(t *testing.T, sortFunc func(interface{}) error, iters int, length 
 		// Populate the slice with random values.
 		list := make([]int, length)
 		for i := 0; i < length; i++ {
-			list[i] = random.Int()
+			if isHash {
+				list[i] = random.Intn(1e6)
+			} else {
+				list[i] = random.Int()
+			}
 		}
 
 		// Sort the slice using the provided algorithm.
@@ -46,7 +51,7 @@ func testSort(t *testing.T, sortFunc func(interface{}) error, iters int, length 
 	}
 }
 
-func testSortInt(t *testing.T, sortFunc func([]int) error, iters int, length int) {
+func testSortInt(t *testing.T, sortFunc func([]int) error, iters int, length int, isHash bool) {
 	for i := 0; i < iters; i++ {
 		seed   := time.Now().UnixNano()
 		source := rand.NewSource(seed)
@@ -55,7 +60,11 @@ func testSortInt(t *testing.T, sortFunc func([]int) error, iters int, length int
 		// Populate the slice with random values.
 		list := make([]int, length)
 		for i := 0; i < length; i++ {
-			list[i] = random.Int()
+			if isHash {
+				list[i] = random.Intn(1e6)
+			} else {
+				list[i] = random.Int()
+			}
 		}
 
 		// Sort the slice using the provided algorithm.
@@ -80,25 +89,25 @@ func testSortInt(t *testing.T, sortFunc func([]int) error, iters int, length int
 }
 
 func TestInsertionInt(t *testing.T) {
-	testSort(t, InsertionInt, 100, 10000)
+	testSort(t, InsertionInt, 100, 10000, false)
 }
 
 func TestSelectionInt(t *testing.T) {
-	testSort(t, SelectionInt, 100, 10000)
+	testSort(t, SelectionInt, 100, 10000, false)
 }
 
 func TestMergeInt(t *testing.T) {
-	testSort(t, MergeInt, 100, 10000)
+	testSort(t, MergeInt, 100, 10000, false)
 }
 
 func TestMergeIntOptimized(t *testing.T) {
-	testSort(t, MergeIntOptimized, 100, 10000)
+	testSort(t, MergeIntOptimized, 100, 10000, false)
 }
 
 func TestHashInt(t *testing.T) {
-	testSort(t, HashInt, 100, 10000)
+	testSort(t, HashInt, 100, 10000, true
 }
 
 func TestBubbleInt(t *testing.T) {
-	testSort(t, BubbleInt, 100, 10000)
+	testSort(t, BubbleInt, 100, 10000, false)
 }
