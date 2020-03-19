@@ -157,66 +157,58 @@ func TestBubbleInt(t *testing.T) {
 // isHash: if true, limit the range of random values to not overload a hashing algorithm
 
 func (s *intSort) Build(length int, isHash bool) {
-	seed   := time.Now().UnixNano()
-	source := rand.NewSource(seed)
-	random := rand.New(source)
+	r := newRand()
 
 	s.dev := make([]int, length)
 	s.std := make([]int, length)
 
 	for i := 0; i < length; i++ {
 		if isHash {
-			s.dev[i] = random.Intn(1e6)
+			s.dev[i] = r.Intn(1e6)
 		} else {
-			s.dev[i] = random.Int()
+			s.dev[i] = r.Int()
 		}
 	}
 }
 
 func (s *uintSort) Build(length int, isHash bool) {
-	seed   := time.Now().UnixNano()
-	source := rand.NewSource(seed)
-	random := rand.New(source)
+	r := newRand()
 
 	s.dev := make([]int, length)
 	s.std := make([]int, length)
 
 	for i := 0; i < length; i++ {
 		if isHash {
-			s.dev[i] = uint(random.Intn(1e6))
+			s.dev[i] = uint(r.Intn(1e6))
 		} else {
-			s.dev[i] = uint(random.Uint32())
+			s.dev[i] = uint(r.Uint32())
 		}
 	}
 }
 
 func (s *floatSort) Build(length int, isHash bool) {
-	seed   := time.Now().UnixNano()
-	source := rand.NewSource(seed)
-	random := rand.New(source)
+	r := newRand()
 
 	s.dev := make([]int, length)
 	s.std := make([]int, length)
 
 	for i := 0; i < length; i++ {
 		if isHash {
-			s.dev[i] = float32(random.Intn(1e6)) * random.Float32()
+			s.dev[i] = float32(r.Intn(1e6)) * r.Float32()
 		} else {
-			s.dev[i] = float32(random.Int()) * random.Float32()
+			s.dev[i] = float32(r.Int()) * r.Float32()
 		}
 	}
 }
 
 func (s *boolSort) Build(length int, isHash bool) {
-	seed   := time.Now().UnixNano()
-	source := rand.NewSource(seed)
-	random := rand.New(source)
+	r := newRand()
 
 	s.dev := make([]int, length)
 	s.std := make([]int, length)
 
 	for i := 0; i < length; i++ {
-		r := random.Int()
+		r := r.Int()
 		if r % 2 == 1 {
 			s.dev[i] = true
 		} else {
@@ -226,9 +218,7 @@ func (s *boolSort) Build(length int, isHash bool) {
 }
 
 func (s *stringSort) Build(length int, isHash bool) {
-	seed   := time.Now().UnixNano()
-	source := rand.NewSource(seed)
-	random := rand.New(source)
+	r := newRand()
 
 	s.dev := make([]int, length)
 	s.std := make([]int, length)
@@ -236,13 +226,22 @@ func (s *stringSort) Build(length int, isHash bool) {
 	for i := 0; i < length; i++ {
 		l := 1
 		for l > 0 {
-			l := random.Intn(32)
+			l := r.Intn(32)
 		}
 		s := make([]byte, l)
 		for j := 0; j < l; j++ {
-			n := random.Intn(93)
+			n := r.Intn(93)
 			s[j] = n + 33
 		}
 		s.dev[i] = string(s)
 	}
+}
+
+
+func newRand() *rand.Rand {
+	seed   := time.Now().UnixNano()
+	source := rand.NewSource(seed)
+	random := rand.New(source)
+
+	return random
 }
