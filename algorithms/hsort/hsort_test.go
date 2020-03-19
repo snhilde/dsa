@@ -20,6 +20,31 @@ type sorter interface {
 	Cmp() bool
 }
 
+type intSort struct {
+	dev []int
+	std []int
+}
+
+type uintSort struct {
+	dev []uint
+	std []uint
+}
+
+type floatSort struct {
+	dev []float32
+	std []float32
+}
+
+type boolSort struct {
+	dev []bool
+	std []bool
+}
+
+type stringSort struct {
+	dev []string
+	std []string
+}
+
 
 // Build a slice of random numbers and sort it with the provided sorting function.
 // t        testing object
