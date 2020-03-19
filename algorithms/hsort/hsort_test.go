@@ -151,3 +151,20 @@ func buildUints(length int, isHash bool) []uint32 {
 
 	return list
 }
+
+func buildFloats(length int, isHash bool) []float32 {
+	seed   := time.Now().UnixNano()
+	source := rand.NewSource(seed)
+	random := rand.New(source)
+
+	list := make([]float32, length)
+	for i := 0; i < length; i++ {
+		if isHash {
+			list[i] = float32(random.Intn(1e6)) * random.Float32()
+		} else {
+			list[i] = float32(random.Int()) * random.Float32()
+		}
+	}
+
+	return list
+}
