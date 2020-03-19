@@ -114,9 +114,10 @@ func TestBubbleInt(t *testing.T) {
 }
 
 
-// Build a slice of random ints.
+// Build slices of various types.
 // length: length of slice to sort
 // isHash: if true, limit the range of random values to not overload a hashing algorithm
+
 func buildInts(length int, isHash bool) []int {
 	list := make([]int, length)
 	for i := 0; i < length; i++ {
@@ -124,6 +125,19 @@ func buildInts(length int, isHash bool) []int {
 			list[i] = random.Intn(1e6)
 		} else {
 			list[i] = random.Int()
+		}
+	}
+
+	return list
+}
+
+func buildUints(length int, isHash bool) []uint32 {
+	list := make([]uint32, length)
+	for i := 0; i < length; i++ {
+		if isHash {
+			list[i] = uint32(random.Intn(1e6))
+		} else {
+			list[i] = random.Uint32()
 		}
 	}
 
