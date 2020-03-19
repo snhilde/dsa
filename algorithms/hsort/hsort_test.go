@@ -168,3 +168,21 @@ func buildFloats(length int, isHash bool) []float32 {
 
 	return list
 }
+
+func buildBools(length int) []bool {
+	seed   := time.Now().UnixNano()
+	source := rand.NewSource(seed)
+	random := rand.New(source)
+
+	list := make([]bool, length)
+	for i := 0; i < length; i++ {
+		r := random.Int()
+		if r % 2 == 1 {
+			list[i] = true
+		} else {
+			list[i] = false
+		}
+	}
+
+	return list
+}
