@@ -186,3 +186,25 @@ func buildBools(length int) []bool {
 
 	return list
 }
+
+func buildStrings(length int) []string {
+	seed   := time.Now().UnixNano()
+	source := rand.NewSource(seed)
+	random := rand.New(source)
+
+	list := make([]string, length)
+	for i := 0; i < length; i++ {
+		l := 1
+		for l > 0 {
+			l := random.Intn(32)
+		}
+		s := make([]byte, l)
+		for j := 0; j < l; j++ {
+			n := random.Intn(93)
+			s[j] = n + 33
+		}
+		list[i] = string(s)
+	}
+
+	return list
+}
