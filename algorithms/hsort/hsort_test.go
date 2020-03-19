@@ -119,6 +119,10 @@ func TestBubbleInt(t *testing.T) {
 // isHash: if true, limit the range of random values to not overload a hashing algorithm
 
 func buildInts(length int, isHash bool) []int {
+	seed   := time.Now().UnixNano()
+	source := rand.NewSource(seed)
+	random := rand.New(source)
+
 	list := make([]int, length)
 	for i := 0; i < length; i++ {
 		if isHash {
@@ -132,6 +136,10 @@ func buildInts(length int, isHash bool) []int {
 }
 
 func buildUints(length int, isHash bool) []uint32 {
+	seed   := time.Now().UnixNano()
+	source := rand.NewSource(seed)
+	random := rand.New(source)
+
 	list := make([]uint32, length)
 	for i := 0; i < length; i++ {
 		if isHash {
