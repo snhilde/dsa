@@ -12,8 +12,6 @@ import (
 // t        testing object
 // sortFunc callback sort function
 // iters    num of iterations to run
-// length   length of slice to sort
-// isHash   if true, limit the range of random values to not overload a hashing algorithm
 func testSort(t *testing.T, sortFunc func(interface{}) error, iters int, length int, isHash bool) {
 	for i := 0; i < iters; i++ {
 		seed   := time.Now().UnixNano()
@@ -113,4 +111,21 @@ func TestHashInt(t *testing.T) {
 func TestBubbleInt(t *testing.T) {
 	testSort(t, Bubble, 100, 1000, false)
 	testSortInt(t, BubbleInt, 100, 1000, false)
+}
+
+
+// Build a slice of random ints.
+// length: length of slice to sort
+// isHash: if true, limit the range of random values to not overload a hashing algorithm
+func buildInts(length int, isHash bool) []int {
+	list := make([]int, length)
+	for i := 0; i < length; i++ {
+		if isHash {
+			list[i] = random.Intn(1e6)
+		} else {
+			list[i] = random.Int()
+		}
+	}
+
+	return list
 }
