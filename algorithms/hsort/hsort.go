@@ -8,7 +8,7 @@ import (
 )
 
 
-// Sort the list using an insertion algorithm. The list must be a slice or array of a uniform data type.
+// Sort the list using an insertion algorithm. The list must be a slice of a uniform data type.
 func Insertion(list interface{}) error {
 	// We're going to follow this sequence for each item in the list:
 	// 1. Get the value at the current index.
@@ -65,7 +65,7 @@ func InsertionInt(list []int) error {
 	return nil
 }
 
-// Sort the list using a selection algorithm. The list must be a slice or array of a uniform data type.
+// Sort the list using a selection algorithm. The list must be a slice of a uniform data type.
 func Selection(list interface{}) error {
 	// We're going to follow this sequence for each item in the list:
 	// 1. Scan the entire list from the current position forward for the lowest value.
@@ -119,7 +119,7 @@ func SelectionInt(list []int) error {
 	return nil
 }
 
-// Sort the list using a bubble algorithm. The list must be a slice or array of a uniform data type.
+// Sort the list using a bubble algorithm. The list must be a slice of a uniform data type.
 func Bubble(list interface{}) error {
 	// For this function, we're going to iterate through every item in the list. If an item has a greater value than its
 	// neighbor to the right, then we'll swap them. When we get to the end, we'll start again at the beginning and keep
@@ -380,10 +380,10 @@ func HashInt(list []int) error {
 // 4. A function that will swap the two Values at the given indices.
 // 5. Any error that occurred along the way, or nil if no error occurred
 func initSort(list interface{}) (int, func(int) reflect.Value, func(i, j reflect.Value) bool, func(i, j int), error) {
-	// Pull out the first underlying Value, and make sure it's an array or slice.
+	// Pull out the underlying Value, and make sure it's a slice.
 	v := reflect.ValueOf(list)
-	if v.Kind() != reflect.Slice && v.Kind() != reflect.Array {
-		return -1, nil, nil, nil, errors.New("List must be slice or array")
+	if v.Kind() != reflect.Slice {
+		return -1, nil, nil, nil, errors.New("List must be slice")
 	}
 
 	// Find out how long our list is.
