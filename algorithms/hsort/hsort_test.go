@@ -8,6 +8,19 @@ import (
 )
 
 
+// sorter is the main interface for this test package. It defines four functions:
+// 1. Build, which will build a list to sort
+// 2. Sort, which will sort the list using the sorting function in development
+// 3. SortStd, which will sort the list using a standard and accepted sorting function
+// 4. Cmp, which will compare the two lists and determine if they are the same or not.
+type sorter interface {
+	Build()
+	Sort()
+	SortStd()
+	Cmp() bool
+}
+
+
 // Build a slice of random numbers and sort it with the provided sorting function.
 // t        testing object
 // sortFunc callback sort function
