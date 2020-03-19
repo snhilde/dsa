@@ -14,7 +14,7 @@ import (
 // 3. SortStd, which will sort the list using a standard and accepted sorting function
 // 4. Cmp, which will compare the two lists and determine if they are the same or not.
 type sorter interface {
-	Build()
+	Build(length int, isHash bool)
 	Sort()
 	SortStd()
 	Cmp() bool
@@ -156,81 +156,83 @@ func TestBubbleInt(t *testing.T) {
 // length: length of slice to sort
 // isHash: if true, limit the range of random values to not overload a hashing algorithm
 
-func buildInts(length int, isHash bool) []int {
+func (s *intSort) Build(length int, isHash bool) {
 	seed   := time.Now().UnixNano()
 	source := rand.NewSource(seed)
 	random := rand.New(source)
 
-	list := make([]int, length)
+	s.dev := make([]int, length)
+	s.std := make([]int, length)
+
 	for i := 0; i < length; i++ {
 		if isHash {
-			list[i] = random.Intn(1e6)
+			s.dev[i] = random.Intn(1e6)
 		} else {
-			list[i] = random.Int()
+			s.dev[i] = random.Int()
 		}
 	}
-
-	return list
 }
 
-func buildUints(length int, isHash bool) []uint32 {
+func (s *uintSort) Build(length int, isHash bool) {
 	seed   := time.Now().UnixNano()
 	source := rand.NewSource(seed)
 	random := rand.New(source)
 
-	list := make([]uint32, length)
+	s.dev := make([]int, length)
+	s.std := make([]int, length)
+
 	for i := 0; i < length; i++ {
 		if isHash {
-			list[i] = uint32(random.Intn(1e6))
+			s.dev[i] = uint(random.Intn(1e6))
 		} else {
-			list[i] = random.Uint32()
+			s.dev[i] = uint(random.Uint32())
 		}
 	}
-
-	return list
 }
 
-func buildFloats(length int, isHash bool) []float32 {
+func (s *floatSort) Build(length int, isHash bool) {
 	seed   := time.Now().UnixNano()
 	source := rand.NewSource(seed)
 	random := rand.New(source)
 
-	list := make([]float32, length)
+	s.dev := make([]int, length)
+	s.std := make([]int, length)
+
 	for i := 0; i < length; i++ {
 		if isHash {
-			list[i] = float32(random.Intn(1e6)) * random.Float32()
+			s.dev[i] = float32(random.Intn(1e6)) * random.Float32()
 		} else {
-			list[i] = float32(random.Int()) * random.Float32()
+			s.dev[i] = float32(random.Int()) * random.Float32()
 		}
 	}
-
-	return list
 }
 
-func buildBools(length int) []bool {
+func (s *boolSort) Build(length int, isHash bool) {
 	seed   := time.Now().UnixNano()
 	source := rand.NewSource(seed)
 	random := rand.New(source)
 
-	list := make([]bool, length)
+	s.dev := make([]int, length)
+	s.std := make([]int, length)
+
 	for i := 0; i < length; i++ {
 		r := random.Int()
 		if r % 2 == 1 {
-			list[i] = true
+			s.dev[i] = true
 		} else {
-			list[i] = false
+			s.dev[i] = false
 		}
 	}
-
-	return list
 }
 
-func buildStrings(length int) []string {
+func (s *stringSort) Build(length int, isHash bool) {
 	seed   := time.Now().UnixNano()
 	source := rand.NewSource(seed)
 	random := rand.New(source)
 
-	list := make([]string, length)
+	s.dev := make([]int, length)
+	s.std := make([]int, length)
+
 	for i := 0; i < length; i++ {
 		l := 1
 		for l > 0 {
@@ -241,8 +243,6 @@ func buildStrings(length int) []string {
 			n := random.Intn(93)
 			s[j] = n + 33
 		}
-		list[i] = string(s)
+		s.dev[i] = string(s)
 	}
-
-	return list
 }
