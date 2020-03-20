@@ -44,7 +44,7 @@ type floatSort struct {
 
 type boolSort struct {
 	dev  []bool
-	std  []bool
+	std  []int
 	sort   func(interface{}) error
 }
 
@@ -294,28 +294,46 @@ func (s *floatSort) Cmp() bool {
 func (s *boolSort) Build(length int, isHash bool) {
 	r := newRand()
 
-	s.dev := make([]int, length)
+	s.dev := make([]bool, length)
 	s.std := make([]int, length)
 
 	for i := 0; i < length; i++ {
 		r := r.Int()
 		if r % 2 == 1 {
 			s.dev[i] = true
-			s.std[i] = true
+			s.std[i] = 1
 		} else {
 			s.dev[i] = false
-			s.std[i] = false
+			s.std[i] = 0
 		}
 	}
 }
 
 func (s *boolSort) Sort() error {
+	return s.sort(s.dev)
 }
 
 func (s *boolSort) SortStd() {
+	sort.Ints(s.std)
 }
 
 func (s *boolSort) Cmp() bool {
+	good := true
+	for i, v := range s.dev {
+		if (v && s.std[i] == 0) || (!v && s.std[i] == 1) {
+			good = false
+			t.Error("Values at index", i, "differ")
+			if v {
+				t.Log("should be: true")
+				t.Log("really is: false")
+			} else {
+				t.Log("should be: false")
+				t.Log("really is: true")
+			}
+		}
+	}
+
+	return good
 }
 
 
