@@ -32,7 +32,7 @@ type intSort struct {
 
 type uintSort struct {
 	dev  []uint
-	std  []uint
+	std  []int
 	sort   func(interface{}) error
 }
 
@@ -194,40 +194,57 @@ func (s *intSort) SortStd() {
 }
 
 func (s *intSort) Cmp(t *testing.T) bool {
+	good := true
 	for i, v := range s.dev {
 		if v != s.std[i] {
+			good = false
 			t.Error("Values at index", i, "differ")
 			t.Log("should be:", s.std[i])
 			t.Log("really is:", v)
 		}
 	}
+
+	return good
 }
 
 
 func (s *uintSort) Build(length int, isHash bool) {
 	r := newRand()
 
-	s.dev := make([]int, length)
+	// std will be an int slice so we can use package sort's Ints() function.
+	s.dev := make([]uint, length)
 	s.std := make([]int, length)
 
 	for i := 0; i < length; i++ {
 		if isHash {
 			s.dev[i] = uint(r.Intn(1e6))
-			s.std[i] = uint(r.Intn(1e6))
 		} else {
 			s.dev[i] = uint(r.Uint32())
-			s.std[i] = uint(r.Uint32())
 		}
+		s.std[i] = int(s.dev[i])
 	}
 }
 
 func (s *uintSort) Sort() error {
+	return s.sort(s.dev)
 }
 
 func (s *uintSort) SortStd() {
+	sort.Ints(s.std)
 }
 
-func (s *uintSort) Cmp() bool {
+func (s *uintSort) Cmp(t *testing.T) bool {
+	good := true
+	for i, v := range s.dev {
+		if v != uint(s.std[i]) {
+			good = false
+			t.Error("Values at index", i, "differ")
+			t.Log("should be:", s.std[i])
+			t.Log("really is:", v)
+		}
+	}
+
+	return good
 }
 
 
