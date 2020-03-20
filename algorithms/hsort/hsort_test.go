@@ -26,7 +26,10 @@ type sorter interface {
 
 
 func TestInsertion(t *testing.T) {
-	i := intSort{sort: Insertion}
+	i := intSort{sortInt: InsertionInt}
+	testSort(t, &i, 100, 1000, false, "int insertion")
+
+	i = intSort{sort: Insertion}
 	testSort(t, &i, 100, 1000, false, "insertion")
 
 	u := uintSort{sort: Insertion}
@@ -43,7 +46,10 @@ func TestInsertion(t *testing.T) {
 }
 
 func TestSelection(t *testing.T) {
-	i := intSort{sort: Selection}
+	i := intSort{sortInt: SelectionInt}
+	testSort(t, &i, 100, 1000, false, "int selection")
+
+	i = intSort{sort: Selection}
 	testSort(t, &i, 100, 1000, false, "selection")
 
 	u := uintSort{sort: Selection}
@@ -60,29 +66,38 @@ func TestSelection(t *testing.T) {
 }
 
 func TestBubble(t *testing.T) {
-	i := intSort{sort: Bubble}
-	testSort(t, &i, 100, 1000, false, "selection")
+	i := intSort{sortInt: BubbleInt}
+	testSort(t, &i, 100, 1000, false, "int bubble")
+
+	i = intSort{sort: Bubble}
+	testSort(t, &i, 100, 1000, false, "bubble")
 
 	u := uintSort{sort: Bubble}
-	testSort(t, &u, 100, 1000, false, "selection")
+	testSort(t, &u, 100, 1000, false, "bubble")
 
 	f := floatSort{sort: Bubble}
-	testSort(t, &f, 100, 1000, false, "selection")
+	testSort(t, &f, 100, 1000, false, "bubble")
 
 	b := boolSort{sort: Bubble}
-	testSort(t, &b, 100, 1000, false, "selection")
+	testSort(t, &b, 100, 1000, false, "bubble")
 
 	s := stringSort{sort: Bubble}
-	testSort(t, &s, 100, 1000, false, "selection")
+	testSort(t, &s, 100, 1000, false, "bubble")
 }
 
 func TestMergeInt(t *testing.T) {
+	i := intSort{sortInt: MergeInt}
+	testSort(t, &i, 100, 1000, false, "int merge")
 }
 
 func TestMergeIntOptimized(t *testing.T) {
+	i := intSort{sortInt: MergeIntOptimized}
+	testSort(t, &i, 100, 1000, false, "int merge optimized")
 }
 
 func TestHashInt(t *testing.T) {
+	i := intSort{sortInt: HashInt}
+	testSort(t, &i, 100, 1000, true, "int hash")
 }
 
 
@@ -116,9 +131,10 @@ func newRand() *rand.Rand {
 
 
 type intSort struct {
-	dev  []int
-	std  []int
-	sort   func(interface{}) error
+	dev     []int
+	std     []int
+	sort      func(interface{}) error
+	sortInt   func([]int) error
 }
 
 func (s *intSort) Build(length int, isHash bool) {
@@ -142,7 +158,10 @@ func (s *intSort) Build(length int, isHash bool) {
 }
 
 func (s *intSort) Sort() error {
-	return s.sort(s.dev)
+	if s.sort != nil {
+		return s.sort(s.dev)
+	}
+	return s.sortInt(s.dev)
 }
 
 func (s *intSort) SortStd() {
