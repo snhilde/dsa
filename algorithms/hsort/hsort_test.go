@@ -37,8 +37,8 @@ type uintSort struct {
 }
 
 type floatSort struct {
-	dev  []float32
-	std  []float32
+	dev  []float64
+	std  []float64
 	sort   func(interface{}) error
 }
 
@@ -251,27 +251,43 @@ func (s *uintSort) Cmp(t *testing.T) bool {
 func (s *floatSort) Build(length int, isHash bool) {
 	r := newRand()
 
-	s.dev := make([]int, length)
-	s.std := make([]int, length)
+	s.dev := make([]float64, length)
+	s.std := make([]float64, length)
 
 	for i := 0; i < length; i++ {
 		if isHash {
-			s.dev[i] = float32(r.Intn(1e6)) * r.Float32()
-			s.std[i] = float32(r.Intn(1e6)) * r.Float32()
+			s.dev[i] = float64(r.Intn(1e6)) * r.Float64()
 		} else {
-			s.dev[i] = float32(r.Int()) * r.Float32()
-			s.std[i] = float32(r.Int()) * r.Float32()
+			s.dev[i] = float64(r.Int()) * r.Float64()
 		}
+
+		if (r.Int() % 2) == 0 {
+			s.dev[i] *= -1
+		}
+		s.std[i] = s.dev[i]
 	}
 }
 
 func (s *floatSort) Sort() error {
+	return s.sort(s.dev)
 }
 
 func (s *floatSort) SortStd() {
+	sort.Float64s(s.std)
 }
 
 func (s *floatSort) Cmp() bool {
+	good := true
+	for i, v := range s.dev {
+		if v != s.std[i] {
+			good = false
+			t.Error("Values at index", i, "differ")
+			t.Log("should be:", s.std[i])
+			t.Log("really is:", v)
+		}
+	}
+
+	return good
 }
 
 
