@@ -161,10 +161,6 @@ func TestBubbleInt(t *testing.T) {
 }
 
 
-// Build slices of various types.
-// length: length of slice to sort
-// isHash: if true, limit the range of random values to not overload a hashing algorithm
-
 func (s *intSort) Build(length int, isHash bool) {
 	r := newRand()
 
@@ -276,7 +272,7 @@ func (s *floatSort) SortStd() {
 	sort.Float64s(s.std)
 }
 
-func (s *floatSort) Cmp() bool {
+func (s *floatSort) Cmp(t *testing.T) bool {
 	good := true
 	for i, v := range s.dev {
 		if v != s.std[i] {
@@ -317,7 +313,7 @@ func (s *boolSort) SortStd() {
 	sort.Ints(s.std)
 }
 
-func (s *boolSort) Cmp() bool {
+func (s *boolSort) Cmp(t *testing.T) bool {
 	good := true
 	for i, v := range s.dev {
 		if (v && s.std[i] == 0) || (!v && s.std[i] == 1) {
@@ -346,16 +342,16 @@ func (s *stringSort) Build(length int, isHash bool) {
 	for i := 0; i < length; i++ {
 		l := 1
 		for l > 0 {
-			l := r.Intn(32)
+			l = r.Intn(32)
 		}
-		s := make([]byte, l)
+		b := make([]byte, l)
 		for j := 0; j < l; j++ {
 			// Fill each byte with a random printable character (0x21 - 0x7E).
-			n := r.Intn(93)
-			s[j] = n + 33
+			n := byte(r.Intn(93))
+			b[j] = n + 33
 		}
-		s.dev[i] = string(s)
-		s.std[i] = string(s)
+		s.dev[i] = string(b)
+		s.std[i] = string(b)
 	}
 }
 
@@ -367,7 +363,7 @@ func (s *stringSort) SortStd() {
 	sort.Strings(s.std)
 }
 
-func (s *stringSort) Cmp() bool {
+func (s *stringSort) Cmp(t *testing.T) bool {
 	good := true
 	for i, v := range s.dev {
 		if v != s.std[i] {
