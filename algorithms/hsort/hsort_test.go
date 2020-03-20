@@ -21,7 +21,7 @@ type sorter interface {
 	SortStd()
 
 	// Cmp will compare the two lists and determine if they are the same or not.
-	Cmp() bool
+	Cmp(*testing.T) bool
 }
 
 type intSort struct {
@@ -174,21 +174,33 @@ func (s *intSort) Build(length int, isHash bool) {
 	for i := 0; i < length; i++ {
 		if isHash {
 			s.dev[i] = r.Intn(1e6)
-			s.std[i] = r.Intn(1e6)
 		} else {
 			s.dev[i] = r.Int()
-			s.std[i] = r.Int()
 		}
+
+		if (r.Int() % 2) == 0 {
+			s.dev[i] *= -1
+		}
+		s.std[i] = s.dev[i]
 	}
 }
 
 func (s *intSort) Sort() error {
+	return s.sort(s.dev)
 }
 
 func (s *intSort) SortStd() {
+	sort.Ints(s.std)
 }
 
-func (s *intSort) Cmp() bool {
+func (s *intSort) Cmp(t *testing.T) bool {
+	for i, v := range s.dev {
+		if v != s.std[i] {
+			t.Error("Values at index", i, "differ")
+			t.Log("should be:", s.std[i])
+			t.Log("really is:", v)
+		}
+	}
 }
 
 
