@@ -5,6 +5,7 @@ import (
 	"errors"
 	"reflect"
 	"fmt"
+	"math"
 )
 
 
@@ -352,14 +353,14 @@ func HashInt(list []int) error {
 			high = v
 		}
 
-		hash := v % length
+		hash := int(math.Abs(float64(v % length)))
 		table[hash] = append(table[hash], v)
 	}
 
 	// Iterate through our value range. If a value exists in the table, then we'll add it back to the list in now-sorted order.
 	index := 0
 	for i := low; i <= high; i++ {
-		hash := i % length
+		hash := int(math.Abs(float64(i % length)))
 		for _, v := range table[hash] {
 			if v == i {
 				list[index] = v
