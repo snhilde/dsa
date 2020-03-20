@@ -8,45 +8,54 @@ import (
 )
 
 
-// sorter is the main interface for this test package. It defines four functions:
-// 1. Build, which will build a list to sort
-// 2. Sort, which will sort the list using the sorting function in development
-// 3. SortStd, which will sort the list using a standard and accepted sorting function
-// 4. Cmp, which will compare the two lists and determine if they are the same or not.
+// sorter is the main interface for this test package. It allows for different types to be used with the same sorting
+// test harness.
 type sorter interface {
+	// Build will build a list to sort. If isHash is true, the range of values should be kept low to allow for hash sorting.
 	Build(length int, isHash bool)
-	Sort()
+
+	// Sort will sort the list using the sorting function in development.
+	Sort() error
+
+	// SortStd will sort the list using a standard and accepted sorting function.
 	SortStd()
+
+	// Cmp will compare the two lists and determine if they are the same or not.
 	Cmp() bool
 }
 
 type intSort struct {
-	dev []int
-	std []int
+	dev  []int
+	std  []int
+	sort   func(interface{}) error
 }
 
 type uintSort struct {
-	dev []uint
-	std []uint
+	dev  []uint
+	std  []uint
+	sort   func(interface{}) error
 }
 
 type floatSort struct {
-	dev []float32
-	std []float32
+	dev  []float32
+	std  []float32
+	sort   func(interface{}) error
 }
 
 type boolSort struct {
-	dev []bool
-	std []bool
+	dev  []bool
+	std  []bool
+	sort   func(interface{}) error
 }
 
 type stringSort struct {
-	dev []string
-	std []string
+	dev  []string
+	std  []string
+	sort   func(interface{}) error
 }
 
 
-// Build a slice of random numbers and sort it with the provided sorting function.
+// Build a slice of random numbers, and sort it with the provided sorting function.
 // t        testing object
 // sortFunc callback sort function
 // iters    num of iterations to run
@@ -173,7 +182,7 @@ func (s *intSort) Build(length int, isHash bool) {
 	}
 }
 
-func (s *intSort) Sort() {
+func (s *intSort) Sort() error {
 }
 
 func (s *intSort) SortStd() {
@@ -200,7 +209,7 @@ func (s *uintSort) Build(length int, isHash bool) {
 	}
 }
 
-func (s *uintSort) Sort() {
+func (s *uintSort) Sort() error {
 }
 
 func (s *uintSort) SortStd() {
@@ -227,7 +236,7 @@ func (s *floatSort) Build(length int, isHash bool) {
 	}
 }
 
-func (s *floatSort) Sort() {
+func (s *floatSort) Sort() error {
 }
 
 func (s *floatSort) SortStd() {
@@ -255,7 +264,7 @@ func (s *boolSort) Build(length int, isHash bool) {
 	}
 }
 
-func (s *boolSort) Sort() {
+func (s *boolSort) Sort() error {
 }
 
 func (s *boolSort) SortStd() {
@@ -286,7 +295,7 @@ func (s *stringSort) Build(length int, isHash bool) {
 	}
 }
 
-func (s *stringSort) Sort() {
+func (s *stringSort) Sort() error {
 }
 
 func (s *stringSort) SortStd() {
