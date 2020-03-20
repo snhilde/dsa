@@ -15,7 +15,7 @@ func Insertion(list interface{}) error {
 	// 2. While the value is less than the value to the left of it, swap the two values.
 	// 3. When the value is greater than the value to the left, it will also be greater than the value to the right and
 	//    therefore in sorted order for this portion of the list.
-	length, at, cmp, swap, err := initSort(list)
+	length, at, greater, swap, err := initSort(list)
 	if err != nil {
 		return err
 	}
@@ -25,7 +25,7 @@ func Insertion(list interface{}) error {
 			// Scan down the section of the list that is now sorted until we find the insertion point.
 			curr := at(j)
 			prev := at(j-1)
-			if cmp(prev, curr) {
+			if greater(prev, curr) {
 				swap(j, j-1)
 			} else {
 				break
@@ -70,7 +70,7 @@ func Selection(list interface{}) error {
 	// We're going to follow this sequence for each item in the list:
 	// 1. Scan the entire list from the current position forward for the lowest value.
 	// 2. Swap the current value and the lowest value.
-	length, at, cmp, swap, err := initSort(list)
+	length, at, greater, swap, err := initSort(list)
 	if err != nil {
 		return err
 	}
@@ -81,7 +81,7 @@ func Selection(list interface{}) error {
 			// Check each value to see if it's lower than our current lowest.
 			low := at(pos)
 			try := at(j)
-			if cmp(low, try) {
+			if greater(low, try) {
 				// We found a value lower than we currently have. Select it.
 				pos = j
 			}
@@ -124,7 +124,7 @@ func Bubble(list interface{}) error {
 	// For this function, we're going to iterate through every item in the list. If an item has a greater value than its
 	// neighbor to the right, then we'll swap them. When we get to the end, we'll start again at the beginning and keep
 	// doing this until we have one pass with no swaps.
-	length, at, cmp, swap, err := initSort(list)
+	length, at, greater, swap, err := initSort(list)
 	if err != nil {
 		return err
 	}
@@ -140,7 +140,7 @@ func Bubble(list interface{}) error {
 			}
 			curr := at(i)
 			next := at(i+1)
-			if cmp(curr, next) {
+			if greater(curr, next) {
 				swap(i, i+1)
 				clean = false
 			}
@@ -415,7 +415,8 @@ func initSort(list interface{}) (int, func(int) reflect.Value, func(i, j reflect
 	}
 
 	// Construct the function that will compare the two Values.
-	cmp := func(i, j reflect.Value) bool {
+	// Returns true if i is greater than j and items need to be swapped.
+	greater := func(i, j reflect.Value) bool {
 		switch k {
 		case reflect.Int64:
 			if i.Int() > j.Int() {
@@ -430,8 +431,7 @@ func initSort(list interface{}) (int, func(int) reflect.Value, func(i, j reflect
 				return true
 			}
 		case reflect.Bool:
-			// experimental
-			if i.Bool() {
+			if i.Bool() && !j.Bool() {
 				return true
 			}
 		case reflect.String:
@@ -446,5 +446,5 @@ func initSort(list interface{}) (int, func(int) reflect.Value, func(i, j reflect
 	// Our swapping function is straight from the reflect library (thanks).
 	swap := reflect.Swapper(list)
 
-	return l, at, cmp, swap, nil
+	return l, at, greater, swap, nil
 }
