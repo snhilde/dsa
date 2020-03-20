@@ -27,53 +27,53 @@ type sorter interface {
 
 func TestInsertion(t *testing.T) {
 	i := intSort{sort: Insertion}
-	testSort(t, &i, 100, 1000, false)
+	testSort(t, &i, 100, 1000, false, "insertion")
 
 	u := uintSort{sort: Insertion}
-	testSort(t, &u, 100, 1000, false)
+	testSort(t, &u, 100, 1000, false, "insertion")
 
 	f := floatSort{sort: Insertion}
-	testSort(t, &f, 100, 1000, false)
+	testSort(t, &f, 100, 1000, false, "insertion")
 
 	b := boolSort{sort: Insertion}
-	testSort(t, &b, 100, 1000, false)
+	testSort(t, &b, 100, 1000, false, "insertion")
 
 	s := stringSort{sort: Insertion}
-	testSort(t, &s, 100, 1000, false)
+	testSort(t, &s, 100, 1000, false, "insertion")
 }
 
 func TestSelection(t *testing.T) {
 	i := intSort{sort: Selection}
-	testSort(t, &i, 100, 1000, false)
+	testSort(t, &i, 100, 1000, false, "selection")
 
 	u := uintSort{sort: Selection}
-	testSort(t, &u, 100, 1000, false)
+	testSort(t, &u, 100, 1000, false, "selection")
 
 	f := floatSort{sort: Selection}
-	testSort(t, &f, 100, 1000, false)
+	testSort(t, &f, 100, 1000, false, "selection")
 
 	b := boolSort{sort: Selection}
-	testSort(t, &b, 100, 1000, false)
+	testSort(t, &b, 100, 1000, false, "selection")
 
 	s := stringSort{sort: Selection}
-	testSort(t, &s, 100, 1000, false)
+	testSort(t, &s, 100, 1000, false, "selection")
 }
 
 func TestBubble(t *testing.T) {
 	i := intSort{sort: Bubble}
-	testSort(t, &i, 100, 1000, false)
+	testSort(t, &i, 100, 1000, false, "selection")
 
 	u := uintSort{sort: Bubble}
-	testSort(t, &u, 100, 1000, false)
+	testSort(t, &u, 100, 1000, false, "selection")
 
 	f := floatSort{sort: Bubble}
-	testSort(t, &f, 100, 1000, false)
+	testSort(t, &f, 100, 1000, false, "selection")
 
 	b := boolSort{sort: Bubble}
-	testSort(t, &b, 100, 1000, false)
+	testSort(t, &b, 100, 1000, false, "selection")
 
 	s := stringSort{sort: Bubble}
-	testSort(t, &s, 100, 1000, false)
+	testSort(t, &s, 100, 1000, false, "selection")
 }
 
 func TestMergeInt(t *testing.T) {
@@ -87,7 +87,7 @@ func TestHashInt(t *testing.T) {
 
 
 // Test out the various types/algorithms.
-func testSort(t *testing.T, s sorter, n int, l int, isHash bool) {
+func testSort(t *testing.T, s sorter, n int, l int, isHash bool, desc string) {
 	for i := 0; i < n; i++ {
 		s.Build(l, isHash)
 
@@ -99,10 +99,19 @@ func testSort(t *testing.T, s sorter, n int, l int, isHash bool) {
 		s.SortStd()
 
 		if !s.Cmp(t) {
-			t.Error("-- Failed sort", i, "/", n, "--")
+			t.Error("-- Failed", desc, "sort", i, "/", n, "--")
 			return
 		}
 	}
+}
+
+
+func newRand() *rand.Rand {
+	seed   := time.Now().UnixNano()
+	source := rand.NewSource(seed)
+	random := rand.New(source)
+
+	return random
 }
 
 
@@ -288,13 +297,12 @@ func (s *boolSort) Cmp(t *testing.T) bool {
 		if (v && s.std[i] == 0) || (!v && s.std[i] == 1) {
 			good = false
 			t.Error("Values at index", i, "differ")
-			if v {
+			if s.std[i] == 1 {
 				t.Log("should be: true")
-				t.Log("really is: false")
 			} else {
 				t.Log("should be: false")
-				t.Log("really is: true")
 			}
+			t.Log("really is:", v)
 		}
 	}
 
@@ -350,14 +358,4 @@ func (s *stringSort) Cmp(t *testing.T) bool {
 	}
 
 	return good
-}
-
-
-
-func newRand() *rand.Rand {
-	seed   := time.Now().UnixNano()
-	source := rand.NewSource(seed)
-	random := rand.New(source)
-
-	return random
 }
