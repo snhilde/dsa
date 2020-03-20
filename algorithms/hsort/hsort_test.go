@@ -168,8 +168,8 @@ func TestBubbleInt(t *testing.T) {
 func (s *intSort) Build(length int, isHash bool) {
 	r := newRand()
 
-	s.dev := make([]int, length)
-	s.std := make([]int, length)
+	s.dev = make([]int, length)
+	s.std = make([]int, length)
 
 	for i := 0; i < length; i++ {
 		if isHash {
@@ -212,8 +212,8 @@ func (s *uintSort) Build(length int, isHash bool) {
 	r := newRand()
 
 	// std will be an int slice so we can use package sort's Ints() function.
-	s.dev := make([]uint, length)
-	s.std := make([]int, length)
+	s.dev = make([]uint, length)
+	s.std = make([]int, length)
 
 	for i := 0; i < length; i++ {
 		if isHash {
@@ -251,8 +251,8 @@ func (s *uintSort) Cmp(t *testing.T) bool {
 func (s *floatSort) Build(length int, isHash bool) {
 	r := newRand()
 
-	s.dev := make([]float64, length)
-	s.std := make([]float64, length)
+	s.dev = make([]float64, length)
+	s.std = make([]float64, length)
 
 	for i := 0; i < length; i++ {
 		if isHash {
@@ -294,8 +294,8 @@ func (s *floatSort) Cmp() bool {
 func (s *boolSort) Build(length int, isHash bool) {
 	r := newRand()
 
-	s.dev := make([]bool, length)
-	s.std := make([]int, length)
+	s.dev = make([]bool, length)
+	s.std = make([]int, length)
 
 	for i := 0; i < length; i++ {
 		r := r.Int()
@@ -340,8 +340,8 @@ func (s *boolSort) Cmp() bool {
 func (s *stringSort) Build(length int, isHash bool) {
 	r := newRand()
 
-	s.dev := make([]string, length)
-	s.std := make([]string, length)
+	s.dev = make([]string, length)
+	s.std = make([]string, length)
 
 	for i := 0; i < length; i++ {
 		l := 1
