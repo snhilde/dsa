@@ -165,11 +165,23 @@ func (s *intSort) Build(length int, isHash bool) {
 	for i := 0; i < length; i++ {
 		if isHash {
 			s.dev[i] = r.Intn(1e6)
+			s.std[i] = r.Intn(1e6)
 		} else {
 			s.dev[i] = r.Int()
+			s.std[i] = r.Int()
 		}
 	}
 }
+
+func (s *intSort) Sort() {
+}
+
+func (s *intSort) SortStd() {
+}
+
+func (s *intSort) Cmp() bool {
+}
+
 
 func (s *uintSort) Build(length int, isHash bool) {
 	r := newRand()
@@ -180,11 +192,23 @@ func (s *uintSort) Build(length int, isHash bool) {
 	for i := 0; i < length; i++ {
 		if isHash {
 			s.dev[i] = uint(r.Intn(1e6))
+			s.std[i] = uint(r.Intn(1e6))
 		} else {
 			s.dev[i] = uint(r.Uint32())
+			s.std[i] = uint(r.Uint32())
 		}
 	}
 }
+
+func (s *uintSort) Sort() {
+}
+
+func (s *uintSort) SortStd() {
+}
+
+func (s *uintSort) Cmp() bool {
+}
+
 
 func (s *floatSort) Build(length int, isHash bool) {
 	r := newRand()
@@ -195,11 +219,23 @@ func (s *floatSort) Build(length int, isHash bool) {
 	for i := 0; i < length; i++ {
 		if isHash {
 			s.dev[i] = float32(r.Intn(1e6)) * r.Float32()
+			s.std[i] = float32(r.Intn(1e6)) * r.Float32()
 		} else {
 			s.dev[i] = float32(r.Int()) * r.Float32()
+			s.std[i] = float32(r.Int()) * r.Float32()
 		}
 	}
 }
+
+func (s *floatSort) Sort() {
+}
+
+func (s *floatSort) SortStd() {
+}
+
+func (s *floatSort) Cmp() bool {
+}
+
 
 func (s *boolSort) Build(length int, isHash bool) {
 	r := newRand()
@@ -211,11 +247,23 @@ func (s *boolSort) Build(length int, isHash bool) {
 		r := r.Int()
 		if r % 2 == 1 {
 			s.dev[i] = true
+			s.std[i] = true
 		} else {
 			s.dev[i] = false
+			s.std[i] = false
 		}
 	}
 }
+
+func (s *boolSort) Sort() {
+}
+
+func (s *boolSort) SortStd() {
+}
+
+func (s *boolSort) Cmp() bool {
+}
+
 
 func (s *stringSort) Build(length int, isHash bool) {
 	r := newRand()
@@ -234,8 +282,19 @@ func (s *stringSort) Build(length int, isHash bool) {
 			s[j] = n + 33
 		}
 		s.dev[i] = string(s)
+		s.std[i] = string(s)
 	}
 }
+
+func (s *stringSort) Sort() {
+}
+
+func (s *stringSort) SortStd() {
+}
+
+func (s *stringSort) Cmp() bool {
+}
+
 
 
 func newRand() *rand.Rand {
