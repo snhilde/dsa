@@ -55,84 +55,6 @@ type stringSort struct {
 }
 
 
-// Build a slice of random numbers, and sort it with the provided sorting function.
-// t        testing object
-// sortFunc callback sort function
-// iters    num of iterations to run
-func testSort(t *testing.T, sortFunc func(interface{}) error, iters int, length int, isHash bool) {
-	for i := 0; i < iters; i++ {
-		seed   := time.Now().UnixNano()
-		source := rand.NewSource(seed)
-		random := rand.New(source)
-
-		// Populate the slice with random values.
-		list := make([]int, length)
-		for i := 0; i < length; i++ {
-			if isHash {
-				list[i] = random.Intn(1e6)
-			} else {
-				list[i] = random.Int()
-			}
-		}
-
-		// Sort the slice using the provided algorithm.
-		listCopy := make([]int, length)
-		copy(listCopy, list)
-		err := sortFunc(list)
-		if err != nil {
-			t.Log("Sorting failed:")
-			t.Error(err)
-		}
-
-		// Check that the sorting algorithm was correct.
-		sort.Ints(listCopy)
-		for i, v := range list {
-			if v != listCopy[i] {
-				t.Error("Values at index", i, "differ")
-				t.Log("should be:", listCopy[i])
-				t.Log("really is:", v)
-			}
-		}
-	}
-}
-
-func testSortInt(t *testing.T, sortFunc func([]int) error, iters int, length int, isHash bool) {
-	for i := 0; i < iters; i++ {
-		seed   := time.Now().UnixNano()
-		source := rand.NewSource(seed)
-		random := rand.New(source)
-
-		// Populate the slice with random values.
-		list := make([]int, length)
-		for i := 0; i < length; i++ {
-			if isHash {
-				list[i] = random.Intn(1e6)
-			} else {
-				list[i] = random.Int()
-			}
-		}
-
-		// Sort the slice using the provided algorithm.
-		listCopy := make([]int, length)
-		copy(listCopy, list)
-		err := sortFunc(list)
-		if err != nil {
-			t.Log("Sorting failed:")
-			t.Error(err)
-		}
-
-		// Check that the sorting algorithm was correct.
-		sort.Ints(listCopy)
-		for i, v := range list {
-			if v != listCopy[i] {
-				t.Error("Values at index", i, "differ")
-				t.Log("should be:", listCopy[i])
-				t.Log("really is:", v)
-			}
-		}
-	}
-}
-
 func TestInsertionInt(t *testing.T) {
 	testSort(t, Insertion, 100, 1000, false)
 	testSortInt(t, InsertionInt, 100, 1000, false)
@@ -158,6 +80,26 @@ func TestHashInt(t *testing.T) {
 func TestBubbleInt(t *testing.T) {
 	testSort(t, Bubble, 100, 1000, false)
 	testSortInt(t, BubbleInt, 100, 1000, false)
+}
+
+
+// Test out the various types/algorithms.
+func testSort(t *testing.T, s sorter, n int, l int, isHash bool) {
+	for i := 0; i < n; i++ {
+		s.Build(l, isHash)
+
+		if err := s.Sort(); err != nil {
+			t.Error(err)
+			return
+		}
+
+		s.SortStd()
+
+		if !s.Cmp(t) {
+			t.Error("-- Failed sort", i, "/", n, "--")
+			return
+		}
+	}
 }
 
 
