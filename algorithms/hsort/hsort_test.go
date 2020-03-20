@@ -24,36 +24,6 @@ type sorter interface {
 	Cmp(*testing.T) bool
 }
 
-type intSort struct {
-	dev  []int
-	std  []int
-	sort   func(interface{}) error
-}
-
-type uintSort struct {
-	dev  []uint
-	std  []int
-	sort   func(interface{}) error
-}
-
-type floatSort struct {
-	dev  []float64
-	std  []float64
-	sort   func(interface{}) error
-}
-
-type boolSort struct {
-	dev  []bool
-	std  []int
-	sort   func(interface{}) error
-}
-
-type stringSort struct {
-	dev  []string
-	std  []string
-	sort   func(interface{}) error
-}
-
 
 func TestInsertion(t *testing.T) {
 	i := intSort{sort: Insertion}
@@ -136,6 +106,12 @@ func testSort(t *testing.T, s sorter, n int, l int, isHash bool) {
 }
 
 
+type intSort struct {
+	dev  []int
+	std  []int
+	sort   func(interface{}) error
+}
+
 func (s *intSort) Build(length int, isHash bool) {
 	r := newRand()
 
@@ -179,6 +155,12 @@ func (s *intSort) Cmp(t *testing.T) bool {
 }
 
 
+type uintSort struct {
+	dev  []uint
+	std  []int
+	sort   func(interface{}) error
+}
+
 func (s *uintSort) Build(length int, isHash bool) {
 	r := newRand()
 
@@ -218,6 +200,12 @@ func (s *uintSort) Cmp(t *testing.T) bool {
 	return good
 }
 
+
+type floatSort struct {
+	dev  []float64
+	std  []float64
+	sort   func(interface{}) error
+}
 
 func (s *floatSort) Build(length int, isHash bool) {
 	r := newRand()
@@ -261,6 +249,12 @@ func (s *floatSort) Cmp(t *testing.T) bool {
 	return good
 }
 
+
+type boolSort struct {
+	dev  []bool
+	std  []int
+	sort   func(interface{}) error
+}
 
 func (s *boolSort) Build(length int, isHash bool) {
 	r := newRand()
@@ -307,6 +301,12 @@ func (s *boolSort) Cmp(t *testing.T) bool {
 	return good
 }
 
+
+type stringSort struct {
+	dev  []string
+	std  []string
+	sort   func(interface{}) error
+}
 
 func (s *stringSort) Build(length int, isHash bool) {
 	r := newRand()
