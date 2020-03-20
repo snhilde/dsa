@@ -340,8 +340,8 @@ func (s *boolSort) Cmp() bool {
 func (s *stringSort) Build(length int, isHash bool) {
 	r := newRand()
 
-	s.dev := make([]int, length)
-	s.std := make([]int, length)
+	s.dev := make([]string, length)
+	s.std := make([]string, length)
 
 	for i := 0; i < length; i++ {
 		l := 1
@@ -350,6 +350,7 @@ func (s *stringSort) Build(length int, isHash bool) {
 		}
 		s := make([]byte, l)
 		for j := 0; j < l; j++ {
+			// Fill each byte with a random printable character (0x21 - 0x7E).
 			n := r.Intn(93)
 			s[j] = n + 33
 		}
@@ -359,12 +360,25 @@ func (s *stringSort) Build(length int, isHash bool) {
 }
 
 func (s *stringSort) Sort() error {
+	return s.sort(s.dev)
 }
 
 func (s *stringSort) SortStd() {
+	sort.Strings(s.std)
 }
 
 func (s *stringSort) Cmp() bool {
+	good := true
+	for i, v := range s.dev {
+		if v != s.std[i] {
+			good = false
+			t.Error("Values at index", i, "differ")
+			t.Log("should be:", s.std[i])
+			t.Log("really is:", v)
+		}
+	}
+
+	return good
 }
 
 
