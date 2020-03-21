@@ -9,12 +9,12 @@ import (
 
 // Stack is the main type for this package. It holds the internal information about the stack.
 type Stack struct {
-	list *List
+	list *hlist.List
 }
 
 // Create a new stack.
 func New() *Stack {
-	return Stack{hlist.New()}
+	return &Stack{hlist.New()}
 }
 
 
@@ -33,7 +33,7 @@ func (stack *Stack) Pop() interface{} {
 		return nil
 	}
 
-	return stack.list.Pop()
+	return stack.list.Pop(0)
 }
 
 // Get the current number of items in the stack.
