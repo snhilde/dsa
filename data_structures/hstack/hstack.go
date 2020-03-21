@@ -4,8 +4,6 @@ package hstack
 import (
 	"github.com/snhilde/dsa/data_structures/hlist"
 	"errors"
-	"strings"
-	"fmt"
 )
 
 
@@ -13,13 +11,6 @@ import (
 type Stack struct {
 	list *List
 }
-
-// internal type for an individual node in the stack
-type hnode struct {
-	next  *hnode
-	value  interface{}
-}
-
 
 // Create a new stack.
 func New() *Stack {
@@ -84,13 +75,4 @@ func (stack *Stack) Merge(new_stack *Stack) error {
 // Display stack contents, with left being the top.
 func (stack *Stack) String() string {
 	return stack.list.String()
-}
-
-
-// internal convenience function for creating a new node
-func newNode(value interface{}) *hnode {
-	node := new(hnode)
-	node.value = value
-
-	return node
 }
