@@ -9,12 +9,12 @@ import (
 
 // Stack is the main type for this package. It holds the internal information about the stack.
 type Stack struct {
-	list *hlist.List
+	hlist.List
 }
 
 // Create a new stack.
 func New() *Stack {
-	return &Stack{hlist.New()}
+	return new(Stack)
 }
 
 
@@ -24,7 +24,7 @@ func (stack *Stack) Add(value interface{}) error {
 		return errors.New("Must create stack with New() first")
 	}
 
-	return stack.list.Insert(value, 0)
+	return stack.Insert(value, 0)
 }
 
 // Pop the top item from the stack.
@@ -33,7 +33,7 @@ func (stack *Stack) Pop() interface{} {
 		return nil
 	}
 
-	return stack.list.Pop(0)
+	return stack.List.Pop(0)
 }
 
 // Get the current number of items in the stack.
@@ -42,7 +42,7 @@ func (stack *Stack) Count() int {
 		return -1
 	}
 
-	return stack.list.Length()
+	return stack.Length()
 }
 
 // Reset the stack to a new state.
@@ -51,7 +51,7 @@ func (stack *Stack) Clear() error {
 		return errors.New("Stack does not exist")
 	}
 
-	return stack.list.Clear()
+	return stack.List.Clear()
 }
 
 // Add a stack on top of the current stack, preserving order. This will clear the new stack.
@@ -64,11 +64,11 @@ func (stack *Stack) Merge(new_stack *Stack) error {
 		return nil
 	}
 
-	if err := new_stack.list.Merge(stack.list); err != nil {
+	if err := new_stack.List.Merge(&stack.List); err != nil {
 		return err
 	}
 
-	stack.list = new_stack.list
+	stack.List = new_stack.List
 	return new_stack.Clear()
 }
 
@@ -78,5 +78,5 @@ func (stack *Stack) String() string {
 		return "<nil>"
 	}
 
-	return stack.list.String()
+	return stack.List.String()
 }
