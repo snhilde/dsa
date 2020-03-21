@@ -178,7 +178,7 @@ func TestClear(t *testing.T) {
 	checkLength(t, &backdoor, 0)
 }
 
-func TestPop(t *testing.T) {
+func TestRemove(t *testing.T) {
 	list := New()
 	list.Append(1)
 	list.Append(2)
@@ -190,28 +190,28 @@ func TestPop(t *testing.T) {
 	checkString(t, list, "1, 2, 3, 4, 5")
 	checkLength(t, list, 5)
 
-	// Pop the 3rd item.
-	value := list.Pop(2)
+	// Remove the 3rd item.
+	value := list.Remove(2)
 	if value != 3 {
-		t.Error("Error popping 3rd item")
+		t.Error("Error removing 3rd item")
 		t.Log("Expected: 3")
 		t.Log("Received:", value)
 	}
 	checkString(t, list, "1, 2, 4, 5")
 	checkLength(t, list, 4)
 
-	// Pop the new 3rd item.
-	value = list.Pop(2)
+	// Remove the new 3rd item.
+	value = list.Remove(2)
 	if value != 4 {
-		t.Error("Error popping new 3rd item")
+		t.Error("Error removing new 3rd item")
 		t.Log("Expected: 4")
 		t.Log("Received:", value)
 	}
 	checkString(t, list, "1, 2, 5")
 	checkLength(t, list, 3)
 
-	// Try to pop a non-existant item.
-	value = list.Pop(10)
+	// Try to remove a non-existant item.
+	value = list.Remove(10)
 	if value != nil {
 		t.Error("Unexpectedly passed out-of-bounds test")
 		t.Log("Expected: nil")
@@ -220,9 +220,9 @@ func TestPop(t *testing.T) {
 	checkString(t, list, "1, 2, 5")
 	checkLength(t, list, 3)
 
-	// Try the pop operation on an invalid list.
+	// Try the remove operation on an invalid list.
 	var bad_list *List
-	value = bad_list.Pop(0)
+	value = bad_list.Remove(0)
 	if value != nil {
 		t.Error("Unexpectedly passed invalid list test")
 		t.Log("Expected: nil")
@@ -230,7 +230,7 @@ func TestPop(t *testing.T) {
 	}
 }
 
-func TestPopMatch(t *testing.T) {
+func TestRemoveMatch(t *testing.T) {
 	list := New()
 	list.Append(1)
 	list.Append("apples")
@@ -242,44 +242,44 @@ func TestPopMatch(t *testing.T) {
 	checkString(t, list, "1, apples, 3, 4, 3.14")
 	checkLength(t, list, 5)
 
-	// Pop the "3".
-	if err := list.PopMatch(3); err != nil {
+	// Remove the "3".
+	if err := list.RemoveMatch(3); err != nil {
 		t.Error(err)
 	}
 	checkString(t, list, "1, apples, 4, 3.14")
 	checkLength(t, list, 4)
 
-	// Pop the "1".
-	if err := list.PopMatch(1); err != nil {
+	// Remove the "1".
+	if err := list.RemoveMatch(1); err != nil {
 		t.Error(err)
 	}
 	checkString(t, list, "apples, 4, 3.14")
 	checkLength(t, list, 3)
 
-	// Pop "apples".
-	if err := list.PopMatch("apples"); err != nil {
+	// Remove "apples".
+	if err := list.RemoveMatch("apples"); err != nil {
 		t.Error(err)
 	}
 	checkString(t, list, "4, 3.14")
 	checkLength(t, list, 2)
 
-	// Pop the "3.14".
-	if err := list.PopMatch(3.14); err != nil {
+	// Remove the "3.14".
+	if err := list.RemoveMatch(3.14); err != nil {
 		t.Error(err)
 	}
 	checkString(t, list, "4")
 	checkLength(t, list, 1)
 
-	// Try to pop a non-existant item.
-	if err := list.PopMatch(10); err != nil {
+	// Try to remove a non-existant item.
+	if err := list.RemoveMatch(10); err != nil {
 		t.Error(err)
 	}
 	checkString(t, list, "4")
 	checkLength(t, list, 1)
 
-	// Try the pop operation on an invalid list.
+	// Try the remove operation on an invalid list.
 	var bad_list *List
-	if err := bad_list.PopMatch(1); err == nil {
+	if err := bad_list.RemoveMatch(1); err == nil {
 		t.Error("Unexpectedly passed invalid list test")
 	}
 }

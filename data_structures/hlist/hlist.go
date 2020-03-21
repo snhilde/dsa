@@ -102,8 +102,8 @@ func (l *List) Append(values ...interface{}) error {
 }
 
 // Remove an item from the list and return its value.
-func (l *List) Pop(index int) interface{} {
-	if l.head == nil {
+func (l *List) Remove(index int) interface{} {
+	if l == nil || l.head == nil {
 		return nil
 	}
 
@@ -127,7 +127,7 @@ func (l *List) Pop(index int) interface{} {
 }
 
 // Find the first item with a matching value, and remove it from the list.
-func (l *List) PopMatch(v interface{}) error {
+func (l *List) RemoveMatch(v interface{}) error {
 	if l == nil {
 		return lErr()
 	}
