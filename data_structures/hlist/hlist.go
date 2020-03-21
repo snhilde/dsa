@@ -223,13 +223,15 @@ func (l *List) Merge(addition *List) error {
 }
 
 // Clear the list to its inital state.
-func (l *List) Clear() {
+func (l *List) Clear() error {
 	if l == nil {
-		return
+		return lErr()
 	}
 
 	l.head = nil
 	l.length = 0
+
+	return nil
 }
 
 // Sort the list using a modified merge algorithm.
