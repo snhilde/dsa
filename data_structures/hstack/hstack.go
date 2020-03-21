@@ -19,64 +19,64 @@ func New() *Stack {
 
 
 // Add a new node to the top of the stack.
-func (stack *Stack) Add(value interface{}) error {
-	if stack == nil {
+func (s *Stack) Add(v interface{}) error {
+	if s == nil {
 		return errors.New("Must create stack with New() first")
 	}
 
-	return stack.Insert(value, 0)
+	return s.Insert(v, 0)
 }
 
 // Pop the top item from the stack.
-func (stack *Stack) Pop() interface{} {
-	if stack == nil {
+func (s *Stack) Pop() interface{} {
+	if s == nil {
 		return nil
 	}
 
-	return stack.List.Pop(0)
+	return s.List.Pop(0)
 }
 
 // Get the current number of items in the stack.
-func (stack *Stack) Count() int {
-	if stack == nil {
+func (s *Stack) Count() int {
+	if s == nil {
 		return -1
 	}
 
-	return stack.Length()
+	return s.Length()
 }
 
 // Reset the stack to a new state.
-func (stack *Stack) Clear() error {
-	if stack == nil {
+func (s *Stack) Clear() error {
+	if s == nil {
 		return errors.New("Stack does not exist")
 	}
 
-	return stack.List.Clear()
+	return s.List.Clear()
 }
 
 // Add a stack on top of the current stack, preserving order. This will clear the new stack.
-func (stack *Stack) Merge(new_stack *Stack) error {
+func (s *Stack) Merge(ns *Stack) error {
 	// For efficiency, we're going to link the new stack in on top of the current stack.
-	if stack == nil {
+	if s == nil {
 		return errors.New("Current stack does not exist")
-	} else if new_stack == nil || new_stack.Count() == 0 {
+	} else if ns == nil || ns.Count() == 0 {
 		// Nothing to add.
 		return nil
 	}
 
-	if err := new_stack.List.Merge(&stack.List); err != nil {
+	if err := ns.List.Merge(&s.List); err != nil {
 		return err
 	}
 
-	stack.List = new_stack.List
-	return new_stack.Clear()
+	s.List = ns.List
+	return ns.Clear()
 }
 
 // Display stack contents, with left being the top.
-func (stack *Stack) String() string {
-	if stack == nil {
+func (s *Stack) String() string {
+	if s == nil {
 		return "<nil>"
 	}
 
-	return stack.List.String()
+	return s.List.String()
 }
