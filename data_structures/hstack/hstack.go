@@ -33,7 +33,7 @@ func (s *Stack) Pop() interface{} {
 		return nil
 	}
 
-	return s.List.Pop(0)
+	return s.Remove(0)
 }
 
 // Get the current number of items in the stack.
@@ -55,7 +55,7 @@ func (s *Stack) Clear() error {
 }
 
 // Add a stack on top of the current stack, preserving order. This will clear the new stack.
-func (s *Stack) Merge(ns *Stack) error {
+func (s *Stack) Stack(ns *Stack) error {
 	// For efficiency, we're going to link the new stack in on top of the current stack.
 	if s == nil {
 		return errors.New("Current stack does not exist")
@@ -64,7 +64,7 @@ func (s *Stack) Merge(ns *Stack) error {
 		return nil
 	}
 
-	if err := ns.List.Merge(&s.List); err != nil {
+	if err := ns.Merge(&s.List); err != nil {
 		return err
 	}
 
@@ -72,7 +72,7 @@ func (s *Stack) Merge(ns *Stack) error {
 	return ns.Clear()
 }
 
-// Display stack contents, with left being the top.
+// Display stack contents, from the top to the bottom.
 func (s *Stack) String() string {
 	if s == nil {
 		return "<nil>"

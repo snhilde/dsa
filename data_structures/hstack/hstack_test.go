@@ -226,7 +226,7 @@ func TestClear(t *testing.T) {
 	checkCount(t, &backdoor, 0)
 }
 
-func TestMerge(t *testing.T) {
+func TestStack(t *testing.T) {
 	// Create two stacks and merge them.
 	base := New()
 	base.Add("monkey")
@@ -242,8 +242,8 @@ func TestMerge(t *testing.T) {
 	checkString(t, tmp, "elephant, 16, 3.14")
 	checkCount(t, tmp, 3)
 
-	// Merge and check that tmp was added on top of base and that tmp was emptied out.
-	err := base.Merge(tmp)
+	// Stack and check that tmp was added on top of base and that tmp was emptied out.
+	err := base.Stack(tmp)
 	if err != nil {
 		t.Error(err)
 	}
@@ -258,7 +258,7 @@ func TestMerge(t *testing.T) {
 	checkCount(t, bad_stack, -1)
 
 	// Test that merge succeeds but everything remains untouched.
-	err = base.Merge(bad_stack)
+	err = base.Stack(bad_stack)
 	if err != nil {
 		t.Error(err)
 	}
@@ -273,7 +273,7 @@ func TestMerge(t *testing.T) {
 	checkCount(t, nil_stack, -1)
 
 	// Test that merge fails and everything remains untouched.
-	err = nil_stack.Merge(base)
+	err = nil_stack.Stack(base)
 	if err == nil {
 		t.Error("unexpectedly passed merge on top of bad stack test")
 	}
