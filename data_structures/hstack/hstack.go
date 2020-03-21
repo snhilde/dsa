@@ -2,6 +2,7 @@
 package hstack
 
 import (
+	"github.com/snhilde/dsa/data_structures/hlist"
 	"errors"
 	"strings"
 	"fmt"
@@ -10,8 +11,7 @@ import (
 
 // Stack is the main type for this package. It holds the internal information about the stack.
 type Stack struct {
-	top    *hnode
-	length  int
+	list *List
 }
 
 // internal type for an individual node in the stack
