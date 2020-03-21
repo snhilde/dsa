@@ -23,7 +23,7 @@ type hnode struct {
 
 // Create a new stack.
 func New() *Stack {
-	return new(Stack)
+	return Stack{hlist.New()}
 }
 
 
@@ -33,25 +33,16 @@ func (stack *Stack) Add(value interface{}) error {
 		return errors.New("Must create stack with New() first")
 	}
 
-	node := newNode(value)
-	node.next = stack.top
-	stack.top = node
-	stack.length++
-
-	return nil
+	return stack.list.Insert(value, 0)
 }
 
 // Pop the top item from the stack.
 func (stack *Stack) Pop() interface{} {
-	if stack == nil || stack.top == nil {
+	if stack == nil {
 		return nil
 	}
 
-	pop := stack.top
-	stack.top = pop.next
-	stack.length--
-
-	return pop.value
+	return stack.list.Pop()
 }
 
 // Get the current number of items in the stack.
@@ -60,7 +51,7 @@ func (stack *Stack) Count() int {
 		return -1
 	}
 
-	return stack.length
+	return stack.list.Length()
 }
 
 // Reset the stack to a new state.
@@ -69,10 +60,7 @@ func (stack *Stack) Clear() error {
 		return errors.New("Stack does not exist")
 	}
 
-	stack.top = nil
-	stack.length = 0
-
-	return nil
+	return stack.list.Clear()
 }
 
 // Add a stack on top of the current stack, preserving order. This will clear the new stack.
@@ -85,42 +73,17 @@ func (stack *Stack) Merge(new_stack *Stack) error {
 		return nil
 	}
 
-	// Find the bottom of the new stack and put it on top of the current stack.
-	if stack.top == nil {
-		stack.top = new_stack.top
-		stack.length = new_stack.length
-	} else {
-		node := new_stack.top
-		for node.next != nil {
-			node = node.next
-		}
-		node.next = stack.top
-		stack.top = new_stack.top
-		stack.length += new_stack.length
+	if err := new_stack.list.Merge(stack.list); err != nil {
+		return err
 	}
 
+	stack.list = new_stack.list
 	return new_stack.Clear()
 }
 
 // Display stack contents, with left being the top.
 func (stack *Stack) String() string {
-	var b strings.Builder
-
-	if stack == nil {
-		return "<nil>"
-	} else if stack.Count() == 0 {
-		return "<empty>"
-	}
-
-	node := stack.top
-	b.WriteString(fmt.Sprintf("%v", node.value))
-	node = node.next
-	for node != nil {
-		b.WriteString(fmt.Sprintf(", %v", node.value))
-		node = node.next
-	}
-
-	return b.String()
+	return stack.list.String()
 }
 
 
