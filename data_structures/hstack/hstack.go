@@ -74,5 +74,9 @@ func (stack *Stack) Merge(new_stack *Stack) error {
 
 // Display stack contents, with left being the top.
 func (stack *Stack) String() string {
+	if stack == nil {
+		return "<nil>"
+	}
+
 	return stack.list.String()
 }
