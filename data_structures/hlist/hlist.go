@@ -103,6 +103,10 @@ func (l *List) Append(values ...interface{}) error {
 
 // Remove an item from the list and return its value.
 func (l *List) Pop(index int) interface{} {
+	if l.head == nil {
+		return nil
+	}
+
 	n, err := l.getPrior(index)
 	if err != nil {
 		return nil
