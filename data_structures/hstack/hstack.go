@@ -56,7 +56,6 @@ func (s *Stack) Clear() error {
 
 // Add a stack on top of the current stack, preserving order. This will clear the new stack.
 func (s *Stack) Stack(ns *Stack) error {
-	// For efficiency, we're going to link the new stack in on top of the current stack.
 	if s == nil {
 		return errors.New("Current stack does not exist")
 	} else if ns == nil || ns.Count() == 0 {
