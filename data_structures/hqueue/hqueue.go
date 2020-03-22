@@ -19,14 +19,14 @@ func New() *Queue {
 // Add a new item or items to the back of the queue.
 func (q *Queue) Add(vs ...interface{}) error {
 	if q == nil {
-		return errors.New("Must create queue with New() first")
+		return qErr()
 	}
 
 	// If caller is trying to add own queue, duplicate it first and then add it.
 	for i, v := range vs {
 		if t, ok := v.(*Queue); ok {
 			if t == q {
-				nq, err := Copy(q)
+				nq, err := q.Copy()
 				if err != nil {
 					return err
 				}
@@ -65,6 +65,23 @@ func (q *Queue) Clear() error {
 	return q.List.Clear()
 }
 
+// Make an exact copy of the queue.
+func (q *Queue) Copy() (*Queue, error) {
+	if q == nil {
+		return nil, qErr()
+	}
+
+	nl, err := q.List.Copy()
+	if err != nil {
+		return nil, err
+	}
+
+	nq := New()
+	nq.List = *nl
+
+	return nq, nil
+}
+
 // Add a queue behind the current queue, preserving order. This will take ownership of and clear the provided queue.
 func (q *Queue) Merge(nq *Queue) error {
 	if q == nil {
@@ -88,4 +105,9 @@ func (q *Queue) String() string {
 	}
 
 	return q.List.String()
+}
+
+
+func qErr() error {
+	return errors.New("Must create queue with New() first")
 }
