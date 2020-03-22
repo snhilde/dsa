@@ -196,7 +196,7 @@ func (l *List) Exists(v interface{}) bool {
 	return false
 }
 
-// Append new list to current list. The current list will take ownership of all nodes.
+// Append new list to current list, preserving order. This will take ownership of and clear the provided list.
 func (l *List) Merge(addition *List) error {
 	if l == nil {
 		return lErr()
