@@ -101,7 +101,7 @@ func TestInsert(t *testing.T) {
 	}
 
 	// Add one item. Test that item was added successfully and that list is displayed correctly and length is correct.
-	err := list.Insert(5, 0)
+	err := list.Insert(0, 5)
 	if err != nil {
 		t.Error(err)
 	}
@@ -110,7 +110,7 @@ func TestInsert(t *testing.T) {
 
 	// Insert another item at the beginning. Test that item was added successfully and that list is displayed correctly
 	// and length is correct.
-	err = list.Insert("bananas", 0)
+	err = list.Insert(0, "bananas")
 	if err != nil {
 		t.Error(err)
 	}
@@ -119,7 +119,7 @@ func TestInsert(t *testing.T) {
 
 	// Add an item in the middle. Test that item was added successfully and that list is displayed correctly and length
 	// is correct.
-	err = list.Insert([]float64{3.14, 1.23}, 1)
+	err = list.Insert(1, []float64{3.14, 1.23})
 	if err != nil {
 		t.Error(err)
 	}
@@ -127,7 +127,7 @@ func TestInsert(t *testing.T) {
 	checkLength(t, list, 3)
 
 	// Now, test incorrect usage.
-	err = list.Insert("no way", 10)
+	err = list.Insert(10, "no way")
 	if err == nil {
 		t.Error("Unexpectedly passed out-of-bounds test")
 	}
@@ -135,7 +135,7 @@ func TestInsert(t *testing.T) {
 	checkLength(t, list, 3)
 
 	var bad_list *List
-	err = bad_list.Insert("shouldn't work", 0)
+	err = bad_list.Insert(0, "shouldn't work")
 	if err == nil {
 		t.Error("Unexpectedly passed invalid list test")
 	}
@@ -472,7 +472,7 @@ func TestSortInt(t *testing.T) {
 	// Test a power of two.
 	list := New()
 	for i := 1; i <= 8; i++ {
-		list.Insert(i, 0)
+		list.Insert(0, i)
 	}
 	checkString(t, list, "8, 7, 6, 5, 4, 3, 2, 1")
 	checkLength(t, list, 8)
@@ -486,7 +486,7 @@ func TestSortInt(t *testing.T) {
 	// Test a block with less than one full stack.
 	list = New()
 	for i := 1; i <= 9; i++ {
-		list.Insert(i, 0)
+		list.Insert(0, i)
 	}
 	checkString(t, list, "9, 8, 7, 6, 5, 4, 3, 2, 1")
 	checkLength(t, list, 9)
@@ -500,7 +500,7 @@ func TestSortInt(t *testing.T) {
 	// Test a block with more than one full stack but less than a full block
 	list = New()
 	for i := 1; i <= 11; i++ {
-		list.Insert(i, 0)
+		list.Insert(0, i)
 	}
 	checkString(t, list, "11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1")
 	checkLength(t, list, 11)
