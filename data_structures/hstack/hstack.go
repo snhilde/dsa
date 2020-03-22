@@ -9,22 +9,37 @@ import (
 
 // Stack is the main type for this package. It holds the internal information about the stack.
 type Stack struct {
-	hlist.List
+	list *hlist.List
 }
 
 // Create a new stack.
 func New() *Stack {
-	return new(Stack)
+	s := new(Stack)
+	s.list = hlist.New()
+	return s
 }
 
 
-// Add a new item to the top of the stack.
-func (s *Stack) Add(v interface{}) error {
+// Add a new item or items to the top of the stack. If there is more than one item, the first item will be at the top.
+func (s *Stack) Add(vs ...interface{}) error {
 	if s == nil {
-		return errors.New("Must create stack with New() first")
+		return sErr()
 	}
 
-	return s.List.Insert(v, 0)
+	// If caller is trying to add own stack, duplicate it first and then add it.
+	for i, v := range vs {
+		if t, ok := v.(*Stack); ok {
+			if t == s {
+				ns, err := s.Copy()
+				if err != nil {
+					return err
+				}
+				vs[i] = ns
+			}
+		}
+	}
+
+	return s.list.Insert(0, vs...)
 }
 
 // Pop the top item from the stack.
@@ -33,7 +48,7 @@ func (s *Stack) Pop() interface{} {
 		return nil
 	}
 
-	return s.List.Remove(0)
+	return s.list.Remove(0)
 }
 
 // Get the current number of items in the stack.
@@ -42,7 +57,7 @@ func (s *Stack) Count() int {
 		return -1
 	}
 
-	return s.List.Length()
+	return s.list.Length()
 }
 
 // Clear the stack to its inital state.
@@ -51,23 +66,39 @@ func (s *Stack) Clear() error {
 		return errors.New("Stack does not exist")
 	}
 
-	return s.List.Clear()
+	return s.list.Clear()
 }
 
-// Add a stack on top of the current stack, preserving order. This will take ownership of and clear the provided stack.
-func (s *Stack) Stack(ns *Stack) error {
+// Make an exact copy of the stack.
+func (s *Stack) Copy() (*Stack, error) {
 	if s == nil {
-		return errors.New("Current stack does not exist")
+		return nil, sErr()
+	}
+
+	nl, err := s.list.Copy()
+	if err != nil {
+		return nil, err
+	}
+
+	ns := New()
+	ns.list = nl
+
+	return ns, nil
+}
+
+// Add a stack below the current stack. This will take ownership of and clear the provided stack.
+func (s *Stack) Merge(ns *Stack) error {
+	if s == nil {
+		return sErr()
 	} else if ns == nil || ns.Count() == 0 {
 		// Nothing to add.
 		return nil
 	}
 
-	if err := ns.List.Merge(&s.List); err != nil {
+	if err := s.list.Merge(ns.list); err != nil {
 		return err
 	}
 
-	s.List = ns.List
 	return ns.Clear()
 }
 
@@ -77,5 +108,10 @@ func (s *Stack) String() string {
 		return "<nil>"
 	}
 
-	return s.List.String()
+	return s.list.String()
+}
+
+
+func sErr() error {
+	return errors.New("Must create stack with New() first")
 }
