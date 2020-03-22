@@ -57,24 +57,39 @@ func (l *List) Length() int {
 	return l.length
 }
 
-// Insert a value into the list at the specified index.
-func (l *List) Insert(v interface{}, index int) error {
+// Insert a value or values into the list at the specified index.
+func (l *List) Insert(index int, vs ...interface{}) error {
 	n, err := l.getPrior(index)
 	if err != nil {
 		return err
 	}
 
-	nn := newNode(v)
+	if len(vs) == 0 {
+		return nil
+	}
+
+	// Make temporary list.
+	head := newNode(nil)
+	nn := head
+	for _, v := range vs {
+		nn.next = newNode(v)
+		nn = nn.next
+		l.length++
+	}
+
+	// Move past the node we created to make adding smoother.
+	head = head.next
+
+	// Link in the temporary list.
 	if n == nil {
 		// Handle the special case of inserting the first node.
 		nn.next = l.head
-		l.head = nn
+		l.head = head
 	} else {
 		nn.next = n.next
-		n.next = nn
+		n.next = head
 	}
 
-	l.length++
 	return nil
 }
 
