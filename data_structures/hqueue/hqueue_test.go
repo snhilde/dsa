@@ -83,7 +83,28 @@ func TestAdd(t *testing.T) {
 	checkString(t, q, "5, kangaroo, 3.1415, <empty>")
 	checkCount(t, q, 4)
 
-	// TODO: test adding a slice and a non-empty queue
+	// Test adding a slice.
+	if err := q.Add([]int{1, 2, 3}); err != nil {
+		t.Error(err)
+	}
+	checkString(t, q, "5, kangaroo, 3.1415, <empty>, [1 2 3]")
+	checkCount(t, q, 5)
+
+	// Test adding a non-empty queue.
+	a := New()
+	a.Add("orange, apple, banana")
+	if err := q.Add(a); err != nil {
+		t.Error(err)
+	}
+	checkString(t, q, "5, kangaroo, 3.1415, <empty>, [1 2 3], orange, apple, banana")
+	checkCount(t, q, 6)
+
+	// Test adding same queue.
+	if err := q.Add(q); err != nil {
+		t.Error(err)
+	}
+	checkString(t, q, "5, kangaroo, 3.1415, <empty>, [1 2 3], orange, apple, banana, 5, kangaroo, 3.1415, <empty>, [1 2 3], orange, apple, banana")
+	checkCount(t, q, 12)
 }
 
 func TestPop(t *testing.T) {
