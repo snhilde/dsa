@@ -2,21 +2,25 @@
 package hqueue
 
 import (
-	"errors"
 	"github.com/snhilde/dsa/data_structures/hlist"
+	"errors"
 )
+
 
 // Queue is the main type for this package. It holds the internal information about the queue.
 type Queue struct {
-	hlist.List
+	list *hlist.List
 }
 
 // Create a new queue.
 func New() *Queue {
-	return new(Queue)
+	q := new(Queue)
+	q.list = hlist.New()
+	return q
 }
 
-// Add a new item or items to the back of the queue.
+// Add a new item or items to the back of the queue. If there is more than one item, the first item will be at the front
+// of the queue.
 func (q *Queue) Add(vs ...interface{}) error {
 	if q == nil {
 		return qErr()
@@ -35,7 +39,7 @@ func (q *Queue) Add(vs ...interface{}) error {
 		}
 	}
 
-	return q.List.Append(vs...)
+	return q.list.Append(vs...)
 }
 
 // Pop the first item in the queue.
@@ -44,7 +48,7 @@ func (q *Queue) Pop() interface{} {
 		return nil
 	}
 
-	return q.List.Remove(0)
+	return q.list.Remove(0)
 }
 
 // Get the current number of items in the queue.
@@ -53,7 +57,7 @@ func (q *Queue) Count() int {
 		return -1
 	}
 
-	return q.List.Length()
+	return q.list.Length()
 }
 
 // Clear the queue to its inital state.
@@ -62,7 +66,7 @@ func (q *Queue) Clear() error {
 		return errors.New("Queue does not exist")
 	}
 
-	return q.List.Clear()
+	return q.list.Clear()
 }
 
 // Make an exact copy of the queue.
@@ -71,13 +75,13 @@ func (q *Queue) Copy() (*Queue, error) {
 		return nil, qErr()
 	}
 
-	nl, err := q.List.Copy()
+	nl, err := q.list.Copy()
 	if err != nil {
 		return nil, err
 	}
 
 	nq := New()
-	nq.List = *nl
+	nq.list = nl
 
 	return nq, nil
 }
@@ -85,13 +89,13 @@ func (q *Queue) Copy() (*Queue, error) {
 // Add a queue behind the current queue, preserving order. This will take ownership of and clear the provided queue.
 func (q *Queue) Merge(nq *Queue) error {
 	if q == nil {
-		return errors.New("Current queue does not exist")
+		return qErr()
 	} else if nq == nil || nq.Count() == 0 {
 		// Nothing to add.
 		return nil
 	}
 
-	if err := q.List.Merge(&nq.List); err != nil {
+	if err := q.list.Merge(nq.list); err != nil {
 		return err
 	}
 
@@ -104,7 +108,7 @@ func (q *Queue) String() string {
 		return "<nil>"
 	}
 
-	return q.List.String()
+	return q.list.String()
 }
 
 
