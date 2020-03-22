@@ -18,13 +18,13 @@ func New() *Stack {
 }
 
 
-// Add a new node to the top of the stack.
+// Add a new item to the top of the stack.
 func (s *Stack) Add(v interface{}) error {
 	if s == nil {
 		return errors.New("Must create stack with New() first")
 	}
 
-	return s.Insert(v, 0)
+	return s.List.Insert(v, 0)
 }
 
 // Pop the top item from the stack.
@@ -33,7 +33,7 @@ func (s *Stack) Pop() interface{} {
 		return nil
 	}
 
-	return s.Remove(0)
+	return s.List.Remove(0)
 }
 
 // Get the current number of items in the stack.
@@ -42,10 +42,10 @@ func (s *Stack) Count() int {
 		return -1
 	}
 
-	return s.Length()
+	return s.List.Length()
 }
 
-// Reset the stack to a new state.
+// Clear the stack to its inital state.
 func (s *Stack) Clear() error {
 	if s == nil {
 		return errors.New("Stack does not exist")
@@ -54,7 +54,7 @@ func (s *Stack) Clear() error {
 	return s.List.Clear()
 }
 
-// Add a stack on top of the current stack, preserving order. This will clear the new stack.
+// Add a stack on top of the current stack, preserving order. This will take ownership of and clear the provided stack.
 func (s *Stack) Stack(ns *Stack) error {
 	if s == nil {
 		return errors.New("Current stack does not exist")
@@ -63,7 +63,7 @@ func (s *Stack) Stack(ns *Stack) error {
 		return nil
 	}
 
-	if err := ns.Merge(&s.List); err != nil {
+	if err := ns.List.Merge(&s.List); err != nil {
 		return err
 	}
 
