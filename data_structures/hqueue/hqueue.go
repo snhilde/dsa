@@ -17,12 +17,25 @@ func New() *Queue {
 }
 
 // Add a new item or items to the back of the queue.
-func (q *Queue) Add(v ...interface{}) error {
+func (q *Queue) Add(vs ...interface{}) error {
 	if q == nil {
 		return errors.New("Must create queue with New() first")
 	}
 
-	return q.List.Append(v...)
+	// If caller is trying to add own queue, duplicate it first and then add it.
+	for i, v := range vs {
+		if t, ok := v.(*Queue); ok {
+			if t == q {
+				nq, err := Copy(q)
+				if err != nil {
+					return err
+				}
+				vs[i] = nq
+			}
+		}
+	}
+
+	return q.List.Append(vs...)
 }
 
 // Pop the first item in the queue.
