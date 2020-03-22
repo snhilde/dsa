@@ -32,6 +32,11 @@ func TestBadPtr(t *testing.T) {
 		t.Error("unexpectedly passed Clear() test with bad pointer")
 	}
 
+	// Test Copy().
+	if _, err := q.Copy(); err == nil {
+		t.Error("unexpectedly passed Copy() test with bad pointer")
+	}
+
 	// Test Merge().
 	if err := q.Merge(New()); err == nil {
 		t.Error("unexpectedly passed Merge() test with bad pointer")
@@ -104,7 +109,7 @@ func TestAdd(t *testing.T) {
 		t.Error(err)
 	}
 	checkString(t, q, "5, kangaroo, 3.1415, <empty>, [1 2 3], orange, apple, banana, 5, kangaroo, 3.1415, <empty>, [1 2 3], orange, apple, banana")
-	checkCount(t, q, 12)
+	checkCount(t, q, 7)
 }
 
 func TestPop(t *testing.T) {
@@ -174,6 +179,31 @@ func TestClear(t *testing.T) {
 	}
 	checkString(t, q, "<empty>")
 	checkCount(t, q, 0)
+}
+
+func TestCopy(t *testing.T) {
+	q := New()
+
+	// Copy an empty list.
+	nq, err := q.Copy()
+	if err != nil {
+		t.Error(err)
+	}
+	checkString(t, nq, "<empty>")
+	checkCount(t, nq, 0)
+
+	// Copy a non-empty list.
+	q.Add("sizzle", 1e5, 3.1415, 15)
+	checkString(t, q, "sizzle, 100000, 3.1415, 15")
+	checkCount(t, q, 4)
+
+	nq, err = q.Copy()
+	if err != nil {
+		t.Error(err)
+	}
+	checkString(t, nq, "sizzle, 100000, 3.1415, 15")
+	checkCount(t, nq, 4)
+
 }
 
 func TestMerge(t *testing.T) {
