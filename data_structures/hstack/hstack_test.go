@@ -6,6 +6,48 @@ import (
 
 
 // TESTS
+func TestBadPtr(t *testing.T) {
+	var s *Stack
+	checkString(t, s, "<nil>")
+	checkCount(t, s, -1)
+
+	// Test Add().
+	if err := s.Add("value"); err == nil {
+		t.Error("unexpectedly passed Add() test with bad pointer")
+	}
+
+	// Test Pop().
+	if v := s.Pop(); v != nil {
+		t.Error("unexpectedly passed Pop() test with bad pointer")
+		t.Log("Expected: nil");
+		t.Log("Received:", v)
+	}
+
+	// Test Count().
+	if n := s.Count(); n != -1 {
+		t.Error("unexpectedly passed Count() test with bad pointer")
+		t.Log("Expected: -1");
+		t.Log("Received:", n)
+	}
+
+	// Test Clear().
+	if err := s.Clear(); err == nil {
+		t.Error("unexpectedly passed Clear() test with bad pointer")
+	}
+
+	// Test Stack().
+	if err := s.Stack(New()); err == nil {
+		t.Error("unexpectedly passed Stack() test with bad pointer")
+	}
+
+	// Test String().
+	if v := s.String(); v != "<nil>" {
+		t.Error("unexpectedly passed String() test with bad pointer")
+		t.Log("Expected: <nil>");
+		t.Log("Received:", v)
+	}
+}
+
 func TestNew(t *testing.T) {
 	// Test out making a proper stack.
 	stack := New()
@@ -52,18 +94,6 @@ func TestAdd(t *testing.T) {
 	}
 	checkString(t, stack, "3.1415, kangaroo, 5")
 	checkCount(t, stack, 3)
-
-	// Test out adding to a bad stack.
-	var bad_stack *Stack
-	checkString(t, bad_stack, "<nil>")
-	checkCount(t, bad_stack, -1)
-
-	err = bad_stack.Add(10)
-	if err == nil {
-		t.Error("unexpectedly passed add to bad stack test")
-	}
-	checkString(t, bad_stack, "<nil>")
-	checkCount(t, bad_stack, -1)
 
 	// Test out adding to a backdoor stack.
 	var backdoor Stack
@@ -136,18 +166,6 @@ func TestPop(t *testing.T) {
 	}
 	checkString(t, stack, "<empty>")
 	checkCount(t, stack, 0)
-
-	// Test out popping from a bad stack.
-	var bad_stack *Stack
-	checkString(t, bad_stack, "<nil>")
-	checkCount(t, bad_stack, -1)
-
-	val = bad_stack.Pop()
-	if val != nil {
-		t.Error("unexpectedly passed pop from bad stack test")
-	}
-	checkString(t, bad_stack, "<nil>")
-	checkCount(t, bad_stack, -1)
 
 	// Test out popping from a backdoor stack.
 	var backdoor Stack
@@ -252,33 +270,27 @@ func TestStack(t *testing.T) {
 	checkString(t, tmp, "<empty>")
 	checkCount(t, tmp, 0)
 
-	// Test merging a bad stack on top of a good one.
-	var bad_stack *Stack
-	checkString(t, bad_stack, "<nil>")
-	checkCount(t, bad_stack, -1)
+	// Test merging a bad stack on top of a good one. Merge should succeed, but everything should remain untouched.
+	var nilStack *Stack
+	checkString(t, nilStack, "<nil>")
+	checkCount(t, nilStack, -1)
 
-	// Test that merge succeeds but everything remains untouched.
-	err = base.Stack(bad_stack)
+	err = base.Stack(nilStack)
 	if err != nil {
 		t.Error(err)
 	}
 	checkString(t, base, "elephant, 16, 3.14, 131, gazelle, monkey")
 	checkCount(t, base, 6)
-	checkString(t, bad_stack, "<nil>")
-	checkCount(t, bad_stack, -1)
+	checkString(t, nilStack, "<nil>")
+	checkCount(t, nilStack, -1)
 
-	// Test merging a good stack on top of a bad one.
-	var nil_stack *Stack
-	checkString(t, nil_stack, "<nil>")
-	checkCount(t, nil_stack, -1)
-
-	// Test that merge fails and everything remains untouched.
-	err = nil_stack.Stack(base)
+	// Test merging a good stack on top of a bad one. Merge should fail, and everything should remain untouched.
+	err = nilStack.Stack(base)
 	if err == nil {
 		t.Error("unexpectedly passed merge on top of bad stack test")
 	}
-	checkString(t, nil_stack, "<nil>")
-	checkCount(t, nil_stack, -1)
+	checkString(t, nilStack, "<nil>")
+	checkCount(t, nilStack, -1)
 	checkString(t, base, "elephant, 16, 3.14, 131, gazelle, monkey")
 	checkCount(t, base, 6)
 }
