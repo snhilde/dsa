@@ -16,13 +16,13 @@ func New() *Queue {
 	return new(Queue)
 }
 
-// Add a new item to the back of the queue.
-func (q *Queue) Add(v interface{}) error {
+// Add a new item or items to the back of the queue.
+func (q *Queue) Add(v ...interface{}) error {
 	if q == nil {
 		return errors.New("Must create queue with New() first")
 	}
 
-	return q.List.Append(v)
+	return q.List.Append(v...)
 }
 
 // Pop the first item in the queue.
