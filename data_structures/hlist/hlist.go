@@ -37,10 +37,12 @@ func (l *List) String() string {
 	}
 
 	n := l.head
-	b.WriteString(fmt.Sprintf("%v", n.v))
-	for n.next != nil {
+	for n != nil {
+		b.WriteString(fmt.Sprintf("%v", n.v))
 		n = n.next
-		b.WriteString(fmt.Sprintf(", %v", n.v))
+		if n != nil {
+			b.WriteString(", ")
+		}
 	}
 
 	return b.String()
@@ -195,6 +197,32 @@ func (l *List) Exists(v interface{}) bool {
 	// If we're here, then we didn't find anything.
 	return false
 }
+
+// Make an exact copy of the list.
+func (l *List) Copy() (*List, error) {
+	if l == nil {
+		return nil, lErr()
+	}
+
+	// We'll add a dummy node to the beginning of the new list to make adding the other nodes easier.
+	nl := New()
+	nl.head = newNode(nil)
+
+	n := l.head
+	nn := nl.head
+	for n != nil {
+		nn.next = newNode(n.v)
+		n = n.next
+		nn = nn.next
+		nl.length++
+	}
+
+	// Get rid of the dummy node.
+	nl.head = nl.head.next
+
+	return nl, nil
+}
+
 
 // Append new list to current list, preserving order. This will take ownership of and clear the provided list.
 func (l *List) Merge(addition *List) error {
