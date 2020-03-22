@@ -2,6 +2,7 @@ package hstack
 
 import (
 	"testing"
+	"reflect"
 )
 
 
@@ -19,15 +20,15 @@ func TestBadPtr(t *testing.T) {
 	// Test Pop().
 	if v := s.Pop(); v != nil {
 		t.Error("unexpectedly passed Pop() test with bad pointer")
-		t.Log("Expected: nil");
-		t.Log("Received:", v)
+		t.Log("\tExpected: nil");
+		t.Log("\tReceived:", v)
 	}
 
 	// Test Count().
 	if n := s.Count(); n != -1 {
 		t.Error("unexpectedly passed Count() test with bad pointer")
-		t.Log("Expected: -1");
-		t.Log("Received:", n)
+		t.Log("\tExpected: -1");
+		t.Log("\tReceived:", n)
 	}
 
 	// Test Clear().
@@ -35,280 +36,292 @@ func TestBadPtr(t *testing.T) {
 		t.Error("unexpectedly passed Clear() test with bad pointer")
 	}
 
-	// Test Stack().
-	if err := s.Stack(New()); err == nil {
-		t.Error("unexpectedly passed Stack() test with bad pointer")
+	// Test Copy().
+	if _, err := s.Copy(); err == nil {
+		t.Error("unexpectedly passed Copy() test with bad pointer")
+	}
+
+	// Test Merge().
+	if err := s.Merge(New()); err == nil {
+		t.Error("unexpectedly passed Merge() test with bad pointer")
 	}
 
 	// Test String().
 	if v := s.String(); v != "<nil>" {
 		t.Error("unexpectedly passed String() test with bad pointer")
-		t.Log("Expected: <nil>");
-		t.Log("Received:", v)
+		t.Log("\tExpected: <nil>");
+		t.Log("\tReceived:", v)
 	}
 }
 
 func TestNew(t *testing.T) {
-	// Test out making a proper stack.
-	stack := New()
-	if stack == nil {
+	s := New()
+	if s == nil {
 		t.Error("new stack unexpectedly nil")
 	}
-	checkString(t, stack, "<empty>")
-	checkCount(t, stack, 0)
-
-	// Test out making a stack pointer to nothing.
-	var stack_ptr *Stack
-	checkString(t, stack_ptr, "<nil>")
-	checkCount(t, stack_ptr, -1)
-
-	// Test out the backdoor method.
-	var backdoor Stack
-	checkString(t, &backdoor, "<empty>")
-	checkCount(t, &backdoor, 0)
+	checkString(t, s, "<empty>")
+	checkCount(t, s, 0)
 }
 
 func TestAdd(t *testing.T) {
-	stack := New()
-	checkString(t, stack, "<empty>")
-	checkCount(t, stack, 0)
+	s := New()
 
-	// Test out adding some items to the stack.
-	err := stack.Add(5)
-	if err != nil {
+	// Testing adding an int.
+	if err := s.Add(5); err != nil {
 		t.Error(err)
 	}
-	checkString(t, stack, "5")
-	checkCount(t, stack, 1)
+	checkString(t, s, "5")
+	checkCount(t, s, 1)
 
-	err = stack.Add("kangaroo")
-	if err != nil {
+	// Test adding a string.
+	if err := s.Add("kangaroo"); err != nil {
 		t.Error(err)
 	}
-	checkString(t, stack, "kangaroo, 5")
-	checkCount(t, stack, 2)
+	checkString(t, s, "kangaroo, 5")
+	checkCount(t, s, 2)
 
-	err = stack.Add(3.1415)
-	if err != nil {
+	// Testing adding a float.
+	if err := s.Add(3.1415); err != nil {
 		t.Error(err)
 	}
-	checkString(t, stack, "3.1415, kangaroo, 5")
-	checkCount(t, stack, 3)
+	checkString(t, s, "3.1415, kangaroo, 5")
+	checkCount(t, s, 3)
 
-	// Test out adding to a backdoor stack.
-	var backdoor Stack
-	checkString(t, &backdoor, "<empty>")
-	checkCount(t, &backdoor, 0)
-
-	err = backdoor.Add(20)
-	if err != nil {
+	// Test out adding multiple items at once.
+	if err := s.Add("a", "b", 3); err != nil {
 		t.Error(err)
 	}
-	checkString(t, &backdoor, "20")
-	checkCount(t, &backdoor, 1)
+	checkString(t, s, "a, b, 3, 3.1415, kangaroo, 5")
+	checkCount(t, s, 6)
+
+	// Test adding a slice.
+	if err := s.Add([]int{1, 2, 3}); err != nil {
+		t.Error(err)
+	}
+	checkString(t, s, "[1 2 3], a, b, 3, 3.1415, kangaroo, 5")
+	checkCount(t, s, 7)
+
+	// Testing adding an empty stack.
+	if err := s.Add(New()); err != nil {
+		t.Error(err)
+	}
+	checkString(t, s, "<empty>, [1 2 3], a, b, 3, 3.1415, kangaroo, 5")
+	checkCount(t, s, 8)
+
+	// Test adding a non-empty stack.
+	a := New()
+	a.Add("orange, apple, banana")
+	if err := s.Add(a); err != nil {
+		t.Error(err)
+	}
+	checkString(t, s, "orange, apple, banana, <empty>, [1 2 3], a, b, 3, 3.1415, kangaroo, 5")
+	checkCount(t, s, 9)
+
+	// Test adding stack to itself.
+	if err := s.Add(s); err != nil {
+		t.Error(err)
+	}
+	checkString(t, s, "orange, apple, banana, <empty>, [1 2 3], a, b, 3, 3.1415, kangaroo, 5, orange, apple, banana, <empty>, [1 2 3], a, b, 3, 3.1415, kangaroo, 5")
+	checkCount(t, s, 10)
 }
 
 func TestPop(t *testing.T) {
-	stack := New()
-	checkString(t, stack, "<empty>")
-	checkCount(t, stack, 0)
+	s := New()
 
 	// Add some items first.
-	stack.Add("sizzle")
-	stack.Add(1e5)
-	stack.Add(3.1415)
-	stack.Add(15)
-	checkString(t, stack, "15, 3.1415, 100000, sizzle")
-	checkCount(t, stack, 4)
+	s.Add("sizzle")
+	s.Add(1e5)
+	s.Add(3.1415)
+	s.Add(15)
+	checkString(t, s, "15, 3.1415, 100000, sizzle")
+	checkCount(t, s, 4)
 
 	// Test out popping the items.
-	val := stack.Pop()
-	if val != 15 {
+	if val := s.Pop(); val != 15 {
 		t.Error("Incorrect value from pop")
-		t.Log("\tExpected 15")
-		t.Log("\tReceived", val)
+		t.Log("\tExpected: 15")
+		t.Log("\tReceived:", val)
 	}
-	checkString(t, stack, "3.1415, 100000, sizzle")
-	checkCount(t, stack, 3)
+	checkString(t, s, "3.1415, 100000, sizzle")
+	checkCount(t, s, 3)
 
-	val = stack.Pop()
-	if val != 3.1415 {
+	if val := s.Pop(); val != 3.1415 {
 		t.Error("Incorrect value from pop")
-		t.Log("\tExpected 3.1415")
-		t.Log("\tReceived", val)
+		t.Log("\tExpected: 3.1415")
+		t.Log("\tReceived:", val)
 	}
-	checkString(t, stack, "100000, sizzle")
-	checkCount(t, stack, 2)
+	checkString(t, s, "100000, sizzle")
+	checkCount(t, s, 2)
 
-	val = stack.Pop()
-	if val != 1e5 {
+	if val := s.Pop(); val != 1e5 {
 		t.Error("Incorrect value from pop")
-		t.Log("\tExpected 1e5")
-		t.Log("\tReceived", val)
+		t.Log("\tExpected: 1e5")
+		t.Log("\tReceived:", val)
 	}
-	checkString(t, stack, "sizzle")
-	checkCount(t, stack, 1)
+	checkString(t, s, "sizzle")
+	checkCount(t, s, 1)
 
-	val = stack.Pop()
-	if val != "sizzle" {
+	if val := s.Pop(); val != "sizzle" {
 		t.Error("Incorrect value from pop")
-		t.Log("\tExpected sizzle")
-		t.Log("\tReceived", val)
+		t.Log("\tExpected: sizzle")
+		t.Log("\tReceived:", val)
 	}
-	checkString(t, stack, "<empty>")
-	checkCount(t, stack, 0)
+	checkString(t, s, "<empty>")
+	checkCount(t, s, 0)
 
-	val = stack.Pop()
-	if val != nil {
+	// Test popping from an empty stack.
+	if val := s.Pop(); val != nil {
 		t.Error("Incorrect value from pop")
-		t.Log("\tExpected nil")
-		t.Log("\tReceived", val)
+		t.Log("\tExpected: nil")
+		t.Log("\tReceived:", val)
 	}
-	checkString(t, stack, "<empty>")
-	checkCount(t, stack, 0)
+	checkString(t, s, "<empty>")
+	checkCount(t, s, 0)
 
-	// Test out popping from a backdoor stack.
-	var backdoor Stack
-	checkString(t, &backdoor, "<empty>")
-	checkCount(t, &backdoor, 0)
+	// Test popping a slice.
+	slice := []int{1, 2, 3}
+	s.Add(slice)
+	checkString(t, s, "[1 2 3]")
+	checkCount(t, s, 1)
 
-	backdoor.Add(20)
-	backdoor.Add("zebra")
-	checkString(t, &backdoor, "zebra, 20")
-	checkCount(t, &backdoor, 2)
-
-	val = backdoor.Pop()
-	if val != "zebra" {
+	if p := s.Pop().([]int); !reflect.DeepEqual(slice, p) {
 		t.Error("Incorrect value from pop")
-		t.Log("\tExpected zebra")
-		t.Log("\tReceived", val)
+		t.Log("\tExpected:", slice)
+		t.Log("\tReceived:", p)
 	}
-	checkString(t, &backdoor, "20")
-	checkCount(t, &backdoor, 1)
+	checkString(t, s, "<empty>")
+	checkCount(t, s, 0)
 
-	val = backdoor.Pop()
-	if val != 20 {
-		t.Error("Incorrect value from pop")
-		t.Log("\tExpected 20")
-		t.Log("\tReceived", val)
-	}
-	checkString(t, &backdoor, "<empty>")
-	checkCount(t, &backdoor, 0)
+	// Test popping a stack.
+	a := New()
+	a.Add("orange, apple, banana")
+	s.Add(a)
+	checkString(t, s, "orange, apple, banana")
+	checkCount(t, s, 1)
 
-	val = backdoor.Pop()
-	if val != nil {
+	if val := s.Pop(); val.(*Stack) != a {
 		t.Error("Incorrect value from pop")
-		t.Log("\tExpected nil")
-		t.Log("\tReceived", val)
+		t.Log("\tExpected:", a)
+		t.Log("\tReceived:", val)
 	}
-	checkString(t, &backdoor, "<empty>")
-	checkCount(t, &backdoor, 0)
+	checkString(t, s, "<empty>")
+	checkCount(t, s, 0)
 }
 
 func TestClear(t *testing.T) {
-	stack := New()
-	checkString(t, stack, "<empty>")
-	checkCount(t, stack, 0)
+	s := New()
 
 	// Add some items first.
-	stack.Add("kangaroo")
-	stack.Add(5)
-	stack.Add(3.1415)
-	checkString(t, stack, "3.1415, 5, kangaroo")
-	checkCount(t, stack, 3)
+	s.Add("kangaroo", 5, 3.1415)
+	checkString(t, s, "kangaroo, 5, 3.1415")
+	checkCount(t, s, 3)
 
 	// Test out clearing the stack.
-	err := stack.Clear()
-	if err != nil {
+	if err := s.Clear(); err != nil {
 		t.Error(err)
 	}
-	checkString(t, stack, "<empty>")
-	checkCount(t, stack, 0)
+	checkString(t, s, "<empty>")
+	checkCount(t, s, 0)
 
-	// Test out clearing a backdoor stack.
-	var backdoor Stack
-	checkString(t, &backdoor, "<empty>")
-	checkCount(t, &backdoor, 0)
-
-	backdoor.Add(20)
-	backdoor.Add(1e2)
-	backdoor.Add("lion")
-	checkString(t, &backdoor, "lion, 100, 20")
-	checkCount(t, &backdoor, 3)
-
-	err = backdoor.Clear()
-	if err != nil {
+	// Test out clearing an empty stack.
+	if err := s.Clear(); err != nil {
 		t.Error(err)
 	}
-	checkString(t, &backdoor, "<empty>")
-	checkCount(t, &backdoor, 0)
+	checkString(t, s, "<empty>")
+	checkCount(t, s, 0)
 }
 
-func TestStack(t *testing.T) {
+func TestCopy(t *testing.T) {
+	s := New()
+
+	// Copy an empty stack.
+	ns, err := s.Copy()
+	if err != nil {
+		t.Error(err)
+	}
+	checkString(t, s, "<empty>")
+	checkCount(t, s, 0)
+	checkString(t, ns, "<empty>")
+	checkCount(t, ns, 0)
+
+	// Copy a non-empty stack.
+	s.Add("sizzle", 1e5, 3.1415, 15)
+	checkString(t, s, "sizzle, 100000, 3.1415, 15")
+	checkCount(t, s, 4)
+
+	ns, err = s.Copy()
+	if err != nil {
+		t.Error(err)
+	}
+	checkString(t, s, "sizzle, 100000, 3.1415, 15")
+	checkCount(t, s, 4)
+	checkString(t, ns, "sizzle, 100000, 3.1415, 15")
+	checkCount(t, ns, 4)
+
+}
+
+func TestMerge(t *testing.T) {
 	// Create two stacks and merge them.
-	base := New()
-	base.Add("monkey")
-	base.Add("gazelle")
-	base.Add(131)
-	checkString(t, base, "131, gazelle, monkey")
-	checkCount(t, base, 3)
+	s := New()
+	s.Add("monkey")
+	s.Add("gazelle")
+	s.Add(131)
+	checkString(t, s, "131, gazelle, monkey")
+	checkCount(t, s, 3)
 
 	tmp := New()
 	tmp.Add(3.14)
 	tmp.Add(16)
-	tmp.Add("elephant")
-	checkString(t, tmp, "elephant, 16, 3.14")
+	tmp.Add([]uint{5, 6, 7})
+	checkString(t, tmp, "[5 6 7], 16, 3.14")
 	checkCount(t, tmp, 3)
 
-	// Stack and check that tmp was added on top of base and that tmp was emptied out.
-	err := base.Stack(tmp)
-	if err != nil {
+	// Merge and check that tmp was added below s and that tmp was emptied out.
+	if err := s.Merge(tmp); err != nil {
 		t.Error(err)
 	}
-	checkString(t, base, "elephant, 16, 3.14, 131, gazelle, monkey")
-	checkCount(t, base, 6)
+	checkString(t, s, "131, gazelle, monkey, [5 6 7], 16, 3.14")
+	checkCount(t, s, 6)
 	checkString(t, tmp, "<empty>")
 	checkCount(t, tmp, 0)
 
-	// Test merging a bad stack on top of a good one. Merge should succeed, but everything should remain untouched.
-	var nilStack *Stack
-	checkString(t, nilStack, "<nil>")
-	checkCount(t, nilStack, -1)
+	// Test merging an invalid stack on top of a good one. Merge should succeed, but everything should remain untouched.
+	var ns *Stack
+	checkString(t, ns, "<nil>")
+	checkCount(t, ns, -1)
 
-	err = base.Stack(nilStack)
-	if err != nil {
+	if err := s.Merge(ns); err != nil {
 		t.Error(err)
 	}
-	checkString(t, base, "elephant, 16, 3.14, 131, gazelle, monkey")
-	checkCount(t, base, 6)
-	checkString(t, nilStack, "<nil>")
-	checkCount(t, nilStack, -1)
+	checkString(t, s, "131, gazelle, monkey, [5 6 7], 16, 3.14")
+	checkCount(t, s, 6)
+	checkString(t, ns, "<nil>")
+	checkCount(t, ns, -1)
 
 	// Test merging a good stack on top of a bad one. Merge should fail, and everything should remain untouched.
-	err = nilStack.Stack(base)
-	if err == nil {
+	if err := ns.Merge(s); err == nil {
 		t.Error("unexpectedly passed merge on top of bad stack test")
 	}
-	checkString(t, nilStack, "<nil>")
-	checkCount(t, nilStack, -1)
-	checkString(t, base, "elephant, 16, 3.14, 131, gazelle, monkey")
-	checkCount(t, base, 6)
+	checkString(t, ns, "<nil>")
+	checkCount(t, ns, -1)
+	checkString(t, s, "131, gazelle, monkey, [5 6 7], 16, 3.14")
+	checkCount(t, s, 6)
 }
 
 
 // HELPERS
-func checkString(t *testing.T, stack *Stack, want string) {
-	if stack.String() != want {
+func checkString(t *testing.T, s *Stack, want string) {
+	if s.String() != want {
 		t.Error("stack contents are incorrect")
-		t.Log("Expected:", want)
-		t.Log("Received:", stack)
+		t.Log("\tExpected:", want)
+		t.Log("\tReceived:", s)
 	}
 }
 
-func checkCount(t *testing.T, stack *Stack, want int) {
-	if stack.Count() != want {
+func checkCount(t *testing.T, s *Stack, want int) {
+	if s.Count() != want {
 		t.Error("Incorrect length")
-		t.Log("Expected:", want)
-		t.Log("Received:", stack.Count())
+		t.Log("\tExpected:", want)
+		t.Log("\tReceived:", s.Count())
 	}
 }
