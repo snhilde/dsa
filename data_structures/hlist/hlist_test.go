@@ -294,6 +294,56 @@ func TestRemove(t *testing.T) {
 	checkLength(t, l, 0)
 }
 
+func TestRemoveMatch(t *testing.T) {
+	l := New()
+	l.Append(1, "apples", 3, []int{4, 5}, 3.14)
+	checkString(t, l, "1, apples, 3, [4 5], 3.14")
+	checkLength(t, l, 5)
+
+	if err := l.RemoveMatch(3); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "1, apples, [4 5], 3.14")
+	checkLength(t, l, 4)
+
+	if err := l.RemoveMatch(1); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "apples, [4 5], 3.14")
+	checkLength(t, l, 3)
+
+	if err := l.RemoveMatch(nil); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "apples, [4 5], 3.14")
+	checkLength(t, l, 3)
+
+	if err := l.RemoveMatch("apples"); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "[4 5], 3.14")
+	checkLength(t, l, 2)
+
+	if err := l.RemoveMatch(3.14); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "[4 5]")
+	checkLength(t, l, 1)
+
+	// Try to remove a non-existant item.
+	if err := l.RemoveMatch(10); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "[4 5]")
+	checkLength(t, l, 1)
+
+	if err := l.RemoveMatch([]int{4, 5}); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "<empty>")
+	checkLength(t, l, 0)
+}
+
 
 // HELPERS
 func checkString(t *testing.T, l *List, want string) {
