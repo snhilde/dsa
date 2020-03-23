@@ -231,6 +231,69 @@ func TestAppend(t *testing.T) {
 	checkLength(t, l, 3)
 }
 
+func TestRemove(t *testing.T) {
+	l := New()
+
+	l.Append(1, 2, 3, "4", []byte{0x05, 0x06})
+	checkString(t, l, "1, 2, 3, 4, [5 6]")
+	checkLength(t, l, 5)
+
+	// Remove the 3rd item.
+	if value := l.Remove(2); value != 3 {
+		t.Error("Error removing 3rd item")
+		t.Log("Expected: 3")
+		t.Log("Received:", value)
+	}
+	checkString(t, l, "1, 2, 4, [5 6]")
+	checkLength(t, l, 4)
+
+	// Remove the new 3rd item.
+	if value := l.Remove(2); value != "4" {
+		t.Error("Error removing new 3rd item")
+		t.Log("Expected: 4")
+		t.Log("Received:", value)
+	}
+	checkString(t, l, "1, 2, [5 6]")
+	checkLength(t, l, 3)
+
+	// Remove the last item.
+	value := l.Remove(l.Length()-1)
+	if len(value.([]byte)) != 2 || value.([]byte)[0] != 0x05 || value.([]byte)[1] != 0x06 {
+		t.Error("Error removing last item")
+		t.Log("Expected: [0x05, 0x06")
+		t.Log("Received:", value)
+	}
+	checkString(t, l, "1, 2")
+	checkLength(t, l, 2)
+
+	// Remove the first item.
+	if value := l.Remove(0); value != 1 {
+		t.Error("Error removing first item")
+		t.Log("Expected: 1")
+		t.Log("Received:", value)
+	}
+	checkString(t, l, "2")
+	checkLength(t, l, 1)
+
+	// Remove the last remaining item.
+	if value := l.Remove(0); value != 2 {
+		t.Error("Error removing last remaining item")
+		t.Log("Expected: 2")
+		t.Log("Received:", value)
+	}
+	checkString(t, l, "<empty>")
+	checkLength(t, l, 0)
+
+	// Make sure nothing is left.
+	if value := l.Remove(0); value != nil {
+		t.Error("Unexpectedly found an item")
+		t.Log("Expected: nil")
+		t.Log("Received:", value)
+	}
+	checkString(t, l, "<empty>")
+	checkLength(t, l, 0)
+}
+
 
 // HELPERS
 func checkString(t *testing.T, l *List, want string) {
