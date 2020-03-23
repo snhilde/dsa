@@ -60,15 +60,6 @@ func (q *Queue) Count() int {
 	return q.list.Length()
 }
 
-// Clear the queue to its inital state.
-func (q *Queue) Clear() error {
-	if q == nil {
-		return errors.New("Queue does not exist")
-	}
-
-	return q.list.Clear()
-}
-
 // Make an exact copy of the queue.
 func (q *Queue) Copy() (*Queue, error) {
 	if q == nil {
@@ -100,6 +91,15 @@ func (q *Queue) Merge(nq *Queue) error {
 	}
 
 	return nq.Clear()
+}
+
+// Clear the queue to its inital state.
+func (q *Queue) Clear() error {
+	if q == nil {
+		return errors.New("Queue does not exist")
+	}
+
+	return q.list.Clear()
 }
 
 // Display queue contents, from the top to the bottom.

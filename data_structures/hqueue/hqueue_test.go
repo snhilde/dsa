@@ -30,11 +30,6 @@ func TestBadPtr(t *testing.T) {
 		t.Log("\tReceived:", n)
 	}
 
-	// Test Clear().
-	if err := q.Clear(); err == nil {
-		t.Error("unexpectedly passed Clear() test with bad pointer")
-	}
-
 	// Test Copy().
 	if _, err := q.Copy(); err == nil {
 		t.Error("unexpectedly passed Copy() test with bad pointer")
@@ -43,6 +38,11 @@ func TestBadPtr(t *testing.T) {
 	// Test Merge().
 	if err := q.Merge(New()); err == nil {
 		t.Error("unexpectedly passed Merge() test with bad pointer")
+	}
+
+	// Test Clear().
+	if err := q.Clear(); err == nil {
+		t.Error("unexpectedly passed Clear() test with bad pointer")
 	}
 
 	// Test String().
@@ -208,29 +208,6 @@ func TestPop(t *testing.T) {
 	checkCount(t, q, 0)
 }
 
-func TestClear(t *testing.T) {
-	q := New()
-
-	// Add some items first.
-	q.Add("kangaroo", 5, 3.1415)
-	checkString(t, q, "kangaroo, 5, 3.1415")
-	checkCount(t, q, 3)
-
-	// Test out clearing the queue.
-	if err := q.Clear(); err != nil {
-		t.Error(err)
-	}
-	checkString(t, q, "<empty>")
-	checkCount(t, q, 0)
-
-	// Test out clearing an empty queue.
-	if err := q.Clear(); err != nil {
-		t.Error(err)
-	}
-	checkString(t, q, "<empty>")
-	checkCount(t, q, 0)
-}
-
 func TestCopy(t *testing.T) {
 	q := New()
 
@@ -302,6 +279,29 @@ func TestMerge(t *testing.T) {
 	checkCount(t, nq, -1)
 	checkString(t, q, "monkey, gazelle, 131, 3.1415, 16, [5 6 7]")
 	checkCount(t, q, 6)
+}
+
+func TestClear(t *testing.T) {
+	q := New()
+
+	// Add some items first.
+	q.Add("kangaroo", 5, 3.1415)
+	checkString(t, q, "kangaroo, 5, 3.1415")
+	checkCount(t, q, 3)
+
+	// Test out clearing the queue.
+	if err := q.Clear(); err != nil {
+		t.Error(err)
+	}
+	checkString(t, q, "<empty>")
+	checkCount(t, q, 0)
+
+	// Test out clearing an empty queue.
+	if err := q.Clear(); err != nil {
+		t.Error(err)
+	}
+	checkString(t, q, "<empty>")
+	checkCount(t, q, 0)
 }
 
 

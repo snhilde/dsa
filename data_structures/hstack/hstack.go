@@ -60,15 +60,6 @@ func (s *Stack) Count() int {
 	return s.list.Length()
 }
 
-// Clear the stack to its inital state.
-func (s *Stack) Clear() error {
-	if s == nil {
-		return errors.New("Stack does not exist")
-	}
-
-	return s.list.Clear()
-}
-
 // Make an exact copy of the stack.
 func (s *Stack) Copy() (*Stack, error) {
 	if s == nil {
@@ -100,6 +91,15 @@ func (s *Stack) Merge(ns *Stack) error {
 	}
 
 	return ns.Clear()
+}
+
+// Clear the stack to its inital state.
+func (s *Stack) Clear() error {
+	if s == nil {
+		return errors.New("Stack does not exist")
+	}
+
+	return s.list.Clear()
 }
 
 // Display stack contents, from the top to the bottom.

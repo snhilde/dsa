@@ -31,11 +31,6 @@ func TestBadPtr(t *testing.T) {
 		t.Log("\tReceived:", n)
 	}
 
-	// Test Clear().
-	if err := s.Clear(); err == nil {
-		t.Error("unexpectedly passed Clear() test with bad pointer")
-	}
-
 	// Test Copy().
 	if _, err := s.Copy(); err == nil {
 		t.Error("unexpectedly passed Copy() test with bad pointer")
@@ -44,6 +39,11 @@ func TestBadPtr(t *testing.T) {
 	// Test Merge().
 	if err := s.Merge(New()); err == nil {
 		t.Error("unexpectedly passed Merge() test with bad pointer")
+	}
+
+	// Test Clear().
+	if err := s.Clear(); err == nil {
+		t.Error("unexpectedly passed Clear() test with bad pointer")
 	}
 
 	// Test String().
@@ -208,29 +208,6 @@ func TestPop(t *testing.T) {
 	checkCount(t, s, 0)
 }
 
-func TestClear(t *testing.T) {
-	s := New()
-
-	// Add some items first.
-	s.Add("kangaroo", 5, 3.1415)
-	checkString(t, s, "kangaroo, 5, 3.1415")
-	checkCount(t, s, 3)
-
-	// Test out clearing the stack.
-	if err := s.Clear(); err != nil {
-		t.Error(err)
-	}
-	checkString(t, s, "<empty>")
-	checkCount(t, s, 0)
-
-	// Test out clearing an empty stack.
-	if err := s.Clear(); err != nil {
-		t.Error(err)
-	}
-	checkString(t, s, "<empty>")
-	checkCount(t, s, 0)
-}
-
 func TestCopy(t *testing.T) {
 	s := New()
 
@@ -306,6 +283,29 @@ func TestMerge(t *testing.T) {
 	checkCount(t, ns, -1)
 	checkString(t, s, "131, gazelle, monkey, [5 6 7], 16, 3.14")
 	checkCount(t, s, 6)
+}
+
+func TestClear(t *testing.T) {
+	s := New()
+
+	// Add some items first.
+	s.Add("kangaroo", 5, 3.1415)
+	checkString(t, s, "kangaroo, 5, 3.1415")
+	checkCount(t, s, 3)
+
+	// Test out clearing the stack.
+	if err := s.Clear(); err != nil {
+		t.Error(err)
+	}
+	checkString(t, s, "<empty>")
+	checkCount(t, s, 0)
+
+	// Test out clearing an empty stack.
+	if err := s.Clear(); err != nil {
+		t.Error(err)
+	}
+	checkString(t, s, "<empty>")
+	checkCount(t, s, 0)
 }
 
 
