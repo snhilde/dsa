@@ -344,6 +344,63 @@ func TestRemoveMatch(t *testing.T) {
 	checkLength(t, l, 0)
 }
 
+func TestIndex(t *testing.T) {
+	l := New()
+	l.Append("apples", 1, 3, 3.14, []byte{0xEE, 0xFF}, "aardvark")
+	checkString(t, l, "apples, 1, 3, 3.14, [238 255], aardvark")
+	checkLength(t, l, 6)
+
+	// Check index of 1.
+	if i := l.Index(1); i != 1 {
+		t.Error("Incorrect index for 1")
+		t.Log("Expected: 1")
+		t.Log("Received:", i)
+	}
+
+	// Check index of "apples".
+	if i := l.Index("apples"); i != 0 {
+		t.Error("Incorrect index for \"apples\"")
+		t.Log("Expected: 0")
+		t.Log("Received:", i)
+	}
+
+	// Check index of pi.
+	if i := l.Index(3.14); i != 3 {
+		t.Error("Incorrect index for 3.14")
+		t.Log("Expected: 3")
+		t.Log("Received:", i)
+	}
+
+	// Remove and index and check index of pi again.
+	l.Remove(1)
+	if i := l.Index(3.14); i != 2 {
+		t.Error("Incorrect index for 3.14")
+		t.Log("Expected: 2")
+		t.Log("Received:", i)
+	}
+
+	// Try to find a non-existant item.
+	if i := l.Index(10); i != -1 {
+		t.Error("Unexpectedly passed no-match test")
+		t.Log("Expected: -1")
+		t.Log("Received:", i)
+	}
+
+	// Test matching a slice.
+	if i := l.Index([]byte{0xEE, 0xFF}); i != 3 {
+		t.Error("Incorrect index for []byte{0xEE, 0xFF}")
+		t.Log("Expected: 3")
+		t.Log("Received:", i)
+	}
+
+	// Test not matching a slice.
+	if i := l.Index([]byte{0xAA, 0xBB}); i != -1 {
+		t.Error("Unexpectedly passed no-match slice test")
+		t.Log("Expected: -1")
+		t.Log("Received:", i)
+	}
+}
+
 
 // HELPERS
 func checkString(t *testing.T, l *List, want string) {
