@@ -145,6 +145,45 @@ func TestNew(t *testing.T) {
 	}
 }
 
+func TestInsert(t *testing.T) {
+	l := New()
+
+	// Add an item to the beginning.
+	if err := l.Insert(0, 5); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "5")
+	checkLength(t, l, 1)
+
+	// Add another item to the beginning.
+	if err := l.Insert(0, "bananas"); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "bananas, 5")
+	checkLength(t, l, 2)
+
+	// Add an item in the middle.
+	if err := l.Insert(1, []float64{3.14, 1.23}); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "bananas, [3.14 1.23], 5")
+	checkLength(t, l, 3)
+
+	// Add some items to the end.
+	if err := l.Insert(l.Length(), 1, 2, 3); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "bananas, [3.14 1.23], 5, 1, 2, 3")
+	checkLength(t, l, 6)
+
+	// Add a nil item.
+	if err := l.Insert(0, nil); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "<nil>, bananas, [3.14 1.23], 5, 1, 2, 3")
+	checkLength(t, l, 7)
+}
+
 
 // HELPERS
 func checkString(t *testing.T, l *List, want string) {
