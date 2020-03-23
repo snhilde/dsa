@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strings"
 	"fmt"
+	"reflect"
 )
 
 
@@ -59,6 +60,10 @@ func (l *List) Length() int {
 
 // Insert a value or values into the list at the specified index.
 func (l *List) Insert(index int, vs ...interface{}) error {
+	if l != nil && index > l.length {
+		return l.Append(vs)
+	}
+
 	n, err := l.getPrior(index)
 	if err != nil {
 		return err
@@ -118,7 +123,7 @@ func (l *List) Append(values ...interface{}) error {
 	return nil
 }
 
-// Remove an item from the list and return its value.
+// Remove an item from the list, and return its value.
 func (l *List) Remove(index int) interface{} {
 	if l == nil || l.head == nil {
 		return nil
@@ -154,7 +159,7 @@ func (l *List) RemoveMatch(v interface{}) error {
 		return nil
 	}
 
-	if l.head.v == v {
+	if reflect.DeepEqual(l.head.v, v) {
 		// Handle the special case of matching on the first node.
 		pop := l.head
 		l.head = pop.next
@@ -162,7 +167,7 @@ func (l *List) RemoveMatch(v interface{}) error {
 	} else {
 		n := l.head
 		for n.next != nil {
-			if n.next.v == v {
+			if reflect.DeepEqual(n.next.v, v) {
 				pop := n.next
 				n.next = pop.next
 				l.length--
@@ -238,7 +243,6 @@ func (l *List) Copy() (*List, error) {
 	return nl, nil
 }
 
-
 // Append new list to current list, preserving order. This will take ownership of and clear the provided list.
 func (l *List) Merge(addition *List) error {
 	if l == nil {
@@ -282,13 +286,15 @@ func (l *List) Clear() error {
 }
 
 // Sort the list using a modified merge algorithm.
-// equality_cb should return a negative value if left should be sorted first or a positive value if right should be sorted first.
-func (l *List) Sort(equality_cb func(left, right interface{}) int) error {
+// gt should return true if left should be sorted first or false if right should be sorted first.
+func (l *List) Sort(gt func(left, right interface{}) bool) error {
 	// We are going to use the merge sort algorithm here. However, because length operations are not constant-time, we
 	// are not going to divide the list into progressively smaller blocks. Instead, we are going to assume a block size
 	// of 2 and iteratively merge-sort blocks of greater and greater size until the list is fully sorted.
 	if l == nil {
 		return lErr()
+	} else if gt == nil {
+		return errors.New("Missing equality comparison callback")
 	}
 
 	list_length := l.Length()
@@ -346,7 +352,7 @@ func (l *List) Sort(equality_cb func(left, right interface{}) int) error {
 					tmp_list.Append(left_stack.v)
 					left_stack = left_stack.next
 					left_len--
-				} else if equality_cb(left_stack.v, right_stack.v) < 0 {
+				} else if gt(left_stack.v, right_stack.v) {
 					tmp_list.Append(left_stack.v)
 					left_stack = left_stack.next
 					left_len--
@@ -392,12 +398,16 @@ func newNode(v interface{}) *hnode {
 }
 
 // integer equality callback for SortInt() method
-func eqInt(left, right interface{}) int {
-	return left.(int) - right.(int)
+func eqInt(left, right interface{}) bool {
+	if left.(int) > right.(int) {
+		return true
+	}
+
+	return false
 }
 
 // string equality callback for SortStr() method
-func eqStr(left, right interface{}) int {
+func eqStr(left, right interface{}) bool {
 	var min int
 
 	l := left.(string)
@@ -415,16 +425,18 @@ func eqStr(left, right interface{}) int {
 	for i := 0; i < min; i++ {
 		if l[i] == r[i] {
 			continue
-		} else if l[i] < r[i] {
-			return -1
-		} else {
-			return 1
+		} else if l[i] > r[i] {
+			return true
 		}
+		return false
 	}
 
 	// If we're here, then one of two things happened: either both values are the same or one value is a substring of
 	// another. We'll compare based on length to favor the shorter value.
-	return lLen - rLen
+	if lLen < rLen {
+		return true
+	}
+	return false
 }
 
 // helper to return standard error on bad list.
