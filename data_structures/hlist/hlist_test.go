@@ -439,6 +439,60 @@ func TestRemoveMatch(t *testing.T) {
 	checkLength(t, l, 0)
 }
 
+func TestCopy(t *testing.T) {
+	l := New()
+
+	// Copy an empty list.
+	nl, err := l.Copy()
+	if err != nil {
+		t.Error(err)
+	}
+	checkString(t, nl, "<empty>")
+	checkLength(t, nl, 0)
+
+	// Copy a non-empty list.
+	l.Append("sizzle", 1e5, 3.1415, 15)
+	checkString(t, l, "sizzle, 100000, 3.1415, 15")
+	checkLength(t, l, 4)
+
+	nl, err = l.Copy()
+	if err != nil {
+		t.Error(err)
+	}
+	checkString(t, nl, "sizzle, 100000, 3.1415, 15")
+	checkLength(t, nl, 4)
+	if l.head == nl.head {
+		t.Error("Lists are clones, not copies")
+	}
+
+	// Make sure the two lists are separate.
+	checkString(t, l, "sizzle, 100000, 3.1415, 15")
+	checkLength(t, l, 4)
+	checkString(t, nl, "sizzle, 100000, 3.1415, 15")
+	checkLength(t, nl, 4)
+	if l.head == nl.head {
+		t.Error("Lists are clones, not copies")
+	}
+
+	l.Remove(1)
+	checkString(t, l, "sizzle, 3.1415, 15")
+	checkLength(t, l, 3)
+	checkString(t, nl, "sizzle, 100000, 3.1415, 15")
+	checkLength(t, nl, 4)
+	if l.head == nl.head {
+		t.Error("Lists are clones, not copies")
+	}
+
+	nl.Remove(2)
+	checkString(t, l, "sizzle, 3.1415, 15")
+	checkLength(t, l, 3)
+	checkString(t, nl, "sizzle, 100000, 15")
+	checkLength(t, nl, 3)
+	if l.head == nl.head {
+		t.Error("Lists are clones, not copies")
+	}
+}
+
 
 // HELPERS
 func checkString(t *testing.T, l *List, want string) {
