@@ -60,6 +60,16 @@ func TestBadPtr(t *testing.T) {
 		t.Error("unexpectedly passed Copy() test with bad pointer")
 	}
 
+	// Test Same().
+	if l.Same(New()) {
+		t.Error("unexpectedly passed Same() test with bad pointer")
+	}
+
+	// Test Twin().
+	if l.Twin(New()) {
+		t.Error("unexpectedly passed Twin() test with bad pointer")
+	}
+
     // Test Merge().
 	if err := l.Merge(New()); err == nil {
 		t.Error("unexpectedly passed Merge() test with bad pointer")
@@ -125,6 +135,16 @@ func TestBadArgs(t *testing.T) {
 	}
 	checkString(t, l, "<empty>")
 	checkLength(t, l, 0)
+
+	// Test Same().
+	if l.Same(nil) {
+		t.Error("unexpectedly passed Same() test for missing arg")
+	}
+
+	// Test Twin().
+	if l.Twin(nil) {
+		t.Error("unexpectedly passed Twin() test for missing arg")
+	}
 
     // Test Sort().
 	if err := l.Sort(nil); err == nil {
