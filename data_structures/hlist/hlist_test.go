@@ -184,6 +184,53 @@ func TestInsert(t *testing.T) {
 	checkLength(t, l, 7)
 }
 
+func TestAppend(t *testing.T) {
+	l := New()
+
+	// Add one item.
+	if err := l.Append(5); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "5")
+	checkLength(t, l, 1)
+
+	// Add another item.
+	if err := l.Append("bananas"); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "5, bananas")
+	checkLength(t, l, 2)
+
+	// Add multiple items.
+	if err := l.Append([]interface{}{3.14, 1.23}...); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "5, bananas, 3.14, 1.23")
+	checkLength(t, l, 4)
+
+	// Add multiple items of different types.
+	if err := l.Append("a", 1, rune('0')); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "5, bananas, 3.14, 1.23, a, 1, 48")
+	checkLength(t, l, 7)
+
+	// Add a nil item.
+	if err := l.Append(nil); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "5, bananas, 3.14, 1.23, a, 1, 48, <nil>")
+	checkLength(t, l, 8)
+
+	// Add multiple items of different types as the first items.
+	l.Clear()
+	if err := l.Append("a", 1, rune('0')); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "a, 1, 48")
+	checkLength(t, l, 3)
+}
+
 
 // HELPERS
 func checkString(t *testing.T, l *List, want string) {
