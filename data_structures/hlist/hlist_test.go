@@ -41,11 +41,6 @@ func TestBadPtr(t *testing.T) {
 		t.Log("\tReceived:", v)
 	}
 
-    // Test RemoveMatch().
-	if err := l.RemoveMatch("item"); err == nil {
-		t.Error("unexpectedly passed RemoveMatch() test with bad pointer")
-	}
-
     // Test Index().
 	if i := l.Index("item"); i != -1 {
 		t.Error("unexpectedly passed Index() test with bad pointer")
@@ -300,46 +295,32 @@ func TestRemoveMatch(t *testing.T) {
 	checkString(t, l, "1, apples, 3, [4 5], 3.14")
 	checkLength(t, l, 5)
 
-	if err := l.RemoveMatch(3); err != nil {
-		t.Error(err)
-	}
+	l.RemoveMatch(3)
 	checkString(t, l, "1, apples, [4 5], 3.14")
 	checkLength(t, l, 4)
 
-	if err := l.RemoveMatch(1); err != nil {
-		t.Error(err)
-	}
+	l.RemoveMatch(1)
 	checkString(t, l, "apples, [4 5], 3.14")
 	checkLength(t, l, 3)
 
-	if err := l.RemoveMatch(nil); err != nil {
-		t.Error(err)
-	}
+	l.RemoveMatch(nil)
 	checkString(t, l, "apples, [4 5], 3.14")
 	checkLength(t, l, 3)
 
-	if err := l.RemoveMatch("apples"); err != nil {
-		t.Error(err)
-	}
+	l.RemoveMatch("apples")
 	checkString(t, l, "[4 5], 3.14")
 	checkLength(t, l, 2)
 
-	if err := l.RemoveMatch(3.14); err != nil {
-		t.Error(err)
-	}
+	l.RemoveMatch(3.14)
 	checkString(t, l, "[4 5]")
 	checkLength(t, l, 1)
 
 	// Try to remove a non-existant item.
-	if err := l.RemoveMatch(10); err != nil {
-		t.Error(err)
-	}
+	l.RemoveMatch(10)
 	checkString(t, l, "[4 5]")
 	checkLength(t, l, 1)
 
-	if err := l.RemoveMatch([]int{4, 5}); err != nil {
-		t.Error(err)
-	}
+	l.RemoveMatch([]int{4, 5})
 	checkString(t, l, "<empty>")
 	checkLength(t, l, 0)
 }
@@ -398,6 +379,43 @@ func TestIndex(t *testing.T) {
 		t.Error("Unexpectedly passed no-match slice test")
 		t.Log("Expected: -1")
 		t.Log("Received:", i)
+	}
+}
+
+func TestExists(t *testing.T) {
+	l := New()
+	l.Append(1, 3, "apples", []byte{0xEE, 0xFF}, 3.14, 4)
+	checkString(t, l, "1, 3, apples, [238 255], 3.14, 4")
+	checkLength(t, l, 6)
+
+	// Check that 3 exists.
+	if ret := l.Exists(3); !ret {
+		t.Error("Expected match for 3, but didn't find it")
+	}
+
+	// Check that "apples" exists.
+	if ret := l.Exists("apples"); !ret {
+		t.Error("Expected match for \"apples\", but didn't find it")
+	}
+
+	// Check that 3.14 exists.
+	if ret := l.Exists(3.14); !ret {
+		t.Error("Expected match for 3,14, but didn't find it")
+	}
+
+	// Try to find a non-existant item.
+	if ret := l.Exists(10); ret {
+		t.Error("Unexpectedly passed no-match test")
+	}
+
+	// Test matching a slice.
+	if ret := l.Exists([]byte{0xEE, 0xFF}); !ret {
+		t.Error("Expected match for []byte{0xEE, 0xFF}, but didn't find it")
+	}
+
+	// Test not matching a slice.
+	if ret := l.Exists([]byte{0xBB, 0xCC}); ret {
+		t.Error("Unexpectedly passed no-match slice test")
 	}
 }
 
