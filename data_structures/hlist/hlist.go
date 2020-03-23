@@ -216,6 +216,49 @@ func (l *List) Copy() (*List, error) {
 	return nl, nil
 }
 
+// Check if the two lists are actually the same list.
+func (l *List) Same(nl *List) bool {
+	if l == nil || nl == nil {
+		return false
+	}
+
+	if l.head == nl.head && l.length == nl.length {
+		return true
+	}
+
+	return false
+}
+
+// Check if the two lists are separate lists but hold the same contents.
+func (l *List) Twin(nl *List) bool {
+	if l == nil || nl == nil {
+		return false
+	}
+
+	// The lists must have the same length.
+	if l.length != nl.length {
+		return false
+	}
+
+	// The lists must not point to the same nodes.
+	if l.head == nl.head {
+		return false
+	}
+
+	n := l.head
+	nn := nl.head
+	for n != nil {
+		if !reflect.DeepEqual(n.v, nn.v) {
+			return false
+		}
+		n = n.next
+		nn = nn.next
+	}
+
+	// If we're here, then all the nodes matched up.
+	return true
+}
+
 // Append new list to current list, preserving order. This will take ownership of and clear the provided list.
 func (l *List) Merge(addition *List) error {
 	if l == nil {
