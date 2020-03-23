@@ -149,35 +149,15 @@ func (l *List) Remove(index int) interface{} {
 }
 
 // Find the first item with a matching value, and remove it from the list.
-func (l *List) RemoveMatch(v interface{}) error {
-	if l == nil {
-		return lErr()
+func (l *List) RemoveMatch(v interface{}) {
+	i := l.Index(v)
+	if i < 0 {
+		// Index() didn't find anything, or the list is invalid.
+		return
 	}
 
-	if l.head == nil {
-		// Nothing to match.
-		return nil
-	}
-
-	if reflect.DeepEqual(l.head.v, v) {
-		// Handle the special case of matching on the first node.
-		pop := l.head
-		l.head = pop.next
-		l.length--
-	} else {
-		n := l.head
-		for n.next != nil {
-			if reflect.DeepEqual(n.next.v, v) {
-				pop := n.next
-				n.next = pop.next
-				l.length--
-				break
-			}
-			n = n.next
-		}
-	}
-
-	return nil
+	l.Remove(i)
+	return
 }
 
 // Get the index of the first matching node, or -1 if not found.
@@ -189,7 +169,7 @@ func (l *List) Index(v interface{}) int {
 	n := l.head
 	i := 0
 	for n != nil {
-		if n.v == v {
+		if reflect.DeepEqual(n.v, v) {
 			return i
 		}
 		n = n.next
@@ -202,20 +182,13 @@ func (l *List) Index(v interface{}) int {
 
 // Check whether or not the value exists in the list.
 func (l *List) Exists(v interface{}) bool {
-	if l == nil {
+	i := l.Index(v)
+	if i < 0 {
+		// Index didn't find anything, or the list is invalid.
 		return false
 	}
 
-	n := l.head
-	for n != nil {
-		if n.v == v {
-			return true
-		}
-		n = n.next
-	}
-
-	// If we're here, then we didn't find anything.
-	return false
+	return true
 }
 
 // Make an exact copy of the list.
@@ -224,7 +197,7 @@ func (l *List) Copy() (*List, error) {
 		return nil, lErr()
 	}
 
-	// We'll add a dummy node to the beginning of the new list to make adding the other nodes easier.
+	// We'll add a helper node to the beginning of the new list to make adding the other nodes easier.
 	nl := New()
 	nl.head = newNode(nil)
 
@@ -237,7 +210,7 @@ func (l *List) Copy() (*List, error) {
 		nl.length++
 	}
 
-	// Get rid of the dummy node.
+	// Get rid of the helper node.
 	nl.head = nl.head.next
 
 	return nl, nil
