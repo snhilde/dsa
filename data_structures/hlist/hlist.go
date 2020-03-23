@@ -123,6 +123,37 @@ func (l *List) Append(values ...interface{}) error {
 	return nil
 }
 
+// Get the index of the first matching node, or -1 if not found.
+func (l *List) Index(v interface{}) int {
+	if l == nil {
+		return -1
+	}
+
+	n := l.head
+	i := 0
+	for n != nil {
+		if reflect.DeepEqual(n.v, v) {
+			return i
+		}
+		n = n.next
+		i++
+	}
+
+	// If we're here, then we didn't find anything.
+	return -1
+}
+
+// Check whether or not the value exists in the list.
+func (l *List) Exists(v interface{}) bool {
+	i := l.Index(v)
+	if i < 0 {
+		// Index didn't find anything, or the list is invalid.
+		return false
+	}
+
+	return true
+}
+
 // Remove an item from the list, and return its value.
 func (l *List) Remove(index int) interface{} {
 	if l == nil || l.head == nil {
@@ -158,37 +189,6 @@ func (l *List) RemoveMatch(v interface{}) {
 
 	l.Remove(i)
 	return
-}
-
-// Get the index of the first matching node, or -1 if not found.
-func (l *List) Index(v interface{}) int {
-	if l == nil {
-		return -1
-	}
-
-	n := l.head
-	i := 0
-	for n != nil {
-		if reflect.DeepEqual(n.v, v) {
-			return i
-		}
-		n = n.next
-		i++
-	}
-
-	// If we're here, then we didn't find anything.
-	return -1
-}
-
-// Check whether or not the value exists in the list.
-func (l *List) Exists(v interface{}) bool {
-	i := l.Index(v)
-	if i < 0 {
-		// Index didn't find anything, or the list is invalid.
-		return false
-	}
-
-	return true
 }
 
 // Make an exact copy of the list.
