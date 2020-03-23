@@ -139,6 +139,12 @@ func TestBadArgs(t *testing.T) {
 	checkLength(t, l, 0)
 }
 
+func TestNew(t *testing.T) {
+	if l := New(); l == nil {
+		t.Error("Failed to create new list")
+	}
+}
+
 
 // HELPERS
 func checkString(t *testing.T, l *List, want string) {
