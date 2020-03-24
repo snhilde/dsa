@@ -306,14 +306,14 @@ func (l *List) Clear() error {
 }
 
 // Sort the list using a modified merge algorithm.
-// gt should return true if left should be sorted first or false if right should be sorted first.
-func (l *List) Sort(gt func(left, right interface{}) bool) error {
+// cmp should return true if left should be sorted first or false if right should be sorted first.
+func (l *List) Sort(cmp func(left, right interface{}) bool) error {
 	// We are going to use the merge sort algorithm here. However, because length operations are not constant-time, we
 	// are not going to divide the list into progressively smaller blocks. Instead, we are going to assume a block size
 	// of 2 and iteratively merge-sort blocks of greater and greater size until the list is fully sorted.
 	if l == nil {
 		return lErr()
-	} else if gt == nil {
+	} else if cmp == nil {
 		return errors.New("Missing equality comparison callback")
 	}
 
@@ -372,14 +372,14 @@ func (l *List) Sort(gt func(left, right interface{}) bool) error {
 					tmp_list.Append(left_stack.v)
 					left_stack = left_stack.next
 					left_len--
-				} else if gt(left_stack.v, right_stack.v) {
-					tmp_list.Append(right_stack.v)
-					right_stack = right_stack.next
-					right_len--
-				} else {
+				} else if cmp(left_stack.v, right_stack.v) {
 					tmp_list.Append(left_stack.v)
 					left_stack = left_stack.next
 					left_len--
+				} else {
+					tmp_list.Append(right_stack.v)
+					right_stack = right_stack.next
+					right_len--
 				}
 			}
 
@@ -399,13 +399,13 @@ func (l *List) Sort(gt func(left, right interface{}) bool) error {
 // Sort the list using a modified merge algorithm.
 // Note: all values in the list must be of type int.
 func (l *List) SortInt() error {
-	return l.Sort(eqInt)
+	return l.Sort(cmpInt)
 }
 
 // Sort the list using a modified merge algorithm.
 // Note: all values in the list must be of type string.
 func (l *List) SortStr() error {
-	return l.Sort(eqStr)
+	return l.Sort(cmpStr)
 }
 
 
@@ -418,8 +418,8 @@ func newNode(v interface{}) *hnode {
 }
 
 // integer equality callback for SortInt() method
-func eqInt(left, right interface{}) bool {
-	if left.(int) > right.(int) {
+func cmpInt(left, right interface{}) bool {
+	if left.(int) < right.(int) {
 		return true
 	}
 
@@ -427,36 +427,27 @@ func eqInt(left, right interface{}) bool {
 }
 
 // string equality callback for SortStr() method
-func eqStr(left, right interface{}) bool {
-	var min int
+func cmpStr(l, r interface{}) bool {
+	lv := []rune(l.(string))
+	rv := []rune(r.(string))
 
-	l := left.(string)
-	r := right.(string)
-
-	lLen := len(l)
-	rLen := len(r)
-
-	if lLen == rLen || lLen < rLen {
-		min = lLen
-	} else {
-		min = rLen
-	}
-
-	for i := 0; i < min; i++ {
-		if l[i] == r[i] {
-			continue
-		} else if l[i] > r[i] {
-			return true
+	for i, v := range lv {
+		if i == len(rv) {
+			// If we're here, then r is a prefix of l.
+			return false
 		}
-		return false
+
+		if v == rv[i] {
+			continue
+		} else if v < rv[i] {
+			return true
+		} else {
+			return false
+		}
 	}
 
-	// If we're here, then one of two things happened: either both values are the same or one value is a substring of
-	// another. We'll compare based on length to favor the shorter value.
-	if lLen < rLen {
-		return true
-	}
-	return false
+	// If we're here, then either l is a prefix of r or both strings are equal.
+	return true
 }
 
 // helper to return standard error on bad list.
