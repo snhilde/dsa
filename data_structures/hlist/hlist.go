@@ -22,12 +22,13 @@ type hnode struct {
 }
 
 
-// Create a new linked list.
+// New creates a new linked list.
 func New() *List {
 	return new(List)
 }
 
 
+// String returns a comma-separated list of the string representations of all of the nodes in the linked list.
 func (l *List) String() string {
 	var b strings.Builder
 
@@ -49,7 +50,7 @@ func (l *List) String() string {
 	return b.String()
 }
 
-// Get the number of nodes in the list, or -1 if list hasn't been created yet.
+// Length gets the number of nodes in the list, or -1 if list hasn't been created yet.
 func (l *List) Length() int {
 	if l == nil {
 		return -1
@@ -58,7 +59,7 @@ func (l *List) Length() int {
 	return l.length
 }
 
-// Insert a value or values into the list at the specified index.
+// Insert inserts one or more value into the list at the specified index.
 func (l *List) Insert(index int, vs ...interface{}) error {
 	if l != nil && index > l.length {
 		return l.Append(vs)
@@ -98,7 +99,7 @@ func (l *List) Insert(index int, vs ...interface{}) error {
 	return nil
 }
 
-// Add one or more values to the end of the list.
+// Append adds one or more values to the end of the list.
 func (l *List) Append(values ...interface{}) error {
 	if l == nil {
 		return lErr()
@@ -123,7 +124,7 @@ func (l *List) Append(values ...interface{}) error {
 	return nil
 }
 
-// Get the index of the first matching node, or -1 if not found.
+// Index gets the index of the first matching node, or -1 if not found.
 func (l *List) Index(v interface{}) int {
 	if l == nil {
 		return -1
@@ -143,7 +144,7 @@ func (l *List) Index(v interface{}) int {
 	return -1
 }
 
-// Check whether or not the value exists in the list.
+// Exists checks whether or not the value exists in the list.
 func (l *List) Exists(v interface{}) bool {
 	i := l.Index(v)
 	if i < 0 {
@@ -154,7 +155,7 @@ func (l *List) Exists(v interface{}) bool {
 	return true
 }
 
-// Remove an item from the list, and return its value.
+// Remove removes an item from the list and returns its value.
 func (l *List) Remove(index int) interface{} {
 	if l == nil || l.head == nil {
 		return nil
@@ -179,7 +180,7 @@ func (l *List) Remove(index int) interface{} {
 	return pop.v
 }
 
-// Find the first item with a matching value, and remove it from the list.
+// RemoveMatch finds the first item with a matching value and removes it from the list.
 func (l *List) RemoveMatch(v interface{}) {
 	i := l.Index(v)
 	if i < 0 {
@@ -191,7 +192,7 @@ func (l *List) RemoveMatch(v interface{}) {
 	return
 }
 
-// Make an exact copy of the list.
+// Copy makes an exact copy of the list.
 func (l *List) Copy() (*List, error) {
 	if l == nil {
 		return nil, lErr()
@@ -216,7 +217,7 @@ func (l *List) Copy() (*List, error) {
 	return nl, nil
 }
 
-// Check if the two lists point to the same underlying data and are therefore the same list..
+// Same checks if the two lists point to the same underlying data and are therefore the same list.
 func (l *List) Same(nl *List) bool {
 	if l == nil || nl == nil {
 		return false
@@ -229,7 +230,7 @@ func (l *List) Same(nl *List) bool {
 	return false
 }
 
-// Check if the two lists are separate lists but hold the same contents.
+// Twin checks if the two lists are separate lists but hold the same contents.
 func (l *List) Twin(nl *List) bool {
 	if l == nil || nl == nil {
 		return false
@@ -263,7 +264,7 @@ func (l *List) Twin(nl *List) bool {
 	return true
 }
 
-// Append new list to current list, preserving order. This will take ownership of and clear the provided list.
+// Merge appends the list to the current list, preserving order. This will take ownership of and clear the provided list.
 func (l *List) Merge(addition *List) error {
 	if l == nil {
 		return lErr()
@@ -293,7 +294,7 @@ func (l *List) Merge(addition *List) error {
 	return nil
 }
 
-// Clear the list to its inital state.
+// Clear resets the list to its inital state.
 func (l *List) Clear() error {
 	if l == nil {
 		return lErr()
@@ -305,8 +306,8 @@ func (l *List) Clear() error {
 	return nil
 }
 
-// Sort the list using a modified merge algorithm.
-// cmp should return true if left should be sorted first or false if right should be sorted first.
+// Sort sorts the list using a modified merge algorithm. cmp should return true if left should be sorted first or false
+// if right should be sorted first.
 func (l *List) Sort(cmp func(left, right interface{}) bool) error {
 	// We are going to use the merge sort algorithm here. However, because length operations are not constant-time, we
 	// are not going to divide the list into progressively smaller blocks. Instead, we are going to assume a block size
@@ -396,14 +397,12 @@ func (l *List) Sort(cmp func(left, right interface{}) bool) error {
 	return nil
 }
 
-// Sort the list using a modified merge algorithm.
-// Note: all values in the list must be of type int.
+// SortInt sorts the list using a modified merge algorithm. Note: all values in the list must be of type int.
 func (l *List) SortInt() error {
 	return l.Sort(cmpInt)
 }
 
-// Sort the list using a modified merge algorithm.
-// Note: all values in the list must be of type string.
+// SortInt sorts the list using a modified merge algorithm. Note: all values in the list must be of type string.
 func (l *List) SortStr() error {
 	return l.Sort(cmpStr)
 }
