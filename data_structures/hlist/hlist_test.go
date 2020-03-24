@@ -493,6 +493,108 @@ func TestCopy(t *testing.T) {
 	}
 }
 
+func TestSame(t *testing.T) {
+	l1 := New()
+	l2 := l1
+
+	// Test an empty list.
+	if !l1.Same(l2) {
+		t.Error("Lists differ (test #1)")
+	}
+	if !l2.Same(l1) {
+		t.Error("Lists differ (test #2)")
+	}
+	checkString(t, l1, "<empty>")
+	checkLength(t, l1, 0)
+	checkString(t, l2, "<empty>")
+	checkLength(t, l2, 0)
+
+	// And an item and test again.
+	l1.Append("item")
+	if !l1.Same(l2) {
+		t.Error("Lists differ (test #3)")
+	}
+	if !l2.Same(l1) {
+		t.Error("Lists differ (test #4)")
+	}
+	checkString(t, l1, "item")
+	checkLength(t, l1, 1)
+	checkString(t, l2, "item")
+	checkLength(t, l2, 1)
+
+	// And multiple items to the 2nd reference.
+	l2.Append(3.14, []int{1, 2, 3}, 5)
+	if !l1.Same(l2) {
+		t.Error("Lists differ (test #5)")
+	}
+	if !l2.Same(l1) {
+		t.Error("Lists differ (test #6)")
+	}
+	checkString(t, l1, "item, 3.14, [1 2 3], 5")
+	checkLength(t, l1, 4)
+	checkString(t, l2, "item, 3.14, [1 2 3], 5")
+	checkLength(t, l2, 4)
+
+	// Remove an item and test again.
+	l1.Remove(3)
+	if !l1.Same(l2) {
+		t.Error("Lists differ (test #7)")
+	}
+	if !l2.Same(l1) {
+		t.Error("Lists differ (test #8)")
+	}
+	checkString(t, l1, "item, 3.14, [1 2 3]")
+	checkLength(t, l1, 3)
+	checkString(t, l2, "item, 3.14, [1 2 3]")
+	checkLength(t, l2, 3)
+
+	// Test copying, and make sure that the old lists and the new list are no longer the same.
+	l3, err := l1.Copy()
+	if err != nil {
+		t.Error(err)
+	}
+	if l1.Same(l3) {
+		t.Error("Lists are unexpectedly the same (test #9)")
+	}
+	if l2.Same(l3) {
+		t.Error("Lists are unexpectedly the same (test #10)")
+	}
+
+	// Test clearing a list.
+	l2.Clear()
+	if !l1.Same(l2) {
+		t.Error("Lists differ (test #11)")
+	}
+	if !l2.Same(l1) {
+		t.Error("Lists differ (test #12)")
+	}
+	checkString(t, l1, "<empty>")
+	checkLength(t, l1, 0)
+	checkString(t, l2, "<empty>")
+	checkLength(t, l2, 0)
+
+	// Test reassigning to make a same list.
+	l3 = l2
+	if !l1.Same(l3) {
+		t.Error("Lists differ (test #13)")
+	}
+	if !l2.Same(l3) {
+		t.Error("Lists differ (test #14)")
+	}
+
+	// Make two lists that have the same contents but are not the same underlying lists.
+	l1 = New()
+	l1.Append("apple", "banana", "carrot")
+	l2 = New()
+	l2.Append("apple", "banana", "carrot")
+	if l1.Same(l2) {
+		t.Error("Lists are unexpectedly the same (test #15)")
+	}
+	if l2.Same(l1) {
+		t.Error("Lists are unexpectedly the same (test #16)")
+	}
+}
+
 
 // HELPERS
 func checkString(t *testing.T, l *List, want string) {
