@@ -216,13 +216,13 @@ func (l *List) Copy() (*List, error) {
 	return nl, nil
 }
 
-// Check if the two lists are actually the same list.
+// Check if the two lists point to the same underlying data and are therefore the same list..
 func (l *List) Same(nl *List) bool {
 	if l == nil || nl == nil {
 		return false
 	}
 
-	if l.head == nl.head && l.length == nl.length {
+	if l == nl {
 		return true
 	}
 
@@ -232,6 +232,10 @@ func (l *List) Same(nl *List) bool {
 // Check if the two lists are separate lists but hold the same contents.
 func (l *List) Twin(nl *List) bool {
 	if l == nil || nl == nil {
+		return false
+	}
+
+	if l.Same(nl) {
 		return false
 	}
 
@@ -369,13 +373,13 @@ func (l *List) Sort(gt func(left, right interface{}) bool) error {
 					left_stack = left_stack.next
 					left_len--
 				} else if gt(left_stack.v, right_stack.v) {
-					tmp_list.Append(left_stack.v)
-					left_stack = left_stack.next
-					left_len--
-				} else {
 					tmp_list.Append(right_stack.v)
 					right_stack = right_stack.next
 					right_len--
+				} else {
+					tmp_list.Append(left_stack.v)
+					left_stack = left_stack.next
+					left_len--
 				}
 			}
 
