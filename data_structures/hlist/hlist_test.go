@@ -695,6 +695,37 @@ func TestMerge(t *testing.T) {
 	checkLength(t, l, 5)
 }
 
+func TestClear(t *testing.T) {
+	l := New()
+
+	// Add some items to the list.
+	l.Append(5, "bronto", "stego", 65e6, "t. rex", 0x0C)
+	checkString(t, l, "5, bronto, stego, 6.5e+07, t. rex, 12")
+	checkLength(t, l, 6)
+
+	// Test clearing out the items.
+	l.Clear()
+	checkString(t, l, "<empty>")
+	checkLength(t, l, 0)
+
+	// Test that clearing one list does not clear a copy.
+	l.Append(5, "bronto", "stego", 65e6, "t. rex", 0x0C)
+	nl, err := l.Copy()
+	if err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "5, bronto, stego, 6.5e+07, t. rex, 12")
+	checkLength(t, l, 6)
+	checkString(t, nl, "5, bronto, stego, 6.5e+07, t. rex, 12")
+	checkLength(t, nl, 6)
+
+	l.Clear()
+	checkString(t, l, "<empty>")
+	checkLength(t, l, 0)
+	checkString(t, nl, "5, bronto, stego, 6.5e+07, t. rex, 12")
+	checkLength(t, nl, 6)
+}
+
 
 // HELPERS
 func checkString(t *testing.T, l *List, want string) {
