@@ -595,6 +595,58 @@ func TestSame(t *testing.T) {
 	}
 }
 
+func TestTwin(t *testing.T) {
+	// Make two lists that have the same contents but are not the same underlying lists.
+	l1 := New()
+	l1.Append("apple", "banana", "carrot")
+	l2 := New()
+	l2.Append("apple", "banana", "carrot")
+	if !l1.Twin(l2) {
+		t.Error("Lists unexpectedly failed twin test (test #1)")
+	}
+	if !l2.Twin(l1) {
+		t.Error("Lists unexpectedly failed twin test (test #2)")
+	}
+
+	// Test on two lists that are the same.
+	l2 = l1
+	if !l1.Same(l2) {
+		t.Error("Lists are the same. Not running twin test.")
+	} else {
+		if l1.Twin(l2) {
+			t.Error("Lists are twins but should not be (test #3)")
+		}
+		if l2.Twin(l1) {
+			t.Error("Lists are twins but should not be (test #4)")
+		}
+	}
+
+	// Make sure that typically uncomparable items can be matched.
+	type s struct {
+		r rune; i []int; n int
+	}
+	l1 = New()
+	l1.Append("apple", []float32{1.23, 2.34, 3.45}, s{'a', []int{8, 9}, 1e3})
+	l2 = New()
+	l2.Append("apple", []float32{1.23, 2.34, 3.45}, s{'a', []int{8, 9}, 1e3})
+	if !l1.Twin(l2) {
+		t.Error("Lists unexpectedly failed twin test (test #5)")
+	}
+	if !l2.Twin(l1) {
+		t.Error("Lists unexpectedly failed twin test (test #6)")
+	}
+
+	// Tweak l2 a bit.
+	l2 = New()
+	l2.Append("apple", []float32{1.23, 2.34, 3.45}, s{'a', []int{8, 999}, 1e3})
+	if l1.Twin(l2) {
+		t.Error("Lists are twins but should not be (test #7)")
+	}
+	if l2.Twin(l1) {
+		t.Error("Lists unexpectedly failed twin test (test #8)")
+	}
+}
+
 
 // HELPERS
 func checkString(t *testing.T, l *List, want string) {
