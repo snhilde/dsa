@@ -22,12 +22,12 @@ type bnode struct {
 }
 
 
-// Create a new bit buffer.
+// New creates a new bit buffer.
 func New() *Buffer {
 	return new(Buffer)
 }
 
-// Get boolean status (set or unset) of bit at provided index.
+// Bit gets the boolean status (set or unset) of the bit at the provided index.
 func (b *Buffer) Bit(index int) bool {
 	node, err := b.getNode(index)
 	if err != nil {
@@ -37,7 +37,7 @@ func (b *Buffer) Bit(index int) bool {
 	return node.v
 }
 
-// Get number of bits in buffer, or -1 on error.
+// Bits gets the number of bits in the buffer, or -1 on error.
 func (b *Buffer) Bits() int {
 	if b == nil {
 		return -1
@@ -53,7 +53,7 @@ func (b *Buffer) Bits() int {
 	return cnt
 }
 
-// Get number of bits forward buffer has been advanced, or -1 on error.
+// Offset gets ther number of bits forward ther buffer has been advanced, or -1 on error.
 func (b *Buffer) Offset() int {
 	if b == nil {
 		return -1
@@ -69,7 +69,7 @@ func (b *Buffer) Offset() int {
 	return cnt
 }
 
-// Create a new buffer with the first n bits of the original buffer.
+// Copy creates a new buffer with the first n bits of the original buffer.
 func (b *Buffer) Copy(n int) *Buffer {
 	if b == nil {
 		return nil
@@ -106,7 +106,7 @@ func (b *Buffer) Copy(n int) *Buffer {
 	return nb
 }
 
-// Realign the bits to the beginning of the buffer.
+// Recalibrate realigns the bits to the beginning of the buffer.
 func (b *Buffer) Recalibrate() error {
 	if b == nil {
 		return bufErr()
@@ -118,7 +118,7 @@ func (b *Buffer) Recalibrate() error {
 	return nil
 }
 
-// Reset the bit buffer to its initial state.
+// Reset resets the bit buffer to its initial state.
 func (b *Buffer) Reset() error {
 	if b == nil {
 		return bufErr()
@@ -130,22 +130,21 @@ func (b *Buffer) Reset() error {
 	return nil
 }
 
-// Get a string representation of the binary data in the buffer.
+// String gets a string representation of the binary data in the buffer.
 func (b *Buffer) String() string {
 	return b.string_int(false)
 }
 
-// Get a string representation of the binary data in the buffer, with a single space between nibbles and a double space
-// between bytes.
+// Display gets a string representation of the binary data in the buffer, with a single space between nibbles and a
+// double space between bytes.
 func (b *Buffer) Display() string {
 	return b.string_int(true)
 }
 
 
-// Read len(p) bytes of bits from the buffer into p.
-// Returns number of bytes read into p, or io.EOF if the buffer is empty. io.EOF will only be returned if the buffer is
-// empty before any bytes have been read into p. If there are not enough bits to fill all of the last byte, then the
-// rest of the byte will be false bits.
+// Read reads len(p) bytes of bits from the buffer into p. It will return the number of bytes read into p, or io.EOF if
+// the buffer is empty. io.EOF will only be returned if the buffer is empty before any bytes have been read into p. If
+// there are not enough bits to fill all of the last byte, then the rest of the byte will be false bits.
 func (b *Buffer) Read(p []byte) (int, error) {
 	if b == nil {
 		return 0, bufErr()
@@ -183,7 +182,7 @@ func (b *Buffer) Read(p []byte) (int, error) {
 	return (cnt+7)/8, err
 }
 
-// Read out one byte of bits at the index. This will not advance the buffer.
+// ReadByte reads out one byte of bits at the index. This will not advance the buffer.
 func (b *Buffer) ReadByte(index int) (byte, error) {
 	node, err := b.getNode(index)
 	if err != nil {
@@ -205,7 +204,7 @@ func (b *Buffer) ReadByte(index int) (byte, error) {
 	return bt, nil
 }
 
-// Read out the 32-bit decimal representation of the bits at the index. This will not advance the buffer.
+// ReadInt reads out the 32-bit decimal representation of the bits at the index. This will not advance the buffer.
 func (b *Buffer) ReadInt(index int) (int, error) {
 	node, err := b.getNode(index)
 	if err != nil {
@@ -227,8 +226,8 @@ func (b *Buffer) ReadInt(index int) (int, error) {
 	return int(n), nil
 }
 
-// Read from r and append bytes to buffer.
-// Returns number of bytes read, and possibly an error.
+// ReadFrom reads from r and append the bytes to the buffer. It will return the number of bytes read, and possibly an
+// error.
 func (b *Buffer) ReadFrom(r io.Reader) (int, error) {
 	if b == nil {
 		return 0, bufErr()
@@ -243,7 +242,7 @@ func (b *Buffer) ReadFrom(r io.Reader) (int, error) {
 	return int(n), err
 }
 
-// Append the entire contents of p to the buffer.
+// Write appends the entire contents of p to the buffer.
 func (b *Buffer) Write(p []byte) (int, error) {
 	end, err := b.getEnd()
 	if err != nil {
@@ -276,7 +275,7 @@ func (b *Buffer) Write(p []byte) (int, error) {
 	return length, nil
 }
 
-// Append a bit to the end of the buffer.
+// WriteBit appends a bit to the end of the buffer.
 func (b *Buffer) WriteBit(v bool) error {
 	end, err := b.getEnd()
 	if err != nil {
@@ -294,26 +293,25 @@ func (b *Buffer) WriteBit(v bool) error {
 	return nil
 }
 
-// Append an octet to the end of the buffer. The bits will be added low to high.
+// WriteByte appends an octet of bits to the end of the buffer. The bits will be added low to high.
 func (b *Buffer) WriteByte(nb byte) error {
 	_, err := b.Write([]byte{nb})
 	return err
 }
 
-// Append bytes to the end of the buffer.
+// WriteBytes appends the provided bytes to the end of the buffer.
 func (b *Buffer) WriteBytes(bytes ...byte) error {
 	_, err := b.Write(bytes)
 	return err
 }
 
-// Append string bytes to the end of the buffer.
+// WriteString appends the provided string (in bytes) to the end of the buffer.
 func (b *Buffer) WriteString(s string) error {
 	_, err := b.Write([]byte(s))
 	return err
 }
 
-
-// Set the value of a particular bit in the buffer.
+// SetBit sets the value of a particular bit in the buffer.
 func (b *Buffer) SetBit(index int, v bool) error {
 	node, err := b.getNode(index)
 	if err != nil {
@@ -325,7 +323,7 @@ func (b *Buffer) SetBit(index int, v bool) error {
 	return nil
 }
 
-// Set the value of a range of bits in the buffer.
+// SetBytes sets the value of a range of bits in the buffer.
 func (b *Buffer) SetBytes(index int, ref []byte) error {
 	node, err := b.getNode(index)
 	if err != nil {
@@ -345,7 +343,7 @@ func (b *Buffer) SetBytes(index int, ref []byte) error {
 	return nil
 }
 
-// Cut out the bit at the index.
+// RemoveBit cuts out the bit at the index.
 func (b *Buffer) RemoveBit(index int) error {
 	node, err := b.getNode(index)
 	if err != nil {
@@ -369,7 +367,7 @@ func (b *Buffer) RemoveBit(index int) error {
 	return nil
 }
 
-// Cut out the bits at the index.
+// RemoveBits cuts out the bits at the index.
 func (b *Buffer) RemoveBits(index, n int) error {
 	if n < 1 {
 		return nil
@@ -400,8 +398,7 @@ func (b *Buffer) RemoveBits(index, n int) error {
 	return nil
 }
 
-// Move start of buffer forward a number of bits.
-// Returns the number of bits moved.
+// Advance moves the start of the buffer forward a number of bits. It will return the number of bits moved.
 func (b *Buffer) Advance(n int) (int, error) {
 	if b == nil {
 		return 0, bufErr()
@@ -432,8 +429,8 @@ func (b *Buffer) Advance(n int) (int, error) {
 	return n, nil
 }
 
-// Move start of buffer back a number of bits, or to the initial start.
-// Returns the number of bits moved.
+// Rewind moves the start of buffer back a number of bits, or to the initial start. It will return the number of bits
+// moved.
 func (b *Buffer) Rewind(n int) (int, error) {
 	if b == nil {
 		return 0, bufErr()
@@ -464,8 +461,8 @@ func (b *Buffer) Rewind(n int) (int, error) {
 	return n, nil
 }
 
-// Append a different buffer to the end of the current one. For safety, the current buffer will take ownership of the
-// second buffer.
+// Join appends a different buffer to the end of the current one. For safety, the current buffer will take ownership of
+// the second buffer.
 func (b *Buffer) Join(nb *Buffer) error {
 	end, err := b.getEnd()
 	if err != nil {
@@ -490,7 +487,7 @@ func (b *Buffer) Join(nb *Buffer) error {
 }
 
 
-// AND the specified bit with the reference bit. This is equivalent to the bitwise operation '&'.
+// ANDBit performs the bitwise operation AND ('&') on the specified bit with the reference bit.
 func (b *Buffer) ANDBit(index int, ref bool) error {
 	node, err := b.getNode(index)
 	if err != nil {
@@ -500,7 +497,7 @@ func (b *Buffer) ANDBit(index int, ref bool) error {
 	return opBit(node, ref, token.AND)
 }
 
-// OR the specified bit with the reference bit. This is equivalent to the bitwise operation '|'.
+// ORBit performs the bitwise operation OR ('|') on the specified bit with the reference bit.
 func (b *Buffer) ORBit(index int, ref bool) error {
 	node, err := b.getNode(index)
 	if err != nil {
@@ -510,7 +507,7 @@ func (b *Buffer) ORBit(index int, ref bool) error {
 	return opBit(node, ref, token.OR)
 }
 
-// XOR the specified bit with the reference bit. This is equivalent to the bitwise operation '^'.
+// XORBit performs the bitwise operation XOR ('^') on the specified bit with the reference bit.
 func (b *Buffer) XORBit(index int, ref bool) error {
 	node, err := b.getNode(index)
 	if err != nil {
@@ -520,37 +517,37 @@ func (b *Buffer) XORBit(index int, ref bool) error {
 	return opBit(node, ref, token.XOR)
 }
 
-// AND the buffer against the reference bytes. This is equivalent to the bitwise operation '&'.
+// ANDBytes performs the bitwise operation AND ('&') on the buffer with the reference bytes.
 func (b *Buffer) ANDBytes(ref []byte) error {
 	return b.opBytes(ref, token.AND)
 }
 
-// OR the buffer against the reference bytes. This is equivalent to the bitwise operation '|'.
+// ORBytes performs the bitwise operation OR ('|') on the buffer with the reference bytes.
 func (b *Buffer) ORBytes(ref []byte) error {
 	return b.opBytes(ref, token.OR)
 }
 
-// XOR the buffer against the reference bytes. This is equivalent to the bitwise operation '^'.
+// XORBytes performs the bitwise operation XOR ('^') on the buffer with the reference bytes.
 func (b *Buffer) XORBytes(ref []byte) error {
 	return b.opBytes(ref, token.XOR)
 }
 
-// AND the buffer against the reference buffer. This is equivalent to the bitwise operation '&'.
+// ANDBuffer performs the bitwise operation AND ('&') on the buffer with the reference buffer.
 func (b *Buffer) ANDBuffer(ref *Buffer) error {
 	return b.opBuf(ref, token.AND)
 }
 
-// OR the buffer against the reference buffer. This is equivalent to the bitwise operation '|'.
+// ORBuffer performs the bitwise operation OR ('|') on the buffer with the reference buffer.
 func (b *Buffer) ORBuffer(ref *Buffer) error {
 	return b.opBuf(ref, token.OR)
 }
 
-// XOR the buffer against the reference buffer. This is equivalent to the bitwise operation '^'.
+// XORBuffer performs the bitwise operation XOR ('^') on the buffer with the reference buffer.
 func (b *Buffer) XORBuffer(ref *Buffer) error {
 	return b.opBuf(ref, token.XOR)
 }
 
-// Shift the bits in the buffer to the left. This is equivalent to the bitwise operation '<<'.
+// ShiftLeft shifts the bits in the buffer to the left. This is equivalent to the bitwise operation '<<'.
 func (b *Buffer) ShiftLeft(n int) error {
 	if n < 0 {
 		return errors.New("Invalid number")
@@ -580,7 +577,7 @@ func (b *Buffer) ShiftLeft(n int) error {
 	return nil
 }
 
-// Shift the bits in the buffer to the right. This is equivalent to the bitwise operation '>>'.
+// ShiftRight shifts the bits in the buffer to the right. This is equivalent to the bitwise operation '>>'.
 func (b *Buffer) ShiftRight(n int) error {
 	if n < 0 {
 		return errors.New("Invalid number")
@@ -610,7 +607,7 @@ func (b *Buffer) ShiftRight(n int) error {
 	return nil
 }
 
-// Negate the specified bit. This is equivalent to the bitwise operation '~'.
+// NOTBit negates the specified bit. This is equivalent to the bitwise operation '~'.
 func (b *Buffer) NOTBit(index int) error {
 	node, err := b.getNode(index)
 	if err != nil {
@@ -620,7 +617,7 @@ func (b *Buffer) NOTBit(index int) error {
 	return opBit(node, false, token.NOT)
 }
 
-// Negate the first n bits in the buffer. This is equivalent to the bitwise operation '~'.
+// NOTBits negates the first n bits in the buffer. This is equivalent to the bitwise operation '~'.
 func (b *Buffer) NOTBits(n int) error {
 	if n < 0 {
 		return errors.New("Invalid range")
