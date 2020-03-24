@@ -726,6 +726,72 @@ func TestClear(t *testing.T) {
 	checkLength(t, nl, 6)
 }
 
+func TestSortInt(t *testing.T) {
+	// Test a power of two.
+	l := New()
+	l.Append(8, 7, 6, 5, 4, 3, 2, 1)
+	checkString(t, l, "8, 7, 6, 5, 4, 3, 2, 1")
+	checkLength(t, l, 8)
+	if err := l.SortInt(); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "1, 2, 3, 4, 5, 6, 7, 8")
+	checkLength(t, l, 8)
+
+	// Test a block with less than one full stack.
+	l.Clear()
+	l.Append(9, 8, 7, 6, 5, 4, 3, 2, 1)
+	checkString(t, l, "9, 8, 7, 6, 5, 4, 3, 2, 1")
+	checkLength(t, l, 9)
+	if err := l.SortInt(); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "1, 2, 3, 4, 5, 6, 7, 8, 9")
+	checkLength(t, l, 9)
+
+	// Test a block with more than one full stack but less than a full block
+	l.Clear()
+	l.Append(11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)
+	checkString(t, l, "11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1")
+	checkLength(t, l, 11)
+	if err := l.SortInt(); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11")
+	checkLength(t, l, 11)
+
+	// Test small list sizes.
+	l.Clear()
+	l.Append(1, 0)
+	checkString(t, l, "1, 0")
+	checkLength(t, l, 2)
+	if err := l.SortInt(); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "0, 1")
+	checkLength(t, l, 2)
+
+	l.Clear()
+	l.Append(1)
+	checkString(t, l, "1")
+	checkLength(t, l, 1)
+	if err := l.SortInt(); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "1")
+	checkLength(t, l, 1)
+
+	// Test an empty list.
+	l.Clear()
+	checkString(t, l, "<empty>")
+	checkLength(t, l, 0)
+	if err := l.SortInt(); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "<empty>")
+	checkLength(t, l, 0)
+}
+
 
 // HELPERS
 func checkString(t *testing.T, l *List, want string) {
