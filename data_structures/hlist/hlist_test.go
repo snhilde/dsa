@@ -647,6 +647,54 @@ func TestTwin(t *testing.T) {
 	}
 }
 
+func TestMerge(t *testing.T) {
+	// Test merging two good lists togther.
+	l := New()
+	l.Append(0, 1, 2, 3, 4)
+	checkString(t, l, "0, 1, 2, 3, 4")
+	checkLength(t, l, 5)
+
+	nl := New()
+	nl.Append(5, 6, 7, 8, 9)
+	checkString(t, nl, "5, 6, 7, 8, 9")
+	checkLength(t, nl, 5)
+
+	if err := l.Merge(nl); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "0, 1, 2, 3, 4, 5, 6, 7, 8, 9")
+	checkLength(t, l, 10)
+	checkString(t, nl, "<empty>")
+	checkLength(t, nl, 0)
+
+	// Test merging a good list and a bad list.
+	l.Clear()
+	l.Append(0, 1, 2, 3, 4)
+	checkString(t, l, "0, 1, 2, 3, 4")
+	checkLength(t, l, 5)
+
+	var lp *List
+	checkString(t, lp, "<nil>")
+	checkLength(t, lp, -1)
+
+	if err := l.Merge(lp); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "0, 1, 2, 3, 4")
+	checkLength(t, l, 5)
+	checkString(t, lp, "<nil>")
+	checkLength(t, lp, -1)
+
+	// Test merging a bad list with a good list.
+	if err := lp.Merge(l); err == nil {
+		t.Error("Unexpectedly passed bad merge")
+	}
+	checkString(t, lp, "<nil>")
+	checkLength(t, lp, -1)
+	checkString(t, l, "0, 1, 2, 3, 4")
+	checkLength(t, l, 5)
+}
+
 
 // HELPERS
 func checkString(t *testing.T, l *List, want string) {
