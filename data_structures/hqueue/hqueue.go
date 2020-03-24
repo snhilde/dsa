@@ -12,15 +12,14 @@ type Queue struct {
 	list *hlist.List
 }
 
-// Create a new queue.
+// New creates a new queue.
 func New() *Queue {
 	q := new(Queue)
 	q.list = hlist.New()
 	return q
 }
 
-// Add a new item or items to the back of the queue. If there is more than one item, the first item will be at the front
-// of the queue.
+// Add adds one or more new items to the back of the queue. The items will be added in the order provided.
 func (q *Queue) Add(vs ...interface{}) error {
 	if q == nil {
 		return qErr()
@@ -42,7 +41,7 @@ func (q *Queue) Add(vs ...interface{}) error {
 	return q.list.Append(vs...)
 }
 
-// Pop the first item in the queue.
+// Pop removes the first item in the queue and returns its value.
 func (q *Queue) Pop() interface{} {
 	if q == nil {
 		return nil
@@ -51,7 +50,7 @@ func (q *Queue) Pop() interface{} {
 	return q.list.Remove(0)
 }
 
-// Get the current number of items in the queue.
+// Count gets the current number of items in the queue.
 func (q *Queue) Count() int {
 	if q == nil {
 		return -1
@@ -60,7 +59,7 @@ func (q *Queue) Count() int {
 	return q.list.Length()
 }
 
-// Make an exact copy of the queue.
+// Copy makes an exact copy of the queue.
 func (q *Queue) Copy() (*Queue, error) {
 	if q == nil {
 		return nil, qErr()
@@ -77,7 +76,8 @@ func (q *Queue) Copy() (*Queue, error) {
 	return nq, nil
 }
 
-// Add a queue behind the current queue, preserving order. This will take ownership of and clear the provided queue.
+// Merge adds a queue behind the current queue, preserving order. This will take ownership of and clear the provided
+// queue.
 func (q *Queue) Merge(nq *Queue) error {
 	if q == nil {
 		return qErr()
@@ -93,7 +93,7 @@ func (q *Queue) Merge(nq *Queue) error {
 	return nq.Clear()
 }
 
-// Clear the queue to its inital state.
+// Clear resets the queue to its inital state.
 func (q *Queue) Clear() error {
 	if q == nil {
 		return errors.New("Queue does not exist")
@@ -102,7 +102,7 @@ func (q *Queue) Clear() error {
 	return q.list.Clear()
 }
 
-// Display queue contents, from the top to the bottom.
+// String displays the queue's contents, from the top to the bottom.
 func (q *Queue) String() string {
 	if q == nil {
 		return "<nil>"
