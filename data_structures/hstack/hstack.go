@@ -12,7 +12,7 @@ type Stack struct {
 	list *hlist.List
 }
 
-// Create a new stack.
+// New creates a new stack.
 func New() *Stack {
 	s := new(Stack)
 	s.list = hlist.New()
@@ -20,7 +20,8 @@ func New() *Stack {
 }
 
 
-// Add a new item or items to the top of the stack. If there is more than one item, the first item will be at the top.
+// Add adds one or more new items to the top of the stack. If there is more than one item, the first item will be at the
+// top.
 func (s *Stack) Add(vs ...interface{}) error {
 	if s == nil {
 		return sErr()
@@ -42,7 +43,7 @@ func (s *Stack) Add(vs ...interface{}) error {
 	return s.list.Insert(0, vs...)
 }
 
-// Pop the top item from the stack.
+// Pop removes the top item from the stack and returns its value.
 func (s *Stack) Pop() interface{} {
 	if s == nil {
 		return nil
@@ -51,7 +52,7 @@ func (s *Stack) Pop() interface{} {
 	return s.list.Remove(0)
 }
 
-// Get the current number of items in the stack.
+// Count gets the current number of items in the stack.
 func (s *Stack) Count() int {
 	if s == nil {
 		return -1
@@ -60,7 +61,7 @@ func (s *Stack) Count() int {
 	return s.list.Length()
 }
 
-// Make an exact copy of the stack.
+// Copy makes an exact copy of the stack.
 func (s *Stack) Copy() (*Stack, error) {
 	if s == nil {
 		return nil, sErr()
@@ -77,7 +78,7 @@ func (s *Stack) Copy() (*Stack, error) {
 	return ns, nil
 }
 
-// Add a stack below the current stack. This will take ownership of and clear the provided stack.
+// Merge adds a stack below the current stack. This will take ownership of and clear the provided stack.
 func (s *Stack) Merge(ns *Stack) error {
 	if s == nil {
 		return sErr()
@@ -93,7 +94,7 @@ func (s *Stack) Merge(ns *Stack) error {
 	return ns.Clear()
 }
 
-// Clear the stack to its inital state.
+// Clear resets the stack to its inital state.
 func (s *Stack) Clear() error {
 	if s == nil {
 		return errors.New("Stack does not exist")
@@ -102,7 +103,7 @@ func (s *Stack) Clear() error {
 	return s.list.Clear()
 }
 
-// Display stack contents, from the top to the bottom.
+// String displays the stack's contents, from the top to the bottom.
 func (s *Stack) String() string {
 	if s == nil {
 		return "<nil>"
