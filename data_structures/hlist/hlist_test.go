@@ -726,6 +726,57 @@ func TestClear(t *testing.T) {
 	checkLength(t, nl, 6)
 }
 
+func TestSort(t *testing.T) {
+	l := New()
+
+	// Test floats.
+	cmp := func(l, r interface{}) bool {
+		if l.(float64) < r.(float64) {
+			return true
+		}
+		return false
+	}
+	l.Append(6.1, 7.1, 4.1, 2.1, 3.1, 5.1, 1.1, 8.1)
+	checkString(t, l, "6.1, 7.1, 4.1, 2.1, 3.1, 5.1, 1.1, 8.1")
+	checkLength(t, l, 8)
+	if err := l.Sort(cmp); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "1.1, 2.1, 3.1, 4.1, 5.1, 6.1, 7.1, 8.1")
+	checkLength(t, l, 8)
+
+	// Test slices.
+	cmp = func(l, r interface{}) bool {
+		ls := l.([]byte)
+		rs := r.([]byte)
+		for i, v := range ls {
+			if i == len(rs) {
+				// If we are equal up to this point, then r is a prefix of l.
+				return false
+			}
+			if v == rs[i] {
+				continue;
+			} else if v < rs[i] {
+				return true
+			} else {
+				return false
+			}
+		}
+
+		// If we got here, then either l is a prefix of r or both slices are equal.
+		return true;
+	}
+	l.Clear()
+	l.Append([]byte{0x0A, 0xBB}, []byte{0x0A, 0xAA}, []byte{0x0A}, []byte{0x01, 0x02, 0x03, 0x04}, []byte{0x0A, 0xAA, 0x00})
+	checkString(t, l, "[10 187], [10 170], [10], [1 2 3 4], [10 170 0]")
+	checkLength(t, l, 5)
+	if err := l.Sort(cmp); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "[1 2 3 4], [10], [10 170], [10 170 0], [10 187]")
+	checkLength(t, l, 5)
+}
+
 func TestSortInt(t *testing.T) {
 	// Test a power of two.
 	l := New()
