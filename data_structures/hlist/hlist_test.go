@@ -856,7 +856,7 @@ func TestSortStr(t *testing.T) {
 	checkLength(t, l, 3)
 
 	// Test variable lengths and no same characters.
-	l = New()
+	l.Clear()
 	l.Append("aaaaaaaaaaa", "bbb", "ccccc")
 	checkString(t, l, "aaaaaaaaaaa, bbb, ccccc")
 	checkLength(t, l, 3)
@@ -867,7 +867,7 @@ func TestSortStr(t *testing.T) {
 	checkLength(t, l, 3)
 
 	// Test uniform length and similar characters.
-	l = New()
+	l.Clear()
 	l.Append("cabc", "caab", "abab")
 	checkString(t, l, "cabc, caab, abab")
 	checkLength(t, l, 3)
@@ -878,7 +878,7 @@ func TestSortStr(t *testing.T) {
 	checkLength(t, l, 3)
 
 	// Test variable length and similar characters.
-	l = New()
+	l.Clear()
 	l.Append("cababcabbcbababca", "cabacbcabacb", "cabababacba")
 	checkString(t, l, "cababcabbcbababca, cabacbcabacb, cabababacba")
 	checkLength(t, l, 3)
@@ -887,6 +887,41 @@ func TestSortStr(t *testing.T) {
 	}
 	checkString(t, l, "cabababacba, cababcabbcbababca, cabacbcabacb")
 	checkLength(t, l, 3)
+
+	// Test subsets.
+	l.Clear()
+	l.Append("cabcdd", "cabc", "cabab")
+	checkString(t, l, "cabcdd, cabc, cabab")
+	checkLength(t, l, 3)
+	if err := l.SortStr(); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "cabab, cabc, cabcdd")
+	checkLength(t, l, 3)
+
+	// Test Unicode characters. The following runes will be appended to the list in this order:
+	// "U+4444 U+3333", "U+1111 U+2222", "U+1111 U+2222 U+4444 U+3333", "U+1100", "U+4444"
+	l.Clear()
+	l.Append("䑄㌳", "ᄑ∢", "ᄑ∢䑄㌳", "ᄀ", "䑄")
+	checkString(t, l, "䑄㌳, ᄑ∢, ᄑ∢䑄㌳, ᄀ, 䑄")
+	checkLength(t, l, 5)
+	if err := l.SortStr(); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "ᄀ, ᄑ∢, ᄑ∢䑄㌳, 䑄, 䑄㌳")
+	checkLength(t, l, 5)
+
+	// Test Unicode characters and ASCII characters. The following runes will be appended to the list in this order:
+	// "U+4444 U+3333", "U+1111 U+2222", "A U+1111 U+2222 U+4444 U+3333", "U+1111 U+2222 U+4444 U+3333", "U+1100", "U+4444", "U+1111 U+2222 A"
+	l.Clear()
+	l.Append("䑄㌳", "ᄑ∢", "Aᄑ∢䑄㌳", "ᄑ∢䑄㌳", "ᄀ", "䑄", "ᄑ∢A")
+	checkString(t, l, "䑄㌳, ᄑ∢, Aᄑ∢䑄㌳, ᄑ∢䑄㌳, ᄀ, 䑄, ᄑ∢A")
+	checkLength(t, l, 7)
+	if err := l.SortStr(); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "Aᄑ∢䑄㌳, ᄀ, ᄑ∢, ᄑ∢A, ᄑ∢䑄㌳, 䑄, 䑄㌳")
+	checkLength(t, l, 7)
 }
 
 
