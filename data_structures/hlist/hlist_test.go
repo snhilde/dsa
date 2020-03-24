@@ -792,6 +792,52 @@ func TestSortInt(t *testing.T) {
 	checkLength(t, l, 0)
 }
 
+func TestSortStr(t *testing.T) {
+	// Test uniform length and no same characters.
+	l := New()
+	l.Append("ccc", "aaa", "bbb")
+	checkString(t, l, "ccc, aaa, bbb")
+	checkLength(t, l, 3)
+	if err := l.SortStr(); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "aaa, bbb, ccc")
+	checkLength(t, l, 3)
+
+	// Test variable lengths and no same characters.
+	l = New()
+	l.Append("aaaaaaaaaaa", "bbb", "ccccc")
+	checkString(t, l, "aaaaaaaaaaa, bbb, ccccc")
+	checkLength(t, l, 3)
+	if err := l.SortStr(); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "aaaaaaaaaaa, bbb, ccccc")
+	checkLength(t, l, 3)
+
+	// Test uniform length and similar characters.
+	l = New()
+	l.Append("cabc", "caab", "abab")
+	checkString(t, l, "cabc, caab, abab")
+	checkLength(t, l, 3)
+	if err := l.SortStr(); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "abab, caab, cabc")
+	checkLength(t, l, 3)
+
+	// Test variable length and similar characters.
+	l = New()
+	l.Append("cababcabbcbababca", "cabacbcabacb", "cabababacba")
+	checkString(t, l, "cababcabbcbababca, cabacbcabacb, cabababacba")
+	checkLength(t, l, 3)
+	if err := l.SortStr(); err != nil {
+		t.Error(err)
+	}
+	checkString(t, l, "cabababacba, cababcabbcbababca, cabacbcabacb")
+	checkLength(t, l, 3)
+}
+
 
 // HELPERS
 func checkString(t *testing.T, l *List, want string) {
