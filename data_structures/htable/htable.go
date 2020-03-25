@@ -13,14 +13,14 @@ import (
 type Table struct {
 	cols   []string
 	rows    *hlist.List
-	length   int
 }
 
 
 // New creates a new table. The strings will denote the names of each column, used during lookup.
-func New() *Table {
+func New(cols ...string) *Table {
 	var t Table
 
+	t.cols = cols
 	t.rows = hlist.New()
 
 	return &t
