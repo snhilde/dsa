@@ -54,6 +54,17 @@ func (t *Table) InsertRow(index int, items ...interface{}) error {
 	return t.rows.Insert(index, r)
 }
 
+// RemoveRow deletes a row from the table.
+func (t *Table) RemoveRow(index int) {
+	if t == nil {
+		return
+	}
+
+	_ = t.rows.Remove(index)
+
+	return nil
+}
+
 
 func tErr() error {
 	return errors.New("Table must be created with New() first")
