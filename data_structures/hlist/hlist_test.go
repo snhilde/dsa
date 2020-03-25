@@ -41,6 +41,13 @@ func TestBadPtr(t *testing.T) {
 		t.Log("\tReceived:", i)
 	}
 
+    // Test Value().
+	if v := l.Value(0); v != nil {
+		t.Error("unexpectedly passed Value() test with bad pointer")
+		t.Log("\tExpected: nil")
+		t.Log("\tReceived:", v)
+	}
+
     // Test Exists().
 	if b := l.Exists("item"); b != false {
 		t.Error("unexpectedly passed Exists() test with bad pointer")
@@ -105,6 +112,33 @@ func TestBadArgs(t *testing.T) {
     // Test Insert().
 	if err := l.Insert(-1, "item"); err == nil {
 		t.Error("unexpectedly passed Insert() test for negative index")
+	}
+	checkString(t, l, "<empty>")
+	checkLength(t, l, 0)
+
+    // Test Value().
+	if v := l.Value(-1); v != nil {
+		t.Error("unexpectedly passed Value() test for negative index")
+		t.Log("\tExpected: nil")
+		t.Log("\tReceived:", v)
+	}
+	checkString(t, l, "<empty>")
+	checkLength(t, l, 0)
+
+    // Test Value().
+	if v := l.Value(0); v != nil {
+		t.Error("unexpectedly passed Value() test for empty list")
+		t.Log("\tExpected: nil")
+		t.Log("\tReceived:", v)
+	}
+	checkString(t, l, "<empty>")
+	checkLength(t, l, 0)
+
+    // Test Value().
+	if v := l.Value(100); v != nil {
+		t.Error("unexpectedly passed Value() test for out-of-range index")
+		t.Log("\tExpected: nil")
+		t.Log("\tReceived:", v)
 	}
 	checkString(t, l, "<empty>")
 	checkLength(t, l, 0)
@@ -929,15 +963,15 @@ func TestSortStr(t *testing.T) {
 func checkString(t *testing.T, l *List, want string) {
 	if l.String() != want {
 		t.Error("List contents are incorrect")
-		t.Log("Expected:", want)
-		t.Log("Received:", l)
+		t.Log("\tExpected:", want)
+		t.Log("\tReceived:", l)
 	}
 }
 
 func checkLength(t *testing.T, l *List, want int) {
 	if l.Length() != want {
 		t.Error("Incorrect length")
-		t.Log("Expected:", want)
-		t.Log("Received:", l.Length())
+		t.Log("\tExpected:", want)
+		t.Log("\tReceived:", l.Length())
 	}
 }
