@@ -65,6 +65,15 @@ func (t *Table) RemoveRow(index int) {
 	return nil
 }
 
+// Rows returns the number of rows in the table, or -1 on error.
+func (t *Table) Rows() int {
+	if t == nil {
+		return -1
+	}
+
+	return t.rows.Length()
+}
+
 
 func tErr() error {
 	return errors.New("Table must be created with New() first")
