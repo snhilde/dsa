@@ -144,6 +144,20 @@ func (l *List) Index(v interface{}) int {
 	return -1
 }
 
+// Value gets the value at the index.
+func (l *List) Value(index int) interface{} {
+	if l == nil || l.head == nil {
+		return nil
+	}
+
+	n, err := l.getPrior(index)
+	if err != nil {
+		return nil
+	}
+
+	return n.next.v
+}
+
 // Exists checks whether or not the value exists in the list.
 func (l *List) Exists(v interface{}) bool {
 	i := l.Index(v)
@@ -460,7 +474,7 @@ func (l *List) getPrior(index int) (*hnode, error) {
 		return nil, lErr()
 	} else if index < 0 {
 		return nil, errors.New("Invalid index")
-	} else if l.length < index {
+	} else if index >= l.length {
 		return nil, errors.New("Out of bounds")
 	}
 
