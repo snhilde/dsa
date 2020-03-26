@@ -295,51 +295,51 @@ func TestIndex(t *testing.T) {
 	// Check index of 1.
 	if i := l.Index(1); i != 1 {
 		t.Error("Incorrect index for 1")
-		t.Log("Expected: 1")
-		t.Log("Received:", i)
+		t.Log("\tExpected: 1")
+		t.Log("\tReceived:", i)
 	}
 
 	// Check index of "apples".
 	if i := l.Index("apples"); i != 0 {
 		t.Error("Incorrect index for \"apples\"")
-		t.Log("Expected: 0")
-		t.Log("Received:", i)
+		t.Log("\tExpected: 0")
+		t.Log("\tReceived:", i)
 	}
 
 	// Check index of pi.
 	if i := l.Index(3.14); i != 3 {
 		t.Error("Incorrect index for 3.14")
-		t.Log("Expected: 3")
-		t.Log("Received:", i)
+		t.Log("\tExpected: 3")
+		t.Log("\tReceived:", i)
 	}
 
 	// Remove an item and check index of pi again.
 	l.Remove(1)
 	if i := l.Index(3.14); i != 2 {
 		t.Error("Incorrect index for 3.14")
-		t.Log("Expected: 2")
-		t.Log("Received:", i)
+		t.Log("\tExpected: 2")
+		t.Log("\tReceived:", i)
 	}
 
 	// Try to find a non-existant item.
 	if i := l.Index(10); i != -1 {
 		t.Error("Unexpectedly passed no-match test")
-		t.Log("Expected: -1")
-		t.Log("Received:", i)
+		t.Log("\tExpected: -1")
+		t.Log("\tReceived:", i)
 	}
 
 	// Test matching a slice.
 	if i := l.Index([]byte{0xEE, 0xFF}); i != 3 {
 		t.Error("Incorrect index for []byte{0xEE, 0xFF}")
-		t.Log("Expected: 3")
-		t.Log("Received:", i)
+		t.Log("\tExpected: 3")
+		t.Log("\tReceived:", i)
 	}
 
 	// Test not matching a slice.
 	if i := l.Index([]byte{0xAA, 0xBB}); i != -1 {
 		t.Error("Unexpectedly passed no-match slice test")
-		t.Log("Expected: -1")
-		t.Log("Received:", i)
+		t.Log("\tExpected: -1")
+		t.Log("\tReceived:", i)
 	}
 }
 
@@ -352,8 +352,8 @@ func TestValue(t *testing.T) {
 	// Check value at first position.
 	if v := l.Value(0); v != "apples" {
 		t.Error("Incorrect value for index 0")
-		t.Log("Expected: apples")
-		t.Log("Received:", v)
+		t.Log("\tExpected: apples")
+		t.Log("\tReceived:", v)
 	}
 	checkString(t, l, "apples, 1, 3, 3.14, [238 255], aardvark")
 	checkLength(t, l, 6)
@@ -361,8 +361,8 @@ func TestValue(t *testing.T) {
 	// Check value at 3rd position.
 	if v := l.Value(2); v != 3 {
 		t.Error("Incorrect value for index 2")
-		t.Log("Expected: 3")
-		t.Log("Received:", v)
+		t.Log("\tExpected: 3")
+		t.Log("\tReceived:", v)
 	}
 	checkString(t, l, "apples, 1, 3, 3.14, [238 255], aardvark")
 	checkLength(t, l, 6)
@@ -370,8 +370,8 @@ func TestValue(t *testing.T) {
 	// Check value at 4th position.
 	if v := l.Value(3); v != 3.14 {
 		t.Error("Incorrect value for index 3")
-		t.Log("Expected: 3.14")
-		t.Log("Received:", v)
+		t.Log("\tExpected: 3.14")
+		t.Log("\tReceived:", v)
 	}
 	checkString(t, l, "apples, 1, 3, 3.14, [238 255], aardvark")
 	checkLength(t, l, 6)
@@ -379,8 +379,8 @@ func TestValue(t *testing.T) {
 	// Check value at last position.
 	if v := l.Value(5); v != "aardvark" {
 		t.Error("Incorrect value for index 5")
-		t.Log("Expected: aardvark")
-		t.Log("Received:", v)
+		t.Log("\tExpected: aardvark")
+		t.Log("\tReceived:", v)
 	}
 	checkString(t, l, "apples, 1, 3, 3.14, [238 255], aardvark")
 	checkLength(t, l, 6)
@@ -389,8 +389,8 @@ func TestValue(t *testing.T) {
 	l.Remove(1)
 	if v := l.Value(3); !reflect.DeepEqual(v, []byte{0xEE, 0xFF}) {
 		t.Error("Incorrect value for index 3")
-		t.Log("Expected: [238 255]")
-		t.Log("Received:", v)
+		t.Log("\tExpected: [238 255]")
+		t.Log("\tReceived:", v)
 	}
 	checkString(t, l, "apples, 3, 3.14, [238 255], aardvark")
 	checkLength(t, l, 5)
@@ -398,8 +398,8 @@ func TestValue(t *testing.T) {
 	// Try to find a non-existant item.
 	if v := l.Value(10); v != nil {
 		t.Error("Unexpectedly passed no-match test")
-		t.Log("Expected: nil")
-		t.Log("Received:", v)
+		t.Log("\tExpected: nil")
+		t.Log("\tReceived:", v)
 	}
 }
 
@@ -450,8 +450,8 @@ func TestRemove(t *testing.T) {
 	// Remove the 3rd item.
 	if value := l.Remove(2); value != 3 {
 		t.Error("Error removing 3rd item")
-		t.Log("Expected: 3")
-		t.Log("Received:", value)
+		t.Log("\tExpected: 3")
+		t.Log("\tReceived:", value)
 	}
 	checkString(t, l, "1, 2, 4, [5 6]")
 	checkLength(t, l, 4)
@@ -459,8 +459,8 @@ func TestRemove(t *testing.T) {
 	// Remove the new 3rd item.
 	if value := l.Remove(2); value != "4" {
 		t.Error("Error removing new 3rd item")
-		t.Log("Expected: 4")
-		t.Log("Received:", value)
+		t.Log("\tExpected: 4")
+		t.Log("\tReceived:", value)
 	}
 	checkString(t, l, "1, 2, [5 6]")
 	checkLength(t, l, 3)
@@ -469,8 +469,8 @@ func TestRemove(t *testing.T) {
 	value := l.Remove(l.Length()-1)
 	if len(value.([]byte)) != 2 || value.([]byte)[0] != 0x05 || value.([]byte)[1] != 0x06 {
 		t.Error("Error removing last item")
-		t.Log("Expected: [0x05, 0x06")
-		t.Log("Received:", value)
+		t.Log("\tExpected: [0x05, 0x06")
+		t.Log("\tReceived:", value)
 	}
 	checkString(t, l, "1, 2")
 	checkLength(t, l, 2)
@@ -478,8 +478,8 @@ func TestRemove(t *testing.T) {
 	// Remove the first item.
 	if value := l.Remove(0); value != 1 {
 		t.Error("Error removing first item")
-		t.Log("Expected: 1")
-		t.Log("Received:", value)
+		t.Log("\tExpected: 1")
+		t.Log("\tReceived:", value)
 	}
 	checkString(t, l, "2")
 	checkLength(t, l, 1)
@@ -487,8 +487,8 @@ func TestRemove(t *testing.T) {
 	// Remove the last remaining item.
 	if value := l.Remove(0); value != 2 {
 		t.Error("Error removing last remaining item")
-		t.Log("Expected: 2")
-		t.Log("Received:", value)
+		t.Log("\tExpected: 2")
+		t.Log("\tReceived:", value)
 	}
 	checkString(t, l, "<empty>")
 	checkLength(t, l, 0)
@@ -496,8 +496,8 @@ func TestRemove(t *testing.T) {
 	// Make sure nothing is left.
 	if value := l.Remove(0); value != nil {
 		t.Error("Unexpectedly found an item")
-		t.Log("Expected: nil")
-		t.Log("Received:", value)
+		t.Log("\tExpected: nil")
+		t.Log("\tReceived:", value)
 	}
 	checkString(t, l, "<empty>")
 	checkLength(t, l, 0)
