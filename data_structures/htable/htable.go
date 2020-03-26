@@ -90,6 +90,18 @@ func (t *Table) Columns() int {
 	return len(t.cols)
 }
 
+// Count returns the number of items in the table, or -1 on error.
+func (t *Table) Count() int {
+	r := t.Rows()
+	c := t.Column()
+
+	if r == -1 || c == -1 {
+		return -1
+	}
+
+	return r * c
+}
+
 // Row returns the index of the first row that contains the item in the specified column, or -1 on error or not found.
 func (t *Table) Row(col string, item interface{}) int {
 	if t == nil {
