@@ -93,7 +93,7 @@ func (t *Table) Columns() int {
 // Count returns the number of items in the table, or -1 on error.
 func (t *Table) Count() int {
 	r := t.Rows()
-	c := t.Column()
+	c := t.Columns()
 
 	if r == -1 || c == -1 {
 		return -1
