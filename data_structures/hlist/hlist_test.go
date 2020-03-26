@@ -2,6 +2,7 @@ package hlist
 
 import (
 	"testing"
+	"reflect"
 )
 
 
@@ -307,7 +308,7 @@ func TestIndex(t *testing.T) {
 		t.Log("Received:", i)
 	}
 
-	// Remove and index and check index of pi again.
+	// Remove an item and check index of pi again.
 	l.Remove(1)
 	if i := l.Index(3.14); i != 2 {
 		t.Error("Incorrect index for 3.14")
@@ -334,6 +335,66 @@ func TestIndex(t *testing.T) {
 		t.Error("Unexpectedly passed no-match slice test")
 		t.Log("Expected: -1")
 		t.Log("Received:", i)
+	}
+}
+
+func TestValue(t *testing.T) {
+	l := New()
+	l.Append("apples", 1, 3, 3.14, []byte{0xEE, 0xFF}, "aardvark")
+	checkString(t, l, "apples, 1, 3, 3.14, [238 255], aardvark")
+	checkLength(t, l, 6)
+
+	// Check value at first position.
+	if v := l.Value(0); v != "apples" {
+		t.Error("Incorrect value for index 0")
+		t.Log("Expected: apples")
+		t.Log("Received:", v)
+	}
+	checkString(t, l, "apples, 1, 3, 3.14, [238 255], aardvark")
+	checkLength(t, l, 6)
+
+	// Check value at 3rd position.
+	if v := l.Value(2); v != 3 {
+		t.Error("Incorrect value for index 2")
+		t.Log("Expected: 3")
+		t.Log("Received:", v)
+	}
+	checkString(t, l, "apples, 1, 3, 3.14, [238 255], aardvark")
+	checkLength(t, l, 6)
+
+	// Check value at 4th position.
+	if v := l.Value(3); v != 3.14 {
+		t.Error("Incorrect value for index 3")
+		t.Log("Expected: 3.14")
+		t.Log("Received:", v)
+	}
+	checkString(t, l, "apples, 1, 3, 3.14, [238 255], aardvark")
+	checkLength(t, l, 6)
+
+	// Check value at last position.
+	if v := l.Value(5); v != "aardvark" {
+		t.Error("Incorrect value for index 5")
+		t.Log("Expected: aardvark")
+		t.Log("Received:", v)
+	}
+	checkString(t, l, "apples, 1, 3, 3.14, [238 255], aardvark")
+	checkLength(t, l, 6)
+
+	// Remove an item and check value at index 3 again.
+	l.Remove(1)
+	if v := l.Value(3); !reflect.DeepEqual(v, []byte{0xEE, 0xFF}) {
+		t.Error("Incorrect value for index 3")
+		t.Log("Expected: [238 255]")
+		t.Log("Received:", v)
+	}
+	checkString(t, l, "apples, 3, 3.14, [238 255], aardvark")
+	checkLength(t, l, 5)
+
+	// Try to find a non-existant item.
+	if v := l.Value(10); v != nil {
+		t.Error("Unexpectedly passed no-match test")
+		t.Log("Expected: nil")
+		t.Log("Received:", v)
 	}
 }
 
