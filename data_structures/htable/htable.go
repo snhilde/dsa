@@ -20,9 +20,18 @@ type Table struct {
 
 
 // New creates a new table. The strings will denote the names of each column, used during lookup.
-func New(cols ...string) *Table {
+func New(cols ...string) (*Table, error) {
 	if cols == nil || len(cols) == 0 {
-		return nil
+		return nil, errors.New("Missing column headers")
+	}
+
+	// Make sure none of the columns match each other. Not the most efficient, but necessary.
+	for i, v := range cols {
+		for j, w := range cols[i+1:] {
+			if v == w {
+				return nil, errors.New(fmt.Sprintf("Columns %v and %v have the same header", i, j))
+			}
+		}
 	}
 
 	var t Table
@@ -30,7 +39,7 @@ func New(cols ...string) *Table {
 	t.cols = cols
 	t.rows = hlist.New()
 
-	return &t
+	return &t, nil
 }
 
 
