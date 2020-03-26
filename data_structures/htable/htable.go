@@ -70,8 +70,6 @@ func (t *Table) RemoveRow(index int) {
 	}
 
 	_ = t.rows.Remove(index)
-
-	return nil
 }
 
 // Rows returns the number of rows in the table, or -1 on error.
@@ -107,7 +105,7 @@ func (t *Table) Row(col string, item interface{}) int {
 	r := t.rows.Yield()
 	i := 0
 	for v := range r {
-		l := v.(*List)
+		l := v.(*hlist.List)
 		if reflect.DeepEqual(item, l.Value(c)) {
 			return i
 		}
@@ -123,7 +121,7 @@ func tErr() error {
 	return errors.New("Table must be created with New() first")
 }
 
-func (t *Table) newRow(items ...interface{}) *hlist.List, error {
+func (t *Table) newRow(items ...interface{}) (*hlist.List, error) {
 	if t == nil {
 		return nil, tErr()
 	} else if len(items) != len(t.cols) {
@@ -143,8 +141,8 @@ func (t *Table) newRow(items ...interface{}) *hlist.List, error {
 			k = reflect.Uint64
 		case reflect.Float32, reflect.Float64:
 			k = reflect.Float64
-		case reflect.Complext64, reflect.Complext128:
-			k = reflect.Complext128
+		case reflect.Complex64, reflect.Complex128:
+			k = reflect.Complex128
 		}
 
 		if t.Rows() == 0 {
