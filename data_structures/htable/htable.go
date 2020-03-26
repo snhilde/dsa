@@ -114,8 +114,8 @@ func (t *Table) Row(col string, item interface{}) int {
 	r := t.rows.Yield()
 	i := 0
 	for v := range r {
-		l := v.(*hlist.List)
-		if reflect.DeepEqual(item, l.Value(c)) {
+		s := v.([]interface{})
+		if reflect.DeepEqual(item, s[c]) {
 			return i
 		}
 		i++
@@ -130,7 +130,7 @@ func tErr() error {
 	return errors.New("Table must be created with New() first")
 }
 
-func (t *Table) newRow(items ...interface{}) (*hlist.List, error) {
+func (t *Table) newRow(items ...interface{}) ([]interface{}, error) {
 	if t == nil {
 		return nil, tErr()
 	} else if len(items) != t.Columns() {
@@ -138,7 +138,7 @@ func (t *Table) newRow(items ...interface{}) (*hlist.List, error) {
 	}
 
 	// Build out our row.
-	r := hlist.New()
+	r := make([]interface{}, t.Columns())
 	for i, v := range items {
 		rv := reflect.ValueOf(v)
 		k := rv.Kind()
@@ -163,7 +163,7 @@ func (t *Table) newRow(items ...interface{}) (*hlist.List, error) {
 				return nil, errors.New(fmt.Sprintf("Item %v (%v) does not match prototype (%v)", i, k, t.types[i]))
 			}
 		}
-		r.Append(v)
+		r[i] = v
 	}
 
 	return r, nil
