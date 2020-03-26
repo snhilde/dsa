@@ -324,6 +324,23 @@ func (l *List) Clear() error {
 	return nil
 }
 
+// Yield provides a buffered channel that will pass successive node values until the list is exhausted.
+func (l *List) Yield() chan interface{} {
+	if l == nil || l.head == nil {
+		return nil
+	}
+
+	ch := make(chan interface{}, l.Length())
+	n := l.head
+	for n != nil {
+		ch <- n.v
+		n = n.next
+	}
+	close(ch)
+
+	return ch
+}
+
 // Sort sorts the list using a modified merge algorithm. cmp should return true if left should be sorted first or false
 // if right should be sorted first.
 func (l *List) Sort(cmp func(left, right interface{}) bool) error {
