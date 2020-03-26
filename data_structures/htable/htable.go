@@ -81,6 +81,15 @@ func (t *Table) Rows() int {
 	return t.rows.Length()
 }
 
+// Columns returns the number of columns in the table, or -1 on error.
+func (t *Table) Columns() int {
+	if t == nil {
+		return -1
+	}
+
+	return len(t.cols)
+}
+
 // Row returns the index of the first row that contains the item in the specified column, or -1 on error or not found.
 func (t *Table) Row(col string, item interface{}) int {
 	if t == nil {
@@ -124,7 +133,7 @@ func tErr() error {
 func (t *Table) newRow(items ...interface{}) (*hlist.List, error) {
 	if t == nil {
 		return nil, tErr()
-	} else if len(items) != len(t.cols) {
+	} else if len(items) != t.Columns() {
 		return nil, errors.New(fmt.Sprintf("Number of items (%v) does not match number of columns (%v)", len(items), len(t.cols)))
 	}
 
