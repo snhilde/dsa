@@ -155,6 +155,10 @@ func (l *List) Value(index int) interface{} {
 		return nil
 	}
 
+	if n == nil {
+		return l.head.v
+	}
+
 	return n.next.v
 }
 
@@ -474,7 +478,7 @@ func (l *List) getPrior(index int) (*hnode, error) {
 		return nil, lErr()
 	} else if index < 0 {
 		return nil, errors.New("Invalid index")
-	} else if index >= l.length {
+	} else if index > l.length {
 		return nil, errors.New("Out of bounds")
 	}
 
