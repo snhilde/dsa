@@ -83,6 +83,41 @@ func (t *Table) Rows() int {
 	return t.rows.Length()
 }
 
+// Row returns the index of the first row that contains the item in the specified column, or -1 on error or not found.
+func (t *Table) Row(col string, item interface{}) int {
+	if t == nil {
+		return -1
+	}
+
+	// Find out which column we need to match on.
+	c := -1
+	for i, v := range t.cols {
+		if col == v {
+			c = i
+			break
+		}
+	}
+
+	// Make sure we found the column.
+	if c == -1 {
+		return -1
+	}
+
+	// Get our iterator to go through the rows.
+	r := t.rows.Yield()
+	i := 0
+	for v := range r {
+		l := v.(*List)
+		if reflect.DeepEqual(item, l.Value(c)) {
+			return i
+		}
+		i++
+	}
+
+	// If we're here, then we didn't find anything.
+	return -1
+}
+
 
 func tErr() error {
 	return errors.New("Table must be created with New() first")
