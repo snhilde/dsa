@@ -69,12 +69,20 @@ func (t *Table) InsertRow(index int, items ...interface{}) error {
 }
 
 // RemoveRow deletes a row from the table.
-func (t *Table) RemoveRow(index int) {
+func (t *Table) RemoveRow(index int) error {
 	if t == nil {
-		return
+		return tErr()
 	}
 
-	_ = t.rows.Remove(index)
+	v := t.rows.Remove(index)
+	if v == nil {
+		// hlist.Remove will return the value at the index. Because our rows can never be nil, if we receive a nil
+		// value, then it means an error occurred.
+		return errors.New(fmt.Sprintf("Failed to remove row %v", index))
+	}
+
+	// All good
+	return nil
 }
 
 // Rows returns the number of rows in the table, or -1 on error.
