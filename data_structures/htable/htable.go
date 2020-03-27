@@ -25,8 +25,13 @@ func New(cols ...string) (*Table, error) {
 		return nil, errors.New("Missing column headers")
 	}
 
-	// Make sure none of the columns match each other. Not the most efficient, but necessary.
+	// Validate the column headers.
 	for i, v := range cols {
+		// Make sure every column has a header.
+		if v == "" {
+			return nil, errors.New(fmt.Sprintf("Column %v has an empty header", i))
+		}
+		// Make sure none of the columns match each other. Not the most efficient, but necessary.
 		for j, w := range cols[i+1:] {
 			if v == w {
 				return nil, errors.New(fmt.Sprintf("Columns %v and %v have the same header", i, j))
