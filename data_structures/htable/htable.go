@@ -116,18 +116,26 @@ func (t *Table) Row(col string, item interface{}) int {
 			break
 		}
 	}
-
 	// Make sure we found the column.
 	if c == -1 {
 		return -1
 	}
 
 	// Get our iterator to go through the rows.
-	r := t.rows.Yield()
+	quit := make(chan interface{})
+	rows := t.rows.Yield(quit)
 	i := 0
-	for v := range r {
-		s := v.([]interface{})
-		if reflect.DeepEqual(item, s[c]) {
+	for v := range rows {
+		row := v.([]interface{})
+		if reflect.DeepEqual(item, row[c]) {
+			// Break out of the list iteration. If Yield's goroutine has already exited (because the list was fully
+			// traversed), then it won't receive the message to quit. We'll try to send the quit message, and then
+			// we'll exit.
+			select {
+			case quit <- 0:
+			default:
+				break
+			}
 			return i
 		}
 		i++
