@@ -82,3 +82,13 @@ func TestBadArgs(t *testing.T) {
 		t.Error("unexpectedly passed missing item test for Row()")
 	}
 }
+
+
+func TestNew(t *testing.T) {
+	n, err := New("a", "b", "c")
+	if err != nil {
+		t.Error(err)
+	} else if n == nil {
+		t.Error("Failed to create new table")
+	}
+}
