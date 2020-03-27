@@ -61,10 +61,6 @@ func (l *List) Length() int {
 
 // Insert inserts one or more value into the list at the specified index.
 func (l *List) Insert(index int, vs ...interface{}) error {
-	if l != nil && index > l.length {
-		return l.Append(vs)
-	}
-
 	n, err := l.getPrior(index)
 	if err != nil {
 		return err

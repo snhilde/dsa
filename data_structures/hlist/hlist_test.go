@@ -127,6 +127,13 @@ func TestBadArgs(t *testing.T) {
 	checkString(t, l, "<empty>")
 	checkLength(t, l, 0)
 
+    // Test Insert().
+	if err := l.Insert(100, "item"); err == nil {
+		t.Error("unexpectedly passed Insert() test for out-of-range index")
+	}
+	checkString(t, l, "<empty>")
+	checkLength(t, l, 0)
+
     // Test Value().
 	if v := l.Value(-1); v != nil {
 		t.Error("unexpectedly passed Value() test for negative index")
