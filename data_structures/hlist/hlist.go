@@ -324,8 +324,36 @@ func (l *List) Clear() error {
 	return nil
 }
 
-// Yield provides a buffered channel that will pass successive node values until the list is exhausted.
-func (l *List) Yield() chan interface{} {
+// Yield provides an unbuffered channel that will continually pass successive node values until the list is exhausted.
+// The channel quit is used to communicate when iteration should be stopped. Send any value on the cnannel (or merely
+// close it) to break quit the communication. This will happen automatically if the list is exhausted. If this is not
+// needed, pass nil as the argument. Use Yield if you are concerned about memory usage or don't know how far through the
+// list you will iterate; otherwise, use YieldAll.
+func (l *List) Yield(quit chan interface{}) chan interface{} {
+	if l == nil || l.head == nil {
+		return nil
+	}
+
+	ch := make(chan interface{})
+	go func() {
+		defer close(ch)
+		n := l.head
+		for n != nil {
+			select {
+			case ch <- n.v:
+				n = n.next
+			case <-quit:
+				return
+			}
+		}
+	}()
+
+	return ch
+}
+
+// YieldAll provides a buffered channel that will pass successive node values until the list is exhausted.
+// Use this if you don't care greatly about memory usage and for convenience.
+func (l *List) YieldAll() chan interface{} {
 	if l == nil || l.head == nil {
 		return nil
 	}
