@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"errors"
 	"fmt"
+	"strings"
 )
 
 
@@ -156,6 +157,27 @@ func (t *Table) Row(col string, item interface{}) int {
 
 	// If we're here, then we didn't find anything.
 	return -1
+}
+
+// String returns a printable list of values, grouped by row.
+func (t *Table) String() string {
+	if t == nil {
+		return "<nil>"
+	} else if t.Count() == 0 {
+		return "<empty>"
+	}
+
+	var b strings.Builder
+	rows := t.rows.YieldAll()
+	for i, v := range t.cols {
+		row := <-rows
+		b.WriteString(fmt.Sprintf("%v: %v", v, row.([]interface{})))
+		if i != len(t.cols) - 1 {
+			b.WriteString(", ")
+		}
+	}
+
+	return b.String()
 }
 
 
