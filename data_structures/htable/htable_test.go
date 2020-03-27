@@ -19,7 +19,9 @@ func TestBadPtr(t *testing.T) {
 	}
 
 	// Test RemoveRow().
-	tb.RemoveRow(2)
+	if err := tb.RemoveRow(2); err == nil {
+		t.Error("unexpectedly passed bad pointer test for RemoveRow()")
+	}
 
     // Test Rows().
 	if n := tb.Rows(); n != -1 {
@@ -42,3 +44,41 @@ func TestBadPtr(t *testing.T) {
 	}
 }
 
+func TestBadArgs(t *testing.T) {
+	tb, _ := New("item")
+
+	// Test New() - missing column header.
+	if tbl, err := New(""); tbl != nil || err == nil {
+		t.Error("unexpectedly passed missing column header test for New()")
+	}
+
+    // Test InsertRow() - negative index.
+	if err := tb.InsertRow(-1, "item"); err == nil {
+		t.Error("unexpectedly passed negative index test for InsertRow()")
+	}
+
+    // Test InsertRow() - out-of-bounds index.
+	if err := tb.InsertRow(100, "item"); err == nil {
+		t.Error("unexpectedly passed out-of-bounds index test for InsertRow()")
+	}
+
+    // Test RemoveRow() - negative index.
+	if err := tb.RemoveRow(-1); err == nil {
+		t.Error("unexpectedly passed negative index test for RemoveRow()")
+	}
+
+    // Test RemoveRow() - out-of-bounds index.
+	if err := tb.RemoveRow(100); err == nil {
+		t.Error("unexpectedly passed out-of-bounds index test for RemoveRow()")
+	}
+
+    // Test Row() - empty column header.
+	if r := tb.Row("", 5); r != -1 {
+		t.Error("unexpectedly passed empty column header test for Row()")
+	}
+
+    // Test Row() - missing item.
+	if r := tb.Row("header", nil); r != -1 {
+		t.Error("unexpectedly passed missing item test for Row()")
+	}
+}
