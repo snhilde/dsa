@@ -51,7 +51,7 @@ func New(cols ...string) (*Table, error) {
 
 // AddRow adds a new row of items to the end of the table.
 func (t *Table) AddRow(items ...interface{}) error {
-	r, err := t.newRow(items)
+	r, err := t.newRow(items...)
 	if err != nil {
 		return err
 	}
@@ -168,13 +168,15 @@ func (t *Table) String() string {
 	}
 
 	var b strings.Builder
+	i := 0
+	n := t.Rows()
 	rows := t.rows.YieldAll()
-	for i, v := range t.cols {
-		row := <-rows
-		b.WriteString(fmt.Sprintf("%v: %v", v, row.([]interface{})))
-		if i != len(t.cols) - 1 {
+	for row := range rows {
+		b.WriteString(fmt.Sprintf("%v", row.([]interface{})))
+		if i != n - 1 {
 			b.WriteString(", ")
 		}
+		i++
 	}
 
 	return b.String()
@@ -215,7 +217,7 @@ func (t *Table) newRow(items ...interface{}) ([]interface{}, error) {
 		} else {
 			// Make sure the type of this element matches the prototype.
 			if k != t.types[i] {
-				return nil, errors.New(fmt.Sprintf("Item %v (%v) does not match prototype (%v)", i, k, t.types[i]))
+				return nil, errors.New(fmt.Sprintf("Item %v's type (%v) does not match column's prototype (%v)", i, k, t.types[i]))
 			}
 		}
 		r[i] = v
