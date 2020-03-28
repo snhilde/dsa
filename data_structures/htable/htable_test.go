@@ -40,6 +40,11 @@ func TestBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad pointer test for Count()")
 	}
 
+	// Test String()
+	if s := tb.String(); s != "<nil>" {
+		t.Error("Unexpectedly passed bad pointer test for String()")
+	}
+
     // Test Row().
 	if n := tb.Row("a", 5); n != -1 {
 		t.Error("Unexpectedly passed bad pointer test for Row()")
@@ -50,9 +55,9 @@ func TestBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad pointer test for Item()")
 	}
 
-	// Test String()
-	if s := tb.String(); s != "<nil>" {
-		t.Error("Unexpectedly passed bad pointer test for String()")
+	// Test Matches().
+	if tb.Matches(0, "a", "item") {
+		t.Error("Unexpectedly passed bad pointer test for Matches()")
 	}
 }
 
@@ -75,18 +80,28 @@ func TestBadArgs(t *testing.T) {
 		t.Error("Unexpectedly passed too many columns test for AddRow()")
 	}
 
-	// Test AddRow() - wrong types.
-	if err := tb.AddRow("item1", "item2", "item3"); err == nil {
-		t.Error("Unexpectedly passed wrong types test for AddRow()")
+	// Test AddRow() - wrong type in first position.
+	if err := tb.AddRow("item1", 5, 6); err == nil {
+		t.Error("Unexpectedly passed wrong type (first) test for AddRow()")
+	}
+
+	// Test AddRow() - wrong type in middle position.
+	if err := tb.AddRow(4, "item5", 6); err == nil {
+		t.Error("Unexpectedly passed wrong type (middle) test for AddRow()")
+	}
+
+	// Test AddRow() - wrong type in last position.
+	if err := tb.AddRow(4, 5, "item6"); err == nil {
+		t.Error("Unexpectedly passed wrong type (last) test for AddRow()")
 	}
 
     // Test InsertRow() - negative index.
-	if err := tb.InsertRow(-1, "item"); err == nil {
+	if err := tb.InsertRow(-1, 4, 5, 6); err == nil {
 		t.Error("Unexpectedly passed negative index test for InsertRow()")
 	}
 
     // Test InsertRow() - out-of-bounds index.
-	if err := tb.InsertRow(100, "item"); err == nil {
+	if err := tb.InsertRow(100, 4, 5, 6); err == nil {
 		t.Error("Unexpectedly passed out-of-bounds index test for InsertRow()")
 	}
 
@@ -105,24 +120,59 @@ func TestBadArgs(t *testing.T) {
 		t.Error("Unexpectedly passed empty column header test for Row()")
 	}
 
+    // Test Row() - invalid column header.
+	if r := tb.Row("4", 4); r != -1 {
+		t.Error("Unexpectedly passed invalid column header test for Row()")
+	}
+
     // Test Row() - missing item.
-	if r := tb.Row("header", nil); r != -1 {
+	if r := tb.Row("1", nil); r != -1 {
 		t.Error("Unexpectedly passed missing item test for Row()")
 	}
 
     // Test Item() - negative index.
-	if v := tb.Item(-1, "header"); v != nil {
-		t.Error("Unexpectedly passed missing item test for Item()")
+	if v := tb.Item(-1, "1"); v != nil {
+		t.Error("Unexpectedly passed negative index test for Item()")
 	}
 
     // Test Item() - out-of-bounds index.
-	if v := tb.Item(100, "header"); v != nil {
-		t.Error("Unexpectedly passed missing item test for Item()")
+	if v := tb.Item(100, "1"); v != nil {
+		t.Error("Unexpectedly passed out-of-bounds index test for Item()")
 	}
 
     // Test Item() - empty column header.
 	if v := tb.Item(0, ""); v != nil {
 		t.Error("Unexpectedly passed empty column header test for Item()")
+	}
+
+    // Test Item() - invalid column header.
+	if v := tb.Item(0, "4"); v != nil {
+		t.Error("Unexpectedly passed invalid column header test for Item()")
+	}
+
+    // Test Matches() - negative index.
+	if tb.Matches(-1, "1", 1) {
+		t.Error("Unexpectedly passed negative index test for Matches()")
+	}
+
+    // Test Matches() - out-of-bounds index.
+	if tb.Matches(100, "1", 1) {
+		t.Error("Unexpectedly passed out-of-bounds index test for Matches()")
+	}
+
+    // Test Matches() - empty column header.
+	if tb.Matches(0, "", 1) {
+		t.Error("Unexpectedly passed empty column header test for Matches()")
+	}
+
+    // Test Matches() - invalid column header.
+	if tb.Matches(0, "4", 4) {
+		t.Error("Unexpectedly passed invalid column header test for Matches()")
+	}
+
+    // Test Matches() - missing item.
+	if tb.Matches(0, "1", nil) {
+		t.Error("Unexpectedly passed missing item test for Matches()")
 	}
 }
 
@@ -611,6 +661,46 @@ func TestRowItem(t *testing.T) {
 			t.Log("\tExpected:", 4 )
 			t.Log("\tReceived:", n)
 		}
+	}
+}
+
+func TestMatches(t *testing.T) {
+	// Set up a new table.
+	tb, _ := New("1", "2", "3")
+	tb.AddRow(1, 2, 3)
+	tb.AddRow(4, 5, 6)
+	tb.AddRow(7, 8, 9)
+
+	// Make sure we have a match at each position.
+	cols := []string{"1", "2", "3"}
+	for row := 0; row < 3; row++ {
+		for i, col := range cols {
+			v := (row * 3) + i + 1
+			if !tb.Matches(row, col, v) {
+				t.Error("Did not match")
+			}
+		}
+	}
+
+	// Set up a new table.
+	tb, _ = New("name", "left-handed", "age")
+	tb.AddRow("Swari", true,  30)
+	tb.AddRow("Kathy", false, 40)
+	tb.AddRow("Joe",   false, 189)
+
+	// Make sure Swari is left-handed.
+	if !tb.Matches(0, "left-handed", true) {
+		t.Error("Did not match")
+	}
+
+	// Make sure Joe is 189.
+	if !tb.Matches(2, "age", 189) {
+		t.Error("Did not match")
+	}
+
+	// Look for a name that doesn't exist.
+	if tb.Matches(0, "name", "April") {
+		t.Error("Unexpectedly matched")
 	}
 }
 
