@@ -12,11 +12,11 @@ import (
 )
 
 
-// Table is the main type in this package. It holds all the rows and columns of data.
+// Table is the main type in this package. It holds all the rows of data.
 type Table struct {
-	types []reflect.Kind
-	cols  []string
-	rows   *hlist.List
+	cols  []string       // Column headers
+	types []reflect.Kind // Types of each column (must be consistent for all rows)
+	rows   *hlist.List   // Linked list of rows
 }
 
 
@@ -51,22 +51,22 @@ func New(cols ...string) (*Table, error) {
 
 // AddRow adds a new row of items to the end of the table.
 func (t *Table) AddRow(items ...interface{}) error {
-	r, err := t.newRow(items...)
+	row, err := t.newRow(items...)
 	if err != nil {
 		return err
 	}
 
-	return t.rows.Append(r)
+	return t.rows.Append(row)
 }
 
 // InsertRow inserts a new row of items at the specified index.
 func (t *Table) InsertRow(index int, items ...interface{}) error {
-	r, err := t.newRow(items...)
+	row, err := t.newRow(items...)
 	if err != nil {
 		return err
 	}
 
-	return t.rows.Insert(index, r)
+	return t.rows.Insert(index, row)
 }
 
 // RemoveRow deletes a row from the table.
@@ -129,7 +129,8 @@ func (t *Table) String() string {
 	n := t.Rows()
 	rows := t.rows.YieldAll()
 	for row := range rows {
-		b.WriteString(fmt.Sprintf("%v", row.([]interface{})))
+		vs := row.(*Row)
+		b.WriteString(fmt.Sprintf("%v", vs.v))
 		if i != n - 1 {
 			b.WriteString(", ")
 		}
@@ -148,12 +149,12 @@ func (t *Table) Row(col string, item interface{}) int {
 	}
 
 	// Get our iterator to go through the rows.
+	i := 0
 	quit := make(chan interface{})
 	rows := t.rows.Yield(quit)
-	i := 0
-	for v := range rows {
-		row := v.([]interface{})
-		if reflect.DeepEqual(item, row[c]) {
+	for row := range rows {
+		vs := row.(*Row)
+		if reflect.DeepEqual(item, vs.v[c]) {
 			// Break out of the list iteration. If Yield's goroutine has already exited (because the list was fully
 			// traversed), then it won't receive the message to quit. We'll try to send the quit message, and then
 			// we'll exit.
@@ -186,18 +187,24 @@ func (t *Table) Item(row int, col string) interface{} {
 	}
 
 	// Get the value of the column.
-	s := r.([]interface{})
-	if len(s) <= c {
+	vs := r.(*Row)
+	if len(vs.v) <= c {
 		// Shouldn't ever happen, but our index is greater than the number of columns in the row.
 		return nil
 	}
-	return s[c]
+	return vs.v[c]
 }
 
 // Matches returns true if the value matches the item at the specified coordinates or false if there is no match.
 func (t *Table) Matches(row int, col string, v interface{}) bool {
 	item := t.Item(row, col)
 	return reflect.DeepEqual(v, item)
+}
+
+
+// Row holds all the data for each row in the table.
+type Row struct {
+	v []interface{}
 }
 
 
@@ -220,15 +227,22 @@ func (t *Table) findCol(col string) int {
 	return -1
 }
 
-func (t *Table) newRow(items ...interface{}) ([]interface{}, error) {
+func (t *Table) newRow(items ...interface{}) (*Row, error) {
 	if t == nil {
 		return nil, tErr()
 	} else if len(items) != t.Columns() {
 		return nil, errors.New(fmt.Sprintf("Number of items (%v) does not match number of columns (%v)", len(items), len(t.cols)))
 	}
 
+	first := false
+	if t.Rows() == 0 {
+		// This is the first row being added to the table. It will set the type of each column in the table.
+		first = true
+	}
+
 	// Build out our row.
-	r := make([]interface{}, t.Columns())
+	row := new(Row)
+	row.v = make([]interface{}, t.Columns())
 	for i, v := range items {
 		rv := reflect.ValueOf(v)
 		k := rv.Kind()
@@ -244,8 +258,7 @@ func (t *Table) newRow(items ...interface{}) ([]interface{}, error) {
 			k = reflect.Complex128
 		}
 
-		if t.Rows() == 0 {
-			// This is the first row being added to the table. It will set the type of each column in the table.
+		if first {
 			t.types[i] = k
 		} else {
 			// Make sure the type of this element matches the prototype.
@@ -253,8 +266,8 @@ func (t *Table) newRow(items ...interface{}) ([]interface{}, error) {
 				return nil, errors.New(fmt.Sprintf("Item %v's type (%v) does not match column's prototype (%v)", i, k, t.types[i]))
 			}
 		}
-		r[i] = v
+		row.v[i] = v
 	}
 
-	return r, nil
+	return row, nil
 }
