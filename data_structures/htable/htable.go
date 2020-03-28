@@ -194,6 +194,12 @@ func (t *Table) Item(row int, col string) interface{} {
 	return s[c]
 }
 
+// Matches returns true if the value matches the item at the specified coordinates or false if there is no match.
+func (t *Table) Matches(row int, col string, v interface{}) bool {
+	item := t.Item(row, col)
+	return reflect.DeepEqual(v, item)
+}
+
 
 func tErr() error {
 	return errors.New("Table must be created with New() first")
