@@ -291,6 +291,66 @@ func TestInsertRow(t *testing.T) {
 }
 
 func TestRemoveRow(t *testing.T) {
+	// Test removing a row at the beginning.
+	tb, _ := New("1", "2", "3")
+	tb.AddRow(-1, -2, -3)
+	tb.AddRow(1, 2, 3)
+	tb.AddRow(4, 5, 6)
+	checkString(t, tb, "[-1 -2 -3], [1 2 3], [4 5 6]")
+	checkCount(t, tb, 9)
+	if err := tb.RemoveRow(0); err != nil {
+		t.Error(err)
+	}
+	checkString(t, tb, "[1 2 3], [4 5 6]")
+	checkCount(t, tb, 6)
+
+	// Test removing a row in the middle.
+	tb, _ = New("1", "2", "3")
+	tb.AddRow("a", "b", "c")
+	tb.AddRow("x", "y", "z")
+	tb.AddRow("d", "e", "f")
+	checkString(t, tb, "[a b c], [x y z], [d e f]")
+	checkCount(t, tb, 9)
+	if err := tb.RemoveRow(1); err != nil {
+		t.Error(err)
+	}
+	checkString(t, tb, "[a b c], [d e f]")
+	checkCount(t, tb, 6)
+
+	// Test removing a row at the end.
+	tb, _ = New("1", "2", "3")
+	tb.AddRow([]int{10, 20}, []int{30, 40}, []int{50, 60})
+	tb.AddRow([]int{100, 200}, []int{300, 400}, []int{500, 600})
+	tb.AddRow([]int{-1, -2, -3}, []int{-4, -5, -6}, []int{-7, -8, -9})
+	checkString(t, tb, "[[10 20] [30 40] [50 60]], [[100 200] [300 400] [500 600]], [[-1 -2 -3] [-4 -5 -6] [-7 -8 -9]]")
+	checkCount(t, tb, 9)
+	if err := tb.RemoveRow(2); err != nil {
+		t.Error(err)
+	}
+	checkString(t, tb, "[[10 20] [30 40] [50 60]], [[100 200] [300 400] [500 600]]")
+	checkCount(t, tb, 6)
+
+	// Test removing a row beyond the table's current boundaries.
+	tb, _ = New("1", "2", "3")
+	tb.AddRow(1.1, "b", []byte{0x03})
+	tb.AddRow(4.4, "e", []byte{0x06})
+	checkString(t, tb, "[1.1 b [3]], [4.4 e [6]]")
+	checkCount(t, tb, 6)
+	if err := tb.RemoveRow(3); err == nil {
+		t.Error("Unexpectedly passed out-of-bounds index test")
+	}
+	checkString(t, tb, "[1.1 b [3]], [4.4 e [6]]")
+	checkCount(t, tb, 6)
+
+	// Test removing when there aren't any rows in the table.
+	tb, _ = New("1", "2", "3")
+	checkString(t, tb, "<empty>")
+	checkCount(t, tb, 0)
+	if err := tb.RemoveRow(0); err == nil {
+		t.Error("Unexpectedly passed removing from empty table test")
+	}
+	checkString(t, tb, "<empty>")
+	checkCount(t, tb, 0)
 }
 
 func TestRows(t *testing.T) {
