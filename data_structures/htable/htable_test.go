@@ -354,6 +354,40 @@ func TestRemoveRow(t *testing.T) {
 }
 
 func TestRows(t *testing.T) {
+	tb, _ := New("1", "2", "3")
+	if n := tb.Rows(); n != 0 {
+		t.Error("Row count is incorrect")
+		t.Log("\tExpected:", 0)
+		t.Log("\tReceived:", n)
+	}
+
+	tb.AddRow(1, 2, 3)
+	if n := tb.Rows(); n != 1 {
+		t.Error("Row count is incorrect")
+		t.Log("\tExpected:", 1)
+		t.Log("\tReceived:", n)
+	}
+
+	tb.AddRow(4, 5, 6)
+	if n := tb.Rows(); n != 2 {
+		t.Error("Row count is incorrect")
+		t.Log("\tExpected:", 2)
+		t.Log("\tReceived:", n)
+	}
+
+	tb.RemoveRow(0)
+	if n := tb.Rows(); n != 1 {
+		t.Error("Row count is incorrect")
+		t.Log("\tExpected:", 1)
+		t.Log("\tReceived:", n)
+	}
+
+	tb.InsertRow(1, 7, 8, 9)
+	if n := tb.Rows(); n != 2 {
+		t.Error("Row count is incorrect")
+		t.Log("\tExpected:", 2)
+		t.Log("\tReceived:", n)
+	}
 }
 
 func TestColumns(t *testing.T) {
@@ -368,8 +402,7 @@ func TestRow(t *testing.T) {
 
 // --- Helper Functions ---
 func checkString(t *testing.T, tb *Table, want string) {
-	s := tb.String()
-	if s != want {
+	if s := tb.String(); s != want {
 		t.Error("Table items are incorrect")
 		t.Log("\tExpected:", want)
 		t.Log("\tReceived:", s)
@@ -377,9 +410,9 @@ func checkString(t *testing.T, tb *Table, want string) {
 }
 
 func checkCount(t *testing.T, tb *Table, want int) {
-	if tb.Count() != want {
+	if n := tb.Count(); n != want {
 		t.Error("Table count is incorrect")
 		t.Log("\tExpected:", want)
-		t.Log("\tReceived:", tb.Count())
+		t.Log("\tReceived:", n)
 	}
 }
