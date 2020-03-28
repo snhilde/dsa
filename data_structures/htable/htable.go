@@ -61,7 +61,7 @@ func (t *Table) AddRow(items ...interface{}) error {
 
 // InsertRow inserts a new row of items at the specified index.
 func (t *Table) InsertRow(index int, items ...interface{}) error {
-	r, err := t.newRow(items)
+	r, err := t.newRow(items...)
 	if err != nil {
 		return err
 	}
