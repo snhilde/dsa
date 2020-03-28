@@ -449,6 +449,29 @@ func TestColumns(t *testing.T) {
 }
 
 func TestCount(t *testing.T) {
+	tb, _ := New("1", "2", "3")
+	checkCount(t, tb, 0)
+
+	tb.AddRow(1, 2, 3)
+	checkCount(t, tb, 3)
+
+	tb.AddRow(4, 5, 6)
+	checkCount(t, tb, 6)
+
+	tb.RemoveRow(0)
+	checkCount(t, tb, 3)
+
+	tb.InsertRow(1, 7, 8, 9)
+	checkCount(t, tb, 6)
+
+	tb, _ = New("1")
+	checkCount(t, tb, 0)
+
+	tb.AddRow(1)
+	checkCount(t, tb, 1)
+
+	tb.RemoveRow(0)
+	checkCount(t, tb, 0)
 }
 
 func TestRow(t *testing.T) {
