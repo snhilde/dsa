@@ -44,6 +44,11 @@ func TestBadPtr(t *testing.T) {
 	if n := tb.Row("a", 5); n != -1 {
 		t.Error("unexpectedly passed bad pointer test for Row()")
 	}
+
+	// Test String()
+	if s := tb.String(); s != "<nil>" {
+		t.Error("unexpectedly passed bad pointer test for String()")
+	}
 }
 
 func TestBadArgs(t *testing.T) {

@@ -116,6 +116,29 @@ func (t *Table) Count() int {
 	return r * c
 }
 
+// String returns a printable list of values, grouped by row.
+func (t *Table) String() string {
+	if t == nil {
+		return "<nil>"
+	} else if t.Count() == 0 {
+		return "<empty>"
+	}
+
+	var b strings.Builder
+	i := 0
+	n := t.Rows()
+	rows := t.rows.YieldAll()
+	for row := range rows {
+		b.WriteString(fmt.Sprintf("%v", row.([]interface{})))
+		if i != n - 1 {
+			b.WriteString(", ")
+		}
+		i++
+	}
+
+	return b.String()
+}
+
 // Row returns the index of the first row that contains the item in the specified column, or -1 on error or not found.
 func (t *Table) Row(col string, item interface{}) int {
 	if t == nil {
@@ -157,29 +180,6 @@ func (t *Table) Row(col string, item interface{}) int {
 
 	// If we're here, then we didn't find anything.
 	return -1
-}
-
-// String returns a printable list of values, grouped by row.
-func (t *Table) String() string {
-	if t == nil {
-		return "<nil>"
-	} else if t.Count() == 0 {
-		return "<empty>"
-	}
-
-	var b strings.Builder
-	i := 0
-	n := t.Rows()
-	rows := t.rows.YieldAll()
-	for row := range rows {
-		b.WriteString(fmt.Sprintf("%v", row.([]interface{})))
-		if i != n - 1 {
-			b.WriteString(", ")
-		}
-		i++
-	}
-
-	return b.String()
 }
 
 
