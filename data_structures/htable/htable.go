@@ -171,8 +171,8 @@ func (t *Table) Row(col string, item interface{}) int {
 	return -1
 }
 
-// Column returns the item at the specified coordinates, or nil if column doesn't exist.
-func (t *Table) Column(row int, col string) interface{} {
+// Item returns the item at the specified coordinates, or nil if there is no item at the coordinates.
+func (t *Table) Item(row int, col string) interface{} {
 	// Find out which column we need to match on. (This will also catch a nil table.)
 	c := t.findCol(col)
 	if c == -1 {

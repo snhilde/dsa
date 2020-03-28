@@ -474,7 +474,7 @@ func TestCount(t *testing.T) {
 	checkCount(t, tb, 0)
 }
 
-func TestRowColumn(t *testing.T) {
+func TestRowItem(t *testing.T) {
 	// Set up a new table.
 	tb, _ := New("1", "2", "3")
 	tb.AddRow(1, 2, 3)
@@ -494,12 +494,12 @@ func TestRowColumn(t *testing.T) {
 		}
 	}
 
-	// Validate the column of each of the 9 values.
+	// Validate each of the 9 items.
 	for row := 0; row < 3; row++ {
 		for i, col := range cols {
 			exp := (row * 3) + i + 1
-			if v := tb.Column(row, col); v != exp {
-				t.Error("Column value incorrect")
+			if v := tb.Item(row, col); v != exp {
+				t.Error("Item value incorrect")
 				t.Log("\tExpected:", exp)
 				t.Log("\tReceived:", v)
 			}
@@ -517,8 +517,8 @@ func TestRowColumn(t *testing.T) {
 		t.Error("Matched incorrect row")
 		t.Log("\tExpected:", 0)
 		t.Log("\tReceived:", row)
-	} else if v := tb.Column(row, "name"); v != "Swari" {
-		t.Error("Column value incorrect")
+	} else if v := tb.Item(row, "name"); v != "Swari" {
+		t.Error("Item value incorrect")
 		t.Log("\tExpected:", "Swari")
 		t.Log("\tReceived:", v)
 	}
@@ -528,8 +528,8 @@ func TestRowColumn(t *testing.T) {
 		t.Error("Matched incorrect row")
 		t.Log("\tExpected:", 1)
 		t.Log("\tReceived:", row)
-	} else if v := tb.Column(row, "name"); v != "Kathy" {
-		t.Error("Column value incorrect")
+	} else if v := tb.Item(row, "name"); v != "Kathy" {
+		t.Error("Item value incorrect")
 		t.Log("\tExpected:", "Kathy")
 		t.Log("\tReceived:", v)
 	}
@@ -541,13 +541,13 @@ func TestRowColumn(t *testing.T) {
 		t.Log("\tReceived:", row)
 	}
 
-	// Look for a column that doesn't exist.
+	// Look for an item that doesn't exist.
 	if row := tb.Row("name", "Kathy"); row != 1 {
 		t.Error("Matched incorrect row")
 		t.Log("\tExpected:", 1)
 		t.Log("\tReceived:", row)
-	} else if v := tb.Column(row, "height"); v != nil {
-		t.Error("Unexpectedly found value")
+	} else if v := tb.Item(row, "height"); v != nil {
+		t.Error("Unexpectedly found item")
 		t.Log("\tExpected: nil")
 		t.Log("\tReceived:", v)
 	}
@@ -566,7 +566,7 @@ func TestRowColumn(t *testing.T) {
 		t.Log("\tExpected:", 0)
 		t.Log("\tReceived:", row)
 	} else {
-		f := tb.Column(row, "func")
+		f := tb.Item(row, "func")
 		if ff, ok := f.(func() string); !ok {
 			t.Error("Returned function is not of type func() string")
 		} else if v := ff(); v != "hello" {
@@ -582,7 +582,7 @@ func TestRowColumn(t *testing.T) {
 		t.Log("\tExpected:", 1)
 		t.Log("\tReceived:", row)
 	} else {
-		f := tb.Column(row, "func")
+		f := tb.Item(row, "func")
 		if ff, ok := f.(func(int) int); !ok {
 			t.Error("Returned function is not of type func(int) int")
 		} else if n := ff(2); n != 4 {
