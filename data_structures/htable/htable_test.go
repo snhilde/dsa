@@ -391,6 +391,61 @@ func TestRows(t *testing.T) {
 }
 
 func TestColumns(t *testing.T) {
+	tb, _ := New("1", "2", "3")
+	if n := tb.Columns(); n != 3 {
+		t.Error("Column count is incorrect")
+		t.Log("\tExpected:", 3)
+		t.Log("\tReceived:", n)
+	}
+
+	tb.AddRow(1, 2, 3)
+	if n := tb.Columns(); n != 3 {
+		t.Error("Column count is incorrect")
+		t.Log("\tExpected:", 3)
+		t.Log("\tReceived:", n)
+	}
+
+	tb.AddRow(4, 5, 6)
+	if n := tb.Columns(); n != 3 {
+		t.Error("Column count is incorrect")
+		t.Log("\tExpected:", 3)
+		t.Log("\tReceived:", n)
+	}
+
+	tb.RemoveRow(0)
+	if n := tb.Columns(); n != 3 {
+		t.Error("Column count is incorrect")
+		t.Log("\tExpected:", 3)
+		t.Log("\tReceived:", n)
+	}
+
+	tb.InsertRow(1, 7, 8, 9)
+	if n := tb.Columns(); n != 3 {
+		t.Error("Column count is incorrect")
+		t.Log("\tExpected:", 3)
+		t.Log("\tReceived:", n)
+	}
+
+	tb, _ = New("1")
+	if n := tb.Columns(); n != 1 {
+		t.Error("Column count is incorrect")
+		t.Log("\tExpected:", 1)
+		t.Log("\tReceived:", n)
+	}
+
+	tb.AddRow(1)
+	if n := tb.Columns(); n != 1 {
+		t.Error("Column count is incorrect")
+		t.Log("\tExpected:", 1)
+		t.Log("\tReceived:", n)
+	}
+
+	tb.RemoveRow(0)
+	if n := tb.Columns(); n != 1 {
+		t.Error("Column count is incorrect")
+		t.Log("\tExpected:", 1)
+		t.Log("\tReceived:", n)
+	}
 }
 
 func TestCount(t *testing.T) {
