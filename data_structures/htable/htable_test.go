@@ -45,6 +45,11 @@ func TestBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad pointer test for Row()")
 	}
 
+    // Test Item().
+	if v := tb.Item(5, "a"); v != nil {
+		t.Error("Unexpectedly passed bad pointer test for Item()")
+	}
+
 	// Test String()
 	if s := tb.String(); s != "<nil>" {
 		t.Error("Unexpectedly passed bad pointer test for String()")
@@ -104,9 +109,25 @@ func TestBadArgs(t *testing.T) {
 	if r := tb.Row("header", nil); r != -1 {
 		t.Error("Unexpectedly passed missing item test for Row()")
 	}
+
+    // Test Item() - negative index.
+	if v := tb.Item(-1, "header"); v != nil {
+		t.Error("Unexpectedly passed missing item test for Item()")
+	}
+
+    // Test Item() - out-of-bounds index.
+	if v := tb.Item(100, "header"); v != nil {
+		t.Error("Unexpectedly passed missing item test for Item()")
+	}
+
+    // Test Item() - empty column header.
+	if v := tb.Item(0, ""); v != nil {
+		t.Error("Unexpectedly passed empty column header test for Item()")
+	}
 }
 
 func TestBadTypes(t *testing.T) {
+	// TODO
 }
 
 
