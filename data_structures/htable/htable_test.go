@@ -474,7 +474,123 @@ func TestCount(t *testing.T) {
 	checkCount(t, tb, 0)
 }
 
-func TestRow(t *testing.T) {
+func TestRowColumn(t *testing.T) {
+	// Set up a new table.
+	tb, _ := New("1", "2", "3")
+	tb.AddRow(1, 2, 3)
+	tb.AddRow(4, 5, 6)
+	tb.AddRow(7, 8, 9)
+
+	// Validate the row of each of the 9 values.
+	cols := []string{"1", "2", "3"}
+	for row := 0; row < 3; row++ {
+		for i, col := range cols {
+			v := (row * 3) + i + 1
+			if r := tb.Row(col, v); r != row {
+				t.Error("Matched incorrect row")
+				t.Log("\tExpected:", r)
+				t.Log("\tReceived:", row)
+			}
+		}
+	}
+
+	// Validate the column of each of the 9 values.
+	for row := 0; row < 3; row++ {
+		for i, col := range cols {
+			exp := (row * 3) + i + 1
+			if v := tb.Column(row, col); v != exp {
+				t.Error("Column value incorrect")
+				t.Log("\tExpected:", exp)
+				t.Log("\tReceived:", v)
+			}
+		}
+	}
+
+	// Set up a new table.
+	tb, _ = New("name", "left-handed", "age")
+	tb.AddRow("Swari", true,  30)
+	tb.AddRow("Kathy", false, 40)
+	tb.AddRow("Joe",   false, 189)
+
+	// Find the first person who is left-handed.
+	if row := tb.Row("left-handed", true); row != 0 {
+		t.Error("Matched incorrect row")
+		t.Log("\tExpected:", 0)
+		t.Log("\tReceived:", row)
+	} else if v := tb.Column(row, "name"); v != "Swari" {
+		t.Error("Column value incorrect")
+		t.Log("\tExpected:", "Swari")
+		t.Log("\tReceived:", v)
+	}
+
+	// Find the first person who is right-handed.
+	if row := tb.Row("left-handed", false); row != 1 {
+		t.Error("Matched incorrect row")
+		t.Log("\tExpected:", 1)
+		t.Log("\tReceived:", row)
+	} else if v := tb.Column(row, "name"); v != "Kathy" {
+		t.Error("Column value incorrect")
+		t.Log("\tExpected:", "Kathy")
+		t.Log("\tReceived:", v)
+	}
+
+	// Look for a name that doesn't exist.
+	if row := tb.Row("name", "Dr. Gutten"); row != -1 {
+		t.Error("Unexpectedly found row")
+		t.Log("\tExpected:", -1)
+		t.Log("\tReceived:", row)
+	}
+
+	// Look for a column that doesn't exist.
+	if row := tb.Row("name", "Kathy"); row != 1 {
+		t.Error("Matched incorrect row")
+		t.Log("\tExpected:", 1)
+		t.Log("\tReceived:", row)
+	} else if v := tb.Column(row, "height"); v != nil {
+		t.Error("Unexpectedly found value")
+		t.Log("\tExpected: nil")
+		t.Log("\tReceived:", v)
+	}
+
+	// Store and run functions.
+	hi := func() string { return "hello" }
+	dbl := func(n int) int { return n * 2 }
+
+	tb, _ = New("name", "func")
+	tb.AddRow("hi", hi)
+	tb.AddRow("dbl", dbl)
+
+	// Find and run the first function.
+	if row := tb.Row("name", "hi"); row != 0 {
+		t.Error("Matched incorrect row")
+		t.Log("\tExpected:", 0)
+		t.Log("\tReceived:", row)
+	} else {
+		f := tb.Column(row, "func")
+		if ff, ok := f.(func() string); !ok {
+			t.Error("Returned function is not of type func() string")
+		} else if v := ff(); v != "hello" {
+			t.Error("Function result incorrect")
+			t.Log("\tExpected:", "hello" )
+			t.Log("\tReceived:", v)
+		}
+	}
+
+	// Find and run the second function.
+	if row := tb.Row("name", "dbl"); row != 1 {
+		t.Error("Matched incorrect row")
+		t.Log("\tExpected:", 1)
+		t.Log("\tReceived:", row)
+	} else {
+		f := tb.Column(row, "func")
+		if ff, ok := f.(func(int) int); !ok {
+			t.Error("Returned function is not of type func(int) int")
+		} else if n := ff(2); n != 4 {
+			t.Error("Function result incorrect")
+			t.Log("\tExpected:", 4 )
+			t.Log("\tReceived:", n)
+		}
+	}
 }
 
 
