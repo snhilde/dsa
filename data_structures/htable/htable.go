@@ -141,19 +141,8 @@ func (t *Table) String() string {
 
 // Row returns the index of the first row that contains the item in the specified column, or -1 on error or not found.
 func (t *Table) Row(col string, item interface{}) int {
-	if t == nil {
-		return -1
-	}
-
-	// Find out which column we need to match on.
-	c := -1
-	for i, v := range t.cols {
-		if col == v {
-			c = i
-			break
-		}
-	}
-	// Make sure we found the column.
+	// Find out which column we need to match on. (This will also catch a nil table.)
+	c := t.findCol(col)
 	if c == -1 {
 		return -1
 	}
@@ -182,9 +171,47 @@ func (t *Table) Row(col string, item interface{}) int {
 	return -1
 }
 
+// Column returns the item at the specified coordinates, or nil if column doesn't exist.
+func (t *Table) Column(row int, col string) interface{} {
+	// Find out which column we need to match on. (This will also catch a nil table.)
+	c := t.findCol(col)
+	if c == -1 {
+		return nil
+	}
+
+	// Grab our row.
+	r := t.rows.Value(row)
+	if r == nil {
+		return nil
+	}
+
+	// Get the value of the column.
+	s := r.([]interface{})
+	if len(s) <= c {
+		// Shouldn't ever happen, but our index is greater than the number of columns in the row.
+		return nil
+	}
+	return s[c]
+}
+
 
 func tErr() error {
 	return errors.New("Table must be created with New() first")
+}
+
+func (t *Table) findCol(col string) int {
+	if t == nil {
+		return -1
+	}
+
+	for i, v := range t.cols {
+		if col == v {
+			return i
+		}
+	}
+
+	// We didn't find the column.
+	return -1
 }
 
 func (t *Table) newRow(items ...interface{}) ([]interface{}, error) {
