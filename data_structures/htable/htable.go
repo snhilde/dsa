@@ -287,11 +287,11 @@ func (t *Table) newRow(items ...interface{}) (*Row, error) {
 		rv := reflect.ValueOf(v)
 		k := rv.Kind()
 		switch k {
-			// We want to use the largest type available, if there are options.
+		// Always default to the common type.
 		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-			k = reflect.Int64
+			k = reflect.Int
 		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-			k = reflect.Uint64
+			k = reflect.Uint
 		case reflect.Float32, reflect.Float64:
 			k = reflect.Float64
 		case reflect.Complex64, reflect.Complex128:
