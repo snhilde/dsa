@@ -51,22 +51,64 @@ func New(headers ...string) (*Table, error) {
 
 // Add creates a new row with the items and adds it to the end of the table.
 func (t *Table) Add(items ...interface{}) error {
-	row, err := t.newRow(items...)
-	if err != nil {
+	// Build the row.
+	r := NewRow(items...)
+
+	// Validate that the overall length and the types of all the items are correct.
+	if err := t.validateRow(r); err != nil {
 		return err
 	}
 
-	return t.rows.Append(row)
+	// Add the headers to the column for easy access later.
+	r.h = t.h
+
+	// Add the row to the table.
+	return t.rows.Append(r)
 }
 
-// InsertRow inserts a new row of items at the specified index.
-func (t *Table) InsertRow(index int, items ...interface{}) error {
-	row, err := t.newRow(items...)
-	if err != nil {
+// Insert creates a new row with the items and inserts it into the table at the specified index.
+func (t *Table) Insert(index int, items ...interface{}) error {
+	// Build the row.
+	r := NewRow(items...)
+
+	// Validate that the overall length and the types of all the items are correct.
+	if err := t.validateRow(r); err != nil {
 		return err
 	}
 
-	return t.rows.Insert(index, row)
+	// Add the headers to the column for easy access later.
+	r.h = t.h
+
+	// Add the row to the table.
+	return t.rows.Insert(index, r)
+}
+
+// AddRow adds the row to the end of the table.
+func (t *Table) AddRow(r *Row) error {
+	// Validate that the overall length and the types of all the items are correct.
+	if err := t.validateRow(r); err != nil {
+		return err
+	}
+
+	// Add the headers to the column for easy access later.
+	r.h = t.h
+
+	// Add the row to the table.
+	return t.rows.Append(r)
+}
+
+// InsertRow inserts the row into the table at the specified index.
+func (t *Table) InsertRow(index int, r *Row) error {
+	// Validate that the overall length and the types of all the items are correct.
+	if err := t.validateRow(r); err != nil {
+		return err
+	}
+
+	// Add the headers to the column for easy access later.
+	r.h = t.h
+
+	// Add the row to the table.
+	return t.rows.Insert(index, r)
 }
 
 // RemoveRow deletes a row from the table.
@@ -86,7 +128,7 @@ func (t *Table) RemoveRow(index int) error {
 	return nil
 }
 
-// Rows returns the number of rows in the table, or -1 on error. This will include all rows, regardless of check status.
+// Rows returns the number of rows in the table, or -1 on error. This will include all rows, regardless of enabled status.
 func (t *Table) Rows() int {
 	if t == nil {
 		return -1
@@ -104,7 +146,7 @@ func (t *Table) Columns() int {
 	return len(t.h)
 }
 
-// Count returns the number of items in the table, or -1 on error. This will include all items, regardless of check status.
+// Count returns the number of items in the table, or -1 on error. This will include all items, regardless of enabled status.
 func (t *Table) Count() int {
 	r := t.Rows()
 	c := t.Columns()
@@ -128,7 +170,7 @@ func (t *Table) String() string {
 	rows := t.rows.YieldAll()
 	for v := range rows {
 		row := v.(*Row)
-		if row.check {
+		if row.enabled {
 			b.WriteString(fmt.Sprintf("%v, ", row.v))
 		}
 	}
@@ -141,8 +183,8 @@ func (t *Table) String() string {
 	return strings.TrimSuffix(s, ", ")
 }
 
-// Row returns the first index and first row that contains the item in the specified column, or -1 and nil if not found
-// or error.
+// Row returns the index and Row type of the first row that contains the item in the specified column, or -1 and nil if
+// not found or error.
 func (t *Table) Row(col string, item interface{}) (int, *Row) {
 	if t == nil {
 		return -1, nil
@@ -168,7 +210,7 @@ func (t *Table) Row(col string, item interface{}) (int, *Row) {
 	rows := t.rows.Yield(quit)
 	for v := range rows {
 		row := v.(*Row)
-		if row.check {
+		if row.enabled {
 			if reflect.DeepEqual(item, row.v[c]) {
 				// Break out of the list iteration. If Yield's goroutine has already exited (because the list was fully
 				// traversed), then it won't receive the message to quit. We'll try to send the quit message, and then
@@ -204,14 +246,14 @@ func (t *Table) Item(row int, col string) interface{} {
 }
 
 // Matches returns true if the value matches the item at the specified coordinates or false if there is no match.
-// Matching can occur on rows toggled off.
+// Matching can occur on disabled rows.
 func (t *Table) Matches(row int, col string, v interface{}) bool {
 	item := t.Item(row, col)
 	return reflect.DeepEqual(v, item)
 }
 
 // Toggle sets the row at the specified index to either be checked or skipped during table lookups (like Row and Count).
-func (t *Table) Toggle(row int, check bool) error {
+func (t *Table) Toggle(row int, enabled bool) error {
 	if t == nil {
 		return tErr()
 	}
@@ -222,7 +264,7 @@ func (t *Table) Toggle(row int, check bool) error {
 	}
 
 	r := tmp.(*Row)
-	r.check = check
+	r.enabled = enabled
 
 	return nil
 }
@@ -230,14 +272,36 @@ func (t *Table) Toggle(row int, check bool) error {
 
 // Row holds all the data for each row in the table.
 type Row struct {
-	h     []string      // Column headers
-	v     []interface{} // Column values
-	check   bool
+	h       []string      // Column headers
+	v       []interface{} // Column values
+	enabled   bool
+}
+
+// NewRow creates a new row with the given items.
+func NewRow(items ...interface{}) *Row {
+	if items == nil || len(items) == 0 {
+		return nil
+	}
+
+	r := new(Row)
+
+	// Add the items.
+	r.v = make([]interface{}, len(items))
+	copy(r.v, items)
+
+	// Default to enabling this row.
+	r.enabled = true
+
+	return r
 }
 
 // Item returns the value at the specified column for this row, or nil if not found or error.
 func (r *Row) Item(col string) interface{} {
 	if r == nil {
+		return nil
+	} else if r.h == nil {
+		return nil
+	} else if col == "" {
 		return nil
 	}
 
@@ -252,7 +316,7 @@ func (r *Row) Item(col string) interface{} {
 }
 
 // Matches returns true if the value matches the item in the specified column or false if there is no match.
-// Matching can occur on rows toggled off.
+// Matching can occur on disabled rows.
 func (r *Row) Matches(col string, v interface{}) bool {
 	item := r.Item(col)
 	return reflect.DeepEqual(v, item)
@@ -263,11 +327,11 @@ func tErr() error {
 	return errors.New("Table must be created with New() first")
 }
 
-func (t *Table) newRow(items ...interface{}) (*Row, error) {
+func (t *Table) validateRow(r *Row) error {
 	if t == nil {
-		return nil, tErr()
-	} else if n := t.Columns(); n != len(items) {
-		return nil, errors.New(fmt.Sprintf("Number of items (%v) does not match number of columns (%v)", len(items), n))
+		return tErr()
+	} else if n := t.Columns(); n != len(r.v) {
+		return errors.New(fmt.Sprintf("Number of items (%v) does not match number of columns (%v)", len(r.v), n))
 	}
 
 	first := false
@@ -276,14 +340,8 @@ func (t *Table) newRow(items ...interface{}) (*Row, error) {
 		first = true
 	}
 
-	// Build out our row.
-	row := new(Row)
-	row.h = t.h
-	row.v = make([]interface{}, t.Columns())
-	row.check = true
-
-	// Add the items to the row.
-	for i, v := range items {
+	// Validate the types.
+	for i, v := range r.v {
 		rv := reflect.ValueOf(v)
 		k := rv.Kind()
 		switch k {
@@ -303,11 +361,10 @@ func (t *Table) newRow(items ...interface{}) (*Row, error) {
 		} else {
 			// Make sure the type of this element matches the prototype.
 			if k != t.types[i] {
-				return nil, errors.New(fmt.Sprintf("Item %v's type (%v) does not match column's prototype (%v)", i, k, t.types[i]))
+				return errors.New(fmt.Sprintf("Item %v's type (%v) does not match column's prototype (%v)", i, k, t.types[i]))
 			}
 		}
-		row.v[i] = v
 	}
 
-	return row, nil
+	return nil
 }
