@@ -229,6 +229,12 @@ func (r *Row) Item(col string) interface{} {
 	return nil
 }
 
+// Matches returns true if the value matches the item in the specified column or false if there is no match.
+func (r *Row) Matches(col string, v interface{}) bool {
+	item := r.Item(col)
+	return reflect.DeepEqual(v, item)
+}
+
 
 func tErr() error {
 	return errors.New("Table must be created with New() first")
