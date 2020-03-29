@@ -14,26 +14,26 @@ import (
 
 // Table is the main type in this package. It holds all the rows of data.
 type Table struct {
-	cols  []string       // Column headers
+	h     []string       // Column headers
 	types []reflect.Kind // Types of each column (must be consistent for all rows)
 	rows   *hlist.List   // Linked list of rows
 }
 
 
 // New creates a new table. The strings will denote the names of each column, used during lookup.
-func New(cols ...string) (*Table, error) {
-	if cols == nil || len(cols) == 0 {
+func New(headers ...string) (*Table, error) {
+	if headers == nil || len(headers) == 0 {
 		return nil, errors.New("Missing column headers")
 	}
 
 	// Validate the column headers.
-	for i, v := range cols {
+	for i, v := range headers {
 		// Make sure every column has a header.
 		if v == "" {
 			return nil, errors.New(fmt.Sprintf("Column %v has an empty header", i))
 		}
 		// Make sure none of the columns match each other. Not the most efficient, but necessary.
-		for j, w := range cols[i+1:] {
+		for j, w := range headers[i+1:] {
 			if v == w {
 				return nil, errors.New(fmt.Sprintf("Columns %v and %v have the same header", i, j))
 			}
@@ -41,8 +41,8 @@ func New(cols ...string) (*Table, error) {
 	}
 
 	var t Table
-	t.types = make([]reflect.Kind, len(cols))
-	t.cols = cols
+	t.h = headers
+	t.types = make([]reflect.Kind, len(headers))
 	t.rows = hlist.New()
 
 	return &t, nil
@@ -101,7 +101,7 @@ func (t *Table) Columns() int {
 		return -1
 	}
 
-	return len(t.cols)
+	return len(t.h)
 }
 
 // Count returns the number of items in the table, or -1 on error.
@@ -140,12 +140,25 @@ func (t *Table) String() string {
 	return b.String()
 }
 
-// Row returns the index of the first row that contains the item in the specified column, or -1 on error or not found.
-func (t *Table) Row(col string, item interface{}) int {
-	// Find out which column we need to match on. (This will also catch a nil table.)
-	c := t.findCol(col)
+// Row returns the first index and first row that contains the item in the specified column, or -1 and nil if not found
+// or error.
+func (t *Table) Row(col string, item interface{}) (int, *Row) {
+	if t == nil {
+		return -1, nil
+	}
+
+	// Find out which column we need to match on.
+	c := -1
+	for i, v := range t.h {
+		if col == v {
+			c = i
+			break
+		}
+	}
+
+	// Make sure we found a column.
 	if c == -1 {
-		return -1
+		return -1, nil
 	}
 
 	// Get our iterator to go through the rows.
@@ -163,20 +176,18 @@ func (t *Table) Row(col string, item interface{}) int {
 			default:
 				break
 			}
-			return i
+			return i, vs
 		}
 		i++
 	}
 
 	// If we're here, then we didn't find anything.
-	return -1
+	return -1, nil
 }
 
 // Item returns the item at the specified coordinates, or nil if there is no item at the coordinates.
 func (t *Table) Item(row int, col string) interface{} {
-	// Find out which column we need to match on. (This will also catch a nil table.)
-	c := t.findCol(col)
-	if c == -1 {
+	if t == nil {
 		return nil
 	}
 
@@ -186,13 +197,7 @@ func (t *Table) Item(row int, col string) interface{} {
 		return nil
 	}
 
-	// Get the value of the column.
-	vs := r.(*Row)
-	if len(vs.v) <= c {
-		// Shouldn't ever happen, but our index is greater than the number of columns in the row.
-		return nil
-	}
-	return vs.v[c]
+	return r.(*Row).Item(col)
 }
 
 // Matches returns true if the value matches the item at the specified coordinates or false if there is no match.
@@ -204,7 +209,24 @@ func (t *Table) Matches(row int, col string, v interface{}) bool {
 
 // Row holds all the data for each row in the table.
 type Row struct {
-	v []interface{}
+	h []string      // Column headers
+	v []interface{} // Column values
+}
+
+// Item returns the value at the specified column for this row, or nil if not found or error.
+func (r *Row) Item(col string) interface{} {
+	if r == nil {
+		return nil
+	}
+
+	for i, v := range r.h {
+		if col == v {
+			return r.v[i]
+		}
+	}
+
+	// If we're here, then we didn't find anything.
+	return nil
 }
 
 
@@ -212,26 +234,11 @@ func tErr() error {
 	return errors.New("Table must be created with New() first")
 }
 
-func (t *Table) findCol(col string) int {
-	if t == nil {
-		return -1
-	}
-
-	for i, v := range t.cols {
-		if col == v {
-			return i
-		}
-	}
-
-	// We didn't find the column.
-	return -1
-}
-
 func (t *Table) newRow(items ...interface{}) (*Row, error) {
 	if t == nil {
 		return nil, tErr()
-	} else if len(items) != t.Columns() {
-		return nil, errors.New(fmt.Sprintf("Number of items (%v) does not match number of columns (%v)", len(items), len(t.cols)))
+	} else if n := t.Columns(); n != len(items) {
+		return nil, errors.New(fmt.Sprintf("Number of items (%v) does not match number of columns (%v)", len(items), n))
 	}
 
 	first := false
@@ -242,6 +249,7 @@ func (t *Table) newRow(items ...interface{}) (*Row, error) {
 
 	// Build out our row.
 	row := new(Row)
+	row.h = t.h
 	row.v = make([]interface{}, t.Columns())
 	for i, v := range items {
 		rv := reflect.ValueOf(v)
