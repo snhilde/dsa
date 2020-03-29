@@ -182,7 +182,7 @@ func TestBadTypes(t *testing.T) {
 
 
 // --- Function Tests ---
-func TestNew(t *testing.T) {
+func TestTNew(t *testing.T) {
 	n, err := New("a", "b", "c")
 	if err != nil {
 		t.Error(err)
@@ -192,8 +192,8 @@ func TestNew(t *testing.T) {
 }
 
 
-// --- Method Tests ---
-func TestAddRow(t *testing.T) {
+// --- Table's Method Tests ---
+func TestTAddRow(t *testing.T) {
 	// Testing rows of integers.
 	tb, _ := New("1", "2", "3")
 	if err := tb.AddRow(1, 2, 3); err != nil {
@@ -280,20 +280,20 @@ func TestAddRow(t *testing.T) {
 
 	// Test rows of functions.
 	tb, _ = New("1", "2", "3")
-	if err := tb.AddRow(TestNew, checkCount, TestInsertRow); err != nil {
+	if err := tb.AddRow(TestTNew, checkCount, TestTInsertRow); err != nil {
 		t.Error(err)
 	}
-	checkString(t, tb, fmt.Sprintf("[%p %p %p]", TestNew, checkCount, TestInsertRow))
+	checkString(t, tb, fmt.Sprintf("[%p %p %p]", TestTNew, checkCount, TestTInsertRow))
 	checkCount(t, tb, 3)
 
-	if err := tb.AddRow(checkString, checkString, TestAddRow); err != nil {
+	if err := tb.AddRow(checkString, checkString, TestTAddRow); err != nil {
 		t.Error(err)
 	}
-	checkString(t, tb, fmt.Sprintf("[%p %p %p], [%p %p %p]", TestNew, checkCount, TestInsertRow, checkString, checkString, TestAddRow))
+	checkString(t, tb, fmt.Sprintf("[%p %p %p], [%p %p %p]", TestTNew, checkCount, TestTInsertRow, checkString, checkString, TestTAddRow))
 	checkCount(t, tb, 6)
 }
 
-func TestInsertRow(t *testing.T) {
+func TestTInsertRow(t *testing.T) {
 	// Test inserting a row at the beginning.
 	tb, _ := New("1", "2", "3")
 	tb.AddRow(1, 2, 3)
@@ -361,7 +361,7 @@ func TestInsertRow(t *testing.T) {
 	checkCount(t, tb, 9)
 }
 
-func TestRemoveRow(t *testing.T) {
+func TestTRemoveRow(t *testing.T) {
 	// Test removing a row at the beginning.
 	tb, _ := New("1", "2", "3")
 	tb.AddRow(-1, -2, -3)
@@ -424,7 +424,7 @@ func TestRemoveRow(t *testing.T) {
 	checkCount(t, tb, 0)
 }
 
-func TestRows(t *testing.T) {
+func TestTRows(t *testing.T) {
 	tb, _ := New("1", "2", "3")
 	if n := tb.Rows(); n != 0 {
 		t.Error("Row count is incorrect")
@@ -461,7 +461,7 @@ func TestRows(t *testing.T) {
 	}
 }
 
-func TestColumns(t *testing.T) {
+func TestTColumns(t *testing.T) {
 	tb, _ := New("1", "2", "3")
 	if n := tb.Columns(); n != 3 {
 		t.Error("Column count is incorrect")
@@ -519,7 +519,7 @@ func TestColumns(t *testing.T) {
 	}
 }
 
-func TestCount(t *testing.T) {
+func TestTCount(t *testing.T) {
 	tb, _ := New("1", "2", "3")
 	checkCount(t, tb, 0)
 
@@ -545,7 +545,7 @@ func TestCount(t *testing.T) {
 	checkCount(t, tb, 0)
 }
 
-func TestRowItem(t *testing.T) {
+func TestTRowItem(t *testing.T) {
 	// Set up a new table.
 	tb, _ := New("1", "2", "3")
 	tb.AddRow(1, 2, 3)
@@ -664,7 +664,7 @@ func TestRowItem(t *testing.T) {
 	}
 }
 
-func TestMatches(t *testing.T) {
+func TestTMatches(t *testing.T) {
 	// Set up a new table.
 	tb, _ := New("1", "2", "3")
 	tb.AddRow(1, 2, 3)
@@ -702,6 +702,17 @@ func TestMatches(t *testing.T) {
 	if tb.Matches(0, "name", "April") {
 		t.Error("Unexpectedly matched")
 	}
+}
+
+func TestTToggle(t *testing.T) {
+}
+
+
+// --- Row's Method Tests ---
+func TestRItem(t *testing.T) {
+}
+
+func TestRMatches(t *testing.T) {
 }
 
 
