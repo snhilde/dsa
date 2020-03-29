@@ -49,8 +49,8 @@ func New(headers ...string) (*Table, error) {
 }
 
 
-// AddRow adds a new row of items to the end of the table.
-func (t *Table) AddRow(items ...interface{}) error {
+// Add creates a new row with the items and adds it to the end of the table.
+func (t *Table) Add(items ...interface{}) error {
 	row, err := t.newRow(items...)
 	if err != nil {
 		return err

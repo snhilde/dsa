@@ -10,9 +10,9 @@ import (
 func TestBadPtr(t *testing.T) {
 	var tb *Table
 
-    // Test AddRow().
-	if err := tb.AddRow("a", "b", "c"); err == nil {
-		t.Error("Unexpectedly passed bad pointer test for AddRow()")
+    // Test Add().
+	if err := tb.Add("a", "b", "c"); err == nil {
+		t.Error("Unexpectedly passed bad pointer test for Add()")
 	}
 
     // Test InsertRow().
@@ -63,36 +63,36 @@ func TestBadPtr(t *testing.T) {
 
 func TestBadArgs(t *testing.T) {
 	tb, _ := New("1", "2", "3")
-	tb.AddRow(1, 2, 3)
+	tb.Add(1, 2, 3)
 
 	// Test New() - missing column header.
 	if tbl, err := New(""); tbl != nil || err == nil {
 		t.Error("Unexpectedly passed missing column header test for New()")
 	}
 
-	// Test AddRow() - too few columns.
-	if err := tb.AddRow(1, 2); err == nil {
-		t.Error("Unexpectedly passed too few columns test for AddRow()")
+	// Test Add() - too few columns.
+	if err := tb.Add(1, 2); err == nil {
+		t.Error("Unexpectedly passed too few columns test for Add()")
 	}
 
-	// Test AddRow() - too many columns.
-	if err := tb.AddRow(1, 2, 3, 4); err == nil {
-		t.Error("Unexpectedly passed too many columns test for AddRow()")
+	// Test Add() - too many columns.
+	if err := tb.Add(1, 2, 3, 4); err == nil {
+		t.Error("Unexpectedly passed too many columns test for Add()")
 	}
 
-	// Test AddRow() - wrong type in first position.
-	if err := tb.AddRow("item1", 5, 6); err == nil {
-		t.Error("Unexpectedly passed wrong type (first) test for AddRow()")
+	// Test Add() - wrong type in first position.
+	if err := tb.Add("item1", 5, 6); err == nil {
+		t.Error("Unexpectedly passed wrong type (first) test for Add()")
 	}
 
-	// Test AddRow() - wrong type in middle position.
-	if err := tb.AddRow(4, "item5", 6); err == nil {
-		t.Error("Unexpectedly passed wrong type (middle) test for AddRow()")
+	// Test Add() - wrong type in middle position.
+	if err := tb.Add(4, "item5", 6); err == nil {
+		t.Error("Unexpectedly passed wrong type (middle) test for Add()")
 	}
 
-	// Test AddRow() - wrong type in last position.
-	if err := tb.AddRow(4, 5, "item6"); err == nil {
-		t.Error("Unexpectedly passed wrong type (last) test for AddRow()")
+	// Test Add() - wrong type in last position.
+	if err := tb.Add(4, 5, "item6"); err == nil {
+		t.Error("Unexpectedly passed wrong type (last) test for Add()")
 	}
 
     // Test InsertRow() - negative index.
@@ -193,16 +193,16 @@ func TestTNew(t *testing.T) {
 
 
 // --- Table's Method Tests ---
-func TestTAddRow(t *testing.T) {
+func TestTAdd(t *testing.T) {
 	// Testing rows of integers.
 	tb, _ := New("1", "2", "3")
-	if err := tb.AddRow(1, 2, 3); err != nil {
+	if err := tb.Add(1, 2, 3); err != nil {
 		t.Error(err)
 	}
 	checkString(t, tb, "[1 2 3]")
 	checkCount(t, tb, 3)
 
-	if err := tb.AddRow(4, 5, 6); err != nil {
+	if err := tb.Add(4, 5, 6); err != nil {
 		t.Error(err)
 	}
 	checkString(t, tb, "[1 2 3], [4 5 6]")
@@ -210,13 +210,13 @@ func TestTAddRow(t *testing.T) {
 
 	// Test rows of characters.
 	tb, _ = New("1", "2", "3")
-	if err := tb.AddRow('a', 'b', 'c'); err != nil {
+	if err := tb.Add('a', 'b', 'c'); err != nil {
 		t.Error(err)
 	}
 	checkString(t, tb, "[97 98 99]")
 	checkCount(t, tb, 3)
 
-	if err := tb.AddRow('d', 'e', 'f'); err != nil {
+	if err := tb.Add('d', 'e', 'f'); err != nil {
 		t.Error(err)
 	}
 	checkString(t, tb, "[97 98 99], [100 101 102]")
@@ -224,13 +224,13 @@ func TestTAddRow(t *testing.T) {
 
 	// Test rows of int slices.
 	tb, _ = New("1", "2", "3")
-	if err := tb.AddRow([]int{10, 20}, []int{30, 40}, []int{50, 60}); err != nil {
+	if err := tb.Add([]int{10, 20}, []int{30, 40}, []int{50, 60}); err != nil {
 		t.Error(err)
 	}
 	checkString(t, tb, "[[10 20] [30 40] [50 60]]")
 	checkCount(t, tb, 3)
 
-	if err := tb.AddRow([]int{100, 200}, []int{300, 400}, []int{500, 600}); err != nil {
+	if err := tb.Add([]int{100, 200}, []int{300, 400}, []int{500, 600}); err != nil {
 		t.Error(err)
 	}
 	checkString(t, tb, "[[10 20] [30 40] [50 60]], [[100 200] [300 400] [500 600]]")
@@ -238,13 +238,13 @@ func TestTAddRow(t *testing.T) {
 
 	// Test mixed-value rows.
 	tb, _ = New("1", "2", "3")
-	if err := tb.AddRow(1.1, "b", []byte{0x03}); err != nil {
+	if err := tb.Add(1.1, "b", []byte{0x03}); err != nil {
 		t.Error(err)
 	}
 	checkString(t, tb, "[1.1 b [3]]")
 	checkCount(t, tb, 3)
 
-	if err := tb.AddRow(4.4, "e", []byte{0x06}); err != nil {
+	if err := tb.Add(4.4, "e", []byte{0x06}); err != nil {
 		t.Error(err)
 	}
 	checkString(t, tb, "[1.1 b [3]], [4.4 e [6]]")
@@ -252,13 +252,13 @@ func TestTAddRow(t *testing.T) {
 
 	// Test rows of strings with spaces.
 	tb, _ = New("1", "2", "3")
-	if err := tb.AddRow("before ", "in between", " after"); err != nil {
+	if err := tb.Add("before ", "in between", " after"); err != nil {
 		t.Error(err)
 	}
 	checkString(t, tb, "[before  in between  after]")
 	checkCount(t, tb, 3)
 
-	if err := tb.AddRow("AAA", "   ", ""); err != nil {
+	if err := tb.Add("AAA", "   ", ""); err != nil {
 		t.Error(err)
 	}
 	checkString(t, tb, "[before  in between  after], [AAA     ]")
@@ -266,13 +266,13 @@ func TestTAddRow(t *testing.T) {
 
 	// Test rows masquerading as interfaces.
 	tb, _ = New("1", "2", "3")
-	if err := tb.AddRow(interface{}(1), interface{}(2), interface{}(3)); err != nil {
+	if err := tb.Add(interface{}(1), interface{}(2), interface{}(3)); err != nil {
 		t.Error(err)
 	}
 	checkString(t, tb, "[1 2 3]")
 	checkCount(t, tb, 3)
 
-	if err := tb.AddRow(4, 5, 6); err != nil {
+	if err := tb.Add(4, 5, 6); err != nil {
 		t.Error(err)
 	}
 	checkString(t, tb, "[1 2 3], [4 5 6]")
@@ -280,24 +280,24 @@ func TestTAddRow(t *testing.T) {
 
 	// Test rows of functions.
 	tb, _ = New("1", "2", "3")
-	if err := tb.AddRow(TestTNew, checkCount, TestTInsertRow); err != nil {
+	if err := tb.Add(TestTNew, checkCount, TestTInsertRow); err != nil {
 		t.Error(err)
 	}
 	checkString(t, tb, fmt.Sprintf("[%p %p %p]", TestTNew, checkCount, TestTInsertRow))
 	checkCount(t, tb, 3)
 
-	if err := tb.AddRow(checkString, checkString, TestTAddRow); err != nil {
+	if err := tb.Add(checkString, checkString, TestTAdd); err != nil {
 		t.Error(err)
 	}
-	checkString(t, tb, fmt.Sprintf("[%p %p %p], [%p %p %p]", TestTNew, checkCount, TestTInsertRow, checkString, checkString, TestTAddRow))
+	checkString(t, tb, fmt.Sprintf("[%p %p %p], [%p %p %p]", TestTNew, checkCount, TestTInsertRow, checkString, checkString, TestTAdd))
 	checkCount(t, tb, 6)
 }
 
 func TestTInsertRow(t *testing.T) {
 	// Test inserting a row at the beginning.
 	tb, _ := New("1", "2", "3")
-	tb.AddRow(1, 2, 3)
-	tb.AddRow(4, 5, 6)
+	tb.Add(1, 2, 3)
+	tb.Add(4, 5, 6)
 	checkString(t, tb, "[1 2 3], [4 5 6]")
 	checkCount(t, tb, 6)
 	if err := tb.InsertRow(0, -1, -2, -3); err != nil {
@@ -308,8 +308,8 @@ func TestTInsertRow(t *testing.T) {
 
 	// Test inserting a row in the middle.
 	tb, _ = New("1", "2", "3")
-	tb.AddRow("a", "b", "c")
-	tb.AddRow("d", "e", "f")
+	tb.Add("a", "b", "c")
+	tb.Add("d", "e", "f")
 	checkString(t, tb, "[a b c], [d e f]")
 	checkCount(t, tb, 6)
 	if err := tb.InsertRow(1, "x", "y", "z"); err != nil {
@@ -320,8 +320,8 @@ func TestTInsertRow(t *testing.T) {
 
 	// Test inserting a row at the end.
 	tb, _ = New("1", "2", "3")
-	tb.AddRow([]int{10, 20}, []int{30, 40}, []int{50, 60})
-	tb.AddRow([]int{100, 200}, []int{300, 400}, []int{500, 600})
+	tb.Add([]int{10, 20}, []int{30, 40}, []int{50, 60})
+	tb.Add([]int{100, 200}, []int{300, 400}, []int{500, 600})
 	checkString(t, tb, "[[10 20] [30 40] [50 60]], [[100 200] [300 400] [500 600]]")
 	checkCount(t, tb, 6)
 	if err := tb.InsertRow(2, []int{-1, -2, -3}, []int{-4, -5, -6}, []int{-7, -8, -9}); err != nil {
@@ -332,8 +332,8 @@ func TestTInsertRow(t *testing.T) {
 
 	// Test inserting a row beyond the table's current boundaries.
 	tb, _ = New("1", "2", "3")
-	tb.AddRow(1.1, "b", []byte{0x03})
-	tb.AddRow(4.4, "e", []byte{0x06})
+	tb.Add(1.1, "b", []byte{0x03})
+	tb.Add(4.4, "e", []byte{0x06})
 	checkString(t, tb, "[1.1 b [3]], [4.4 e [6]]")
 	checkCount(t, tb, 6)
 	if err := tb.InsertRow(3, 7.7, "h", []byte{0x09}); err == nil {
@@ -364,9 +364,9 @@ func TestTInsertRow(t *testing.T) {
 func TestTRemoveRow(t *testing.T) {
 	// Test removing a row at the beginning.
 	tb, _ := New("1", "2", "3")
-	tb.AddRow(-1, -2, -3)
-	tb.AddRow(1, 2, 3)
-	tb.AddRow(4, 5, 6)
+	tb.Add(-1, -2, -3)
+	tb.Add(1, 2, 3)
+	tb.Add(4, 5, 6)
 	checkString(t, tb, "[-1 -2 -3], [1 2 3], [4 5 6]")
 	checkCount(t, tb, 9)
 	if err := tb.RemoveRow(0); err != nil {
@@ -377,9 +377,9 @@ func TestTRemoveRow(t *testing.T) {
 
 	// Test removing a row in the middle.
 	tb, _ = New("1", "2", "3")
-	tb.AddRow("a", "b", "c")
-	tb.AddRow("x", "y", "z")
-	tb.AddRow("d", "e", "f")
+	tb.Add("a", "b", "c")
+	tb.Add("x", "y", "z")
+	tb.Add("d", "e", "f")
 	checkString(t, tb, "[a b c], [x y z], [d e f]")
 	checkCount(t, tb, 9)
 	if err := tb.RemoveRow(1); err != nil {
@@ -390,9 +390,9 @@ func TestTRemoveRow(t *testing.T) {
 
 	// Test removing a row at the end.
 	tb, _ = New("1", "2", "3")
-	tb.AddRow([]int{10, 20}, []int{30, 40}, []int{50, 60})
-	tb.AddRow([]int{100, 200}, []int{300, 400}, []int{500, 600})
-	tb.AddRow([]int{-1, -2, -3}, []int{-4, -5, -6}, []int{-7, -8, -9})
+	tb.Add([]int{10, 20}, []int{30, 40}, []int{50, 60})
+	tb.Add([]int{100, 200}, []int{300, 400}, []int{500, 600})
+	tb.Add([]int{-1, -2, -3}, []int{-4, -5, -6}, []int{-7, -8, -9})
 	checkString(t, tb, "[[10 20] [30 40] [50 60]], [[100 200] [300 400] [500 600]], [[-1 -2 -3] [-4 -5 -6] [-7 -8 -9]]")
 	checkCount(t, tb, 9)
 	if err := tb.RemoveRow(2); err != nil {
@@ -403,8 +403,8 @@ func TestTRemoveRow(t *testing.T) {
 
 	// Test removing a row beyond the table's current boundaries.
 	tb, _ = New("1", "2", "3")
-	tb.AddRow(1.1, "b", []byte{0x03})
-	tb.AddRow(4.4, "e", []byte{0x06})
+	tb.Add(1.1, "b", []byte{0x03})
+	tb.Add(4.4, "e", []byte{0x06})
 	checkString(t, tb, "[1.1 b [3]], [4.4 e [6]]")
 	checkCount(t, tb, 6)
 	if err := tb.RemoveRow(3); err == nil {
@@ -432,14 +432,14 @@ func TestTRows(t *testing.T) {
 		t.Log("\tReceived:", n)
 	}
 
-	tb.AddRow(1, 2, 3)
+	tb.Add(1, 2, 3)
 	if n := tb.Rows(); n != 1 {
 		t.Error("Row count is incorrect")
 		t.Log("\tExpected:", 1)
 		t.Log("\tReceived:", n)
 	}
 
-	tb.AddRow(4, 5, 6)
+	tb.Add(4, 5, 6)
 	if n := tb.Rows(); n != 2 {
 		t.Error("Row count is incorrect")
 		t.Log("\tExpected:", 2)
@@ -469,14 +469,14 @@ func TestTColumns(t *testing.T) {
 		t.Log("\tReceived:", n)
 	}
 
-	tb.AddRow(1, 2, 3)
+	tb.Add(1, 2, 3)
 	if n := tb.Columns(); n != 3 {
 		t.Error("Column count is incorrect")
 		t.Log("\tExpected:", 3)
 		t.Log("\tReceived:", n)
 	}
 
-	tb.AddRow(4, 5, 6)
+	tb.Add(4, 5, 6)
 	if n := tb.Columns(); n != 3 {
 		t.Error("Column count is incorrect")
 		t.Log("\tExpected:", 3)
@@ -504,7 +504,7 @@ func TestTColumns(t *testing.T) {
 		t.Log("\tReceived:", n)
 	}
 
-	tb.AddRow(1)
+	tb.Add(1)
 	if n := tb.Columns(); n != 1 {
 		t.Error("Column count is incorrect")
 		t.Log("\tExpected:", 1)
@@ -523,10 +523,10 @@ func TestTCount(t *testing.T) {
 	tb, _ := New("1", "2", "3")
 	checkCount(t, tb, 0)
 
-	tb.AddRow(1, 2, 3)
+	tb.Add(1, 2, 3)
 	checkCount(t, tb, 3)
 
-	tb.AddRow(4, 5, 6)
+	tb.Add(4, 5, 6)
 	checkCount(t, tb, 6)
 
 	tb.RemoveRow(0)
@@ -538,7 +538,7 @@ func TestTCount(t *testing.T) {
 	tb, _ = New("1")
 	checkCount(t, tb, 0)
 
-	tb.AddRow(1)
+	tb.Add(1)
 	checkCount(t, tb, 1)
 
 	tb.RemoveRow(0)
@@ -548,9 +548,9 @@ func TestTCount(t *testing.T) {
 func TestTRowItem(t *testing.T) {
 	// Set up a new table.
 	tb, _ := New("1", "2", "3")
-	tb.AddRow(1, 2, 3)
-	tb.AddRow(4, 5, 6)
-	tb.AddRow(7, 8, 9)
+	tb.Add(1, 2, 3)
+	tb.Add(4, 5, 6)
+	tb.Add(7, 8, 9)
 
 	// Validate the row of each of the 9 values.
 	cols := []string{"1", "2", "3"}
@@ -579,9 +579,9 @@ func TestTRowItem(t *testing.T) {
 
 	// Set up a new table.
 	tb, _ = New("name", "left-handed", "age")
-	tb.AddRow("Swari", true,  30)
-	tb.AddRow("Kathy", false, 40)
-	tb.AddRow("Joe",   false, 189)
+	tb.Add("Swari", true,  30)
+	tb.Add("Kathy", false, 40)
+	tb.Add("Joe",   false, 189)
 
 	// Find the first person who is left-handed.
 	if i, _ := tb.Row("left-handed", true); i != 0 {
@@ -628,8 +628,8 @@ func TestTRowItem(t *testing.T) {
 	dbl := func(n int) int { return n * 2 }
 
 	tb, _ = New("name", "func")
-	tb.AddRow("hi", hi)
-	tb.AddRow("dbl", dbl)
+	tb.Add("hi", hi)
+	tb.Add("dbl", dbl)
 
 	// Find and run the first function.
 	if i, _ := tb.Row("name", "hi"); i != 0 {
@@ -667,9 +667,9 @@ func TestTRowItem(t *testing.T) {
 func TestTMatches(t *testing.T) {
 	// Set up a new table.
 	tb, _ := New("1", "2", "3")
-	tb.AddRow(1, 2, 3)
-	tb.AddRow(4, 5, 6)
-	tb.AddRow(7, 8, 9)
+	tb.Add(1, 2, 3)
+	tb.Add(4, 5, 6)
+	tb.Add(7, 8, 9)
 
 	// Make sure we have a match at each position.
 	cols := []string{"1", "2", "3"}
@@ -684,9 +684,9 @@ func TestTMatches(t *testing.T) {
 
 	// Set up a new table.
 	tb, _ = New("name", "left-handed", "age")
-	tb.AddRow("Swari", true,  30)
-	tb.AddRow("Kathy", false, 40)
-	tb.AddRow("Joe",   false, 189)
+	tb.Add("Swari", true,  30)
+	tb.Add("Kathy", false, 40)
+	tb.Add("Joe",   false, 189)
 
 	// Make sure Swari is left-handed.
 	if !tb.Matches(0, "left-handed", true) {
