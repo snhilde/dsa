@@ -46,7 +46,7 @@ func TestBadPtr(t *testing.T) {
 	}
 
     // Test Row().
-	if n := tb.Row("a", 5); n != -1 {
+	if i, r := tb.Row("a", 5); i != -1 || r != nil {
 		t.Error("Unexpectedly passed bad pointer test for Row()")
 	}
 
@@ -116,17 +116,17 @@ func TestBadArgs(t *testing.T) {
 	}
 
     // Test Row() - empty column header.
-	if r := tb.Row("", 5); r != -1 {
+	if i, r := tb.Row("", 5); i != -1 || r != nil {
 		t.Error("Unexpectedly passed empty column header test for Row()")
 	}
 
     // Test Row() - invalid column header.
-	if r := tb.Row("4", 4); r != -1 {
+	if i, r := tb.Row("4", 4); i != -1 || r != nil {
 		t.Error("Unexpectedly passed invalid column header test for Row()")
 	}
 
     // Test Row() - missing item.
-	if r := tb.Row("1", nil); r != -1 {
+	if i, r := tb.Row("1", nil); i != -1 || r != nil {
 		t.Error("Unexpectedly passed missing item test for Row()")
 	}
 
@@ -557,10 +557,10 @@ func TestRowItem(t *testing.T) {
 	for row := 0; row < 3; row++ {
 		for i, col := range cols {
 			v := (row * 3) + i + 1
-			if r := tb.Row(col, v); r != row {
+			if i, _ := tb.Row(col, v); i != row {
 				t.Error("Matched incorrect row")
-				t.Log("\tExpected:", r)
-				t.Log("\tReceived:", row)
+				t.Log("\tExpected:", row)
+				t.Log("\tReceived:", i)
 			}
 		}
 	}
@@ -584,40 +584,40 @@ func TestRowItem(t *testing.T) {
 	tb.AddRow("Joe",   false, 189)
 
 	// Find the first person who is left-handed.
-	if row := tb.Row("left-handed", true); row != 0 {
+	if i, _ := tb.Row("left-handed", true); i != 0 {
 		t.Error("Matched incorrect row")
 		t.Log("\tExpected:", 0)
-		t.Log("\tReceived:", row)
-	} else if v := tb.Item(row, "name"); v != "Swari" {
+		t.Log("\tReceived:", i)
+	} else if v := tb.Item(i, "name"); v != "Swari" {
 		t.Error("Item value incorrect")
 		t.Log("\tExpected:", "Swari")
 		t.Log("\tReceived:", v)
 	}
 
 	// Find the first person who is right-handed.
-	if row := tb.Row("left-handed", false); row != 1 {
+	if i, _ := tb.Row("left-handed", false); i != 1 {
 		t.Error("Matched incorrect row")
 		t.Log("\tExpected:", 1)
-		t.Log("\tReceived:", row)
-	} else if v := tb.Item(row, "name"); v != "Kathy" {
+		t.Log("\tReceived:", i)
+	} else if v := tb.Item(i, "name"); v != "Kathy" {
 		t.Error("Item value incorrect")
 		t.Log("\tExpected:", "Kathy")
 		t.Log("\tReceived:", v)
 	}
 
 	// Look for a name that doesn't exist.
-	if row := tb.Row("name", "Dr. Gutten"); row != -1 {
+	if i, _ := tb.Row("name", "Dr. Gutten"); i != -1 {
 		t.Error("Unexpectedly found row")
 		t.Log("\tExpected:", -1)
-		t.Log("\tReceived:", row)
+		t.Log("\tReceived:", i)
 	}
 
 	// Look for an item that doesn't exist.
-	if row := tb.Row("name", "Kathy"); row != 1 {
+	if i, _ := tb.Row("name", "Kathy"); i != 1 {
 		t.Error("Matched incorrect row")
 		t.Log("\tExpected:", 1)
-		t.Log("\tReceived:", row)
-	} else if v := tb.Item(row, "height"); v != nil {
+		t.Log("\tReceived:", i)
+	} else if v := tb.Item(i, "height"); v != nil {
 		t.Error("Unexpectedly found item")
 		t.Log("\tExpected: nil")
 		t.Log("\tReceived:", v)
@@ -632,12 +632,12 @@ func TestRowItem(t *testing.T) {
 	tb.AddRow("dbl", dbl)
 
 	// Find and run the first function.
-	if row := tb.Row("name", "hi"); row != 0 {
+	if i, _ := tb.Row("name", "hi"); i != 0 {
 		t.Error("Matched incorrect row")
 		t.Log("\tExpected:", 0)
-		t.Log("\tReceived:", row)
+		t.Log("\tReceived:", i)
 	} else {
-		f := tb.Item(row, "func")
+		f := tb.Item(i, "func")
 		if ff, ok := f.(func() string); !ok {
 			t.Error("Returned function is not of type func() string")
 		} else if v := ff(); v != "hello" {
@@ -648,12 +648,12 @@ func TestRowItem(t *testing.T) {
 	}
 
 	// Find and run the second function.
-	if row := tb.Row("name", "dbl"); row != 1 {
+	if i, _ := tb.Row("name", "dbl"); i != 1 {
 		t.Error("Matched incorrect row")
 		t.Log("\tExpected:", 1)
-		t.Log("\tReceived:", row)
+		t.Log("\tReceived:", i)
 	} else {
-		f := tb.Item(row, "func")
+		f := tb.Item(i, "func")
 		if ff, ok := f.(func(int) int); !ok {
 			t.Error("Returned function is not of type func(int) int")
 		} else if n := ff(2); n != 4 {
