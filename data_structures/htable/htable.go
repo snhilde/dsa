@@ -86,7 +86,7 @@ func (t *Table) RemoveRow(index int) error {
 	return nil
 }
 
-// Rows returns the number of rows in the table, or -1 on error.
+// Rows returns the number of rows in the table, or -1 on error. This will include all rows, regardless of check status.
 func (t *Table) Rows() int {
 	if t == nil {
 		return -1
@@ -104,7 +104,7 @@ func (t *Table) Columns() int {
 	return len(t.h)
 }
 
-// Count returns the number of items in the table, or -1 on error.
+// Count returns the number of items in the table, or -1 on error. This will include all items, regardless of check status.
 func (t *Table) Count() int {
 	r := t.Rows()
 	c := t.Columns()
@@ -125,19 +125,20 @@ func (t *Table) String() string {
 	}
 
 	var b strings.Builder
-	i := 0
-	n := t.Rows()
 	rows := t.rows.YieldAll()
-	for row := range rows {
-		vs := row.(*Row)
-		b.WriteString(fmt.Sprintf("%v", vs.v))
-		if i != n - 1 {
-			b.WriteString(", ")
+	for v := range rows {
+		row := v.(*Row)
+		if row.check {
+			b.WriteString(fmt.Sprintf("%v, ", row.v))
 		}
-		i++
 	}
 
-	return b.String()
+	s := b.String()
+	if s == "" {
+		s = "<empty>"
+	}
+
+	return strings.TrimSuffix(s, ", ")
 }
 
 // Row returns the first index and first row that contains the item in the specified column, or -1 and nil if not found
@@ -165,18 +166,20 @@ func (t *Table) Row(col string, item interface{}) (int, *Row) {
 	i := 0
 	quit := make(chan interface{})
 	rows := t.rows.Yield(quit)
-	for row := range rows {
-		vs := row.(*Row)
-		if reflect.DeepEqual(item, vs.v[c]) {
-			// Break out of the list iteration. If Yield's goroutine has already exited (because the list was fully
-			// traversed), then it won't receive the message to quit. We'll try to send the quit message, and then
-			// we'll exit.
-			select {
-			case quit <- 0:
-			default:
-				break
+	for v := range rows {
+		row := v.(*Row)
+		if row.check {
+			if reflect.DeepEqual(item, row.v[c]) {
+				// Break out of the list iteration. If Yield's goroutine has already exited (because the list was fully
+				// traversed), then it won't receive the message to quit. We'll try to send the quit message, and then
+				// we'll exit.
+				select {
+				case quit <- 0:
+				default:
+					break
+				}
+				return i, row
 			}
-			return i, vs
 		}
 		i++
 	}
@@ -201,16 +204,35 @@ func (t *Table) Item(row int, col string) interface{} {
 }
 
 // Matches returns true if the value matches the item at the specified coordinates or false if there is no match.
+// Matching can occur on rows toggled off.
 func (t *Table) Matches(row int, col string, v interface{}) bool {
 	item := t.Item(row, col)
 	return reflect.DeepEqual(v, item)
 }
 
+// Toggle sets the row at the specified index to either be checked or skipped during table lookups (like Row and Count).
+func (t *Table) Toggle(row int, check bool) error {
+	if t == nil {
+		return tErr()
+	}
+
+	tmp := t.rows.Value(row)
+	if tmp == nil {
+		return errors.New("Invalid index")
+	}
+
+	r := tmp.(*Row)
+	r.check = check
+
+	return nil
+}
+
 
 // Row holds all the data for each row in the table.
 type Row struct {
-	h []string      // Column headers
-	v []interface{} // Column values
+	h     []string      // Column headers
+	v     []interface{} // Column values
+	check   bool
 }
 
 // Item returns the value at the specified column for this row, or nil if not found or error.
@@ -230,6 +252,7 @@ func (r *Row) Item(col string) interface{} {
 }
 
 // Matches returns true if the value matches the item in the specified column or false if there is no match.
+// Matching can occur on rows toggled off.
 func (r *Row) Matches(col string, v interface{}) bool {
 	item := r.Item(col)
 	return reflect.DeepEqual(v, item)
@@ -257,6 +280,9 @@ func (t *Table) newRow(items ...interface{}) (*Row, error) {
 	row := new(Row)
 	row.h = t.h
 	row.v = make([]interface{}, t.Columns())
+	row.check = true
+
+	// Add the items to the row.
 	for i, v := range items {
 		rv := reflect.ValueOf(v)
 		k := rv.Kind()
