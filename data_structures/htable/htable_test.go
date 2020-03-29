@@ -7,7 +7,7 @@ import (
 
 
 // --- Blanket Tests ---
-func TestBadPtr(t *testing.T) {
+func TestTBadPtr(t *testing.T) {
 	var tb *Table
 
     // Test Add().
@@ -15,8 +15,18 @@ func TestBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad pointer test for Add()")
 	}
 
+    // Test Insert().
+	if err := tb.Insert(1, "a", "b", "c"); err == nil {
+		t.Error("Unexpectedly passed bad pointer test for Insert()")
+	}
+
+    // Test AddRow().
+	if err := tb.AddRow(NewRow(1, 2, 3)); err == nil {
+		t.Error("Unexpectedly passed bad pointer test for AddRow()")
+	}
+
     // Test InsertRow().
-	if err := tb.InsertRow(1, "a", "b", "c"); err == nil {
+	if err := tb.InsertRow(0, NewRow(1, 2, 3)); err == nil {
 		t.Error("Unexpectedly passed bad pointer test for InsertRow()")
 	}
 
@@ -59,9 +69,26 @@ func TestBadPtr(t *testing.T) {
 	if tb.Matches(0, "a", "item") {
 		t.Error("Unexpectedly passed bad pointer test for Matches()")
 	}
+
+	// Test Toggle().
+	if err := tb.Toggle(0, false); err == nil {
+		t.Error("Unexpectedly passed bad pointer test for Toggle()")
+	}
 }
 
-func TestBadArgs(t *testing.T) {
+func TestRBadPtr(t *testing.T) {
+	var r *Row
+
+	if v := r.Item("1"); v != nil {
+		t.Error("Unexpectedly passed bad pointer test for Row's Item()")
+	}
+
+	if r.Matches("1", 1) {
+		t.Error("Unexpectedly passed bad pointer test for Row's Matches()")
+	}
+}
+
+func TestTBadArgs(t *testing.T) {
 	tb, _ := New("1", "2", "3")
 	tb.Add(1, 2, 3)
 
@@ -95,14 +122,14 @@ func TestBadArgs(t *testing.T) {
 		t.Error("Unexpectedly passed wrong type (last) test for Add()")
 	}
 
-    // Test InsertRow() - negative index.
-	if err := tb.InsertRow(-1, 4, 5, 6); err == nil {
-		t.Error("Unexpectedly passed negative index test for InsertRow()")
+    // Test Insert() - negative index.
+	if err := tb.Insert(-1, 4, 5, 6); err == nil {
+		t.Error("Unexpectedly passed negative index test for Insert()")
 	}
 
-    // Test InsertRow() - out-of-bounds index.
-	if err := tb.InsertRow(100, 4, 5, 6); err == nil {
-		t.Error("Unexpectedly passed out-of-bounds index test for InsertRow()")
+    // Test Insert() - out-of-bounds index.
+	if err := tb.Insert(100, 4, 5, 6); err == nil {
+		t.Error("Unexpectedly passed out-of-bounds index test for Insert()")
 	}
 
     // Test RemoveRow() - negative index.
@@ -176,6 +203,30 @@ func TestBadArgs(t *testing.T) {
 	}
 }
 
+func TestRBadArgs(t *testing.T) {
+	r := NewRow(1, 2, 3)
+
+	// Test Item() - no column headers.
+	if v := r.Item("1"); v != nil {
+		t.Error("Unexpectedly passed no column headers test for Item()")
+	}
+
+	// Test Item() - missing column header.
+	if v := r.Item(""); v != nil {
+		t.Error("Unexpectedly passed missing column header test for Item()")
+	}
+
+	// Test Matches() - no column headers.
+	if r.Matches("1", 1) {
+		t.Error("Unexpectedly passed no column headers test for Matches()")
+	}
+
+	// Test Matches() - missing column header.
+	if r.Matches("", 1) {
+		t.Error("Unexpectedly passed missing column header test for Matches()")
+	}
+}
+
 func TestBadTypes(t *testing.T) {
 	// TODO
 }
@@ -189,6 +240,10 @@ func TestTNew(t *testing.T) {
 	} else if n == nil {
 		t.Error("Failed to create new table")
 	}
+}
+
+func TestRNewRow(t *testing.T) {
+	// TODO
 }
 
 
@@ -280,27 +335,27 @@ func TestTAdd(t *testing.T) {
 
 	// Test rows of functions.
 	tb, _ = New("1", "2", "3")
-	if err := tb.Add(TestTNew, checkCount, TestTInsertRow); err != nil {
+	if err := tb.Add(TestTNew, checkCount, TestTInsert); err != nil {
 		t.Error(err)
 	}
-	checkString(t, tb, fmt.Sprintf("[%p %p %p]", TestTNew, checkCount, TestTInsertRow))
+	checkString(t, tb, fmt.Sprintf("[%p %p %p]", TestTNew, checkCount, TestTInsert))
 	checkCount(t, tb, 3)
 
 	if err := tb.Add(checkString, checkString, TestTAdd); err != nil {
 		t.Error(err)
 	}
-	checkString(t, tb, fmt.Sprintf("[%p %p %p], [%p %p %p]", TestTNew, checkCount, TestTInsertRow, checkString, checkString, TestTAdd))
+	checkString(t, tb, fmt.Sprintf("[%p %p %p], [%p %p %p]", TestTNew, checkCount, TestTInsert, checkString, checkString, TestTAdd))
 	checkCount(t, tb, 6)
 }
 
-func TestTInsertRow(t *testing.T) {
+func TestTInsert(t *testing.T) {
 	// Test inserting a row at the beginning.
 	tb, _ := New("1", "2", "3")
 	tb.Add(1, 2, 3)
 	tb.Add(4, 5, 6)
 	checkString(t, tb, "[1 2 3], [4 5 6]")
 	checkCount(t, tb, 6)
-	if err := tb.InsertRow(0, -1, -2, -3); err != nil {
+	if err := tb.Insert(0, -1, -2, -3); err != nil {
 		t.Error(err)
 	}
 	checkString(t, tb, "[-1 -2 -3], [1 2 3], [4 5 6]")
@@ -312,7 +367,7 @@ func TestTInsertRow(t *testing.T) {
 	tb.Add("d", "e", "f")
 	checkString(t, tb, "[a b c], [d e f]")
 	checkCount(t, tb, 6)
-	if err := tb.InsertRow(1, "x", "y", "z"); err != nil {
+	if err := tb.Insert(1, "x", "y", "z"); err != nil {
 		t.Error(err)
 	}
 	checkString(t, tb, "[a b c], [x y z], [d e f]")
@@ -324,7 +379,7 @@ func TestTInsertRow(t *testing.T) {
 	tb.Add([]int{100, 200}, []int{300, 400}, []int{500, 600})
 	checkString(t, tb, "[[10 20] [30 40] [50 60]], [[100 200] [300 400] [500 600]]")
 	checkCount(t, tb, 6)
-	if err := tb.InsertRow(2, []int{-1, -2, -3}, []int{-4, -5, -6}, []int{-7, -8, -9}); err != nil {
+	if err := tb.Insert(2, []int{-1, -2, -3}, []int{-4, -5, -6}, []int{-7, -8, -9}); err != nil {
 		t.Error(err)
 	}
 	checkString(t, tb, "[[10 20] [30 40] [50 60]], [[100 200] [300 400] [500 600]], [[-1 -2 -3] [-4 -5 -6] [-7 -8 -9]]")
@@ -336,7 +391,7 @@ func TestTInsertRow(t *testing.T) {
 	tb.Add(4.4, "e", []byte{0x06})
 	checkString(t, tb, "[1.1 b [3]], [4.4 e [6]]")
 	checkCount(t, tb, 6)
-	if err := tb.InsertRow(3, 7.7, "h", []byte{0x09}); err == nil {
+	if err := tb.Insert(3, 7.7, "h", []byte{0x09}); err == nil {
 		t.Error("Unexpectedly passed out-of-bounds index test")
 	}
 	checkString(t, tb, "[1.1 b [3]], [4.4 e [6]]")
@@ -344,21 +399,29 @@ func TestTInsertRow(t *testing.T) {
 
 	// Test only inserting instead of appending.
 	tb, _ = New("1", "2", "3")
-	if err := tb.InsertRow(0, "before ", "in between", " after"); err != nil {
+	if err := tb.Insert(0, "before ", "in between", " after"); err != nil {
 		t.Error(err)
 	}
 	checkString(t, tb, "[before  in between  after]")
 	checkCount(t, tb, 3)
-	if err := tb.InsertRow(1, "AAA", "   ", ""); err != nil {
+	if err := tb.Insert(1, "AAA", "   ", ""); err != nil {
 		t.Error(err)
 	}
 	checkString(t, tb, "[before  in between  after], [AAA     ]")
 	checkCount(t, tb, 6)
-	if err := tb.InsertRow(0, "first", "second", "third"); err != nil {
+	if err := tb.Insert(0, "first", "second", "third"); err != nil {
 		t.Error(err)
 	}
 	checkString(t, tb, "[first second third], [before  in between  after], [AAA     ]")
 	checkCount(t, tb, 9)
+}
+
+func TestTAddRow(t *testing.T) {
+	// TODO
+}
+
+func TestTInsertRow(t *testing.T) {
+	// TODO
 }
 
 func TestTRemoveRow(t *testing.T) {
@@ -453,7 +516,7 @@ func TestTRows(t *testing.T) {
 		t.Log("\tReceived:", n)
 	}
 
-	tb.InsertRow(1, 7, 8, 9)
+	tb.Insert(1, 7, 8, 9)
 	if n := tb.Rows(); n != 2 {
 		t.Error("Row count is incorrect")
 		t.Log("\tExpected:", 2)
@@ -490,7 +553,7 @@ func TestTColumns(t *testing.T) {
 		t.Log("\tReceived:", n)
 	}
 
-	tb.InsertRow(1, 7, 8, 9)
+	tb.Insert(1, 7, 8, 9)
 	if n := tb.Columns(); n != 3 {
 		t.Error("Column count is incorrect")
 		t.Log("\tExpected:", 3)
@@ -532,7 +595,7 @@ func TestTCount(t *testing.T) {
 	tb.RemoveRow(0)
 	checkCount(t, tb, 3)
 
-	tb.InsertRow(1, 7, 8, 9)
+	tb.Insert(1, 7, 8, 9)
 	checkCount(t, tb, 6)
 
 	tb, _ = New("1")
@@ -705,14 +768,17 @@ func TestTMatches(t *testing.T) {
 }
 
 func TestTToggle(t *testing.T) {
+	// TODO
 }
 
 
 // --- Row's Method Tests ---
 func TestRItem(t *testing.T) {
+	// TODO
 }
 
 func TestRMatches(t *testing.T) {
+	// TODO
 }
 
 
