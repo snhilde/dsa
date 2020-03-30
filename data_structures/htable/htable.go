@@ -128,6 +128,31 @@ func (t *Table) RemoveRow(index int) error {
 	return nil
 }
 
+// String returns a formatted list of the items in the table, row by row.
+func (t *Table) String() string {
+	if t == nil {
+		return "<nil>"
+	} else if t.Count() == 0 {
+		return "<empty>"
+	}
+
+	var b strings.Builder
+	rows := t.rows.YieldAll()
+	for v := range rows {
+		row := v.(*Row)
+		if row.enabled {
+			b.WriteString(fmt.Sprintf("%v, ", row))
+		}
+	}
+
+	s := b.String()
+	if s == "" {
+		s = "<empty>"
+	}
+
+	return strings.TrimSuffix(s, ", ")
+}
+
 // Rows returns the number of rows in the table, or -1 on error. This will include all rows, regardless of enabled status.
 func (t *Table) Rows() int {
 	if t == nil {
@@ -156,31 +181,6 @@ func (t *Table) Count() int {
 	}
 
 	return r * c
-}
-
-// String returns a formatted list of the items in the table, row by row.
-func (t *Table) String() string {
-	if t == nil {
-		return "<nil>"
-	} else if t.Count() == 0 {
-		return "<empty>"
-	}
-
-	var b strings.Builder
-	rows := t.rows.YieldAll()
-	for v := range rows {
-		row := v.(*Row)
-		if row.enabled {
-			b.WriteString(fmt.Sprintf("%v, ", row))
-		}
-	}
-
-	s := b.String()
-	if s == "" {
-		s = "<empty>"
-	}
-
-	return strings.TrimSuffix(s, ", ")
 }
 
 // Row returns the index and Row type of the first row that contains the item in the specified column, or -1 and nil if
@@ -324,6 +324,12 @@ func (r *Row) Matches(col string, v interface{}) bool {
 
 // String returns a formatted list of the items in the row.
 func (r *Row) String() string {
+	if r == nil {
+		return "<nil"
+	} else if len(r.v) == 0 {
+		return "<empty>"
+	}
+
 	return fmt.Sprintf("%v", r.v)
 }
 
