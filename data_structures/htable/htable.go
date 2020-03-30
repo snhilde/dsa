@@ -330,7 +330,17 @@ func (r *Row) String() string {
 		return "<empty>"
 	}
 
-	return fmt.Sprintf("%v", r.v)
+	var b strings.Builder
+	for i, v := range r.v {
+		if r.h != nil {
+			b.WriteString(fmt.Sprintf("%v: ", r.h[i]))
+		}
+		b.WriteString(fmt.Sprintf("%v, ", v))
+	}
+
+	s := strings.TrimSuffix(b.String(), ", ")
+
+	return strings.Join([]string{"{", s, "}"}, "")
 }
 
 // Count returns the number of items in the row, or -1 on error.
