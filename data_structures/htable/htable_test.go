@@ -758,7 +758,16 @@ func TestTRemoveRow(t *testing.T) {
 }
 
 func TestTColumnToIndex(t *testing.T) {
-	// TODO
+	tb, _ := New("1", "2", "3")
+
+	// Make sure each column lines up with the correct index.
+	for i, v := range []string{"1", "2", "3"} {
+		if n := tb.ColumnToIndex(v); n != i {
+			t.Error("Column does not align to expected index")
+			t.Log("\tExpected:", i)
+			t.Log("\tReceived:", n)
+		}
+	}
 }
 
 func TestTSet(t *testing.T) {
