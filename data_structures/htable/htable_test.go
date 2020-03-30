@@ -984,7 +984,104 @@ func TestTMatches(t *testing.T) {
 }
 
 func TestTToggle(t *testing.T) {
-	// TODO
+	tb, _ := New("1", "2", "3")
+	tb.Add(1, 2, 3)
+	tb.Add(4, 5, 6)
+	tb.Add(7, 8, 9)
+	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}, {1: 7, 2: 8, 3: 9}")
+	checkTCount(t, tb, 9)
+
+	// Disable first row.
+	if err := tb.Toggle(0, false); err != nil {
+		t.Error(err)
+	}
+	checkTString(t, tb, "{1: 4, 2: 5, 3: 6}, {1: 7, 2: 8, 3: 9}")
+	checkTCount(t, tb, 9)
+
+	// Enable first row.
+	if err := tb.Toggle(0, true); err != nil {
+		t.Error(err)
+	}
+	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}, {1: 7, 2: 8, 3: 9}")
+	checkTCount(t, tb, 9)
+
+	// Disable middle row.
+	if err := tb.Toggle(1, false); err != nil {
+		t.Error(err)
+	}
+	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 7, 2: 8, 3: 9}")
+	checkTCount(t, tb, 9)
+
+	// Enable middle row.
+	if err := tb.Toggle(1, true); err != nil {
+		t.Error(err)
+	}
+	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}, {1: 7, 2: 8, 3: 9}")
+	checkTCount(t, tb, 9)
+
+	// Disable last row.
+	if err := tb.Toggle(2, false); err != nil {
+		t.Error(err)
+	}
+	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
+	checkTCount(t, tb, 9)
+
+	// Enable last row.
+	if err := tb.Toggle(2, true); err != nil {
+		t.Error(err)
+	}
+	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}, {1: 7, 2: 8, 3: 9}")
+	checkTCount(t, tb, 9)
+
+	// Enable already-enabled row.
+	if err := tb.Toggle(0, true); err != nil {
+		t.Error(err)
+	}
+	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}, {1: 7, 2: 8, 3: 9}")
+	checkTCount(t, tb, 9)
+
+	// Disable already-disabled row.
+	if err := tb.Toggle(0, false); err != nil {
+		t.Error(err)
+	}
+	if err := tb.Toggle(0, false); err != nil {
+		t.Error(err)
+	}
+	checkTString(t, tb, "{1: 4, 2: 5, 3: 6}, {1: 7, 2: 8, 3: 9}")
+	checkTCount(t, tb, 9)
+
+	// Remove disabled row.
+	tb.RemoveRow(0)
+	checkTString(t, tb, "{1: 4, 2: 5, 3: 6}, {1: 7, 2: 8, 3: 9}")
+	checkTCount(t, tb, 6)
+
+	// Remove row before disable row, then enable row.
+	if err := tb.Toggle(1, false); err != nil {
+		t.Error(err)
+	}
+	checkTString(t, tb, "{1: 4, 2: 5, 3: 6}")
+	checkTCount(t, tb, 6)
+
+	tb.RemoveRow(0)
+	checkTString(t, tb, "<empty>")
+	checkTCount(t, tb, 3)
+
+	if err := tb.Toggle(0, true); err != nil {
+		t.Error(err)
+	}
+	checkTString(t, tb, "{1: 7, 2: 8, 3: 9}")
+	checkTCount(t, tb, 3)
+
+	// Try to toggle a row in an empty table.
+	tb.RemoveRow(0)
+	checkTString(t, tb, "<empty>")
+	checkTCount(t, tb, 0)
+
+	if err := tb.Toggle(0, true); err == nil {
+		t.Error("Unexpectedly toggle nonexistant row")
+	}
+	checkTString(t, tb, "<empty>")
+	checkTCount(t, tb, 0)
 }
 
 
