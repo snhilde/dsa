@@ -35,6 +35,11 @@ func TestTBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad pointer test for RemoveRow()")
 	}
 
+    // Test ColumnToIndex().
+	if n := tb.ColumnToIndex("1"); n != -1 {
+		t.Error("Unexpectedly passed bad pointer test for ColumnToIndex()")
+	}
+
     // Test Rows().
 	if n := tb.Rows(); n != -1 {
 		t.Error("Unexpectedly passed bad pointer test for Rows()")
@@ -79,11 +84,11 @@ func TestTBadPtr(t *testing.T) {
 func TestRBadPtr(t *testing.T) {
 	var r *Row
 
-	if v := r.Item("1"); v != nil {
+	if v := r.Item(0); v != nil {
 		t.Error("Unexpectedly passed bad pointer test for Row's Item()")
 	}
 
-	if r.Matches("1", 1) {
+	if r.Matches(0, 1) {
 		t.Error("Unexpectedly passed bad pointer test for Row's Matches()")
 	}
 
@@ -185,6 +190,17 @@ func TestTBadArgs(t *testing.T) {
 		t.Error("Unexpectedly passed out-of-bounds index test for RemoveRow()")
 	}
 
+    // Test ColumnToIndex() - empty column header.
+	if i := tb.ColumnToIndex(""); i != -1 {
+		t.Error("Unexpectedly passed empty column header test for ColumnToIndex()")
+	}
+
+    // Test ColumnToIndex() - invalid column header.
+	if i := tb.ColumnToIndex("4"); i != -1 {
+		t.Error("Unexpectedly passed invalid column header test for ColumnToIndex()")
+	}
+
+
     // Test Row() - empty column header.
 	if i, r := tb.Row("", 5); i != -1 || r != nil {
 		t.Error("Unexpectedly passed empty column header test for Row()")
@@ -259,24 +275,24 @@ func TestTBadArgs(t *testing.T) {
 func TestRBadArgs(t *testing.T) {
 	r := NewRow(1, 2, 3)
 
-	// Test Item() - no column headers.
-	if v := r.Item("1"); v != nil {
-		t.Error("Unexpectedly passed no column headers test for Item()")
+	// Test Item() - negative index.
+	if v := r.Item(-1); v != nil {
+		t.Error("Unexpectedly passed negative index test for Item()")
 	}
 
-	// Test Item() - missing column header.
-	if v := r.Item(""); v != nil {
-		t.Error("Unexpectedly passed missing column header test for Item()")
+	// Test Item() - out-of-bounds index.
+	if v := r.Item(100); v != nil {
+		t.Error("Unexpectedly passed out-of-bounds index test for Item()")
 	}
 
-	// Test Matches() - no column headers.
-	if r.Matches("1", 1) {
-		t.Error("Unexpectedly passed no column headers test for Matches()")
+	// Test Matches() - negative index.
+	if r.Matches(-1, 1) {
+		t.Error("Unexpectedly passed negative index test for Matches()")
 	}
 
-	// Test Matches() - missing column header.
-	if r.Matches("", 1) {
-		t.Error("Unexpectedly passed missing column header test for Matches()")
+	// Test Matches() - out-of-bounds index.
+	if r.Matches(100, 1) {
+		t.Error("Unexpectedly passed out-of-bounds index test for Matches()")
 	}
 }
 
@@ -701,6 +717,10 @@ func TestTRemoveRow(t *testing.T) {
 	}
 	checkTString(t, tb, "<empty>")
 	checkTCount(t, tb, 0)
+}
+
+func TestColumnToIndex(t *testing.T) {
+	// TODO
 }
 
 func TestTRows(t *testing.T) {
