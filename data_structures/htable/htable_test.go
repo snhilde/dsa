@@ -89,20 +89,24 @@ func TestTBadPtr(t *testing.T) {
 func TestRBadPtr(t *testing.T) {
 	var r *Row
 
+	if r.String() != "<nil>" {
+		t.Error("Unexpectedly passed bad pointer test for Row's String()")
+	}
+
+	if err := r.Set(0, "item"); err == nil {
+		t.Error("Unexpectedly passed bad pointer test for Row's Set()")
+	}
+
+	if n := r.Count(); n != -1 {
+		t.Error("Unexpectedly passed bad pointer test for Row's Count()")
+	}
+
 	if v := r.Item(0); v != nil {
 		t.Error("Unexpectedly passed bad pointer test for Row's Item()")
 	}
 
 	if r.Matches(0, 1) {
 		t.Error("Unexpectedly passed bad pointer test for Row's Matches()")
-	}
-
-	if r.String() != "<nil>" {
-		t.Error("Unexpectedly passed bad pointer test for Row's String()")
-	}
-
-	if r.Count() != -1 {
-		t.Error("Unexpectedly passed bad pointer test for Row's Count()")
 	}
 }
 
@@ -298,6 +302,16 @@ func TestTBadArgs(t *testing.T) {
 
 func TestRBadArgs(t *testing.T) {
 	r := NewRow(1, 2, 3)
+
+	// Test Set() - negative index.
+	if err := r.Set(-1, "value"); err == nil {
+		t.Error("Unexpectedly passed negative index tests for Set()")
+	}
+
+	// Test Set() - out-of-bounds index.
+	if err := r.Set(100, "value"); err == nil {
+		t.Error("Unexpectedly passed out-of-bounds index tests for Set()")
+	}
 
 	// Test Item() - negative index.
 	if v := r.Item(-1); v != nil {
@@ -1134,6 +1148,10 @@ func TestTToggle(t *testing.T) {
 
 
 // --- Row's Method Tests ---
+func TestRSet(t *testing.T) {
+	// TODO
+}
+
 func TestRItem(t *testing.T) {
 	r := NewRow(1, 2, 3)
 	checkRString(t, r, "{1, 2, 3}")
