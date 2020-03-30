@@ -199,6 +199,27 @@ func (t *Table) SetItem(row int, col string, value interface{}) error {
 	return nil
 }
 
+// SetHeader changes the specified column's header to name.
+func (t *Table) SetHeader(col string, name string) error {
+	if t == nil {
+		return tErr()
+	} else if col == "" {
+		return errors.New("Invalid column")
+	} else if name == "" {
+		return errors.New("Missing name")
+	}
+
+	for i, v := range t.h {
+		if col == v {
+			t.h[i] = name
+			return nil
+		}
+	}
+
+	// If we're here, then we didn't find the column.
+	return errors.New("Missing column")
+}
+
 // Headers returns a copy of the table's column headers.
 func (t *Table) Headers() []string {
 	if t == nil {
