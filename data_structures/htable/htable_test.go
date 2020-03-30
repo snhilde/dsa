@@ -243,7 +243,22 @@ func TestTNew(t *testing.T) {
 }
 
 func TestRNewRow(t *testing.T) {
-	// TODO
+	r := NewRow(1, 2, 3)
+	checkRString(t, r, "{1, 2, 3}")
+	checkRCount(t, r, 3)
+
+	type s struct {
+		s1 string
+		s2 string
+	}
+	r = NewRow(1, 2, s{s1:"a", s2:"b"})
+	checkRString(t, r, "{1, 2, {a b}}")
+	checkRCount(t, r, 3)
+
+	tmp := NewRow("other", "row")
+	r = NewRow("this row", "here", 5, tmp)
+	checkRString(t, r, "{this row, here, 5, {other, row}}")
+	checkRCount(t, r, 4)
 }
 
 
