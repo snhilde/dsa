@@ -199,6 +199,18 @@ func (t *Table) Set(row int, col string, value interface{}) error {
 	return nil
 }
 
+// Headers returns a copy of the table's column headers.
+func (t *Table) Headers() []string {
+	if t == nil {
+		return nil
+	}
+
+	h := make([]string, t.Columns())
+	copy(h, t.h)
+
+	return h
+}
+
 // Rows returns the number of rows in the table, or -1 on error. This will include all rows, regardless of enabled status.
 func (t *Table) Rows() int {
 	if t == nil {
