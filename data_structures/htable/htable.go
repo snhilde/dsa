@@ -333,6 +333,15 @@ func (r *Row) String() string {
 	return fmt.Sprintf("%v", r.v)
 }
 
+// Count returns the number of items in the row, or -1 on error.
+func (r *Row) Count() int {
+	if r == nil {
+		return -1
+	}
+
+	return len(r.v)
+}
+
 
 func tErr() error {
 	return errors.New("Table must be created with New() first")
