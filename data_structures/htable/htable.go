@@ -59,9 +59,6 @@ func (t *Table) Add(items ...interface{}) error {
 		return err
 	}
 
-	// Add the headers to the column for easy access later.
-	r.h = t.h
-
 	// Add the row to the table.
 	return t.rows.Append(r)
 }
@@ -76,9 +73,6 @@ func (t *Table) Insert(index int, items ...interface{}) error {
 		return err
 	}
 
-	// Add the headers to the column for easy access later.
-	r.h = t.h
-
 	// Add the row to the table.
 	return t.rows.Insert(index, r)
 }
@@ -90,9 +84,6 @@ func (t *Table) AddRow(r *Row) error {
 		return err
 	}
 
-	// Add the headers to the column for easy access later.
-	r.h = t.h
-
 	// Add the row to the table.
 	return t.rows.Append(r)
 }
@@ -103,9 +94,6 @@ func (t *Table) InsertRow(index int, r *Row) error {
 	if err := t.validateRow(r); err != nil {
 		return err
 	}
-
-	// Add the headers to the column for easy access later.
-	r.h = t.h
 
 	// Add the row to the table.
 	return t.rows.Insert(index, r)
@@ -128,6 +116,22 @@ func (t *Table) RemoveRow(index int) error {
 	return nil
 }
 
+// ColumnToIndex translates the column's string name to its index in the table. This will return -1 on error.
+func (t *Table) ColumnToIndex(col string) int {
+	if t == nil {
+		return -1
+	}
+
+	for i, v := range t.h {
+		if col == v {
+			return i
+		}
+	}
+
+	// If we're here, then we didn't find anything.
+	return -1
+}
+
 // String returns a formatted list of the items in the table, row by row.
 func (t *Table) String() string {
 	if t == nil {
@@ -138,10 +142,17 @@ func (t *Table) String() string {
 
 	var b strings.Builder
 	rows := t.rows.YieldAll()
-	for v := range rows {
-		row := v.(*Row)
+	for r := range rows {
+		row := r.(*Row)
 		if row.enabled {
-			b.WriteString(fmt.Sprintf("%v, ", row))
+			var tmp strings.Builder
+			for i, v := range row.v {
+				tmp.WriteString(fmt.Sprintf("%v: %v, ", t.h[i], v))
+			}
+			s := tmp.String()
+			s = strings.TrimSuffix(s, ", ")
+			s = strings.Join([]string{"{", s, "}"}, "")
+			b.WriteString(fmt.Sprintf("%v, ", s))
 		}
 	}
 
@@ -242,7 +253,13 @@ func (t *Table) Item(row int, col string) interface{} {
 		return nil
 	}
 
-	return r.(*Row).Item(col)
+	// Figure out the index of the column.
+	i := t.ColumnToIndex(col)
+	if i < 0 {
+		return nil
+	}
+
+	return r.(*Row).Item(i)
 }
 
 // Matches returns true if the value matches the item at the specified coordinates or false if there is no match.
@@ -272,7 +289,6 @@ func (t *Table) Toggle(row int, enabled bool) error {
 
 // Row holds all the data for each row in the table.
 type Row struct {
-	h       []string      // Column headers
 	v       []interface{} // Column values
 	enabled   bool
 }
@@ -295,30 +311,23 @@ func NewRow(items ...interface{}) *Row {
 	return r
 }
 
-// Item returns the value at the specified column for this row, or nil if not found or error.
-func (r *Row) Item(col string) interface{} {
+// Item returns the row's value at the specified index, or nil if not found or error.
+func (r *Row) Item(index int) interface{} {
 	if r == nil {
 		return nil
-	} else if r.h == nil {
+	} else if index < 0 {
 		return nil
-	} else if col == "" {
+	} else if index >= len(r.v) {
 		return nil
 	}
 
-	for i, v := range r.h {
-		if col == v {
-			return r.v[i]
-		}
-	}
-
-	// If we're here, then we didn't find anything.
-	return nil
+	return r.v[index]
 }
 
 // Matches returns true if the value matches the item in the specified column or false if there is no match.
 // Matching can occur on disabled rows.
-func (r *Row) Matches(col string, v interface{}) bool {
-	item := r.Item(col)
+func (r *Row) Matches(index int, v interface{}) bool {
+	item := r.Item(index)
 	return reflect.DeepEqual(v, item)
 }
 
@@ -331,10 +340,7 @@ func (r *Row) String() string {
 	}
 
 	var b strings.Builder
-	for i, v := range r.v {
-		if r.h != nil {
-			b.WriteString(fmt.Sprintf("%v: ", r.h[i]))
-		}
+	for _, v := range r.v {
 		b.WriteString(fmt.Sprintf("%v, ", v))
 	}
 
