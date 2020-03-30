@@ -164,6 +164,41 @@ func (t *Table) String() string {
 	return strings.TrimSuffix(s, ", ")
 }
 
+// Set changes the value of the item at the specified coordinates.
+func (t *Table) Set(row int, col string, value interface{}) error {
+	if t == nil {
+		return tErr()
+	} else if row < 0 || t.Rows() <= row {
+		return errors.New("Invalid row")
+	}
+
+	// Grab our row.
+	r := t.rows.Value(row)
+	if r == nil {
+		return errors.New("Missing row")
+	}
+
+	// Figure out the index of the column.
+	i := t.ColumnToIndex(col)
+	if i < 0 {
+		return errors.New("Invalid column")
+	}
+
+	// Make our new row.
+	nr := NewRow(r.(*Row).v ...)
+	nr.v[i] = value
+
+	// Add the row back in to the table, which will also validate the new value.
+	if err := t.RemoveRow(row); err != nil {
+		return err
+	}
+	if err := t.InsertRow(row, nr); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Rows returns the number of rows in the table, or -1 on error. This will include all rows, regardless of enabled status.
 func (t *Table) Rows() int {
 	if t == nil {
