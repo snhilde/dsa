@@ -1149,7 +1149,49 @@ func TestTToggle(t *testing.T) {
 
 // --- Row's Method Tests ---
 func TestRSet(t *testing.T) {
-	// TODO
+	r := NewRow(1, 2, 3)
+	checkRString(t, r, "{1, 2, 3}")
+	checkRCount(t, r, 3)
+
+	// Try setting the first item.
+	if err := r.Set(0, 4); err != nil {
+		t.Error(err)
+	}
+	checkRString(t, r, "{4, 2, 3}")
+	checkRCount(t, r, 3)
+
+	// Try setting the middle item.
+	if err := r.Set(1, 5); err != nil {
+		t.Error(err)
+	}
+	checkRString(t, r, "{4, 5, 3}")
+	checkRCount(t, r, 3)
+
+	// Try setting the last item.
+	if err := r.Set(2, 6); err != nil {
+		t.Error(err)
+	}
+	checkRString(t, r, "{4, 5, 6}")
+	checkRCount(t, r, 3)
+
+	// Make sure you can set a different type for rows (tables should fail).
+	if err := r.Set(0, 3.14); err != nil {
+		t.Error(err)
+	}
+	checkRString(t, r, "{3.14, 5, 6}")
+	checkRCount(t, r, 3)
+
+	if err := r.Set(1, "scooby"); err != nil {
+		t.Error(err)
+	}
+	checkRString(t, r, "{3.14, scooby, 6}")
+	checkRCount(t, r, 3)
+
+	if err := r.Set(2, []int{10, 20, 30}); err != nil {
+		t.Error(err)
+	}
+	checkRString(t, r, "{3.14, scooby, [10 20 30]}")
+	checkRCount(t, r, 3)
 }
 
 func TestRItem(t *testing.T) {
