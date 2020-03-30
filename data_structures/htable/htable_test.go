@@ -1131,7 +1131,36 @@ func TestRItem(t *testing.T) {
 }
 
 func TestRMatches(t *testing.T) {
-	// TODO
+	r := NewRow(1, 2, 3)
+	checkRString(t, r, "{1, 2, 3}")
+	checkRCount(t, r, 3)
+
+	// Test same types.
+	for i, v := range []int{1, 2, 3} {
+		// Make sure same values match.
+		if !r.Matches(i, v) {
+			t.Error("Doesn't match")
+		}
+
+		// Make sure different values don't match.
+		if r.Matches(i, v+1) {
+			t.Error("Matches, but shouldn't")
+		}
+	}
+
+	// Test different types.
+	for i, v := range []string{"1", "2", "3"} {
+		if r.Matches(i, v) {
+			t.Error("Matches, but shouldn't")
+		}
+	}
+
+	// Test different types but same binary representation.
+	for i, v := range []byte{0x01, 0x02, 0x03} {
+		if r.Matches(i, v) {
+			t.Error("Matches, but shouldn't")
+		}
+	}
 }
 
 
