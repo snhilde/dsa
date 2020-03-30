@@ -50,6 +50,11 @@ func TestTBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad pointer test for SetItem()")
 	}
 
+	// Test SetHeader().
+	if err := tb.SetHeader("1", "10"); err == nil {
+		t.Error("Unexpectedly passed bad pointer test for SetHeader()")
+	}
+
 	// Test Headers().
 	if tb.Headers() != nil {
 		t.Error("Unexpectedly passed bad pointer test for Headers()")
@@ -216,22 +221,37 @@ func TestTBadArgs(t *testing.T) {
 
 	// Test SetItem() - negative index.
 	if err := tb.SetItem(-1, "1", "value"); err == nil {
-		t.Error("Unexpectedly passed negative index tests for SetItem()")
+		t.Error("Unexpectedly passed negative index test for SetItem()")
 	}
 
 	// Test SetItem() - out-of-bounds index.
 	if err := tb.SetItem(100, "1", "value"); err == nil {
-		t.Error("Unexpectedly passed out-of-bounds index tests for SetItem()")
+		t.Error("Unexpectedly passed out-of-bounds index test for SetItem()")
 	}
 
 	// Test SetItem() - missing column header.
 	if err := tb.SetItem(0, "", "value"); err == nil {
-		t.Error("Unexpectedly passed missing column header tests for SetItem()")
+		t.Error("Unexpectedly passed missing column header test for SetItem()")
 	}
 
 	// Test SetItem() - invalid column header.
 	if err := tb.SetItem(0, "4", "value"); err == nil {
-		t.Error("Unexpectedly passed invalid column header tests for SetItem()")
+		t.Error("Unexpectedly passed invalid column header test for SetItem()")
+	}
+
+	// Test SetHeader() - empty column header.
+	if err := tb.SetHeader("", "30"); err == nil {
+		t.Error("Unexpectedly passed empty column header test for SetHeader()")
+	}
+
+	// Test SetHeader() - invalid column header.
+	if err := tb.SetHeader("4", "30"); err == nil {
+		t.Error("Unexpectedly passed invalid column header test for SetHeader()")
+	}
+
+	// Test SetHeader() - empty name.
+	if err := tb.SetHeader("3", ""); err == nil {
+		t.Error("Unexpectedly passed empty name test for SetHeader()")
 	}
 
     // Test Row() - empty column header.
@@ -310,12 +330,12 @@ func TestRBadArgs(t *testing.T) {
 
 	// Test SetItem() - negative index.
 	if err := r.SetItem(-1, "value"); err == nil {
-		t.Error("Unexpectedly passed negative index tests for SetItem()")
+		t.Error("Unexpectedly passed negative index test for SetItem()")
 	}
 
 	// Test SetItem() - out-of-bounds index.
 	if err := r.SetItem(100, "value"); err == nil {
-		t.Error("Unexpectedly passed out-of-bounds index tests for SetItem()")
+		t.Error("Unexpectedly passed out-of-bounds index test for SetItem()")
 	}
 
 	// Test Item() - negative index.
@@ -806,6 +826,35 @@ func TestTSetItem(t *testing.T) {
 	// Make sure you can't change an item's type.
 	if err := tb.SetItem(0, "1", "a"); err == nil {
 		t.Error("Unexpectedly passed changing an item's type")
+	}
+}
+
+func TestTSetHeader(t *testing.T) {
+	tb, _ := New("1", "2", "3")
+
+	was := []string{"1", "2", "3"}
+	to := []string{"4", "5", "6"}
+	for i, v := range was {
+		// First, make sure the current header is correct.
+		h := tb.Headers()
+		if v != h[i] {
+			t.Error("Received incorrect header")
+			t.Log("\tExpected:", v)
+			t.Log("\tReceived:", h[i])
+		}
+
+		// Now, change the header.
+		if err := tb.SetHeader(v, to[i]); err != nil {
+			t.Error(err)
+		}
+
+		// Make sure the old value is gone and the new one is in place.
+		h = tb.Headers()
+		if to[i] != h[i] {
+			t.Error("Did not change header")
+			t.Log("\tExpected:", to[i])
+			t.Log("\tReceived:", h[i])
+		}
 	}
 }
 
