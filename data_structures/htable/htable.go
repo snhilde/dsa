@@ -158,7 +158,7 @@ func (t *Table) Count() int {
 	return r * c
 }
 
-// String returns a printable list of values, grouped by row.
+// String returns a formatted list of the items in the table, row by row.
 func (t *Table) String() string {
 	if t == nil {
 		return "<nil>"
@@ -171,7 +171,7 @@ func (t *Table) String() string {
 	for v := range rows {
 		row := v.(*Row)
 		if row.enabled {
-			b.WriteString(fmt.Sprintf("%v, ", row.v))
+			b.WriteString(fmt.Sprintf("%v, ", row))
 		}
 	}
 
@@ -320,6 +320,11 @@ func (r *Row) Item(col string) interface{} {
 func (r *Row) Matches(col string, v interface{}) bool {
 	item := r.Item(col)
 	return reflect.DeepEqual(v, item)
+}
+
+// String returns a formatted list of the items in the row.
+func (r *Row) String() string {
+	return fmt.Sprintf("%v", r.v)
 }
 
 
