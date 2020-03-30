@@ -140,6 +140,41 @@ func TestTBadArgs(t *testing.T) {
 		t.Error("Unexpectedly passed out-of-bounds index test for Insert()")
 	}
 
+	// Test AddRow() - too few columns.
+	if err := tb.AddRow(NewRow(1, 2)); err == nil {
+		t.Error("Unexpectedly passed too few columns test for AddRow()")
+	}
+
+	// Test AddRow() - too many columns.
+	if err := tb.AddRow(NewRow(1, 2, 3, 4)); err == nil {
+		t.Error("Unexpectedly passed too many columns test for AddRow()")
+	}
+
+	// Test AddRow() - wrong type in first position.
+	if err := tb.AddRow(NewRow("item1", 5, 6)); err == nil {
+		t.Error("Unexpectedly passed wrong type (first) test for AddRow()")
+	}
+
+	// Test AddRow() - wrong type in middle position.
+	if err := tb.AddRow(NewRow(4, "item5", 6)); err == nil {
+		t.Error("Unexpectedly passed wrong type (middle) test for AddRow()")
+	}
+
+	// Test AddRow() - wrong type in last position.
+	if err := tb.AddRow(NewRow(4, 5, "item6")); err == nil {
+		t.Error("Unexpectedly passed wrong type (last) test for AddRow()")
+	}
+
+    // Test InsertRow() - negative index.
+	if err := tb.InsertRow(-1, NewRow(-1, 4, 5, 6)); err == nil {
+		t.Error("Unexpectedly passed negative index test for InsertRow()")
+	}
+
+    // Test InsertRow() - out-of-bounds index.
+	if err := tb.InsertRow(100, NewRow(100, 4, 5, 6)); err == nil {
+		t.Error("Unexpectedly passed out-of-bounds index test for InsertRow()")
+	}
+
     // Test RemoveRow() - negative index.
 	if err := tb.RemoveRow(-1); err == nil {
 		t.Error("Unexpectedly passed negative index test for RemoveRow()")
@@ -208,6 +243,16 @@ func TestTBadArgs(t *testing.T) {
     // Test Matches() - missing item.
 	if tb.Matches(0, "1", nil) {
 		t.Error("Unexpectedly passed missing item test for Matches()")
+	}
+
+    // Test Toggle() - negative index.
+	if err := tb.Toggle(-1, true); err == nil {
+		t.Error("Unexpectedly passed negative index test for Toggle()")
+	}
+
+    // Test Toggle() - out-of-bounds index.
+	if err := tb.Toggle(100, true); err == nil {
+		t.Error("Unexpectedly passed out-of-bounds index test for Toggle()")
 	}
 }
 
