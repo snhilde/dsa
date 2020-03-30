@@ -243,6 +243,7 @@ func TestTNew(t *testing.T) {
 }
 
 func TestRNewRow(t *testing.T) {
+	// TODO
 }
 
 
@@ -253,13 +254,13 @@ func TestTAdd(t *testing.T) {
 	if err := tb.Add(1, 2, 3); err != nil {
 		t.Error(err)
 	}
-	checkTString(t, tb, "[1 2 3]")
+	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}")
 	checkTCount(t, tb, 3)
 
 	if err := tb.Add(4, 5, 6); err != nil {
 		t.Error(err)
 	}
-	checkTString(t, tb, "[1 2 3], [4 5 6]")
+	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
 	checkTCount(t, tb, 6)
 
 	// Test rows of characters.
@@ -267,13 +268,13 @@ func TestTAdd(t *testing.T) {
 	if err := tb.Add('a', 'b', 'c'); err != nil {
 		t.Error(err)
 	}
-	checkTString(t, tb, "[97 98 99]")
+	checkTString(t, tb, "{1: 97, 2: 98, 3: 99}")
 	checkTCount(t, tb, 3)
 
 	if err := tb.Add('d', 'e', 'f'); err != nil {
 		t.Error(err)
 	}
-	checkTString(t, tb, "[97 98 99], [100 101 102]")
+	checkTString(t, tb, "{1: 97, 2: 98, 3: 99}, {1: 100, 2: 101, 3: 102}")
 	checkTCount(t, tb, 6)
 
 	// Test rows of int slices.
@@ -281,13 +282,13 @@ func TestTAdd(t *testing.T) {
 	if err := tb.Add([]int{10, 20}, []int{30, 40}, []int{50, 60}); err != nil {
 		t.Error(err)
 	}
-	checkTString(t, tb, "[[10 20] [30 40] [50 60]]")
+	checkTString(t, tb, "{1: [10 20], 2: [30 40], 3: [50 60]}")
 	checkTCount(t, tb, 3)
 
 	if err := tb.Add([]int{100, 200}, []int{300, 400}, []int{500, 600}); err != nil {
 		t.Error(err)
 	}
-	checkTString(t, tb, "[[10 20] [30 40] [50 60]], [[100 200] [300 400] [500 600]]")
+	checkTString(t, tb, "{1: [10 20], 2: [30 40], 3: [50 60]}, {1: [100 200], 2: [300 400], 3: [500 600]}")
 	checkTCount(t, tb, 6)
 
 	// Test mixed-value rows.
@@ -295,13 +296,13 @@ func TestTAdd(t *testing.T) {
 	if err := tb.Add(1.1, "b", []byte{0x03}); err != nil {
 		t.Error(err)
 	}
-	checkTString(t, tb, "[1.1 b [3]]")
+	checkTString(t, tb, "{1: 1.1, 2: b, 3: [3]}")
 	checkTCount(t, tb, 3)
 
 	if err := tb.Add(4.4, "e", []byte{0x06}); err != nil {
 		t.Error(err)
 	}
-	checkTString(t, tb, "[1.1 b [3]], [4.4 e [6]]")
+	checkTString(t, tb, "{1: 1.1, 2: b, 3: [3]}, {1: 4.4, 2: e, 3: [6]}")
 	checkTCount(t, tb, 6)
 
 	// Test rows of strings with spaces.
@@ -309,13 +310,13 @@ func TestTAdd(t *testing.T) {
 	if err := tb.Add("before ", "in between", " after"); err != nil {
 		t.Error(err)
 	}
-	checkTString(t, tb, "[before  in between  after]")
+	checkTString(t, tb, "{1: before , 2: in between, 3:  after}")
 	checkTCount(t, tb, 3)
 
 	if err := tb.Add("AAA", "   ", ""); err != nil {
 		t.Error(err)
 	}
-	checkTString(t, tb, "[before  in between  after], [AAA     ]")
+	checkTString(t, tb, "{1: before , 2: in between, 3:  after}, {1: AAA, 2:    , 3: }")
 	checkTCount(t, tb, 6)
 
 	// Test rows masquerading as interfaces.
@@ -323,13 +324,13 @@ func TestTAdd(t *testing.T) {
 	if err := tb.Add(interface{}(1), interface{}(2), interface{}(3)); err != nil {
 		t.Error(err)
 	}
-	checkTString(t, tb, "[1 2 3]")
+	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}")
 	checkTCount(t, tb, 3)
 
 	if err := tb.Add(4, 5, 6); err != nil {
 		t.Error(err)
 	}
-	checkTString(t, tb, "[1 2 3], [4 5 6]")
+	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
 	checkTCount(t, tb, 6)
 
 	// Test rows of functions.
@@ -337,13 +338,13 @@ func TestTAdd(t *testing.T) {
 	if err := tb.Add(TestTNew, checkTCount, TestTInsert); err != nil {
 		t.Error(err)
 	}
-	checkTString(t, tb, fmt.Sprintf("[%p %p %p]", TestTNew, checkTCount, TestTInsert))
+	checkTString(t, tb, fmt.Sprintf("{1: %p, 2: %p, 3: %p}", TestTNew, checkTCount, TestTInsert))
 	checkTCount(t, tb, 3)
 
 	if err := tb.Add(checkTString, checkTString, TestTAdd); err != nil {
 		t.Error(err)
 	}
-	checkTString(t, tb, fmt.Sprintf("[%p %p %p], [%p %p %p]", TestTNew, checkTCount, TestTInsert, checkTString, checkTString, TestTAdd))
+	checkTString(t, tb, fmt.Sprintf("{1: %p, 2: %p, 3: %p}, {1: %p, 2: %p, 3: %p}", TestTNew, checkTCount, TestTInsert, checkTString, checkTString, TestTAdd))
 	checkTCount(t, tb, 6)
 }
 
@@ -352,48 +353,48 @@ func TestTInsert(t *testing.T) {
 	tb, _ := New("1", "2", "3")
 	tb.Add(1, 2, 3)
 	tb.Add(4, 5, 6)
-	checkTString(t, tb, "[1 2 3], [4 5 6]")
+	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
 	checkTCount(t, tb, 6)
 	if err := tb.Insert(0, -1, -2, -3); err != nil {
 		t.Error(err)
 	}
-	checkTString(t, tb, "[-1 -2 -3], [1 2 3], [4 5 6]")
+	checkTString(t, tb, "{1: -1, 2: -2, 3: -3}, {1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
 	checkTCount(t, tb, 9)
 
 	// Test inserting a row in the middle.
 	tb, _ = New("1", "2", "3")
 	tb.Add("a", "b", "c")
 	tb.Add("d", "e", "f")
-	checkTString(t, tb, "[a b c], [d e f]")
+	checkTString(t, tb, "{1: a, 2: b, 3: c}, {1: d, 2: e, 3: f}")
 	checkTCount(t, tb, 6)
 	if err := tb.Insert(1, "x", "y", "z"); err != nil {
 		t.Error(err)
 	}
-	checkTString(t, tb, "[a b c], [x y z], [d e f]")
+	checkTString(t, tb, "{1: a, 2: b, 3: c}, {1: x, 2: y, 3: z}, {1: d, 2: e, 3: f}")
 	checkTCount(t, tb, 9)
 
 	// Test inserting a row at the end.
 	tb, _ = New("1", "2", "3")
 	tb.Add([]int{10, 20}, []int{30, 40}, []int{50, 60})
 	tb.Add([]int{100, 200}, []int{300, 400}, []int{500, 600})
-	checkTString(t, tb, "[[10 20] [30 40] [50 60]], [[100 200] [300 400] [500 600]]")
+	checkTString(t, tb, "{1: [10 20], 2: [30 40], 3: [50 60]}, {1: [100 200], 2: [300 400], 3: [500 600]}")
 	checkTCount(t, tb, 6)
 	if err := tb.Insert(2, []int{-1, -2, -3}, []int{-4, -5, -6}, []int{-7, -8, -9}); err != nil {
 		t.Error(err)
 	}
-	checkTString(t, tb, "[[10 20] [30 40] [50 60]], [[100 200] [300 400] [500 600]], [[-1 -2 -3] [-4 -5 -6] [-7 -8 -9]]")
+	checkTString(t, tb, "{1: [10 20], 2: [30 40], 3: [50 60]}, {1: [100 200], 2: [300 400], 3: [500 600]}, {1: [-1 -2 -3], 2: [-4 -5 -6], 3: [-7 -8 -9]}")
 	checkTCount(t, tb, 9)
 
 	// Test inserting a row beyond the table's current boundaries.
 	tb, _ = New("1", "2", "3")
 	tb.Add(1.1, "b", []byte{0x03})
 	tb.Add(4.4, "e", []byte{0x06})
-	checkTString(t, tb, "[1.1 b [3]], [4.4 e [6]]")
+	checkTString(t, tb, "{1: 1.1, 2: b, 3: [3]}, {1: 4.4, 2: e, 3: [6]}")
 	checkTCount(t, tb, 6)
 	if err := tb.Insert(3, 7.7, "h", []byte{0x09}); err == nil {
 		t.Error("Unexpectedly passed out-of-bounds index test")
 	}
-	checkTString(t, tb, "[1.1 b [3]], [4.4 e [6]]")
+	checkTString(t, tb, "{1: 1.1, 2: b, 3: [3]}, {1: 4.4, 2: e, 3: [6]}")
 	checkTCount(t, tb, 6)
 
 	// Test only inserting instead of appending.
@@ -401,17 +402,17 @@ func TestTInsert(t *testing.T) {
 	if err := tb.Insert(0, "before ", "in between", " after"); err != nil {
 		t.Error(err)
 	}
-	checkTString(t, tb, "[before  in between  after]")
+	checkTString(t, tb, "{1: before , 2: in between, 3:  after}")
 	checkTCount(t, tb, 3)
 	if err := tb.Insert(1, "AAA", "   ", ""); err != nil {
 		t.Error(err)
 	}
-	checkTString(t, tb, "[before  in between  after], [AAA     ]")
+	checkTString(t, tb, "{1: before , 2: in between, 3:  after}, {1: AAA, 2:    , 3: }")
 	checkTCount(t, tb, 6)
 	if err := tb.Insert(0, "first", "second", "third"); err != nil {
 		t.Error(err)
 	}
-	checkTString(t, tb, "[first second third], [before  in between  after], [AAA     ]")
+	checkTString(t, tb, "{1: first, 2: second, 3: third}, {1: before , 2: in between, 3:  after}, {1: AAA, 2:    , 3: }")
 	checkTCount(t, tb, 9)
 }
 
@@ -429,12 +430,12 @@ func TestTRemoveRow(t *testing.T) {
 	tb.Add(-1, -2, -3)
 	tb.Add(1, 2, 3)
 	tb.Add(4, 5, 6)
-	checkTString(t, tb, "[-1 -2 -3], [1 2 3], [4 5 6]")
+	checkTString(t, tb, "{1: -1, 2: -2, 3: -3}, {1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
 	checkTCount(t, tb, 9)
 	if err := tb.RemoveRow(0); err != nil {
 		t.Error(err)
 	}
-	checkTString(t, tb, "[1 2 3], [4 5 6]")
+	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
 	checkTCount(t, tb, 6)
 
 	// Test removing a row in the middle.
@@ -442,12 +443,12 @@ func TestTRemoveRow(t *testing.T) {
 	tb.Add("a", "b", "c")
 	tb.Add("x", "y", "z")
 	tb.Add("d", "e", "f")
-	checkTString(t, tb, "[a b c], [x y z], [d e f]")
+	checkTString(t, tb, "{1: a, 2: b, 3: c}, {1: x, 2: y, 3: z}, {1: d, 2: e, 3: f}")
 	checkTCount(t, tb, 9)
 	if err := tb.RemoveRow(1); err != nil {
 		t.Error(err)
 	}
-	checkTString(t, tb, "[a b c], [d e f]")
+	checkTString(t, tb, "{1: a, 2: b, 3: c}, {1: d, 2: e, 3: f}")
 	checkTCount(t, tb, 6)
 
 	// Test removing a row at the end.
@@ -455,24 +456,24 @@ func TestTRemoveRow(t *testing.T) {
 	tb.Add([]int{10, 20}, []int{30, 40}, []int{50, 60})
 	tb.Add([]int{100, 200}, []int{300, 400}, []int{500, 600})
 	tb.Add([]int{-1, -2, -3}, []int{-4, -5, -6}, []int{-7, -8, -9})
-	checkTString(t, tb, "[[10 20] [30 40] [50 60]], [[100 200] [300 400] [500 600]], [[-1 -2 -3] [-4 -5 -6] [-7 -8 -9]]")
+	checkTString(t, tb, "{1: [10 20], 2: [30 40], 3: [50 60]}, {1: [100 200], 2: [300 400], 3: [500 600]}, {1: [-1 -2 -3], 2: [-4 -5 -6], 3: [-7 -8 -9]}")
 	checkTCount(t, tb, 9)
 	if err := tb.RemoveRow(2); err != nil {
 		t.Error(err)
 	}
-	checkTString(t, tb, "[[10 20] [30 40] [50 60]], [[100 200] [300 400] [500 600]]")
+	checkTString(t, tb, "{1: [10 20], 2: [30 40], 3: [50 60]}, {1: [100 200], 2: [300 400], 3: [500 600]}")
 	checkTCount(t, tb, 6)
 
 	// Test removing a row beyond the table's current boundaries.
 	tb, _ = New("1", "2", "3")
 	tb.Add(1.1, "b", []byte{0x03})
 	tb.Add(4.4, "e", []byte{0x06})
-	checkTString(t, tb, "[1.1 b [3]], [4.4 e [6]]")
+	checkTString(t, tb, "{1: 1.1, 2: b, 3: [3]}, {1: 4.4, 2: e, 3: [6]}")
 	checkTCount(t, tb, 6)
 	if err := tb.RemoveRow(3); err == nil {
 		t.Error("Unexpectedly passed out-of-bounds index test")
 	}
-	checkTString(t, tb, "[1.1 b [3]], [4.4 e [6]]")
+	checkTString(t, tb, "{1: 1.1, 2: b, 3: [3]}, {1: 4.4, 2: e, 3: [6]}")
 	checkTCount(t, tb, 6)
 
 	// Test removing when there aren't any rows in the table.
