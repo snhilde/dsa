@@ -440,11 +440,159 @@ func TestTInsert(t *testing.T) {
 }
 
 func TestTAddRow(t *testing.T) {
-	// TODO
+	tb, _ := New("1", "2", "3")
+	checkTString(t, tb, "<empty>")
+	checkTCount(t, tb, 0)
+
+	// Test adding a row with the correct number of columns.
+	r := NewRow(1, 2, 3)
+	if err := tb.AddRow(r); err != nil {
+		t.Error(err)
+	}
+	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}")
+	checkTCount(t, tb, 3)
+
+	// Test adding a row with too few columns.
+	r = NewRow(1, 2)
+	if err := tb.AddRow(r); err == nil {
+		t.Error("Unexpectedly passed adding a row with too few columns")
+	}
+	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}")
+	checkTCount(t, tb, 3)
+
+	// Test adding a row with too many columns.
+	r = NewRow(1, 2, 3, 4)
+	if err := tb.AddRow(r); err == nil {
+		t.Error("Unexpectedly passed adding a row with too many columns")
+	}
+	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}")
+	checkTCount(t, tb, 3)
+
+	// Test adding a row with the right types.
+	r = NewRow(4, 5, 6)
+	if err := tb.AddRow(r); err != nil {
+		t.Error(err)
+	}
+	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
+	checkTCount(t, tb, 6)
+
+	// Test adding a row with the first value being the wrong type.
+	r = NewRow("7", 8, 9)
+	if err := tb.AddRow(r); err == nil {
+		t.Error("Unexpectedly passed adding a row with the first value being the wrong type")
+	}
+	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
+	checkTCount(t, tb, 6)
+
+	// Test adding a row with the middle value being the wrong type.
+	r = NewRow(7, "8", 9)
+	if err := tb.AddRow(r); err == nil {
+		t.Error("Unexpectedly passed adding a row with the middle value being the wrong type")
+	}
+	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
+	checkTCount(t, tb, 6)
+
+	// Test adding a row with the last value being the wrong type.
+	r = NewRow(7, 8, "9")
+	if err := tb.AddRow(r); err == nil {
+		t.Error("Unexpectedly passed adding a row with the last value being the wrong type")
+	}
+	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
+	checkTCount(t, tb, 6)
+
+	// Test adding a row with all values being the wrong type.
+	r = NewRow("7", "8", "9")
+	if err := tb.AddRow(r); err == nil {
+		t.Error("Unexpectedly passed adding a row with all values being the wrong type")
+	}
+	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
+	checkTCount(t, tb, 6)
 }
 
 func TestTInsertRow(t *testing.T) {
-	// TODO
+	tb, _ := New("1", "2", "3")
+	checkTString(t, tb, "<empty>")
+	checkTCount(t, tb, 0)
+
+	// Test inserting a row with the correct number of columns.
+	r := NewRow(1, 2, 3)
+	if err := tb.InsertRow(0, r); err != nil {
+		t.Error(err)
+	}
+	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}")
+	checkTCount(t, tb, 3)
+
+	// Test adding a row with too few columns.
+	r = NewRow(1, 2)
+	if err := tb.InsertRow(0, r); err == nil {
+		t.Error("Unexpectedly passed adding a row with too few columns")
+	}
+	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}")
+	checkTCount(t, tb, 3)
+
+	// Test adding a row with too many columns.
+	r = NewRow(1, 2, 3, 4)
+	if err := tb.InsertRow(0, r); err == nil {
+		t.Error("Unexpectedly passed adding a row with too many columns")
+	}
+	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}")
+	checkTCount(t, tb, 3)
+
+	// Test inserting a row before the current first row.
+	r = NewRow(-1, -2, -3)
+	if err := tb.InsertRow(0, r); err != nil {
+		t.Error(err)
+	}
+	checkTString(t, tb, "{1: -1, 2: -2, 3: -3}, {1: 1, 2: 2, 3: 3}")
+	checkTCount(t, tb, 6)
+
+	// Test inserting a row after the current first row.
+	r = NewRow(0, 0, 0)
+	if err := tb.InsertRow(1, r); err != nil {
+		t.Error(err)
+	}
+	checkTString(t, tb, "{1: -1, 2: -2, 3: -3}, {1: 0, 2: 0, 3: 0}, {1: 1, 2: 2, 3: 3}")
+	checkTCount(t, tb, 9)
+
+	// Test inserting a row at the end.
+	r = NewRow(4, 5, 6)
+	if err := tb.InsertRow(tb.Rows(), r); err != nil {
+		t.Error(err)
+	}
+	checkTString(t, tb, "{1: -1, 2: -2, 3: -3}, {1: 0, 2: 0, 3: 0}, {1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
+	checkTCount(t, tb, 12)
+
+	// Test inserting a row with the first value being the wrong type.
+	r = NewRow("7", 8, 9)
+	if err := tb.InsertRow(1, r); err == nil {
+		t.Error("Unexpectedly passed inserting a row with the first value being the wrong type")
+	}
+	checkTString(t, tb, "{1: -1, 2: -2, 3: -3}, {1: 0, 2: 0, 3: 0}, {1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
+	checkTCount(t, tb, 12)
+
+	// Test inserting a row with the middle value being the wrong type.
+	r = NewRow(7, "8", 9)
+	if err := tb.InsertRow(1, r); err == nil {
+		t.Error("Unexpectedly passed inserting a row with the middle value being the wrong type")
+	}
+	checkTString(t, tb, "{1: -1, 2: -2, 3: -3}, {1: 0, 2: 0, 3: 0}, {1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
+	checkTCount(t, tb, 12)
+
+	// Test inserting a row with the last value being the wrong type.
+	r = NewRow(7, 8, "9")
+	if err := tb.InsertRow(1, r); err == nil {
+		t.Error("Unexpectedly passed inserting a row with the last value being the wrong type")
+	}
+	checkTString(t, tb, "{1: -1, 2: -2, 3: -3}, {1: 0, 2: 0, 3: 0}, {1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
+	checkTCount(t, tb, 12)
+
+	// Test inserting a row with all values being the wrong type.
+	r = NewRow("7", "8", "9")
+	if err := tb.InsertRow(1, r); err == nil {
+		t.Error("Unexpectedly passed inserting a row with all values being the wrong type")
+	}
+	checkTString(t, tb, "{1: -1, 2: -2, 3: -3}, {1: 0, 2: 0, 3: 0}, {1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
+	checkTCount(t, tb, 12)
 }
 
 func TestTRemoveRow(t *testing.T) {
