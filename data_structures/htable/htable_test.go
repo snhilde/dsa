@@ -50,6 +50,11 @@ func TestTBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad pointer test for Set()")
 	}
 
+	// Test Headers().
+	if tb.Headers() != nil {
+		t.Error("Unexpectedly passed bad pointer test for Headers()")
+	}
+
     // Test Rows().
 	if n := tb.Rows(); n != -1 {
 		t.Error("Unexpectedly passed bad pointer test for Rows()")
@@ -801,6 +806,27 @@ func TestTSet(t *testing.T) {
 	// Make sure you can't change an item's type.
 	if err := tb.Set(0, "1", "a"); err == nil {
 		t.Error("Unexpectedly passed changing an item's type")
+	}
+}
+
+func TestTHeaders(t *testing.T) {
+	tb, _ := New("1", "2", "3")
+
+	exp := []string{"1", "2", "3"}
+	h := tb.Headers()
+	for i, v := range h {
+		if v != exp[i] {
+			t.Error("Received incorrect header")
+			t.Log("\tExpected:", exp[i])
+			t.Log("\tReceived:", v)
+		}
+	}
+
+	// Make sure you returned slice of headers doesn't reference the same underlying array as the table's headers.
+	h[0] = "4"
+	hh := tb.Headers()
+	if hh[0] == "4" {
+		t.Error("Changed table's column header")
 	}
 }
 
