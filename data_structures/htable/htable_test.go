@@ -762,7 +762,37 @@ func TestTColumnToIndex(t *testing.T) {
 }
 
 func TestTSet(t *testing.T) {
-	// TODO
+	tb, _ := New("1", "2", "3")
+	checkTString(t, tb, "<empty>")
+	checkTCount(t, tb, 0)
+
+	// Make sure you can't set any values with an empty table.
+	if err := tb.Set(0, "1", 5); err == nil {
+		t.Error("Unexpectedly passed setting a value with an empty table")
+	}
+
+	tb.Add(1, 2, 3)
+	tb.Add(4, 5, 6)
+	tb.Add(7, 8, 9)
+	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}, {1: 7, 2: 8, 3: 9}")
+	checkTCount(t, tb, 9)
+
+	// Change each value for all three rows.
+	for row := 0; row < 3; row++ {
+		for i, v := range []string{"1", "2", "3"} {
+			n := ((row * 3) + i + 1) * 10
+			if err := tb.Set(row, v, n); err != nil {
+				t.Error(err)
+			}
+		}
+	}
+	checkTString(t, tb, "{1: 10, 2: 20, 3: 30}, {1: 40, 2: 50, 3: 60}, {1: 70, 2: 80, 3: 90}")
+	checkTCount(t, tb, 9)
+
+	// Make sure you can't change an item's type.
+	if err := tb.Set(0, "1", "a"); err == nil {
+		t.Error("Unexpectedly passed changing an item's type")
+	}
 }
 
 func TestTRows(t *testing.T) {
