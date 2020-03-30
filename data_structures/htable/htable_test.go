@@ -243,7 +243,6 @@ func TestTNew(t *testing.T) {
 }
 
 func TestRNewRow(t *testing.T) {
-	// TODO
 }
 
 
@@ -254,98 +253,98 @@ func TestTAdd(t *testing.T) {
 	if err := tb.Add(1, 2, 3); err != nil {
 		t.Error(err)
 	}
-	checkString(t, tb, "[1 2 3]")
-	checkCount(t, tb, 3)
+	checkTString(t, tb, "[1 2 3]")
+	checkTCount(t, tb, 3)
 
 	if err := tb.Add(4, 5, 6); err != nil {
 		t.Error(err)
 	}
-	checkString(t, tb, "[1 2 3], [4 5 6]")
-	checkCount(t, tb, 6)
+	checkTString(t, tb, "[1 2 3], [4 5 6]")
+	checkTCount(t, tb, 6)
 
 	// Test rows of characters.
 	tb, _ = New("1", "2", "3")
 	if err := tb.Add('a', 'b', 'c'); err != nil {
 		t.Error(err)
 	}
-	checkString(t, tb, "[97 98 99]")
-	checkCount(t, tb, 3)
+	checkTString(t, tb, "[97 98 99]")
+	checkTCount(t, tb, 3)
 
 	if err := tb.Add('d', 'e', 'f'); err != nil {
 		t.Error(err)
 	}
-	checkString(t, tb, "[97 98 99], [100 101 102]")
-	checkCount(t, tb, 6)
+	checkTString(t, tb, "[97 98 99], [100 101 102]")
+	checkTCount(t, tb, 6)
 
 	// Test rows of int slices.
 	tb, _ = New("1", "2", "3")
 	if err := tb.Add([]int{10, 20}, []int{30, 40}, []int{50, 60}); err != nil {
 		t.Error(err)
 	}
-	checkString(t, tb, "[[10 20] [30 40] [50 60]]")
-	checkCount(t, tb, 3)
+	checkTString(t, tb, "[[10 20] [30 40] [50 60]]")
+	checkTCount(t, tb, 3)
 
 	if err := tb.Add([]int{100, 200}, []int{300, 400}, []int{500, 600}); err != nil {
 		t.Error(err)
 	}
-	checkString(t, tb, "[[10 20] [30 40] [50 60]], [[100 200] [300 400] [500 600]]")
-	checkCount(t, tb, 6)
+	checkTString(t, tb, "[[10 20] [30 40] [50 60]], [[100 200] [300 400] [500 600]]")
+	checkTCount(t, tb, 6)
 
 	// Test mixed-value rows.
 	tb, _ = New("1", "2", "3")
 	if err := tb.Add(1.1, "b", []byte{0x03}); err != nil {
 		t.Error(err)
 	}
-	checkString(t, tb, "[1.1 b [3]]")
-	checkCount(t, tb, 3)
+	checkTString(t, tb, "[1.1 b [3]]")
+	checkTCount(t, tb, 3)
 
 	if err := tb.Add(4.4, "e", []byte{0x06}); err != nil {
 		t.Error(err)
 	}
-	checkString(t, tb, "[1.1 b [3]], [4.4 e [6]]")
-	checkCount(t, tb, 6)
+	checkTString(t, tb, "[1.1 b [3]], [4.4 e [6]]")
+	checkTCount(t, tb, 6)
 
 	// Test rows of strings with spaces.
 	tb, _ = New("1", "2", "3")
 	if err := tb.Add("before ", "in between", " after"); err != nil {
 		t.Error(err)
 	}
-	checkString(t, tb, "[before  in between  after]")
-	checkCount(t, tb, 3)
+	checkTString(t, tb, "[before  in between  after]")
+	checkTCount(t, tb, 3)
 
 	if err := tb.Add("AAA", "   ", ""); err != nil {
 		t.Error(err)
 	}
-	checkString(t, tb, "[before  in between  after], [AAA     ]")
-	checkCount(t, tb, 6)
+	checkTString(t, tb, "[before  in between  after], [AAA     ]")
+	checkTCount(t, tb, 6)
 
 	// Test rows masquerading as interfaces.
 	tb, _ = New("1", "2", "3")
 	if err := tb.Add(interface{}(1), interface{}(2), interface{}(3)); err != nil {
 		t.Error(err)
 	}
-	checkString(t, tb, "[1 2 3]")
-	checkCount(t, tb, 3)
+	checkTString(t, tb, "[1 2 3]")
+	checkTCount(t, tb, 3)
 
 	if err := tb.Add(4, 5, 6); err != nil {
 		t.Error(err)
 	}
-	checkString(t, tb, "[1 2 3], [4 5 6]")
-	checkCount(t, tb, 6)
+	checkTString(t, tb, "[1 2 3], [4 5 6]")
+	checkTCount(t, tb, 6)
 
 	// Test rows of functions.
 	tb, _ = New("1", "2", "3")
-	if err := tb.Add(TestTNew, checkCount, TestTInsert); err != nil {
+	if err := tb.Add(TestTNew, checkTCount, TestTInsert); err != nil {
 		t.Error(err)
 	}
-	checkString(t, tb, fmt.Sprintf("[%p %p %p]", TestTNew, checkCount, TestTInsert))
-	checkCount(t, tb, 3)
+	checkTString(t, tb, fmt.Sprintf("[%p %p %p]", TestTNew, checkTCount, TestTInsert))
+	checkTCount(t, tb, 3)
 
-	if err := tb.Add(checkString, checkString, TestTAdd); err != nil {
+	if err := tb.Add(checkTString, checkTString, TestTAdd); err != nil {
 		t.Error(err)
 	}
-	checkString(t, tb, fmt.Sprintf("[%p %p %p], [%p %p %p]", TestTNew, checkCount, TestTInsert, checkString, checkString, TestTAdd))
-	checkCount(t, tb, 6)
+	checkTString(t, tb, fmt.Sprintf("[%p %p %p], [%p %p %p]", TestTNew, checkTCount, TestTInsert, checkTString, checkTString, TestTAdd))
+	checkTCount(t, tb, 6)
 }
 
 func TestTInsert(t *testing.T) {
@@ -353,67 +352,67 @@ func TestTInsert(t *testing.T) {
 	tb, _ := New("1", "2", "3")
 	tb.Add(1, 2, 3)
 	tb.Add(4, 5, 6)
-	checkString(t, tb, "[1 2 3], [4 5 6]")
-	checkCount(t, tb, 6)
+	checkTString(t, tb, "[1 2 3], [4 5 6]")
+	checkTCount(t, tb, 6)
 	if err := tb.Insert(0, -1, -2, -3); err != nil {
 		t.Error(err)
 	}
-	checkString(t, tb, "[-1 -2 -3], [1 2 3], [4 5 6]")
-	checkCount(t, tb, 9)
+	checkTString(t, tb, "[-1 -2 -3], [1 2 3], [4 5 6]")
+	checkTCount(t, tb, 9)
 
 	// Test inserting a row in the middle.
 	tb, _ = New("1", "2", "3")
 	tb.Add("a", "b", "c")
 	tb.Add("d", "e", "f")
-	checkString(t, tb, "[a b c], [d e f]")
-	checkCount(t, tb, 6)
+	checkTString(t, tb, "[a b c], [d e f]")
+	checkTCount(t, tb, 6)
 	if err := tb.Insert(1, "x", "y", "z"); err != nil {
 		t.Error(err)
 	}
-	checkString(t, tb, "[a b c], [x y z], [d e f]")
-	checkCount(t, tb, 9)
+	checkTString(t, tb, "[a b c], [x y z], [d e f]")
+	checkTCount(t, tb, 9)
 
 	// Test inserting a row at the end.
 	tb, _ = New("1", "2", "3")
 	tb.Add([]int{10, 20}, []int{30, 40}, []int{50, 60})
 	tb.Add([]int{100, 200}, []int{300, 400}, []int{500, 600})
-	checkString(t, tb, "[[10 20] [30 40] [50 60]], [[100 200] [300 400] [500 600]]")
-	checkCount(t, tb, 6)
+	checkTString(t, tb, "[[10 20] [30 40] [50 60]], [[100 200] [300 400] [500 600]]")
+	checkTCount(t, tb, 6)
 	if err := tb.Insert(2, []int{-1, -2, -3}, []int{-4, -5, -6}, []int{-7, -8, -9}); err != nil {
 		t.Error(err)
 	}
-	checkString(t, tb, "[[10 20] [30 40] [50 60]], [[100 200] [300 400] [500 600]], [[-1 -2 -3] [-4 -5 -6] [-7 -8 -9]]")
-	checkCount(t, tb, 9)
+	checkTString(t, tb, "[[10 20] [30 40] [50 60]], [[100 200] [300 400] [500 600]], [[-1 -2 -3] [-4 -5 -6] [-7 -8 -9]]")
+	checkTCount(t, tb, 9)
 
 	// Test inserting a row beyond the table's current boundaries.
 	tb, _ = New("1", "2", "3")
 	tb.Add(1.1, "b", []byte{0x03})
 	tb.Add(4.4, "e", []byte{0x06})
-	checkString(t, tb, "[1.1 b [3]], [4.4 e [6]]")
-	checkCount(t, tb, 6)
+	checkTString(t, tb, "[1.1 b [3]], [4.4 e [6]]")
+	checkTCount(t, tb, 6)
 	if err := tb.Insert(3, 7.7, "h", []byte{0x09}); err == nil {
 		t.Error("Unexpectedly passed out-of-bounds index test")
 	}
-	checkString(t, tb, "[1.1 b [3]], [4.4 e [6]]")
-	checkCount(t, tb, 6)
+	checkTString(t, tb, "[1.1 b [3]], [4.4 e [6]]")
+	checkTCount(t, tb, 6)
 
 	// Test only inserting instead of appending.
 	tb, _ = New("1", "2", "3")
 	if err := tb.Insert(0, "before ", "in between", " after"); err != nil {
 		t.Error(err)
 	}
-	checkString(t, tb, "[before  in between  after]")
-	checkCount(t, tb, 3)
+	checkTString(t, tb, "[before  in between  after]")
+	checkTCount(t, tb, 3)
 	if err := tb.Insert(1, "AAA", "   ", ""); err != nil {
 		t.Error(err)
 	}
-	checkString(t, tb, "[before  in between  after], [AAA     ]")
-	checkCount(t, tb, 6)
+	checkTString(t, tb, "[before  in between  after], [AAA     ]")
+	checkTCount(t, tb, 6)
 	if err := tb.Insert(0, "first", "second", "third"); err != nil {
 		t.Error(err)
 	}
-	checkString(t, tb, "[first second third], [before  in between  after], [AAA     ]")
-	checkCount(t, tb, 9)
+	checkTString(t, tb, "[first second third], [before  in between  after], [AAA     ]")
+	checkTCount(t, tb, 9)
 }
 
 func TestTAddRow(t *testing.T) {
@@ -430,61 +429,61 @@ func TestTRemoveRow(t *testing.T) {
 	tb.Add(-1, -2, -3)
 	tb.Add(1, 2, 3)
 	tb.Add(4, 5, 6)
-	checkString(t, tb, "[-1 -2 -3], [1 2 3], [4 5 6]")
-	checkCount(t, tb, 9)
+	checkTString(t, tb, "[-1 -2 -3], [1 2 3], [4 5 6]")
+	checkTCount(t, tb, 9)
 	if err := tb.RemoveRow(0); err != nil {
 		t.Error(err)
 	}
-	checkString(t, tb, "[1 2 3], [4 5 6]")
-	checkCount(t, tb, 6)
+	checkTString(t, tb, "[1 2 3], [4 5 6]")
+	checkTCount(t, tb, 6)
 
 	// Test removing a row in the middle.
 	tb, _ = New("1", "2", "3")
 	tb.Add("a", "b", "c")
 	tb.Add("x", "y", "z")
 	tb.Add("d", "e", "f")
-	checkString(t, tb, "[a b c], [x y z], [d e f]")
-	checkCount(t, tb, 9)
+	checkTString(t, tb, "[a b c], [x y z], [d e f]")
+	checkTCount(t, tb, 9)
 	if err := tb.RemoveRow(1); err != nil {
 		t.Error(err)
 	}
-	checkString(t, tb, "[a b c], [d e f]")
-	checkCount(t, tb, 6)
+	checkTString(t, tb, "[a b c], [d e f]")
+	checkTCount(t, tb, 6)
 
 	// Test removing a row at the end.
 	tb, _ = New("1", "2", "3")
 	tb.Add([]int{10, 20}, []int{30, 40}, []int{50, 60})
 	tb.Add([]int{100, 200}, []int{300, 400}, []int{500, 600})
 	tb.Add([]int{-1, -2, -3}, []int{-4, -5, -6}, []int{-7, -8, -9})
-	checkString(t, tb, "[[10 20] [30 40] [50 60]], [[100 200] [300 400] [500 600]], [[-1 -2 -3] [-4 -5 -6] [-7 -8 -9]]")
-	checkCount(t, tb, 9)
+	checkTString(t, tb, "[[10 20] [30 40] [50 60]], [[100 200] [300 400] [500 600]], [[-1 -2 -3] [-4 -5 -6] [-7 -8 -9]]")
+	checkTCount(t, tb, 9)
 	if err := tb.RemoveRow(2); err != nil {
 		t.Error(err)
 	}
-	checkString(t, tb, "[[10 20] [30 40] [50 60]], [[100 200] [300 400] [500 600]]")
-	checkCount(t, tb, 6)
+	checkTString(t, tb, "[[10 20] [30 40] [50 60]], [[100 200] [300 400] [500 600]]")
+	checkTCount(t, tb, 6)
 
 	// Test removing a row beyond the table's current boundaries.
 	tb, _ = New("1", "2", "3")
 	tb.Add(1.1, "b", []byte{0x03})
 	tb.Add(4.4, "e", []byte{0x06})
-	checkString(t, tb, "[1.1 b [3]], [4.4 e [6]]")
-	checkCount(t, tb, 6)
+	checkTString(t, tb, "[1.1 b [3]], [4.4 e [6]]")
+	checkTCount(t, tb, 6)
 	if err := tb.RemoveRow(3); err == nil {
 		t.Error("Unexpectedly passed out-of-bounds index test")
 	}
-	checkString(t, tb, "[1.1 b [3]], [4.4 e [6]]")
-	checkCount(t, tb, 6)
+	checkTString(t, tb, "[1.1 b [3]], [4.4 e [6]]")
+	checkTCount(t, tb, 6)
 
 	// Test removing when there aren't any rows in the table.
 	tb, _ = New("1", "2", "3")
-	checkString(t, tb, "<empty>")
-	checkCount(t, tb, 0)
+	checkTString(t, tb, "<empty>")
+	checkTCount(t, tb, 0)
 	if err := tb.RemoveRow(0); err == nil {
 		t.Error("Unexpectedly passed removing from empty table test")
 	}
-	checkString(t, tb, "<empty>")
-	checkCount(t, tb, 0)
+	checkTString(t, tb, "<empty>")
+	checkTCount(t, tb, 0)
 }
 
 func TestTRows(t *testing.T) {
@@ -584,28 +583,28 @@ func TestTColumns(t *testing.T) {
 
 func TestTCount(t *testing.T) {
 	tb, _ := New("1", "2", "3")
-	checkCount(t, tb, 0)
+	checkTCount(t, tb, 0)
 
 	tb.Add(1, 2, 3)
-	checkCount(t, tb, 3)
+	checkTCount(t, tb, 3)
 
 	tb.Add(4, 5, 6)
-	checkCount(t, tb, 6)
+	checkTCount(t, tb, 6)
 
 	tb.RemoveRow(0)
-	checkCount(t, tb, 3)
+	checkTCount(t, tb, 3)
 
 	tb.Insert(1, 7, 8, 9)
-	checkCount(t, tb, 6)
+	checkTCount(t, tb, 6)
 
 	tb, _ = New("1")
-	checkCount(t, tb, 0)
+	checkTCount(t, tb, 0)
 
 	tb.Add(1)
-	checkCount(t, tb, 1)
+	checkTCount(t, tb, 1)
 
 	tb.RemoveRow(0)
-	checkCount(t, tb, 0)
+	checkTCount(t, tb, 0)
 }
 
 func TestTRowItem(t *testing.T) {
@@ -783,7 +782,7 @@ func TestRMatches(t *testing.T) {
 
 
 // --- Helper Functions ---
-func checkString(t *testing.T, tb *Table, want string) {
+func checkTString(t *testing.T, tb *Table, want string) {
 	if s := tb.String(); s != want {
 		t.Error("Table items are incorrect")
 		t.Log("\tExpected:", want)
@@ -791,8 +790,24 @@ func checkString(t *testing.T, tb *Table, want string) {
 	}
 }
 
-func checkCount(t *testing.T, tb *Table, want int) {
+func checkTCount(t *testing.T, tb *Table, want int) {
 	if n := tb.Count(); n != want {
+		t.Error("Table count is incorrect")
+		t.Log("\tExpected:", want)
+		t.Log("\tReceived:", n)
+	}
+}
+
+func checkRString(t *testing.T, r *Row, want string) {
+	if s := r.String(); s != want {
+		t.Error("Table items are incorrect")
+		t.Log("\tExpected:", want)
+		t.Log("\tReceived:", s)
+	}
+}
+
+func checkRCount(t *testing.T, r *Row, want int) {
+	if n := r.Count(); n != want {
 		t.Error("Table count is incorrect")
 		t.Log("\tExpected:", want)
 		t.Log("\tReceived:", n)
