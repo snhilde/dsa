@@ -1107,7 +1107,27 @@ func TestTToggle(t *testing.T) {
 
 // --- Row's Method Tests ---
 func TestRItem(t *testing.T) {
-	// TODO
+	r := NewRow(1, 2, 3)
+	checkRString(t, r, "{1, 2, 3}")
+	checkRCount(t, r, 3)
+
+	if v := r.Item(0); v != 1 {
+		t.Error("Item is row is incorrect")
+		t.Log("\tExpected:", 1)
+		t.Log("\tReceived:", v)
+	}
+
+	if v := r.Item(1); v != 2 {
+		t.Error("Item is row is incorrect")
+		t.Log("\tExpected:", 2)
+		t.Log("\tReceived:", v)
+	}
+
+	if v := r.Item(2); v != 3 {
+		t.Error("Item is row is incorrect")
+		t.Log("\tExpected:", 3)
+		t.Log("\tReceived:", v)
+	}
 }
 
 func TestRMatches(t *testing.T) {
