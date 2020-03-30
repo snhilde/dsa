@@ -45,9 +45,9 @@ func TestTBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad pointer test for String()")
 	}
 
-	// Test Set().
-	if err := tb.Set(0, "1", 1); err == nil {
-		t.Error("Unexpectedly passed bad pointer test for Set()")
+	// Test SetItem().
+	if err := tb.SetItem(0, "1", 1); err == nil {
+		t.Error("Unexpectedly passed bad pointer test for SetItem()")
 	}
 
 	// Test Headers().
@@ -98,8 +98,8 @@ func TestRBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad pointer test for Row's String()")
 	}
 
-	if err := r.Set(0, "item"); err == nil {
-		t.Error("Unexpectedly passed bad pointer test for Row's Set()")
+	if err := r.SetItem(0, "item"); err == nil {
+		t.Error("Unexpectedly passed bad pointer test for Row's SetItem()")
 	}
 
 	if n := r.Count(); n != -1 {
@@ -214,24 +214,24 @@ func TestTBadArgs(t *testing.T) {
 		t.Error("Unexpectedly passed invalid column header test for ColumnToIndex()")
 	}
 
-	// Test Set() - negative index.
-	if err := tb.Set(-1, "1", "value"); err == nil {
-		t.Error("Unexpectedly passed negative index tests for Set()")
+	// Test SetItem() - negative index.
+	if err := tb.SetItem(-1, "1", "value"); err == nil {
+		t.Error("Unexpectedly passed negative index tests for SetItem()")
 	}
 
-	// Test Set() - out-of-bounds index.
-	if err := tb.Set(100, "1", "value"); err == nil {
-		t.Error("Unexpectedly passed out-of-bounds index tests for Set()")
+	// Test SetItem() - out-of-bounds index.
+	if err := tb.SetItem(100, "1", "value"); err == nil {
+		t.Error("Unexpectedly passed out-of-bounds index tests for SetItem()")
 	}
 
-	// Test Set() - missing column header.
-	if err := tb.Set(0, "", "value"); err == nil {
-		t.Error("Unexpectedly passed missing column header tests for Set()")
+	// Test SetItem() - missing column header.
+	if err := tb.SetItem(0, "", "value"); err == nil {
+		t.Error("Unexpectedly passed missing column header tests for SetItem()")
 	}
 
-	// Test Set() - invalid column header.
-	if err := tb.Set(0, "4", "value"); err == nil {
-		t.Error("Unexpectedly passed invalid column header tests for Set()")
+	// Test SetItem() - invalid column header.
+	if err := tb.SetItem(0, "4", "value"); err == nil {
+		t.Error("Unexpectedly passed invalid column header tests for SetItem()")
 	}
 
     // Test Row() - empty column header.
@@ -308,14 +308,14 @@ func TestTBadArgs(t *testing.T) {
 func TestRBadArgs(t *testing.T) {
 	r := NewRow(1, 2, 3)
 
-	// Test Set() - negative index.
-	if err := r.Set(-1, "value"); err == nil {
-		t.Error("Unexpectedly passed negative index tests for Set()")
+	// Test SetItem() - negative index.
+	if err := r.SetItem(-1, "value"); err == nil {
+		t.Error("Unexpectedly passed negative index tests for SetItem()")
 	}
 
-	// Test Set() - out-of-bounds index.
-	if err := r.Set(100, "value"); err == nil {
-		t.Error("Unexpectedly passed out-of-bounds index tests for Set()")
+	// Test SetItem() - out-of-bounds index.
+	if err := r.SetItem(100, "value"); err == nil {
+		t.Error("Unexpectedly passed out-of-bounds index tests for SetItem()")
 	}
 
 	// Test Item() - negative index.
@@ -775,13 +775,13 @@ func TestTColumnToIndex(t *testing.T) {
 	}
 }
 
-func TestTSet(t *testing.T) {
+func TestTSetItem(t *testing.T) {
 	tb, _ := New("1", "2", "3")
 	checkTString(t, tb, "<empty>")
 	checkTCount(t, tb, 0)
 
 	// Make sure you can't set any values with an empty table.
-	if err := tb.Set(0, "1", 5); err == nil {
+	if err := tb.SetItem(0, "1", 5); err == nil {
 		t.Error("Unexpectedly passed setting a value with an empty table")
 	}
 
@@ -795,7 +795,7 @@ func TestTSet(t *testing.T) {
 	for row := 0; row < 3; row++ {
 		for i, v := range []string{"1", "2", "3"} {
 			n := ((row * 3) + i + 1) * 10
-			if err := tb.Set(row, v, n); err != nil {
+			if err := tb.SetItem(row, v, n); err != nil {
 				t.Error(err)
 			}
 		}
@@ -804,7 +804,7 @@ func TestTSet(t *testing.T) {
 	checkTCount(t, tb, 9)
 
 	// Make sure you can't change an item's type.
-	if err := tb.Set(0, "1", "a"); err == nil {
+	if err := tb.SetItem(0, "1", "a"); err == nil {
 		t.Error("Unexpectedly passed changing an item's type")
 	}
 }
@@ -1213,46 +1213,46 @@ func TestTToggle(t *testing.T) {
 
 
 // --- Row's Method Tests ---
-func TestRSet(t *testing.T) {
+func TestRSetItem(t *testing.T) {
 	r := NewRow(1, 2, 3)
 	checkRString(t, r, "{1, 2, 3}")
 	checkRCount(t, r, 3)
 
 	// Try setting the first item.
-	if err := r.Set(0, 4); err != nil {
+	if err := r.SetItem(0, 4); err != nil {
 		t.Error(err)
 	}
 	checkRString(t, r, "{4, 2, 3}")
 	checkRCount(t, r, 3)
 
 	// Try setting the middle item.
-	if err := r.Set(1, 5); err != nil {
+	if err := r.SetItem(1, 5); err != nil {
 		t.Error(err)
 	}
 	checkRString(t, r, "{4, 5, 3}")
 	checkRCount(t, r, 3)
 
 	// Try setting the last item.
-	if err := r.Set(2, 6); err != nil {
+	if err := r.SetItem(2, 6); err != nil {
 		t.Error(err)
 	}
 	checkRString(t, r, "{4, 5, 6}")
 	checkRCount(t, r, 3)
 
 	// Make sure you can set a different type for rows (tables should fail).
-	if err := r.Set(0, 3.14); err != nil {
+	if err := r.SetItem(0, 3.14); err != nil {
 		t.Error(err)
 	}
 	checkRString(t, r, "{3.14, 5, 6}")
 	checkRCount(t, r, 3)
 
-	if err := r.Set(1, "scooby"); err != nil {
+	if err := r.SetItem(1, "scooby"); err != nil {
 		t.Error(err)
 	}
 	checkRString(t, r, "{3.14, scooby, 6}")
 	checkRCount(t, r, 3)
 
-	if err := r.Set(2, []int{10, 20, 30}); err != nil {
+	if err := r.SetItem(2, []int{10, 20, 30}); err != nil {
 		t.Error(err)
 	}
 	checkRString(t, r, "{3.14, scooby, [10 20 30]}")

@@ -164,8 +164,8 @@ func (t *Table) String() string {
 	return strings.TrimSuffix(s, ", ")
 }
 
-// Set changes the value of the item at the specified coordinates.
-func (t *Table) Set(row int, col string, value interface{}) error {
+// SetItem changes the value of the item at the specified coordinates.
+func (t *Table) SetItem(row int, col string, value interface{}) error {
 	if t == nil {
 		return tErr()
 	} else if row < 0 || t.Rows() <= row {
@@ -186,7 +186,7 @@ func (t *Table) Set(row int, col string, value interface{}) error {
 
 	// Change the value.
 	nr := r.(*Row)
-	nr.Set(i, value)
+	nr.SetItem(i, value)
 
 	// Add the row back in to the table, which will also validate the new value.
 	if err := t.RemoveRow(row); err != nil {
@@ -376,8 +376,8 @@ func (r *Row) String() string {
 	return strings.Join([]string{"{", s, "}"}, "")
 }
 
-// Set changes the value of the item in the specified column.
-func (r *Row) Set(index int, value interface{}) error {
+// SetItem changes the value of the item in the specified column.
+func (r *Row) SetItem(index int, value interface{}) error {
 	if r == nil {
 		return rErr()
 	} else if index < 0 || r.Count() <= index {
