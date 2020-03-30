@@ -40,6 +40,16 @@ func TestTBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad pointer test for ColumnToIndex()")
 	}
 
+	// Test String().
+	if s := tb.String(); s != "<nil>" {
+		t.Error("Unexpectedly passed bad pointer test for String()")
+	}
+
+	// Test Set().
+	if err := tb.Set(0, "1", 1); err == nil {
+		t.Error("Unexpectedly passed bad pointer test for Set()")
+	}
+
     // Test Rows().
 	if n := tb.Rows(); n != -1 {
 		t.Error("Unexpectedly passed bad pointer test for Rows()")
@@ -53,11 +63,6 @@ func TestTBadPtr(t *testing.T) {
     // Test Count().
 	if n := tb.Count(); n != -1 {
 		t.Error("Unexpectedly passed bad pointer test for Count()")
-	}
-
-	// Test String()
-	if s := tb.String(); s != "<nil>" {
-		t.Error("Unexpectedly passed bad pointer test for String()")
 	}
 
     // Test Row().
@@ -200,6 +205,25 @@ func TestTBadArgs(t *testing.T) {
 		t.Error("Unexpectedly passed invalid column header test for ColumnToIndex()")
 	}
 
+	// Test Set() - negative index.
+	if err := tb.Set(-1, "1", "value"); err == nil {
+		t.Error("Unexpectedly passed negative index tests for Set()")
+	}
+
+	// Test Set() - out-of-bounds index.
+	if err := tb.Set(100, "1", "value"); err == nil {
+		t.Error("Unexpectedly passed out-of-bounds index tests for Set()")
+	}
+
+	// Test Set() - missing column header.
+	if err := tb.Set(0, "", "value"); err == nil {
+		t.Error("Unexpectedly passed missing column header tests for Set()")
+	}
+
+	// Test Set() - invalid column header.
+	if err := tb.Set(0, "4", "value"); err == nil {
+		t.Error("Unexpectedly passed invalid column header tests for Set()")
+	}
 
     // Test Row() - empty column header.
 	if i, r := tb.Row("", 5); i != -1 || r != nil {
@@ -719,7 +743,11 @@ func TestTRemoveRow(t *testing.T) {
 	checkTCount(t, tb, 0)
 }
 
-func TestColumnToIndex(t *testing.T) {
+func TestTColumnToIndex(t *testing.T) {
+	// TODO
+}
+
+func TestTSet(t *testing.T) {
 	// TODO
 }
 
