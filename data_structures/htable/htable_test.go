@@ -86,6 +86,14 @@ func TestRBadPtr(t *testing.T) {
 	if r.Matches("1", 1) {
 		t.Error("Unexpectedly passed bad pointer test for Row's Matches()")
 	}
+
+	if r.String() != "<nil>" {
+		t.Error("Unexpectedly passed bad pointer test for Row's String()")
+	}
+
+	if r.Count() != -1 {
+		t.Error("Unexpectedly passed bad pointer test for Row's Count()")
+	}
 }
 
 func TestTBadArgs(t *testing.T) {

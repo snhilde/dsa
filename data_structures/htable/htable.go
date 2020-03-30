@@ -325,7 +325,7 @@ func (r *Row) Matches(col string, v interface{}) bool {
 // String returns a formatted list of the items in the row.
 func (r *Row) String() string {
 	if r == nil {
-		return "<nil"
+		return "<nil>"
 	} else if len(r.v) == 0 {
 		return "<empty>"
 	}
