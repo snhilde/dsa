@@ -184,9 +184,9 @@ func (t *Table) Set(row int, col string, value interface{}) error {
 		return errors.New("Invalid column")
 	}
 
-	// Make our new row.
-	nr := NewRow(r.(*Row).v ...)
-	nr.v[i] = value
+	// Change the value.
+	nr := r.(*Row)
+	nr.Set(i, value)
 
 	// Add the row back in to the table, which will also validate the new value.
 	if err := t.RemoveRow(row); err != nil {
@@ -346,6 +346,46 @@ func NewRow(items ...interface{}) *Row {
 	return r
 }
 
+// String returns a formatted list of the items in the row.
+func (r *Row) String() string {
+	if r == nil {
+		return "<nil>"
+	} else if len(r.v) == 0 {
+		return "<empty>"
+	}
+
+	var b strings.Builder
+	for _, v := range r.v {
+		b.WriteString(fmt.Sprintf("%v, ", v))
+	}
+
+	s := strings.TrimSuffix(b.String(), ", ")
+
+	return strings.Join([]string{"{", s, "}"}, "")
+}
+
+// Set changes the value of the item in the specified column.
+func (r *Row) Set(index int, value interface{}) error {
+	if r == nil {
+		return rErr()
+	} else if index < 0 || r.Count() <= index {
+		return errors.New("Invalid column")
+	}
+
+	r.v[index] = value
+
+	return nil
+}
+
+// Count returns the number of items in the row, or -1 on error.
+func (r *Row) Count() int {
+	if r == nil {
+		return -1
+	}
+
+	return len(r.v)
+}
+
 // Item returns the row's value at the specified index, or nil if not found or error.
 func (r *Row) Item(index int) interface{} {
 	if r == nil {
@@ -366,36 +406,13 @@ func (r *Row) Matches(index int, v interface{}) bool {
 	return reflect.DeepEqual(v, item)
 }
 
-// String returns a formatted list of the items in the row.
-func (r *Row) String() string {
-	if r == nil {
-		return "<nil>"
-	} else if len(r.v) == 0 {
-		return "<empty>"
-	}
-
-	var b strings.Builder
-	for _, v := range r.v {
-		b.WriteString(fmt.Sprintf("%v, ", v))
-	}
-
-	s := strings.TrimSuffix(b.String(), ", ")
-
-	return strings.Join([]string{"{", s, "}"}, "")
-}
-
-// Count returns the number of items in the row, or -1 on error.
-func (r *Row) Count() int {
-	if r == nil {
-		return -1
-	}
-
-	return len(r.v)
-}
-
 
 func tErr() error {
 	return errors.New("Table must be created with New() first")
+}
+
+func rErr() error {
+	return errors.New("Row must be created with NewRow() first")
 }
 
 func (t *Table) validateRow(r *Row) error {
