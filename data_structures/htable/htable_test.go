@@ -360,7 +360,156 @@ func TestRBadArgs(t *testing.T) {
 }
 
 func TestBadTypes(t *testing.T) {
-	// TODO
+	// Make sure all signed integer types are compatible with each other.
+	rows := [][]interface{} {
+		{int(1), int(2), int(3)},
+		{int8(1), int8(2), int8(3)},
+		{int16(1), int16(2), int16(3)},
+		{int32(1), int32(2), int32(3)},
+		{int64(1), int64(2), int64(3)},
+	}
+
+	for i, v := range rows {
+		tb, _ := New("1", "2", "3")
+
+		// Set the integer type from this row.
+		if err := tb.Add(v...); err != nil {
+			t.Error(err)
+		}
+
+		// Now try adding all the other integer types.
+		for j, w := range rows {
+			if i == j {
+				continue
+			}
+			if err := tb.Add(w...); err != nil {
+				t.Error(err)
+			}
+		}
+	}
+
+	// Make sure all unsigned integer types are compatible with each other.
+	rows = [][]interface{} {
+		{uint(1), uint(2), uint(3)},
+		{uint8(1), uint8(2), uint8(3)},
+		{uint16(1), uint16(2), uint16(3)},
+		{uint32(1), uint32(2), uint32(3)},
+		{uint64(1), uint64(2), uint64(3)},
+	}
+
+	for i, v := range rows {
+		tb, _ := New("1", "2", "3")
+
+		// Set the unsigned integer type from this row.
+		if err := tb.Add(v...); err != nil {
+			t.Error(err)
+		}
+
+		// Now try adding all the other unsigned integer types.
+		for j, w := range rows {
+			if i == j {
+				continue
+			}
+			if err := tb.Add(w...); err != nil {
+				t.Error(err)
+			}
+		}
+	}
+
+	// Make sure all float types are compatible with each other.
+	rows = [][]interface{} {
+		{float32(1.1), float32(2.2), float32(3.3)},
+		{float64(1.1), float64(2.2), float64(3.3)},
+	}
+
+	for i, v := range rows {
+		tb, _ := New("1", "2", "3")
+
+		// Set the float type from this row.
+		if err := tb.Add(v...); err != nil {
+			t.Error(err)
+		}
+
+		// Now try adding the other float type.
+		for j, w := range rows {
+			if i == j {
+				continue
+			}
+			if err := tb.Add(w...); err != nil {
+				t.Error(err)
+			}
+		}
+	}
+
+	// Make sure all complex types are compatible with each other.
+	rows = [][]interface{} {
+		{complex64(1+10i), complex64(2+20i), complex64(3+30i)},
+		{complex128(4+40i), complex128(5+50i), complex128(6+60i)},
+	}
+
+	for i, v := range rows {
+		tb, _ := New("1", "2", "3")
+
+		// Set the complex type from this row.
+		if err := tb.Add(v...); err != nil {
+			t.Error(err)
+		}
+
+		// Now try adding the other complex type.
+		for j, w := range rows {
+			if i == j {
+				continue
+			}
+			if err := tb.Add(w...); err != nil {
+				t.Error(err)
+			}
+		}
+	}
+
+	// Make sure struct types are compatible with each other.
+	type s1 struct {
+		s string
+		n int
+	}
+	type s2 struct {
+		i int
+		v float32
+	}
+
+	tb, _ := New("1", "2", "3")
+	tb.Add(s1{"a", 1}, s1{"b", 2}, s1{"c", 3})
+	tb.Add(s2{4, 4.4}, s2{5, 5.5}, s2{6, 6.6})
+	tb.Add(s1{"d", 4}, s2{5, 5.5}, s1{"f", 6})
+
+	tb, _ = New("1", "2", "3")
+	tb.Add(s2{4, 4.4}, s2{5, 5.5}, s2{6, 6.6})
+	tb.Add(s1{"a", 1}, s1{"b", 2}, s1{"c", 3})
+	tb.Add(s2{4, 4.4}, s1{"e", 5}, s2{6, 6.6})
+
+	// Make sure functions of different types are compatible with each other.
+	f1 := func(int)error{return nil}
+	f2 := func()string{return ""}
+	f3 := func([]int){}
+	items := []interface{}{f1, f2, f3}
+
+	for i, v := range items {
+		tb, _ := New("1", "2", "3")
+
+		// Use this function as the type, to make sure that the type of the function is not important.
+		if err := tb.Add(v, v, v); err != nil {
+			t.Error(err)
+		}
+
+		// Now try adding the other complex type.
+		for j, w := range items {
+			if i == j {
+				continue
+			}
+			if err := tb.Add(w, w, w); err != nil {
+				t.Error(err)
+			}
+		}
+	}
 }
 
 
