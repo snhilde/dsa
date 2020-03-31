@@ -104,22 +104,27 @@ func TestTBadPtr(t *testing.T) {
 func TestRBadPtr(t *testing.T) {
 	var r *Row
 
+	// Test String().
 	if r.String() != "<nil>" {
 		t.Error("Unexpectedly passed bad pointer test for Row's String()")
 	}
 
+	// Test SetItem().
 	if err := r.SetItem(0, "item"); err == nil {
 		t.Error("Unexpectedly passed bad pointer test for Row's SetItem()")
 	}
 
+	// Test Count().
 	if n := r.Count(); n != -1 {
 		t.Error("Unexpectedly passed bad pointer test for Row's Count()")
 	}
 
+	// Test Item().
 	if v := r.Item(0); v != nil {
 		t.Error("Unexpectedly passed bad pointer test for Row's Item()")
 	}
 
+	// Test Matches().
 	if r.Matches(0, 1) {
 		t.Error("Unexpectedly passed bad pointer test for Row's Matches()")
 	}
@@ -169,6 +174,31 @@ func TestTBadArgs(t *testing.T) {
 		t.Error("Unexpectedly passed out-of-bounds index test for Insert()")
 	}
 
+	// Test Insert() - too few columns.
+	if err := tb.Insert(0, 1, 2); err == nil {
+		t.Error("Unexpectedly passed too few columns test for Insert()")
+	}
+
+	// Test Insert() - too many columns.
+	if err := tb.Insert(0, 1, 2, 3, 4); err == nil {
+		t.Error("Unexpectedly passed too many columns test for Insert()")
+	}
+
+	// Test Insert() - wrong type in first position.
+	if err := tb.Insert(0, "item1", 5, 6); err == nil {
+		t.Error("Unexpectedly passed wrong type (first) test for Insert()")
+	}
+
+	// Test Insert() - wrong type in middle position.
+	if err := tb.Insert(0, 4, "item5", 6); err == nil {
+		t.Error("Unexpectedly passed wrong type (middle) test for Insert()")
+	}
+
+	// Test Insert() - wrong type in last position.
+	if err := tb.Insert(0, 4, 5, "item6"); err == nil {
+		t.Error("Unexpectedly passed wrong type (last) test for Insert()")
+	}
+
 	// Test AddRow() - too few columns.
 	if err := tb.AddRow(NewRow(1, 2)); err == nil {
 		t.Error("Unexpectedly passed too few columns test for AddRow()")
@@ -202,6 +232,31 @@ func TestTBadArgs(t *testing.T) {
     // Test InsertRow() - out-of-bounds index.
 	if err := tb.InsertRow(100, NewRow(100, 4, 5, 6)); err == nil {
 		t.Error("Unexpectedly passed out-of-bounds index test for InsertRow()")
+	}
+
+	// Test InsertRow() - too few columns.
+	if err := tb.InsertRow(0, NewRow(1, 2)); err == nil {
+		t.Error("Unexpectedly passed too few columns test for InsertRow()")
+	}
+
+	// Test InsertRow() - too many columns.
+	if err := tb.InsertRow(0, NewRow(1, 2, 3, 4)); err == nil {
+		t.Error("Unexpectedly passed too many columns test for InsertRow()")
+	}
+
+	// Test InsertRow() - wrong type in first position.
+	if err := tb.InsertRow(0, NewRow("item1", 5, 6)); err == nil {
+		t.Error("Unexpectedly passed wrong type (first) test for InsertRow()")
+	}
+
+	// Test InsertRow() - wrong type in middle position.
+	if err := tb.InsertRow(0, NewRow(4, "item5", 6)); err == nil {
+		t.Error("Unexpectedly passed wrong type (middle) test for InsertRow()")
+	}
+
+	// Test InsertRow() - wrong type in last position.
+	if err := tb.InsertRow(0, NewRow(4, 5, "item6")); err == nil {
+		t.Error("Unexpectedly passed wrong type (last) test for InsertRow()")
 	}
 
     // Test RemoveRow() - negative index.
@@ -334,12 +389,12 @@ func TestRBadArgs(t *testing.T) {
 	r := NewRow(1, 2, 3)
 
 	// Test SetItem() - negative index.
-	if err := r.SetItem(-1, "value"); err == nil {
+	if err := r.SetItem(-1, nil); err == nil {
 		t.Error("Unexpectedly passed negative index test for SetItem()")
 	}
 
 	// Test SetItem() - out-of-bounds index.
-	if err := r.SetItem(100, "value"); err == nil {
+	if err := r.SetItem(100, nil); err == nil {
 		t.Error("Unexpectedly passed out-of-bounds index test for SetItem()")
 	}
 
