@@ -35,6 +35,11 @@ func TestTBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad pointer test for RemoveRow()")
 	}
 
+	// Test Clear().
+	if err := tb.Clear(); err == nil {
+		t.Error("Unexpectedly passed bad pointer test for Clear()")
+	}
+
     // Test ColumnToIndex().
 	if n := tb.ColumnToIndex("1"); n != -1 {
 		t.Error("Unexpectedly passed bad pointer test for ColumnToIndex()")
@@ -926,6 +931,81 @@ func TestTRemoveRow(t *testing.T) {
 	checkTCount(t, tb, 0)
 	if err := tb.RemoveRow(0); err == nil {
 		t.Error("Unexpectedly passed removing from empty table test")
+	}
+	checkTString(t, tb, "<empty>")
+	checkTCount(t, tb, 0)
+}
+
+func TestTClear(t *testing.T) {
+	// Try clearing an empty table.
+	tb, _ := New("1", "2", "3")
+	checkTString(t, tb, "<empty>")
+	checkTCount(t, tb, 0)
+
+	if err := tb.Clear(); err != nil {
+		t.Error(err)
+	}
+	checkTString(t, tb, "<empty>")
+	checkTCount(t, tb, 0)
+
+	// Add some rows and clear again.
+	tb, _ = New("1", "2", "3")
+	tb.Add(1, 2, 3)
+	tb.Add(4, 5, 6)
+	tb.Add(7, 8, 9)
+	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}, {1: 7, 2: 8, 3: 9}")
+	checkTCount(t, tb, 9)
+
+	if err := tb.Clear(); err != nil {
+		t.Error(err)
+	}
+	checkTString(t, tb, "<empty>")
+	checkTCount(t, tb, 0)
+
+	// Add some rows, delete one row, and then clear.
+	tb, _ = New("1", "2", "3")
+	tb.Add(1, 2, 3)
+	tb.Add(4, 5, 6)
+	tb.Add(7, 8, 9)
+	tb.RemoveRow(1)
+	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 7, 2: 8, 3: 9}")
+	checkTCount(t, tb, 6)
+
+	if err := tb.Clear(); err != nil {
+		t.Error(err)
+	}
+	checkTString(t, tb, "<empty>")
+	checkTCount(t, tb, 0)
+
+	// Add some rows, delete all the rows, and then clear.
+	tb, _ = New("1", "2", "3")
+	tb.Add(1, 2, 3)
+	tb.Add(4, 5, 6)
+	tb.Add(7, 8, 9)
+	tb.RemoveRow(0)
+	tb.RemoveRow(0)
+	tb.RemoveRow(0)
+	checkTString(t, tb, "<empty>")
+	checkTCount(t, tb, 0)
+
+	if err := tb.Clear(); err != nil {
+		t.Error(err)
+	}
+	checkTString(t, tb, "<empty>")
+	checkTCount(t, tb, 0)
+
+	// Add some rows, disable a couple of rows, and clear the table.
+	tb, _ = New("1", "2", "3")
+	tb.Add(1, 2, 3)
+	tb.Add(4, 5, 6)
+	tb.Add(7, 8, 9)
+	tb.Toggle(1, false)
+	tb.Toggle(2, false)
+	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}")
+	checkTCount(t, tb, 9)
+
+	if err := tb.Clear(); err != nil {
+		t.Error(err)
 	}
 	checkTString(t, tb, "<empty>")
 	checkTCount(t, tb, 0)
