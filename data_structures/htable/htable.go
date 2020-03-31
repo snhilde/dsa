@@ -122,11 +122,6 @@ func (t *Table) Clear() error {
 		return tErr()
 	}
 
-	if t.rows == nil {
-		// Nothing to do.
-		return nil
-	}
-
 	return t.rows.Clear()
 }
 
