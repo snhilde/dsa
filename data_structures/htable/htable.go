@@ -116,6 +116,20 @@ func (t *Table) RemoveRow(index int) error {
 	return nil
 }
 
+// Clear erases the rows in the table but leaves the column headers and column types.
+func (t *Table) Clear() error {
+	if t == nil {
+		return tErr()
+	}
+
+	if t.rows == nil {
+		// Nothing to do.
+		return nil
+	}
+
+	return t.rows.Clear()
+}
+
 // ColumnToIndex translates the column's string name to its index in the table. This will return -1 on error.
 func (t *Table) ColumnToIndex(col string) int {
 	if t == nil {
