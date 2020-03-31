@@ -7,6 +7,7 @@ Data Structures and Algorithms
 	* [Linked List (hlist)](https://godoc.org/github.com/snhilde/dsa/data_structures/hlist)
 	* [Stack (hstack)](https://godoc.org/github.com/snhilde/dsa/data_structures/hstack)
 	* [Binary Buffer (hbit)](https://godoc.org/github.com/snhilde/dsa/data_structures/hbit)
+	* [Data Table (htable)](https://godoc.org/github.com/snhilde/dsa/data_structures/htable)
 * Algorithms
 	* [Search (hsearch)](https://godoc.org/github.com/snhilde/dsa/algorithms/hsearch)
 	* [Sort (hsort)](https://godoc.org/github.com/snhilde/dsa/algorithms/hsort)
