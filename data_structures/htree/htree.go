@@ -17,3 +17,8 @@ type node struct {
 	l *node        // left branch
 	r *node        // right branch
 }
+
+
+func New() *Tree {
+	return new(Tree)
+}
