@@ -357,8 +357,8 @@ func (s *stringSort) Build(length int, isHash bool) {
 	s.std = make([]string, length)
 
 	for i := 0; i < length; i++ {
-		l := 1
-		for l > 0 {
+		l := 0
+		for l == 0 {
 			l = r.Intn(32)
 		}
 		b := make([]byte, l)
