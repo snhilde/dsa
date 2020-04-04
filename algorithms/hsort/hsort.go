@@ -198,8 +198,9 @@ func Merge(list interface{}) error {
 		return err
 	}
 
-	indexOf := make([]int, length) // item's index -> item's order
-	orderOf := make([]int, length) // item's order -> item's index
+	// Use these two lists to track where the item's will be sorted after we are done calculating.
+	indexOf := make([]int, length) // item's order -> item's index
+	orderOf := make([]int, length) // item's index -> item's order
 
 	b := block{0, length, false}
 	s := []block{b}
