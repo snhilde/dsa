@@ -215,7 +215,7 @@ func Merge(list interface{}) error {
 		rightIndex := b.index + leftLen
 		rightLen := b.length - leftLen
 		if b.merge {
-			// Merge the two halves.
+			// Calculate the sorted order of each item.
 			for i := 0; i < b.length; i++ {
 				if leftLen == 0 {
 					// We only have values on the right side still.
@@ -239,7 +239,21 @@ func Merge(list interface{}) error {
 					rightLen--
 				}
 			}
-			copy(list[b.index:], tmp[:b.length])
+			// Now that everything is calculated, put the items into sorted order.
+			for i := 0; i < b.length; i++ {
+				// The item with order i is currently in this index:
+				curr := indexOf[i]
+				// However, we want it to be in this index:
+				want := b.index + i
+				// But the item with this order is currently occupying the desired index:
+				order := orderOf[want]
+				// First, let's swap the two items.
+				swap(curr, want)
+				// Now, let's update the second item's index, so we can find it later when it's turn has come to be
+				// swapped into the correct order.
+				indexOf[order] = curr
+				orderOf[curr] = order
+			}
 		} else {
 			// We're still on the splitting phase.
 			b.merge = true
