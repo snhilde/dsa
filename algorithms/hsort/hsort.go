@@ -219,18 +219,22 @@ func Merge(list interface{}) error {
 			for i := 0; i < b.length; i++ {
 				if leftLen == 0 {
 					// We only have values on the right side still.
-					tmp[i] = rightIndex
+					indexOf[i] = rightIndex
+					orderOf[rightIndex] = i
 					rightIndex++
 				} else if rightLen == 0 {
 					// We only have values on the left side still.
-					tmp[i] = leftIndex
+					indexOf[i] = leftIndex
+					orderOf[leftIndex] = i
 					leftIndex++
 				} else if cmp(at(rightIndex), at(leftIndex)) {
-					tmp[i] = leftIndex
+					indexOf[i] = leftIndex
+					orderOf[leftIndex] = i
 					leftIndex++
 					leftLen--
 				} else {
-					tmp[i] = rightIndex
+					indexOf[i] = rightIndex
+					orderOf[rightIndex] = i
 					rightIndex++
 					rightLen--
 				}
