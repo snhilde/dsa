@@ -108,6 +108,21 @@ func TestMergeInt(t *testing.T) {
 func TestMergeIntOptimized(t *testing.T) {
 	i := intSort{sortInt: MergeIntOptimized}
 	testSort(t, &i, 100, 10000, false, "int merge optimized (true int)")
+
+	i = intSort{sort: MergeOptimized}
+	testSort(t, &i, 100, 10, false, "int merge optimized")
+
+	u := uintSort{sort: MergeOptimized}
+	testSort(t, &u, 100, 10000, false, "uint merge optimized")
+
+	f := floatSort{sort: MergeOptimized}
+	testSort(t, &f, 100, 10000, false, "float merge optimized")
+
+	b := boolSort{sort: MergeOptimized}
+	testSort(t, &b, 100, 10000, false, "bool merge optimized")
+
+	s := stringSort{sort: MergeOptimized}
+	testSort(t, &s, 100, 10000, false, "string merge optimized")
 }
 
 func TestHashInt(t *testing.T) {
