@@ -27,107 +27,107 @@ type sorter interface {
 
 func TestInsertion(t *testing.T) {
 	i := intSort{sortInt: InsertionInt}
-	testSort(t, &i, 100, 1000, false, "int insertion (true int)")
+	testSort(t, &i, 100, 1000, false, "InsertionInt")
 
 	i = intSort{sort: Insertion}
-	testSort(t, &i, 100, 1000, false, "int insertion")
+	testSort(t, &i, 100, 1000, false, "Insertion (int)")
 
 	u := uintSort{sort: Insertion}
-	testSort(t, &u, 100, 1000, false, "uint insertion")
+	testSort(t, &u, 100, 1000, false, "Insertion (uint)")
 
 	f := floatSort{sort: Insertion}
-	testSort(t, &f, 100, 1000, false, "float insertion")
+	testSort(t, &f, 100, 1000, false, "Insertion (float)")
 
 	b := boolSort{sort: Insertion}
-	testSort(t, &b, 100, 1000, false, "bool insertion")
+	testSort(t, &b, 100, 1000, false, "Insertion (bool)")
 
 	s := stringSort{sort: Insertion}
-	testSort(t, &s, 100, 1000, false, "string insertion")
+	testSort(t, &s, 100, 1000, false, "Insertion (string)")
 }
 
 func TestSelection(t *testing.T) {
 	i := intSort{sortInt: SelectionInt}
-	testSort(t, &i, 100, 1000, false, "int selection (true int)")
+	testSort(t, &i, 100, 1000, false, "SelectionInt")
 
 	i = intSort{sort: Selection}
-	testSort(t, &i, 100, 1000, false, "int selection")
+	testSort(t, &i, 100, 1000, false, "Selection (int)")
 
 	u := uintSort{sort: Selection}
-	testSort(t, &u, 100, 1000, false, "uint selection")
+	testSort(t, &u, 100, 1000, false, "Selection (uint)")
 
 	f := floatSort{sort: Selection}
-	testSort(t, &f, 100, 1000, false, "float selection")
+	testSort(t, &f, 100, 1000, false, "Selection (float)")
 
 	b := boolSort{sort: Selection}
-	testSort(t, &b, 100, 1000, false, "bool selection")
+	testSort(t, &b, 100, 1000, false, "Selection (bool)")
 
 	s := stringSort{sort: Selection}
-	testSort(t, &s, 100, 1000, false, "string selection")
+	testSort(t, &s, 100, 1000, false, "Selection (string)")
 }
 
 func TestBubble(t *testing.T) {
 	i := intSort{sortInt: BubbleInt}
-	testSort(t, &i, 100, 1000, false, "int bubble (true int)")
+	testSort(t, &i, 100, 1000, false, "BubbleInt")
 
 	i = intSort{sort: Bubble}
-	testSort(t, &i, 100, 1000, false, "int bubble")
+	testSort(t, &i, 100, 1000, false, "Bubble (int)")
 
 	u := uintSort{sort: Bubble}
-	testSort(t, &u, 100, 1000, false, "uint bubble")
+	testSort(t, &u, 100, 1000, false, "Bubble (uint)")
 
 	f := floatSort{sort: Bubble}
-	testSort(t, &f, 100, 1000, false, "float bubble")
+	testSort(t, &f, 100, 1000, false, "Bubble (float)")
 
 	b := boolSort{sort: Bubble}
-	testSort(t, &b, 100, 1000, false, "bool bubble")
+	testSort(t, &b, 100, 1000, false, "Bubble (bool)")
 
 	s := stringSort{sort: Bubble}
-	testSort(t, &s, 100, 1000, false, "string bubble")
+	testSort(t, &s, 100, 1000, false, "Bubble (string)")
 }
 
 func TestMerge(t *testing.T) {
 	i := intSort{sortInt: MergeInt}
-	testSort(t, &i, 100, 10000, false, "int merge (true int)")
+	testSort(t, &i, 100, 10000, false, "MergeInt")
 
 	i = intSort{sort: Merge}
-	testSort(t, &i, 100, 10000, false, "int merge")
+	testSort(t, &i, 100, 10000, false, "Merge (int)")
 
 	u := uintSort{sort: Merge}
-	testSort(t, &u, 100, 10000, false, "uint merge")
+	testSort(t, &u, 100, 10000, false, "Merge (uint)")
 
 	f := floatSort{sort: Merge}
-	testSort(t, &f, 100, 10000, false, "float merge")
+	testSort(t, &f, 100, 10000, false, "Merge (float)")
 
 	b := boolSort{sort: Merge}
-	testSort(t, &b, 100, 10000, false, "bool merge")
+	testSort(t, &b, 100, 10000, false, "Merge (bool)")
 
 	s := stringSort{sort: Merge}
-	testSort(t, &s, 100, 10000, false, "string merge")
+	testSort(t, &s, 100, 10000, false, "Merge (string)")
 }
 
 func TestMergeOptimized(t *testing.T) {
 	i := intSort{sortInt: MergeIntOptimized}
-	testSort(t, &i, 100, 10000, false, "int merge optimized (true int)")
+	testSort(t, &i, 100, 10000, false, "MergeIntOptimized")
 
 	i = intSort{sort: MergeOptimized}
-	testSort(t, &i, 100, 10, false, "int merge optimized")
+	testSort(t, &i, 100, 10, false, "MergeOptimized (int)")
 
 	u := uintSort{sort: MergeOptimized}
-	testSort(t, &u, 100, 10000, false, "uint merge optimized")
+	testSort(t, &u, 100, 10000, false, "MergeOptimized (uint)")
 
 	f := floatSort{sort: MergeOptimized}
-	testSort(t, &f, 100, 10000, false, "float merge optimized")
+	testSort(t, &f, 100, 10000, false, "MergeOptimized (float)")
 
 	b := boolSort{sort: MergeOptimized}
-	testSort(t, &b, 100, 10000, false, "bool merge optimized")
+	testSort(t, &b, 100, 10000, false, "MergeOptimized (bool)")
 
 	s := stringSort{sort: MergeOptimized}
-	testSort(t, &s, 100, 10000, false, "string merge optimized")
+	testSort(t, &s, 100, 10000, false, "MergeOptimized (string)")
 }
 
 func TestHashInt(t *testing.T) {
 	i := intSort{sortInt: HashInt}
-	testSort(t, &i, 100, 10000, true, "int hash (true int)")
+	testSort(t, &i, 100, 10000, true, "HashInt")
 }
 
 
@@ -144,7 +144,7 @@ func testSort(t *testing.T, s sorter, n int, l int, isHash bool, desc string) {
 		s.SortStd()
 
 		if !s.Cmp(t) {
-			t.Error("-- Failed", desc, "sort", i, "/", n, "--")
+			t.Error("-- Failed:", desc, "( test", i, "/", n, ") --")
 			return
 		}
 	}
