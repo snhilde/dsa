@@ -87,22 +87,22 @@ func TestBubble(t *testing.T) {
 
 func TestMergeInt(t *testing.T) {
 	i := intSort{sortInt: MergeInt}
-	testSort(t, &i, 100, 1000, false, "int merge (true int)")
+	testSort(t, &i, 100, 10000, false, "int merge (true int)")
 
 	i = intSort{sort: Merge}
-	testSort(t, &i, 100, 1000, false, "int merge")
+	testSort(t, &i, 100, 10000, false, "int merge")
 
 	u := uintSort{sort: Merge}
-	testSort(t, &u, 100, 1000, false, "uint merge")
+	testSort(t, &u, 100, 10000, false, "uint merge")
 
 	f := floatSort{sort: Merge}
-	testSort(t, &f, 100, 1000, false, "float merge")
+	testSort(t, &f, 100, 10000, false, "float merge")
 
 	b := boolSort{sort: Merge}
-	testSort(t, &b, 100, 1000, false, "bool merge")
+	testSort(t, &b, 100, 10000, false, "bool merge")
 
 	s := stringSort{sort: Merge}
-	testSort(t, &s, 100, 1000, false, "string merge")
+	testSort(t, &s, 100, 10000, false, "string merge")
 }
 
 func TestMergeIntOptimized(t *testing.T) {
