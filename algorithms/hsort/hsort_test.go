@@ -85,7 +85,7 @@ func TestBubble(t *testing.T) {
 	testSort(t, &s, 100, 1000, false, "string bubble")
 }
 
-func TestMergeInt(t *testing.T) {
+func TestMerge(t *testing.T) {
 	i := intSort{sortInt: MergeInt}
 	testSort(t, &i, 100, 10000, false, "int merge (true int)")
 
@@ -105,7 +105,7 @@ func TestMergeInt(t *testing.T) {
 	testSort(t, &s, 100, 10000, false, "string merge")
 }
 
-func TestMergeIntOptimized(t *testing.T) {
+func TestMergeOptimized(t *testing.T) {
 	i := intSort{sortInt: MergeIntOptimized}
 	testSort(t, &i, 100, 10000, false, "int merge optimized (true int)")
 
