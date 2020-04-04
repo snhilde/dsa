@@ -346,6 +346,94 @@ func MergeInt(list []int) error {
 }
 
 // Sort the list of ints using a merging algorithm that is optimized for low memory use.
+func MergeOptimized(list interface{}) error {
+	// While the standard merging algorithm first divides the list to be sorted into iteratively smaller blocks and then
+	// merges back up the tree, this implementation starts at the bottom and merges upward immediately. This reduces
+	// the memory overhead, as there is no tree allocation/construction.
+	// We're going to focus on stacks and blocks here. Stacks are already-sorted sublists, and blocks are two stacks
+	// that are being merged. The algorithm starts with a stack size of 1, meaning at the bottom level of individual
+	// items. It will form blocks by merging two stacks together, working through the entire list. It will then make
+	// stacks out of those blocks and continuing operating in this manner until the stack size consumes the entire list
+	// and everything is sorted.
+	length, at, cmp, swap, err := initSort(list)
+	if err != nil {
+		return err
+	}
+
+	// Use these two lists to track where the item's will be sorted after we are done calculating.
+	indexOf := make([]int, length) // item's order -> item's index
+	orderOf := make([]int, length) // item's index -> item's order
+
+	// Progressively work from smallest stack size up.
+	for stackSize := 1; stackSize < length; stackSize *= 2 {
+		// A block represents both stacks put together.
+		blockSize := stackSize * 2
+		numBlocks := (length / blockSize) + 1
+
+		// Operate on each individual block.
+		for i := 0; i < numBlocks; i++ {
+			index := blockSize * i
+			// If this is the last block in the row, we have to compensate for potentially not having a full block.
+			if i == numBlocks - 1 {
+				blockSize = length - index
+				if blockSize <= stackSize {
+					// Already sorted
+					break
+				}
+			}
+
+			leftIndex := index
+			leftLen := stackSize
+
+			rightIndex := index + stackSize
+			rightLen := blockSize - stackSize
+
+			// Merge both stacks together.
+			for j := 0; j < blockSize; j++ {
+				if leftLen == 0 {
+					// We only have values on the right side still.
+					indexOf[j] = rightIndex
+					orderOf[rightIndex] = j
+					rightIndex++
+				} else if rightLen == 0 {
+					// We only have values on the left side still.
+					indexOf[j] = leftIndex
+					orderOf[leftIndex] = j
+					leftIndex++
+				} else if cmp(at(rightIndex), at(leftIndex)) {
+					indexOf[j] = leftIndex
+					orderOf[leftIndex] = j
+					leftIndex++
+					leftLen--
+				} else {
+					indexOf[j] = rightIndex
+					orderOf[rightIndex] = j
+					rightIndex++
+					rightLen--
+				}
+			}
+			// Now that everything is calculated, put the items into sorted order.
+			for j := 0; j < blockSize; j++ {
+				// The item with order i is currently in this index:
+				curr := indexOf[j]
+				// However, we want it to be in this index:
+				want := index + j
+				// But the item with this order is currently occupying the desired index:
+				order := orderOf[want]
+				// First, let's swap the two items.
+				swap(curr, want)
+				// Now, let's update the second item's index, so we can find it later when it's turn has come to be
+				// swapped into the correct order.
+				indexOf[order] = curr
+				orderOf[curr] = order
+			}
+		}
+	}
+
+	return nil
+}
+
+// Sort the list of ints using a merging algorithm that is optimized for low memory use.
 func MergeIntOptimized(list []int) error {
 	// While the standard merging algorithm first divides the list to be sorted into iteratively smaller blocks and then
 	// merges back up the tree, this implementation starts at the bottom and merges upward immediately. This reduces
