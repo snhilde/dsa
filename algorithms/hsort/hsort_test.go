@@ -107,12 +107,12 @@ func TestMergeInt(t *testing.T) {
 
 func TestMergeIntOptimized(t *testing.T) {
 	i := intSort{sortInt: MergeIntOptimized}
-	testSort(t, &i, 100, 1000, false, "int merge optimized (true int)")
+	testSort(t, &i, 100, 10000, false, "int merge optimized (true int)")
 }
 
 func TestHashInt(t *testing.T) {
 	i := intSort{sortInt: HashInt}
-	testSort(t, &i, 100, 1000, true, "int hash (true int)")
+	testSort(t, &i, 100, 10000, true, "int hash (true int)")
 }
 
 
