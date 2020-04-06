@@ -2,6 +2,7 @@
 package htree
 
 import (
+	"errors"
 )
 
 
@@ -25,4 +26,9 @@ func New(vs ...interface{}) *Tree {
 	t.Add(vs...)
 
 	return t
+}
+
+
+func tErr() error {
+	return errors.New("Tree must be created with New() first")
 }
