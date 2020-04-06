@@ -29,6 +29,19 @@ func New(vs ...interface{}) *Tree {
 }
 
 
+// Add inserts the values into the tree.
+func (t *Tree) Add(vs ...interface{}) error {
+	if t == nil {
+		return tErr()
+	}
+
+	for _, v := range vs {
+	}
+
+	return nil
+}
+
+
 func tErr() error {
 	return errors.New("Tree must be created with New() first")
 }
