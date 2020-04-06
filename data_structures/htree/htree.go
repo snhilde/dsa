@@ -19,6 +19,9 @@ type node struct {
 }
 
 
-func New() *Tree {
-	return new(Tree)
+func New(vs ...interface{}) *Tree {
+	t := new(Tree)
+	t.Add(vs...)
+
+	return t
 }
