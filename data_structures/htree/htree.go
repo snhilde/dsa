@@ -19,6 +19,7 @@ type node struct {
 }
 
 
+// New creates a new binary tree, optionally being populated with the provided values.
 func New(vs ...interface{}) *Tree {
 	t := new(Tree)
 	t.Add(vs...)
