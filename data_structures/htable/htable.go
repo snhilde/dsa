@@ -363,6 +363,30 @@ func (t *Table) Toggle(row int, enabled bool) error {
 	return nil
 }
 
+// WriteCSV converts the table into rows of comma-separated values, with each row delineated by \r\n newlines.
+func (t *Table) WriteCSV() string {
+	if t == nil || t.Rows() < 1 {
+		return ""
+	}
+
+	var b strings.Builder
+	rows := t.rows.YieldAll()
+	for r := range rows {
+		row := r.(*Row)
+		if row.enabled {
+			items := make([]string, len(row.v))
+			for i, v := range row.v {
+				items[i] = fmt.Sprintf("%v", v)
+			}
+			b.WriteString(strings.Join(items, ","))
+			b.WriteString("\r\n")
+		}
+	}
+
+	// Remove the last newline before returning the string.
+	return strings.TrimSuffix(b.String(), "\r\n")
+}
+
 
 // Row holds all the data for each row in the table.
 type Row struct {
