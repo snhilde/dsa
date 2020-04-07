@@ -99,6 +99,11 @@ func TestTBadPtr(t *testing.T) {
 	if err := tb.Toggle(0, false); err == nil {
 		t.Error("Unexpectedly passed bad pointer test for Toggle()")
 	}
+
+	// Test WriteCSV().
+	if s := tb.WriteCSV(); s != "" {
+		t.Error("Unexpectedly passed bad pointer test for WriteCSV()")
+	}
 }
 
 func TestRBadPtr(t *testing.T) {
