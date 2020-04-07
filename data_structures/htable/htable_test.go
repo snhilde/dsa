@@ -1664,6 +1664,14 @@ func checkTString(t *testing.T, tb *Table, want string) {
 	}
 }
 
+func checkTCSV(t *testing.T, tb *Table, want string) {
+	if s := tb.WriteCSV(); s != want {
+		t.Error("CSV is incorrect")
+		t.Log("\tExpected:", want)
+		t.Log("\tReceived:", s)
+	}
+}
+
 func checkTCount(t *testing.T, tb *Table, want int) {
 	if n := tb.Count(); n != want {
 		t.Error("Table count is incorrect")
