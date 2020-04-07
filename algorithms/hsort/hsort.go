@@ -187,6 +187,13 @@ func Merge(list interface{}) error {
 	// - Look at the top block on the stack.
 	//     - If it hasn't been split yet, then make two blocks out of each half and add them to the stack.
 	//     - If it has already been split, then merge its two halves together and throw away the block.
+	// Typically, on the merging step, you would use a temporary array to handle sorting the stacks together.
+	// Unfortunately, we will not know the necessary underlying type beforehand, so we can't create this temporary
+	// array. Instead of moving items to another list and then moving them back in sorted order, we're going to keep
+	// track of two positions: 1) each item's current index in the list, 2) the index where each item needs to be for
+	// the list to be in sorted order. After we calculate each item's required index for sorting, we'll start swapping
+	// each item into its correct position. After the swap, we have to update the table of where each item is, so we can
+	// find it later when we need it.
 	type block struct {
 		index  int
 		length int
@@ -198,7 +205,7 @@ func Merge(list interface{}) error {
 		return err
 	}
 
-	// Use these two lists to track where the item's will be sorted after we are done calculating.
+	// Use these two lists to track where the items will be sorted after we are done calculating.
 	indexOf := make([]int, length) // item's order -> item's index
 	orderOf := make([]int, length) // item's index -> item's order
 
@@ -355,6 +362,13 @@ func MergeOptimized(list interface{}) error {
 	// items. It will form blocks by merging two stacks together, working through the entire list. It will then make
 	// stacks out of those blocks and continuing operating in this manner until the stack size consumes the entire list
 	// and everything is sorted.
+	// Typically, you would use a temporary array to handle merging the stacks together. Unfortunately, we will not know
+	// the necessary underlying type beforehand, so we can't create this temporary array. Instead of moving items to
+	// another list and then moving them back in sorted order, we're going to keep track of two positions: 1) each
+	// item's current index in the list, 2) the index where each item needs to be for the list to be in sorted order.
+	// After we calculate each item's required index for sorting, we'll start swapping each item into its correct
+	// position. After the swap, we have to update the table of where each item is, so we can find it later when we need
+	// it.
 	length, at, cmp, swap, err := initSort(list)
 	if err != nil {
 		return err
