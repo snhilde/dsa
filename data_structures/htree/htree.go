@@ -2,6 +2,7 @@
 package htree
 
 import (
+	"github.com/snhilde/dsa/data_structures/hstack"
 	"errors"
 )
 
