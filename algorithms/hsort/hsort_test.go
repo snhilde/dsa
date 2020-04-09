@@ -142,6 +142,16 @@ func BenchmarkMergeInt(b *testing.B) {
 	}
 }
 
+func BenchmarkMerge(b *testing.B) {
+	i := intSort{sort: Merge}
+	for n := 0; n < b.N; n++ {
+		i.Build(10000, false)
+		if err := i.Sort(); err != nil {
+			break
+		}
+	}
+}
+
 
 // Test out the various types/algorithms.
 func testSort(t *testing.T, s sorter, n int, l int, isHash bool, desc string) {
