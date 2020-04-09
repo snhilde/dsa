@@ -132,7 +132,27 @@ func TestHashInt(t *testing.T) {
 }
 
 // Sort benchmarks
-func BenchmarkMergeInt(b *testing.B) {
+func BenchmarkMergeInt100(b *testing.B) {
+	i := intSort{sortInt: MergeInt}
+	for n := 0; n < b.N; n++ {
+		i.Build(100, false)
+		if err := i.Sort(); err != nil {
+			break
+		}
+	}
+}
+
+func BenchmarkMergeInt1000(b *testing.B) {
+	i := intSort{sortInt: MergeInt}
+	for n := 0; n < b.N; n++ {
+		i.Build(1000, false)
+		if err := i.Sort(); err != nil {
+			break
+		}
+	}
+}
+
+func BenchmarkMergeInt10000(b *testing.B) {
 	i := intSort{sortInt: MergeInt}
 	for n := 0; n < b.N; n++ {
 		i.Build(10000, false)
