@@ -166,7 +166,17 @@ func BenchmarkMergeInt10000(b *testing.B) {
 	benchmarkSort(b, &i, 10000)
 }
 
-func BenchmarkMerge(b *testing.B) {
+func BenchmarkMerge100(b *testing.B) {
+	i := intSort{sort: Merge}
+	benchmarkSort(b, &i, 100)
+}
+
+func BenchmarkMerge1000(b *testing.B) {
+	i := intSort{sort: Merge}
+	benchmarkSort(b, &i, 1000)
+}
+
+func BenchmarkMerge10000(b *testing.B) {
 	i := intSort{sort: Merge}
 	benchmarkSort(b, &i, 10000)
 }
