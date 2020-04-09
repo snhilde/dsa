@@ -25,6 +25,7 @@ type sorter interface {
 }
 
 
+// Sort tests
 func TestInsertion(t *testing.T) {
 	i := intSort{sortInt: InsertionInt}
 	testSort(t, &i, 100, 1000, false, "InsertionInt")
@@ -128,6 +129,17 @@ func TestMergeOptimized(t *testing.T) {
 func TestHashInt(t *testing.T) {
 	i := intSort{sortInt: HashInt}
 	testSort(t, &i, 100, 10000, true, "HashInt")
+}
+
+// Sort benchmarks
+func BenchmarkMergeInt(b *testing.B) {
+	i := intSort{sortInt: MergeInt}
+	for n := 0; n < b.N; n++ {
+		i.Build(10000, false)
+		if err := i.Sort(); err != nil {
+			break
+		}
+	}
 }
 
 
