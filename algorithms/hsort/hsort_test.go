@@ -131,49 +131,6 @@ func TestHashInt(t *testing.T) {
 	testSort(t, &i, 100, 10000, true, "HashInt")
 }
 
-// Sort benchmarks
-func BenchmarkMergeInt100(b *testing.B) {
-	i := intSort{sortInt: MergeInt}
-	for n := 0; n < b.N; n++ {
-		i.Build(100, false)
-		if err := i.Sort(); err != nil {
-			break
-		}
-	}
-}
-
-func BenchmarkMergeInt1000(b *testing.B) {
-	i := intSort{sortInt: MergeInt}
-	for n := 0; n < b.N; n++ {
-		i.Build(1000, false)
-		if err := i.Sort(); err != nil {
-			break
-		}
-	}
-}
-
-func BenchmarkMergeInt10000(b *testing.B) {
-	i := intSort{sortInt: MergeInt}
-	for n := 0; n < b.N; n++ {
-		i.Build(10000, false)
-		if err := i.Sort(); err != nil {
-			break
-		}
-	}
-}
-
-func BenchmarkMerge(b *testing.B) {
-	i := intSort{sort: Merge}
-	for n := 0; n < b.N; n++ {
-		i.Build(10000, false)
-		if err := i.Sort(); err != nil {
-			break
-		}
-	}
-}
-
-
-// Test out the various types/algorithms.
 func testSort(t *testing.T, s sorter, n int, l int, isHash bool, desc string) {
 	for i := 0; i < n; i++ {
 		s.Build(l, isHash)
@@ -191,6 +148,38 @@ func testSort(t *testing.T, s sorter, n int, l int, isHash bool, desc string) {
 		}
 	}
 }
+
+
+// Sort benchmarks
+func BenchmarkMergeInt100(b *testing.B) {
+	i := intSort{sortInt: MergeInt}
+	benchmarkSort(b, &i, 100)
+}
+
+func BenchmarkMergeInt1000(b *testing.B) {
+	i := intSort{sortInt: MergeInt}
+	benchmarkSort(b, &i, 1000)
+}
+
+func BenchmarkMergeInt10000(b *testing.B) {
+	i := intSort{sortInt: MergeInt}
+	benchmarkSort(b, &i, 10000)
+}
+
+func BenchmarkMerge(b *testing.B) {
+	i := intSort{sort: Merge}
+	benchmarkSort(b, &i, 10000)
+}
+
+func benchmarkSort(b *testing.B, s sorter, n int) {
+	for i := 0; i < b.N; i++ {
+		s.Build(n, false)
+		if err := s.Sort(); err != nil {
+			break
+		}
+	}
+}
+
 
 
 func newRand() *rand.Rand {
