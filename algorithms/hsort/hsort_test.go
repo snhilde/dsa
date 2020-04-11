@@ -196,6 +196,51 @@ func BenchmarkInsertion10000_uint(b *testing.B) {
 	benchmarkSort(b, &u, 10000, false)
 }
 
+func BenchmarkInsertion100_float(b *testing.B) {
+	f := floatSort{sort: Insertion}
+	benchmarkSort(b, &f, 100, false)
+}
+
+func BenchmarkInsertion1000_float(b *testing.B) {
+	f := floatSort{sort: Insertion}
+	benchmarkSort(b, &f, 1000, false)
+}
+
+func BenchmarkInsertion10000_float(b *testing.B) {
+	f := floatSort{sort: Insertion}
+	benchmarkSort(b, &f, 10000, false)
+}
+
+func BenchmarkInsertion100_bool(b *testing.B) {
+	bl := boolSort{sort: Insertion}
+	benchmarkSort(b, &bl, 100, false)
+}
+
+func BenchmarkInsertion1000_bool(b *testing.B) {
+	bl := boolSort{sort: Insertion}
+	benchmarkSort(b, &bl, 1000, false)
+}
+
+func BenchmarkInsertion10000_bool(b *testing.B) {
+	bl := boolSort{sort: Insertion}
+	benchmarkSort(b, &bl, 10000, false)
+}
+
+func BenchmarkInsertion100_string(b *testing.B) {
+	s := stringSort{sort: Insertion}
+	benchmarkSort(b, &s, 100, false)
+}
+
+func BenchmarkInsertion1000_string(b *testing.B) {
+	s := stringSort{sort: Insertion}
+	benchmarkSort(b, &s, 1000, false)
+}
+
+func BenchmarkInsertion10000_string(b *testing.B) {
+	s := stringSort{sort: Insertion}
+	benchmarkSort(b, &s, 10000, false)
+}
+
 func BenchmarkSelectionInt100(b *testing.B) {
 	i := intSort{sortInt: SelectionInt}
 	benchmarkSort(b, &i, 100, false)
