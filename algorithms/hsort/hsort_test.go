@@ -376,6 +376,51 @@ func BenchmarkBubble10000_uint(b *testing.B) {
 	benchmarkSort(b, &u, 10000, false)
 }
 
+func BenchmarkBubble100_float(b *testing.B) {
+	f := floatSort{sort: Bubble}
+	benchmarkSort(b, &f, 100, false)
+}
+
+func BenchmarkBubble1000_float(b *testing.B) {
+	f := floatSort{sort: Bubble}
+	benchmarkSort(b, &f, 1000, false)
+}
+
+func BenchmarkBubble10000_float(b *testing.B) {
+	f := floatSort{sort: Bubble}
+	benchmarkSort(b, &f, 10000, false)
+}
+
+func BenchmarkBubble100_bool(b *testing.B) {
+	bl := boolSort{sort: Bubble}
+	benchmarkSort(b, &bl, 100, false)
+}
+
+func BenchmarkBubble1000_bool(b *testing.B) {
+	bl := boolSort{sort: Bubble}
+	benchmarkSort(b, &bl, 1000, false)
+}
+
+func BenchmarkBubble10000_bool(b *testing.B) {
+	bl := boolSort{sort: Bubble}
+	benchmarkSort(b, &bl, 10000, false)
+}
+
+func BenchmarkBubble100_string(b *testing.B) {
+	s := stringSort{sort: Bubble}
+	benchmarkSort(b, &s, 100, false)
+}
+
+func BenchmarkBubble1000_string(b *testing.B) {
+	s := stringSort{sort: Bubble}
+	benchmarkSort(b, &s, 1000, false)
+}
+
+func BenchmarkBubble10000_string(b *testing.B) {
+	s := stringSort{sort: Bubble}
+	benchmarkSort(b, &s, 10000, false)
+}
+
 func BenchmarkMergeInt100(b *testing.B) {
 	i := intSort{sortInt: MergeInt}
 	benchmarkSort(b, &i, 100, false)
