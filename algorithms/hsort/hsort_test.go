@@ -181,6 +181,36 @@ func BenchmarkInsertion10000(b *testing.B) {
 	benchmarkSort(b, &i, 10000)
 }
 
+func BenchmarkSelectionInt100(b *testing.B) {
+	i := intSort{sortInt: SelectionInt}
+	benchmarkSort(b, &i, 100)
+}
+
+func BenchmarkSelectionInt1000(b *testing.B) {
+	i := intSort{sortInt: SelectionInt}
+	benchmarkSort(b, &i, 1000)
+}
+
+func BenchmarkSelectionInt10000(b *testing.B) {
+	i := intSort{sortInt: SelectionInt}
+	benchmarkSort(b, &i, 10000)
+}
+
+func BenchmarkSelection100(b *testing.B) {
+	i := intSort{sort: Selection}
+	benchmarkSort(b, &i, 100)
+}
+
+func BenchmarkSelection1000(b *testing.B) {
+	i := intSort{sort: Selection}
+	benchmarkSort(b, &i, 1000)
+}
+
+func BenchmarkSelection10000(b *testing.B) {
+	i := intSort{sort: Selection}
+	benchmarkSort(b, &i, 10000)
+}
+
 func BenchmarkMergeInt100(b *testing.B) {
 	i := intSort{sortInt: MergeInt}
 	benchmarkSort(b, &i, 100)
