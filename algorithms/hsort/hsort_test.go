@@ -286,49 +286,49 @@ func BenchmarkSelection10000_uint(b *testing.B) {
 	benchmarkSort(b, &u, 10000, false)
 }
 
-func BenchmarkSelection100_uint(b *testing.B) {
-	u := uintSort{sort: Selection}
-	benchmarkSort(b, &u, 100, false)
+func BenchmarkSelection100_float(b *testing.B) {
+	f := floatSort{sort: Selection}
+	benchmarkSort(b, &f, 100, false)
 }
 
-func BenchmarkSelection1000_uint(b *testing.B) {
-	u := uintSort{sort: Selection}
-	benchmarkSort(b, &u, 1000, false)
+func BenchmarkSelection1000_float(b *testing.B) {
+	f := floatSort{sort: Selection}
+	benchmarkSort(b, &f, 1000, false)
 }
 
-func BenchmarkSelection10000_uint(b *testing.B) {
-	u := uintSort{sort: Selection}
-	benchmarkSort(b, &u, 10000, false)
+func BenchmarkSelection10000_float(b *testing.B) {
+	f := floatSort{sort: Selection}
+	benchmarkSort(b, &f, 10000, false)
 }
 
-func BenchmarkSelection100_uint(b *testing.B) {
-	u := uintSort{sort: Selection}
-	benchmarkSort(b, &u, 100, false)
+func BenchmarkSelection100_bool(b *testing.B) {
+	bl := boolSort{sort: Selection}
+	benchmarkSort(b, &bl, 100, false)
 }
 
-func BenchmarkSelection1000_uint(b *testing.B) {
-	u := uintSort{sort: Selection}
-	benchmarkSort(b, &u, 1000, false)
+func BenchmarkSelection1000_bool(b *testing.B) {
+	bl := boolSort{sort: Selection}
+	benchmarkSort(b, &bl, 1000, false)
 }
 
-func BenchmarkSelection10000_uint(b *testing.B) {
-	u := uintSort{sort: Selection}
-	benchmarkSort(b, &u, 10000, false)
+func BenchmarkSelection10000_bool(b *testing.B) {
+	bl := boolSort{sort: Selection}
+	benchmarkSort(b, &bl, 10000, false)
 }
 
-func BenchmarkSelection100_uint(b *testing.B) {
-	u := uintSort{sort: Selection}
-	benchmarkSort(b, &u, 100, false)
+func BenchmarkSelection100_string(b *testing.B) {
+	s := stringSort{sort: Selection}
+	benchmarkSort(b, &s, 100, false)
 }
 
-func BenchmarkSelection1000_uint(b *testing.B) {
-	u := uintSort{sort: Selection}
-	benchmarkSort(b, &u, 1000, false)
+func BenchmarkSelection1000_string(b *testing.B) {
+	s := stringSort{sort: Selection}
+	benchmarkSort(b, &s, 1000, false)
 }
 
-func BenchmarkSelection10000_uint(b *testing.B) {
-	u := uintSort{sort: Selection}
-	benchmarkSort(b, &u, 10000, false)
+func BenchmarkSelection10000_string(b *testing.B) {
+	s := stringSort{sort: Selection}
+	benchmarkSort(b, &s, 10000, false)
 }
 
 func BenchmarkBubbleInt100(b *testing.B) {
