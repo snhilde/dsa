@@ -301,6 +301,21 @@ func BenchmarkMergeOptimized10000(b *testing.B) {
 	benchmarkSort(b, &i, 10000, false)
 }
 
+func BenchmarkHashInt100(b *testing.B) {
+	i := intSort{sortInt: HashInt}
+	benchmarkSort(b, &i, 100, true)
+}
+
+func BenchmarkHashInt1000(b *testing.B) {
+	i := intSort{sortInt: HashInt}
+	benchmarkSort(b, &i, 1000, true)
+}
+
+func BenchmarkHashInt10000(b *testing.B) {
+	i := intSort{sortInt: HashInt}
+	benchmarkSort(b, &i, 10000, true)
+}
+
 
 func benchmarkSort(b *testing.B, s sorter, n int, isHash bool) {
 	for i := 0; i < b.N; i++ {
