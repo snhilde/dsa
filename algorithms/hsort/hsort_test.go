@@ -27,6 +27,11 @@ type sorter interface {
 
 // --- SORT TESTS ---
 func TestInsertion(t *testing.T) {
+	// Make sure that we can only pass a slice of certain types.
+	testBadArg(t, Insertion)
+	testBadList(t, Insertion)
+
+	// Make sure that our functions sort correctly.
 	i := intSort{sortInt: InsertionInt}
 	testSort(t, &i, 100, 1000, false, "InsertionInt")
 
@@ -47,6 +52,11 @@ func TestInsertion(t *testing.T) {
 }
 
 func TestSelection(t *testing.T) {
+	// Make sure that we can only pass a slice of certain types.
+	testBadArg(t, Selection)
+	testBadList(t, Selection)
+
+	// Make sure that our functions sort correctly.
 	i := intSort{sortInt: SelectionInt}
 	testSort(t, &i, 100, 1000, false, "SelectionInt")
 
@@ -67,6 +77,11 @@ func TestSelection(t *testing.T) {
 }
 
 func TestBubble(t *testing.T) {
+	// Make sure that we can only pass a slice of certain types.
+	testBadArg(t, Bubble)
+	testBadList(t, Bubble)
+
+	// Make sure that our functions sort correctly.
 	i := intSort{sortInt: BubbleInt}
 	testSort(t, &i, 100, 1000, false, "BubbleInt")
 
@@ -87,6 +102,11 @@ func TestBubble(t *testing.T) {
 }
 
 func TestMerge(t *testing.T) {
+	// Make sure that we can only pass a slice of certain types.
+	testBadArg(t, Merge)
+	testBadList(t, Merge)
+
+	// Make sure that our functions sort correctly.
 	i := intSort{sortInt: MergeInt}
 	testSort(t, &i, 100, 10000, false, "MergeInt")
 
@@ -107,6 +127,11 @@ func TestMerge(t *testing.T) {
 }
 
 func TestMergeOptimized(t *testing.T) {
+	// Make sure that we can only pass a slice of certain types.
+	testBadArg(t, MergeOptimized)
+	testBadList(t, MergeOptimized)
+
+	// Make sure that our functions sort correctly.
 	i := intSort{sortInt: MergeIntOptimized}
 	testSort(t, &i, 100, 10000, false, "MergeIntOptimized")
 
@@ -127,6 +152,7 @@ func TestMergeOptimized(t *testing.T) {
 }
 
 func TestHashInt(t *testing.T) {
+	// Make sure that our function sorts correctly.
 	i := intSort{sortInt: HashInt}
 	testSort(t, &i, 100, 10000, true, "HashInt")
 }
@@ -600,6 +626,140 @@ func BenchmarkHashInt10000(b *testing.B) {
 
 
 // --- HELPER FUNCTIONS ---
+func testBadArg(t *testing.T, sort func(interface{}) error) {
+	// Make sure the function won't accept any of the types below.
+
+	// int
+	var i int
+	if err := sort(i); err == nil {
+		t.Error("Sort function accepted an int")
+	}
+
+	// uint
+	var u uint
+	if err := sort(u); err == nil {
+		t.Error("Sort function accepted a uint")
+	}
+
+	// float
+	var f float32
+	if err := sort(f); err == nil {
+		t.Error("Sort function accepted a float")
+	}
+
+	// complex number
+	var c complex64
+	if err := sort(c); err == nil {
+		t.Error("Sort function accepted a complex number")
+	}
+
+	// bool
+	var b bool
+	if err := sort(b); err == nil {
+		t.Error("Sort function accepted a bool")
+	}
+
+	// string
+	var s string
+	if err := sort(s); err == nil {
+		t.Error("Sort function accepted a string")
+	}
+
+	// array
+	var arr [64]int
+	if err := sort(arr); err == nil {
+		t.Error("Sort function accepted an array")
+	}
+
+	// channel
+	ch := make(chan int)
+	if err := sort(ch); err == nil {
+		t.Error("Sort function accepted a channel")
+	}
+
+	// function
+	fn := func() {}
+	if err := sort(fn); err == nil {
+		t.Error("Sort function accepted a function")
+	}
+
+	// interface
+	var iface interface{}
+	if err := sort(iface); err == nil {
+		t.Error("Sort function accepted an interface")
+	}
+
+	// map
+	m := make(map[int]int)
+	if err := sort(m); err == nil {
+		t.Error("Sort function accepted a map")
+	}
+
+	// struct
+	type st struct {
+		i int
+	}
+	st1 := st{}
+	if err := sort(st1); err == nil {
+		t.Error("Sort function accepted a struct")
+	}
+}
+
+func testBadList(t *testing.T, sort func(interface{}) error) {
+	// Make sure the function won't accept a slice of any of the types below.
+
+	// complex number
+	var c []complex64
+	if err := sort(c); err == nil {
+		t.Error("Sort function accepted a slice of complex numbers")
+	}
+
+	// slice
+	var is [][]int
+	if err := sort(is); err == nil {
+		t.Error("Sort function accepted a slice of slices")
+	}
+
+	// array
+	var ia [][64]int
+	if err := sort(ia); err == nil {
+		t.Error("Sort function accepted a slice of arrays")
+	}
+
+	// channel
+	var ch []chan int
+	if err := sort(ch); err == nil {
+		t.Error("Sort function accepted a slice of channels")
+	}
+
+	// function
+	var fn []func()
+	if err := sort(fn); err == nil {
+		t.Error("Sort function accepted a slice of functions")
+	}
+
+	// interface
+	var iface []interface{}
+	if err := sort(iface); err == nil {
+		t.Error("Sort function accepted a slice of interfaces")
+	}
+
+	// map
+	var m []map[int]int
+	if err := sort(m); err == nil {
+		t.Error("Sort function accepted a slice of maps")
+	}
+
+	// struct
+	type st struct {
+		i int
+	}
+	var sta []st
+	if err := sort(sta); err == nil {
+		t.Error("Sort function accepted a slice of structs")
+	}
+}
+
 func testSort(t *testing.T, s sorter, n int, l int, isHash bool, desc string) {
 	for i := 0; i < n; i++ {
 		s.Build(l, isHash)
