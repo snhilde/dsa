@@ -131,24 +131,6 @@ func TestHashInt(t *testing.T) {
 	testSort(t, &i, 100, 10000, true, "HashInt")
 }
 
-func testSort(t *testing.T, s sorter, n int, l int, isHash bool, desc string) {
-	for i := 0; i < n; i++ {
-		s.Build(l, isHash)
-
-		if err := s.Sort(); err != nil {
-			t.Error(err)
-			return
-		}
-
-		s.SortStd()
-
-		if !s.Cmp(t) {
-			t.Error("-- Failed:", desc, "( test", i, "/", n, ") --")
-			return
-		}
-	}
-}
-
 
 // --- SORT BENCHMARKS ---
 func BenchmarkInsertionInt100(b *testing.B) {
@@ -617,6 +599,25 @@ func BenchmarkHashInt10000(b *testing.B) {
 }
 
 
+// --- HELPER FUNCTIONS ---
+func testSort(t *testing.T, s sorter, n int, l int, isHash bool, desc string) {
+	for i := 0; i < n; i++ {
+		s.Build(l, isHash)
+
+		if err := s.Sort(); err != nil {
+			t.Error(err)
+			return
+		}
+
+		s.SortStd()
+
+		if !s.Cmp(t) {
+			t.Error("-- Failed:", desc, "( test", i, "/", n, ") --")
+			return
+		}
+	}
+}
+
 func benchmarkSort(b *testing.B, s sorter, n int, isHash bool) {
 	for i := 0; i < b.N; i++ {
 		s.Build(n, isHash)
@@ -626,9 +627,6 @@ func benchmarkSort(b *testing.B, s sorter, n int, isHash bool) {
 	}
 }
 
-
-
-// --- HELPER FUNCTIONS ---
 func newRand() *rand.Rand {
 	seed   := time.Now().UnixNano()
 	source := rand.NewSource(seed)
