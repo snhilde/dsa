@@ -466,6 +466,51 @@ func BenchmarkMerge10000_uint(b *testing.B) {
 	benchmarkSort(b, &u, 10000, false)
 }
 
+func BenchmarkMerge100_float(b *testing.B) {
+	f := floatSort{sort: Merge}
+	benchmarkSort(b, &f, 100, false)
+}
+
+func BenchmarkMerge1000_float(b *testing.B) {
+	f := floatSort{sort: Merge}
+	benchmarkSort(b, &f, 1000, false)
+}
+
+func BenchmarkMerge10000_float(b *testing.B) {
+	f := floatSort{sort: Merge}
+	benchmarkSort(b, &f, 10000, false)
+}
+
+func BenchmarkMerge100_bool(b *testing.B) {
+	bl := boolSort{sort: Merge}
+	benchmarkSort(b, &bl, 100, false)
+}
+
+func BenchmarkMerge1000_bool(b *testing.B) {
+	bl := boolSort{sort: Merge}
+	benchmarkSort(b, &bl, 1000, false)
+}
+
+func BenchmarkMerge10000_bool(b *testing.B) {
+	bl := boolSort{sort: Merge}
+	benchmarkSort(b, &bl, 10000, false)
+}
+
+func BenchmarkMerge100_string(b *testing.B) {
+	s := stringSort{sort: Merge}
+	benchmarkSort(b, &s, 100, false)
+}
+
+func BenchmarkMerge1000_string(b *testing.B) {
+	s := stringSort{sort: Merge}
+	benchmarkSort(b, &s, 1000, false)
+}
+
+func BenchmarkMerge10000_string(b *testing.B) {
+	s := stringSort{sort: Merge}
+	benchmarkSort(b, &s, 10000, false)
+}
+
 func BenchmarkMergeIntOptimized100(b *testing.B) {
 	i := intSort{sortInt: MergeIntOptimized}
 	benchmarkSort(b, &i, 100, false)
