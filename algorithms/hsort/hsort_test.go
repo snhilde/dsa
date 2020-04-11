@@ -272,32 +272,32 @@ func BenchmarkMerge10000(b *testing.B) {
 }
 
 func BenchmarkMergeOptimizedInt100(b *testing.B) {
-	i := intSort{sortInt: MergeInt}
+	i := intSort{sortInt: MergeOptimizedInt}
 	benchmarkSort(b, &i, 100)
 }
 
-func BenchmarkMergeInt1000(b *testing.B) {
-	i := intSort{sortInt: MergeInt}
+func BenchmarkMergeOptimizedInt1000(b *testing.B) {
+	i := intSort{sortInt: MergeOptimizedInt}
 	benchmarkSort(b, &i, 1000)
 }
 
-func BenchmarkMergeInt10000(b *testing.B) {
-	i := intSort{sortInt: MergeInt}
+func BenchmarkMergeOptimizedInt10000(b *testing.B) {
+	i := intSort{sortInt: MergeOptimizedInt}
 	benchmarkSort(b, &i, 10000)
 }
 
-func BenchmarkMerge100(b *testing.B) {
-	i := intSort{sort: Merge}
+func BenchmarkMergeOptimized100(b *testing.B) {
+	i := intSort{sort: MergeOptimized}
 	benchmarkSort(b, &i, 100)
 }
 
-func BenchmarkMerge1000(b *testing.B) {
-	i := intSort{sort: Merge}
+func BenchmarkMergeOptimized1000(b *testing.B) {
+	i := intSort{sort: MergeOptimized}
 	benchmarkSort(b, &i, 1000)
 }
 
-func BenchmarkMerge10000(b *testing.B) {
-	i := intSort{sort: Merge}
+func BenchmarkMergeOptimized10000(b *testing.B) {
+	i := intSort{sort: MergeOptimized}
 	benchmarkSort(b, &i, 10000)
 }
 
