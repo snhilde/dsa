@@ -190,10 +190,8 @@ func Merge(list interface{}) error {
 	// Typically, on the merging step, you would use a temporary array to handle sorting the stacks together.
 	// Unfortunately, we will not know the necessary underlying type beforehand, so we can't create this temporary
 	// array. Instead of moving items to another list and then moving them back in sorted order, we're going to keep
-	// track of two positions: 1) each item's current index in the list, 2) the index where each item needs to be for
-	// the list to be in sorted order. After we calculate each item's required index for sorting, we'll start swapping
-	// each item into its correct position. After the swap, we have to update the table of where each item is, so we can
-	// find it later when we need it.
+	// track of where each item should be. After we calculate each item's required index for sorting, we'll start
+	// swapping each item into its correct position.
 	type block struct {
 		index  int
 		length int
@@ -205,9 +203,8 @@ func Merge(list interface{}) error {
 		return err
 	}
 
-	// Use these two lists to track where the items will be sorted after we are done calculating.
-	indexOf := make([]int, length) // item's order -> item's index
-	orderOf := make([]int, length) // item's index -> item's order
+	// This list will track where the item at each index needs to be moved to in order to sort the list properly.
+	moveTo := make([]int, length)
 
 	b := block{0, length, false}
 	s := []block{b}
@@ -223,44 +220,40 @@ func Merge(list interface{}) error {
 		rightLen := b.length - leftLen
 		if b.merge {
 			// Calculate the sorted order of each item.
-			for i := 0; i < b.length; i++ {
+			for i := b.index; i < b.index + b.length; i++ {
 				if leftLen == 0 {
 					// We only have values on the right side still.
-					indexOf[i] = rightIndex
-					orderOf[rightIndex] = i
+					moveTo[rightIndex] = i
 					rightIndex++
 				} else if rightLen == 0 {
 					// We only have values on the left side still.
-					indexOf[i] = leftIndex
-					orderOf[leftIndex] = i
+					moveTo[leftIndex] = i
 					leftIndex++
 				} else if cmp(at(rightIndex), at(leftIndex)) {
-					indexOf[i] = leftIndex
-					orderOf[leftIndex] = i
+					moveTo[leftIndex] = i
 					leftIndex++
 					leftLen--
 				} else {
-					indexOf[i] = rightIndex
-					orderOf[rightIndex] = i
+					moveTo[rightIndex] = i
 					rightIndex++
 					rightLen--
 				}
 			}
+
 			// Now that everything is calculated, put the items into sorted order.
-			for i := 0; i < b.length; i++ {
-				// The item with order i is currently in this index:
-				curr := indexOf[i]
-				// However, we want it to be in this index:
-				want := b.index + i
-				// But the item with this order is currently occupying the desired index:
-				order := orderOf[want]
-				// First, let's swap the two items.
-				swap(curr, want)
-				// Now, let's update the second item's index, so we can find it later when it's turn has come to be
-				// swapped into the correct order.
-				indexOf[order] = curr
-				orderOf[curr] = order
+			for i := b.index; i < b.index + b.length; i++ {
+				// Keep swapping items until the one at this index should be in this index.
+				for i != moveTo[i] {
+					// The item at this index needs to be moved to this index:
+					to := moveTo[i]
+					// Swap the two items.
+					swap(i, to)
+					// Update the sorted index of each item.
+					moveTo[i] = moveTo[to]
+					moveTo[to] = to
+				}
 			}
+
 		} else {
 			// We're still on the splitting phase.
 			b.merge = true
@@ -362,21 +355,18 @@ func MergeOptimized(list interface{}) error {
 	// items. It will form blocks by merging two stacks together, working through the entire list. It will then make
 	// stacks out of those blocks and continuing operating in this manner until the stack size consumes the entire list
 	// and everything is sorted.
-	// Typically, you would use a temporary array to handle merging the stacks together. Unfortunately, we will not know
+	// Typically, you would use a temporary array to handle sorting the stacks together. Unfortunately, we will not know
 	// the necessary underlying type beforehand, so we can't create this temporary array. Instead of moving items to
-	// another list and then moving them back in sorted order, we're going to keep track of two positions: 1) each
-	// item's current index in the list, 2) the index where each item needs to be for the list to be in sorted order.
+	// another list and then moving them back in sorted order, we're going to keep track of where each item should be.
 	// After we calculate each item's required index for sorting, we'll start swapping each item into its correct
-	// position. After the swap, we have to update the table of where each item is, so we can find it later when we need
-	// it.
+	// position.
 	length, at, cmp, swap, err := initSort(list)
 	if err != nil {
 		return err
 	}
 
-	// Use these two lists to track where the item's will be sorted after we are done calculating.
-	indexOf := make([]int, length) // item's order -> item's index
-	orderOf := make([]int, length) // item's index -> item's order
+	// This list will track where the item at each index needs to be moved to in order to sort the list properly.
+	moveTo := make([]int, length)
 
 	// Progressively work from smallest stack size up.
 	for stackSize := 1; stackSize < length; stackSize *= 2 {
@@ -403,43 +393,38 @@ func MergeOptimized(list interface{}) error {
 			rightLen := blockSize - stackSize
 
 			// Merge both stacks together.
-			for j := 0; j < blockSize; j++ {
+			for j := index; j < index + blockSize; j++ {
 				if leftLen == 0 {
 					// We only have values on the right side still.
-					indexOf[j] = rightIndex
-					orderOf[rightIndex] = j
+					moveTo[rightIndex] = j
 					rightIndex++
 				} else if rightLen == 0 {
 					// We only have values on the left side still.
-					indexOf[j] = leftIndex
-					orderOf[leftIndex] = j
+					moveTo[leftIndex] = j
 					leftIndex++
 				} else if cmp(at(rightIndex), at(leftIndex)) {
-					indexOf[j] = leftIndex
-					orderOf[leftIndex] = j
+					moveTo[leftIndex] = j
 					leftIndex++
 					leftLen--
 				} else {
-					indexOf[j] = rightIndex
-					orderOf[rightIndex] = j
+					moveTo[rightIndex] = j
 					rightIndex++
 					rightLen--
 				}
 			}
+
 			// Now that everything is calculated, put the items into sorted order.
-			for j := 0; j < blockSize; j++ {
-				// The item with order i is currently in this index:
-				curr := indexOf[j]
-				// However, we want it to be in this index:
-				want := index + j
-				// But the item with this order is currently occupying the desired index:
-				order := orderOf[want]
-				// First, let's swap the two items.
-				swap(curr, want)
-				// Now, let's update the second item's index, so we can find it later when it's turn has come to be
-				// swapped into the correct order.
-				indexOf[order] = curr
-				orderOf[curr] = order
+			for j := index; j < index + blockSize; j++ {
+				// Keep swapping items until the one at this index should be in this index.
+				for j != moveTo[j] {
+					// The item at this index needs to be moved to this index:
+					to := moveTo[j]
+					// Swap the two items.
+					swap(j, to)
+					// Update the sorted index of each item.
+					moveTo[j] = moveTo[to]
+					moveTo[to] = to
+				}
 			}
 		}
 	}
