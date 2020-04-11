@@ -166,17 +166,17 @@ func BenchmarkInsertionInt10000(b *testing.B) {
 	benchmarkSort(b, &i, 10000, false)
 }
 
-func BenchmarkInsertion100(b *testing.B) {
+func BenchmarkInsertion100_int(b *testing.B) {
 	i := intSort{sort: Insertion}
 	benchmarkSort(b, &i, 100, false)
 }
 
-func BenchmarkInsertion1000(b *testing.B) {
+func BenchmarkInsertion1000_int(b *testing.B) {
 	i := intSort{sort: Insertion}
 	benchmarkSort(b, &i, 1000, false)
 }
 
-func BenchmarkInsertion10000(b *testing.B) {
+func BenchmarkInsertion10000_int(b *testing.B) {
 	i := intSort{sort: Insertion}
 	benchmarkSort(b, &i, 10000, false)
 }
@@ -196,17 +196,17 @@ func BenchmarkSelectionInt10000(b *testing.B) {
 	benchmarkSort(b, &i, 10000, false)
 }
 
-func BenchmarkSelection100(b *testing.B) {
+func BenchmarkSelection100_int(b *testing.B) {
 	i := intSort{sort: Selection}
 	benchmarkSort(b, &i, 100, false)
 }
 
-func BenchmarkSelection1000(b *testing.B) {
+func BenchmarkSelection1000_int(b *testing.B) {
 	i := intSort{sort: Selection}
 	benchmarkSort(b, &i, 1000, false)
 }
 
-func BenchmarkSelection10000(b *testing.B) {
+func BenchmarkSelection10000_int(b *testing.B) {
 	i := intSort{sort: Selection}
 	benchmarkSort(b, &i, 10000, false)
 }
@@ -226,17 +226,17 @@ func BenchmarkBubbleInt10000(b *testing.B) {
 	benchmarkSort(b, &i, 10000, false)
 }
 
-func BenchmarkBubble100(b *testing.B) {
+func BenchmarkBubble100_int(b *testing.B) {
 	i := intSort{sort: Bubble}
 	benchmarkSort(b, &i, 100, false)
 }
 
-func BenchmarkBubble1000(b *testing.B) {
+func BenchmarkBubble1000_int(b *testing.B) {
 	i := intSort{sort: Bubble}
 	benchmarkSort(b, &i, 1000, false)
 }
 
-func BenchmarkBubble10000(b *testing.B) {
+func BenchmarkBubble10000_int(b *testing.B) {
 	i := intSort{sort: Bubble}
 	benchmarkSort(b, &i, 10000, false)
 }
@@ -256,17 +256,17 @@ func BenchmarkMergeInt10000(b *testing.B) {
 	benchmarkSort(b, &i, 10000, false)
 }
 
-func BenchmarkMerge100(b *testing.B) {
+func BenchmarkMerge100_int(b *testing.B) {
 	i := intSort{sort: Merge}
 	benchmarkSort(b, &i, 100, false)
 }
 
-func BenchmarkMerge1000(b *testing.B) {
+func BenchmarkMerge1000_int(b *testing.B) {
 	i := intSort{sort: Merge}
 	benchmarkSort(b, &i, 1000, false)
 }
 
-func BenchmarkMerge10000(b *testing.B) {
+func BenchmarkMerge10000_int(b *testing.B) {
 	i := intSort{sort: Merge}
 	benchmarkSort(b, &i, 10000, false)
 }
@@ -286,17 +286,17 @@ func BenchmarkMergeIntOptimized10000(b *testing.B) {
 	benchmarkSort(b, &i, 10000, false)
 }
 
-func BenchmarkMergeOptimized100(b *testing.B) {
+func BenchmarkMergeOptimized100_int(b *testing.B) {
 	i := intSort{sort: MergeOptimized}
 	benchmarkSort(b, &i, 100, false)
 }
 
-func BenchmarkMergeOptimized1000(b *testing.B) {
+func BenchmarkMergeOptimized1000_int(b *testing.B) {
 	i := intSort{sort: MergeOptimized}
 	benchmarkSort(b, &i, 1000, false)
 }
 
-func BenchmarkMergeOptimized10000(b *testing.B) {
+func BenchmarkMergeOptimized10000_int(b *testing.B) {
 	i := intSort{sort: MergeOptimized}
 	benchmarkSort(b, &i, 10000, false)
 }
