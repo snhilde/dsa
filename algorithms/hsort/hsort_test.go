@@ -25,7 +25,7 @@ type sorter interface {
 }
 
 
-// Sort tests
+// --- SORT TESTS ---
 func TestInsertion(t *testing.T) {
 	i := intSort{sortInt: InsertionInt}
 	testSort(t, &i, 100, 1000, false, "InsertionInt")
@@ -150,7 +150,7 @@ func testSort(t *testing.T, s sorter, n int, l int, isHash bool, desc string) {
 }
 
 
-// Sort benchmarks
+// --- SORT BENCHMARKS ---
 func BenchmarkInsertionInt100(b *testing.B) {
 	i := intSort{sortInt: InsertionInt}
 	benchmarkSort(b, &i, 100, false)
@@ -328,6 +328,7 @@ func benchmarkSort(b *testing.B, s sorter, n int, isHash bool) {
 
 
 
+// --- HELPER FUNCTIONS ---
 func newRand() *rand.Rand {
 	seed   := time.Now().UnixNano()
 	source := rand.NewSource(seed)
@@ -337,6 +338,7 @@ func newRand() *rand.Rand {
 }
 
 
+// --- TYPES THAT IMPLEMENT SORTER INTERFACE ---
 type intSort struct {
 	dev     []int
 	std     []int
