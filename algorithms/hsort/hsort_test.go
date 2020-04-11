@@ -211,6 +211,36 @@ func BenchmarkSelection10000(b *testing.B) {
 	benchmarkSort(b, &i, 10000)
 }
 
+func BenchmarkBubbleInt100(b *testing.B) {
+	i := intSort{sortInt: BubbleInt}
+	benchmarkSort(b, &i, 100)
+}
+
+func BenchmarkBubbleInt1000(b *testing.B) {
+	i := intSort{sortInt: BubbleInt}
+	benchmarkSort(b, &i, 1000)
+}
+
+func BenchmarkBubbleInt10000(b *testing.B) {
+	i := intSort{sortInt: BubbleInt}
+	benchmarkSort(b, &i, 10000)
+}
+
+func BenchmarkBubble100(b *testing.B) {
+	i := intSort{sort: Bubble}
+	benchmarkSort(b, &i, 100)
+}
+
+func BenchmarkBubble1000(b *testing.B) {
+	i := intSort{sort: Bubble}
+	benchmarkSort(b, &i, 1000)
+}
+
+func BenchmarkBubble10000(b *testing.B) {
+	i := intSort{sort: Bubble}
+	benchmarkSort(b, &i, 10000)
+}
+
 func BenchmarkMergeInt100(b *testing.B) {
 	i := intSort{sortInt: MergeInt}
 	benchmarkSort(b, &i, 100)
