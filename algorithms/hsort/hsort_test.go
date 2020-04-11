@@ -181,6 +181,21 @@ func BenchmarkInsertion10000_int(b *testing.B) {
 	benchmarkSort(b, &i, 10000, false)
 }
 
+func BenchmarkInsertion100_uint(b *testing.B) {
+	u := uintSort{sort: Insertion}
+	benchmarkSort(b, &u, 100, false)
+}
+
+func BenchmarkInsertion1000_uint(b *testing.B) {
+	u := uintSort{sort: Insertion}
+	benchmarkSort(b, &u, 1000, false)
+}
+
+func BenchmarkInsertion10000_uint(b *testing.B) {
+	u := uintSort{sort: Insertion}
+	benchmarkSort(b, &u, 10000, false)
+}
+
 func BenchmarkSelectionInt100(b *testing.B) {
 	i := intSort{sortInt: SelectionInt}
 	benchmarkSort(b, &i, 100, false)
@@ -209,6 +224,21 @@ func BenchmarkSelection1000_int(b *testing.B) {
 func BenchmarkSelection10000_int(b *testing.B) {
 	i := intSort{sort: Selection}
 	benchmarkSort(b, &i, 10000, false)
+}
+
+func BenchmarkSelection100_uint(b *testing.B) {
+	u := uintSort{sort: Selection}
+	benchmarkSort(b, &u, 100, false)
+}
+
+func BenchmarkSelection1000_uint(b *testing.B) {
+	u := uintSort{sort: Selection}
+	benchmarkSort(b, &u, 1000, false)
+}
+
+func BenchmarkSelection10000_uint(b *testing.B) {
+	u := uintSort{sort: Selection}
+	benchmarkSort(b, &u, 10000, false)
 }
 
 func BenchmarkBubbleInt100(b *testing.B) {
@@ -241,6 +271,21 @@ func BenchmarkBubble10000_int(b *testing.B) {
 	benchmarkSort(b, &i, 10000, false)
 }
 
+func BenchmarkBubble100_uint(b *testing.B) {
+	u := uintSort{sort: Bubble}
+	benchmarkSort(b, &u, 100, false)
+}
+
+func BenchmarkBubble1000_uint(b *testing.B) {
+	u := uintSort{sort: Bubble}
+	benchmarkSort(b, &u, 1000, false)
+}
+
+func BenchmarkBubble10000_uint(b *testing.B) {
+	u := uintSort{sort: Bubble}
+	benchmarkSort(b, &u, 10000, false)
+}
+
 func BenchmarkMergeInt100(b *testing.B) {
 	i := intSort{sortInt: MergeInt}
 	benchmarkSort(b, &i, 100, false)
@@ -271,6 +316,21 @@ func BenchmarkMerge10000_int(b *testing.B) {
 	benchmarkSort(b, &i, 10000, false)
 }
 
+func BenchmarkMerge100_uint(b *testing.B) {
+	u := uintSort{sort: Merge}
+	benchmarkSort(b, &u, 100, false)
+}
+
+func BenchmarkMerge1000_uint(b *testing.B) {
+	u := uintSort{sort: Merge}
+	benchmarkSort(b, &u, 1000, false)
+}
+
+func BenchmarkMerge10000_uint(b *testing.B) {
+	u := uintSort{sort: Merge}
+	benchmarkSort(b, &u, 10000, false)
+}
+
 func BenchmarkMergeIntOptimized100(b *testing.B) {
 	i := intSort{sortInt: MergeIntOptimized}
 	benchmarkSort(b, &i, 100, false)
@@ -299,6 +359,21 @@ func BenchmarkMergeOptimized1000_int(b *testing.B) {
 func BenchmarkMergeOptimized10000_int(b *testing.B) {
 	i := intSort{sort: MergeOptimized}
 	benchmarkSort(b, &i, 10000, false)
+}
+
+func BenchmarkMergeOptimized100_uint(b *testing.B) {
+	u := uintSort{sort: MergeOptimized}
+	benchmarkSort(b, &u, 100, false)
+}
+
+func BenchmarkMergeOptimized1000_uint(b *testing.B) {
+	u := uintSort{sort: MergeOptimized}
+	benchmarkSort(b, &u, 1000, false)
+}
+
+func BenchmarkMergeOptimized10000_uint(b *testing.B) {
+	u := uintSort{sort: MergeOptimized}
+	benchmarkSort(b, &u, 10000, false)
 }
 
 func BenchmarkHashInt100(b *testing.B) {
