@@ -271,6 +271,36 @@ func BenchmarkMerge10000(b *testing.B) {
 	benchmarkSort(b, &i, 10000)
 }
 
+func BenchmarkMergeOptimizedInt100(b *testing.B) {
+	i := intSort{sortInt: MergeInt}
+	benchmarkSort(b, &i, 100)
+}
+
+func BenchmarkMergeInt1000(b *testing.B) {
+	i := intSort{sortInt: MergeInt}
+	benchmarkSort(b, &i, 1000)
+}
+
+func BenchmarkMergeInt10000(b *testing.B) {
+	i := intSort{sortInt: MergeInt}
+	benchmarkSort(b, &i, 10000)
+}
+
+func BenchmarkMerge100(b *testing.B) {
+	i := intSort{sort: Merge}
+	benchmarkSort(b, &i, 100)
+}
+
+func BenchmarkMerge1000(b *testing.B) {
+	i := intSort{sort: Merge}
+	benchmarkSort(b, &i, 1000)
+}
+
+func BenchmarkMerge10000(b *testing.B) {
+	i := intSort{sort: Merge}
+	benchmarkSort(b, &i, 10000)
+}
+
 func benchmarkSort(b *testing.B, s sorter, n int) {
 	for i := 0; i < b.N; i++ {
 		s.Build(n, false)
