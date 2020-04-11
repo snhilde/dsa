@@ -151,6 +151,36 @@ func testSort(t *testing.T, s sorter, n int, l int, isHash bool, desc string) {
 
 
 // Sort benchmarks
+func BenchmarkInsertionInt100(b *testing.B) {
+	i := intSort{sortInt: InsertionInt}
+	benchmarkSort(b, &i, 100)
+}
+
+func BenchmarkInsertionInt1000(b *testing.B) {
+	i := intSort{sortInt: InsertionInt}
+	benchmarkSort(b, &i, 1000)
+}
+
+func BenchmarkInsertionInt10000(b *testing.B) {
+	i := intSort{sortInt: InsertionInt}
+	benchmarkSort(b, &i, 10000)
+}
+
+func BenchmarkInsertion100(b *testing.B) {
+	i := intSort{sort: Insertion}
+	benchmarkSort(b, &i, 100)
+}
+
+func BenchmarkInsertion1000(b *testing.B) {
+	i := intSort{sort: Insertion}
+	benchmarkSort(b, &i, 1000)
+}
+
+func BenchmarkInsertion10000(b *testing.B) {
+	i := intSort{sort: Insertion}
+	benchmarkSort(b, &i, 10000)
+}
+
 func BenchmarkMergeInt100(b *testing.B) {
 	i := intSort{sortInt: MergeInt}
 	benchmarkSort(b, &i, 100)
