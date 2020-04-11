@@ -198,7 +198,7 @@ func Merge(list interface{}) error {
 		merge  bool
 	}
 
-	length, at, cmp, swap, err := initSort(list)
+	length, at, greater, swap, err := initSort(list)
 	if err != nil {
 		return err
 	}
@@ -229,7 +229,7 @@ func Merge(list interface{}) error {
 					// We only have values on the left side still.
 					moveTo[leftIndex] = i
 					leftIndex++
-				} else if cmp(at(rightIndex), at(leftIndex)) {
+				} else if greater(at(rightIndex), at(leftIndex)) {
 					moveTo[leftIndex] = i
 					leftIndex++
 					leftLen--
@@ -360,7 +360,7 @@ func MergeOptimized(list interface{}) error {
 	// another list and then moving them back in sorted order, we're going to keep track of where each item should be.
 	// After we calculate each item's required index for sorting, we'll start swapping each item into its correct
 	// position.
-	length, at, cmp, swap, err := initSort(list)
+	length, at, greater, swap, err := initSort(list)
 	if err != nil {
 		return err
 	}
@@ -402,7 +402,7 @@ func MergeOptimized(list interface{}) error {
 					// We only have values on the left side still.
 					moveTo[leftIndex] = j
 					leftIndex++
-				} else if cmp(at(rightIndex), at(leftIndex)) {
+				} else if greater(at(rightIndex), at(leftIndex)) {
 					moveTo[leftIndex] = j
 					leftIndex++
 					leftLen--
@@ -559,72 +559,72 @@ func HashInt(list []int) error {
 // 3. A function that will compare the two Values, return M_TRUE if the first is greater and M_FALSE if the second is greater.
 // 4. A function that will swap the two Values at the given indices.
 // 5. Any error that occurred along the way, or nil if no error occurred
-func initSort(list interface{}) (int, func(int) reflect.Value, func(i, j reflect.Value) bool, func(i, j int), error) {
+func initSort(list interface{}) (length int, at func(int) reflect.Value, greater func(i, j reflect.Value) bool, swap func(i, j int), err error) {
 	// Pull out the underlying Value, and make sure it's a slice.
 	v := reflect.ValueOf(list)
 	if v.Kind() != reflect.Slice {
-		return -1, nil, nil, nil, errors.New("List must be slice")
+		err = errors.New("List must be slice")
+		return
 	}
 
 	// Find out how long our list is.
-	l := v.Len()
-	if l < 1 {
-		return -1, nil, nil, nil, errors.New("Invalid list size")
-	}
-
-	// Make sure we have a type that we can work with.
-	var k reflect.Kind
-	switch v := v.Index(0).Kind(); v {
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		k = reflect.Int64
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		k = reflect.Uint64
-	case reflect.Float32, reflect.Float64:
-		k = reflect.Float64
-	case reflect.Bool:
-		k = reflect.Bool
-	case reflect.String:
-		k = reflect.String
-	default:
-		return -1, nil, nil, nil, errors.New(fmt.Sprintf("Invalid underlying type (%s)", v))
+	length = v.Len()
+	if length < 1 {
+		err = errors.New("Invalid list size")
+		return
 	}
 
 	// Construct the function that will return the Value at the given index.
-	at := func(i int) reflect.Value {
+	at = func(i int) reflect.Value {
 		return v.Index(i)
 	}
 
-	// Construct the function that will compare the two Values.
+	// Construct the function that will compare the two Values (and make sure we have a type we can work with).
 	// Returns true if i is greater than j and items need to be swapped.
-	greater := func(i, j reflect.Value) bool {
-		switch k {
-		case reflect.Int64:
+	switch k := v.Index(0).Kind(); k {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		greater = func(i, j reflect.Value) bool {
 			if i.Int() > j.Int() {
 				return true
 			}
-		case reflect.Uint64:
+			return false
+		}
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		greater = func(i, j reflect.Value) bool {
 			if i.Uint() > j.Uint() {
 				return true
 			}
-		case reflect.Float64:
+			return false
+		}
+	case reflect.Float32, reflect.Float64:
+		greater = func(i, j reflect.Value) bool {
 			if i.Float() > j.Float() {
 				return true
 			}
-		case reflect.Bool:
+			return false
+		}
+	case reflect.Bool:
+		greater = func(i, j reflect.Value) bool {
 			if i.Bool() && !j.Bool() {
 				return true
 			}
-		case reflect.String:
+			return false
+		}
+	case reflect.String:
+		greater = func(i, j reflect.Value) bool {
 			if i.String() > j.String() {
 				return true
 			}
+			return false
 		}
-
-		return false
+	default:
+		err = errors.New(fmt.Sprintf("Invalid underlying type (%s)", v))
+		return
 	}
 
-	// Our swapping function is straight from the reflect library (thanks).
-	swap := reflect.Swapper(list)
+	// Our swapping function is straight from the reflect library (thank you to the authors).
+	swap = reflect.Swapper(list)
 
-	return l, at, greater, swap, nil
+	// All good.
+	return
 }
