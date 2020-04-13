@@ -12,6 +12,14 @@ import (
 )
 
 
+var (
+	// This is the standard error message when trying to use an invalid table.
+	badTable = errors.New("Table must be created with New() first")
+	// This is the standard error message when trying to use an invalid row.
+	badRow = errors.New("Row must be created with NewRow() first")
+)
+
+
 // Table is the main type in this package. It holds all the rows of data.
 type Table struct {
 	h     []string       // Column headers
@@ -102,7 +110,7 @@ func (t *Table) InsertRow(index int, r *Row) error {
 // RemoveRow deletes a row from the table.
 func (t *Table) RemoveRow(index int) error {
 	if t == nil {
-		return tErr()
+		return badTable
 	}
 
 	v := t.rows.Remove(index)
@@ -119,7 +127,7 @@ func (t *Table) RemoveRow(index int) error {
 // Clear erases the rows in the table but leaves the column headers and column types.
 func (t *Table) Clear() error {
 	if t == nil {
-		return tErr()
+		return badTable
 	}
 
 	return t.rows.Clear()
@@ -176,7 +184,7 @@ func (t *Table) String() string {
 // SetItem changes the value of the item at the specified coordinates.
 func (t *Table) SetItem(row int, col string, value interface{}) error {
 	if t == nil {
-		return tErr()
+		return badTable
 	} else if row < 0 || t.Rows() <= row {
 		return errors.New("Invalid row")
 	}
@@ -211,7 +219,7 @@ func (t *Table) SetItem(row int, col string, value interface{}) error {
 // SetHeader changes the specified column's header to name.
 func (t *Table) SetHeader(col string, name string) error {
 	if t == nil {
-		return tErr()
+		return badTable
 	} else if col == "" {
 		return errors.New("Invalid column")
 	} else if name == "" {
@@ -349,7 +357,7 @@ func (t *Table) Matches(row int, col string, v interface{}) bool {
 // Toggle sets the row at the specified index to either be checked or skipped during table lookups (like Row and Count).
 func (t *Table) Toggle(row int, enabled bool) error {
 	if t == nil {
-		return tErr()
+		return badTable
 	}
 
 	tmp := t.rows.Value(row)
@@ -433,7 +441,7 @@ func (r *Row) String() string {
 // SetItem changes the value of the item in the specified column.
 func (r *Row) SetItem(index int, value interface{}) error {
 	if r == nil {
-		return rErr()
+		return badRow
 	} else if index < 0 || r.Count() <= index {
 		return errors.New("Invalid column")
 	}
@@ -473,17 +481,9 @@ func (r *Row) Matches(index int, v interface{}) bool {
 }
 
 
-func tErr() error {
-	return errors.New("Table must be created with New() first")
-}
-
-func rErr() error {
-	return errors.New("Row must be created with NewRow() first")
-}
-
 func (t *Table) validateRow(r *Row) error {
 	if t == nil {
-		return tErr()
+		return badTable
 	} else if n := t.Columns(); n != len(r.v) {
 		return errors.New(fmt.Sprintf("Number of items (%v) does not match number of columns (%v)", len(r.v), n))
 	}
