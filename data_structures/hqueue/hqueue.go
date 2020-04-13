@@ -7,6 +7,12 @@ import (
 )
 
 
+var (
+	// This is the standard error message when trying to use an invalid queue.
+	badQueue = errors.New("Must create queue with New() first")
+)
+
+
 // Queue is the main type for this package. It holds the internal information about the queue.
 type Queue struct {
 	list *hlist.List
@@ -22,7 +28,7 @@ func New() *Queue {
 // Add adds one or more new items to the back of the queue. The items will be added in the order provided.
 func (q *Queue) Add(vs ...interface{}) error {
 	if q == nil {
-		return qErr()
+		return badQueue
 	}
 
 	// If caller is trying to add own queue, duplicate it first and then add it.
@@ -62,7 +68,7 @@ func (q *Queue) Count() int {
 // Copy makes an exact copy of the queue.
 func (q *Queue) Copy() (*Queue, error) {
 	if q == nil {
-		return nil, qErr()
+		return nil, badQueue
 	}
 
 	nl, err := q.list.Copy()
@@ -80,7 +86,7 @@ func (q *Queue) Copy() (*Queue, error) {
 // queue.
 func (q *Queue) Merge(nq *Queue) error {
 	if q == nil {
-		return qErr()
+		return badQueue
 	} else if nq == nil || nq.Count() == 0 {
 		// Nothing to add.
 		return nil
@@ -109,9 +115,4 @@ func (q *Queue) String() string {
 	}
 
 	return q.list.String()
-}
-
-
-func qErr() error {
-	return errors.New("Must create queue with New() first")
 }
