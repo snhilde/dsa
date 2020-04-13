@@ -9,6 +9,12 @@ import (
 )
 
 
+var (
+	// This is the standard error message when trying to use an invalid buffer.
+	badBuf = errors.New("Must create bit buffer with New() first")
+)
+
+
 // Buffer is the main type for this package. It holds the internal information about the bit buffer.
 type Buffer struct {
 	head *bnode
@@ -109,7 +115,7 @@ func (b *Buffer) Copy(n int) *Buffer {
 // Recalibrate realigns the bits to the beginning of the buffer.
 func (b *Buffer) Recalibrate() error {
 	if b == nil {
-		return bufErr()
+		return badBuf
 	}
 
 	// All we have to do is cut off the tail.
@@ -121,7 +127,7 @@ func (b *Buffer) Recalibrate() error {
 // Reset resets the bit buffer to its initial state.
 func (b *Buffer) Reset() error {
 	if b == nil {
-		return bufErr()
+		return badBuf
 	}
 
 	b.head = nil
@@ -147,7 +153,7 @@ func (b *Buffer) Display() string {
 // there are not enough bits to fill all of the last byte, then the rest of the byte will be false bits.
 func (b *Buffer) Read(p []byte) (int, error) {
 	if b == nil {
-		return 0, bufErr()
+		return 0, badBuf
 	}
 
 	// Check if our buffer has anything to read.
@@ -230,7 +236,7 @@ func (b *Buffer) ReadInt(index int) (int, error) {
 // error.
 func (b *Buffer) ReadFrom(r io.Reader) (int, error) {
 	if b == nil {
-		return 0, bufErr()
+		return 0, badBuf
 	} else if r == nil {
 		return 0, io.EOF
 	}
@@ -401,7 +407,7 @@ func (b *Buffer) RemoveBits(index, n int) error {
 // Advance moves the start of the buffer forward a number of bits. It will return the number of bits moved.
 func (b *Buffer) Advance(n int) (int, error) {
 	if b == nil {
-		return 0, bufErr()
+		return 0, badBuf
 	} else if n < 0 {
 		return 0, errors.New("Invalid number")
 	}
@@ -433,7 +439,7 @@ func (b *Buffer) Advance(n int) (int, error) {
 // moved.
 func (b *Buffer) Rewind(n int) (int, error) {
 	if b == nil {
-		return 0, bufErr()
+		return 0, badBuf
 	} else if n < 0 {
 		return 0, errors.New("Invalid number")
 	}
@@ -652,15 +658,10 @@ func bitOn(b byte, bit int) bool {
 	return false
 }
 
-// This is the standard error message for passing an invalid buffer.
-func bufErr() error {
-	return errors.New("Must create bit buffer with New() first")
-}
-
 // Get the last node in the buffer.
 func (b *Buffer) getEnd() (*bnode, error) {
 	if b == nil {
-		return nil, bufErr()
+		return nil, badBuf
 	} else if b.head == nil {
 		return nil, nil
 	}
@@ -676,7 +677,7 @@ func (b *Buffer) getEnd() (*bnode, error) {
 // Get the node at a given index.
 func (b *Buffer) getNode(index int) (*bnode, error) {
 	if b == nil {
-		return nil, bufErr()
+		return nil, badBuf
 	} else if index < 0 {
 		return nil, errors.New("Invalid index")
 	}
@@ -727,7 +728,7 @@ func opBit(bit *bnode, ref bool, t token.Token) error {
 // Perform a bitwise operation over a byte range.
 func (b *Buffer) opBytes(ref []byte, t token.Token) error {
 	if b == nil {
-		return bufErr()
+		return badBuf
 	}
 
 	node := b.head
@@ -751,7 +752,7 @@ func (b *Buffer) opBytes(ref []byte, t token.Token) error {
 // Perform a bitwise operation using another buffer as the reference.
 func (b *Buffer) opBuf(ref *Buffer, t token.Token) error {
 	if b == nil || ref == nil {
-		return bufErr()
+		return badBuf
 	}
 
 	node := b.head
