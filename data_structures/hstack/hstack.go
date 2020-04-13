@@ -7,6 +7,12 @@ import (
 )
 
 
+var (
+	// This is the standard error message when trying to use an invalid stack.
+	badStack = errors.New("Must create stack with New() first")
+)
+
+
 // Stack is the main type for this package. It holds the internal information about the stack.
 type Stack struct {
 	list *hlist.List
@@ -24,7 +30,7 @@ func New() *Stack {
 // top.
 func (s *Stack) Add(vs ...interface{}) error {
 	if s == nil {
-		return sErr()
+		return badStack
 	}
 
 	// If caller is trying to add own stack, duplicate it first and then add it.
@@ -64,7 +70,7 @@ func (s *Stack) Count() int {
 // Copy makes an exact copy of the stack.
 func (s *Stack) Copy() (*Stack, error) {
 	if s == nil {
-		return nil, sErr()
+		return nil, badStack
 	}
 
 	nl, err := s.list.Copy()
@@ -81,7 +87,7 @@ func (s *Stack) Copy() (*Stack, error) {
 // Merge adds a stack below the current stack. This will take ownership of and clear the provided stack.
 func (s *Stack) Merge(ns *Stack) error {
 	if s == nil {
-		return sErr()
+		return badStack
 	} else if ns == nil || ns.Count() == 0 {
 		// Nothing to add.
 		return nil
@@ -110,9 +116,4 @@ func (s *Stack) String() string {
 	}
 
 	return s.list.String()
-}
-
-
-func sErr() error {
-	return errors.New("Must create stack with New() first")
 }
