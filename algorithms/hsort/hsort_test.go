@@ -157,6 +157,32 @@ func TestHashInt(t *testing.T) {
 	testSort(t, &i, 100, 10000, true, "HashInt")
 }
 
+func TestBogo(t *testing.T) {
+	// Make sure that we can only pass a slice of certain types.
+	testBadArg(t, Bogo)
+	testBadList(t, Bogo)
+
+	// Make sure that our functions sort correctly.
+	// We're using extremely small list sizes and only 2 iterations because this algorithm is so comically inefficient.
+	i := intSort{sortInt: BogoInt}
+	testSort(t, &i, 2, 10, false, "BogoInt")
+
+	i = intSort{sort: Bogo}
+	testSort(t, &i, 2, 10, false, "Bogo (int)")
+
+	u := uintSort{sort: Bogo}
+	testSort(t, &u, 2, 10, false, "Bogo (uint)")
+
+	f := floatSort{sort: Bogo}
+	testSort(t, &f, 2, 10, false, "Bogo (float)")
+
+	b := boolSort{sort: Bogo}
+	testSort(t, &b, 2, 10, false, "Bogo (bool)")
+
+	s := stringSort{sort: Bogo}
+	testSort(t, &s, 2, 10, false, "Bogo (string)")
+}
+
 
 // --- SORT BENCHMARKS ---
 func BenchmarkInsertionInt100(b *testing.B) {
@@ -622,6 +648,96 @@ func BenchmarkHashInt1000(b *testing.B) {
 func BenchmarkHashInt10000(b *testing.B) {
 	i := intSort{sortInt: HashInt}
 	benchmarkSort(b, &i, 10000, true)
+}
+
+func BenchmarkBogoInt2(b *testing.B) {
+	i := intSort{sortInt: BogoInt}
+	benchmarkSort(b, &i, 2, false)
+}
+
+func BenchmarkBogoInt4(b *testing.B) {
+	i := intSort{sortInt: BogoInt}
+	benchmarkSort(b, &i, 4, false)
+}
+
+func BenchmarkBogoInt8(b *testing.B) {
+	i := intSort{sortInt: BogoInt}
+	benchmarkSort(b, &i, 8, false)
+}
+
+func BenchmarkBogo2_int(b *testing.B) {
+	i := intSort{sort: Bogo}
+	benchmarkSort(b, &i, 2, false)
+}
+
+func BenchmarkBogo4_int(b *testing.B) {
+	i := intSort{sort: Bogo}
+	benchmarkSort(b, &i, 4, false)
+}
+
+func BenchmarkBogo8_int(b *testing.B) {
+	i := intSort{sort: Bogo}
+	benchmarkSort(b, &i, 8, false)
+}
+
+func BenchmarkBogo2_uint(b *testing.B) {
+	u := uintSort{sort: Bogo}
+	benchmarkSort(b, &u, 2, false)
+}
+
+func BenchmarkBogo4_uint(b *testing.B) {
+	u := uintSort{sort: Bogo}
+	benchmarkSort(b, &u, 4, false)
+}
+
+func BenchmarkBogo8_uint(b *testing.B) {
+	u := uintSort{sort: Bogo}
+	benchmarkSort(b, &u, 8, false)
+}
+
+func BenchmarkBogo2_float(b *testing.B) {
+	f := floatSort{sort: Bogo}
+	benchmarkSort(b, &f, 2, false)
+}
+
+func BenchmarkBogo4_float(b *testing.B) {
+	f := floatSort{sort: Bogo}
+	benchmarkSort(b, &f, 4, false)
+}
+
+func BenchmarkBogo8_float(b *testing.B) {
+	f := floatSort{sort: Bogo}
+	benchmarkSort(b, &f, 8, false)
+}
+
+func BenchmarkBogo2_bool(b *testing.B) {
+	bl := boolSort{sort: Bogo}
+	benchmarkSort(b, &bl, 2, false)
+}
+
+func BenchmarkBogo4_bool(b *testing.B) {
+	bl := boolSort{sort: Bogo}
+	benchmarkSort(b, &bl, 4, false)
+}
+
+func BenchmarkBogo8_bool(b *testing.B) {
+	bl := boolSort{sort: Bogo}
+	benchmarkSort(b, &bl, 8, false)
+}
+
+func BenchmarkBogo2_string(b *testing.B) {
+	s := stringSort{sort: Bogo}
+	benchmarkSort(b, &s, 2, false)
+}
+
+func BenchmarkBogo4_string(b *testing.B) {
+	s := stringSort{sort: Bogo}
+	benchmarkSort(b, &s, 4, false)
+}
+
+func BenchmarkBogo8_string(b *testing.B) {
+	s := stringSort{sort: Bogo}
+	benchmarkSort(b, &s, 8, false)
 }
 
 
