@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"fmt"
 	"math"
+	"math/rand"
 )
 
 
@@ -551,6 +552,81 @@ func HashInt(list []int) error {
 				index++
 			}
 		}
+	}
+
+	return nil
+}
+
+// Sort the list using a bogo algorithm. The list must be a slice of a uniform data type.
+// Note: This is a bogus algorithm intended to be highly inefficient.
+func Bogo(list interface{}) error {
+	// The loop for this process is simple:
+	// 1. Make sure the list is not currently sorted.
+	// 2. Randomize the items in the list.
+	// We will continue doing this until the loop is sorted.
+	length, at, greater, swap, err := initSort(list)
+	if err != nil {
+		return err
+	}
+
+	var sorted bool
+	for {
+		// Check to see if the list is sorted.
+		sorted = true
+		for i := 0; i < length-1; i++ {
+			if greater(at(i), at(i+1)) {
+				sorted = false
+				break
+			}
+		}
+
+		if sorted {
+			// All good. List is sorted.
+			break
+		}
+
+		// If we're here, then the list is not sorted yet. Randomly shuffle the list.
+		rand.Shuffle(length, swap)
+	}
+
+	return nil
+}
+
+// Sort the list of ints using a bogosort algorithm.
+// Note: Please don't use this.
+func BogoInt(list []int) error {
+	// The loop for this process is simple:
+	// 1. Make sure the list is not currently sorted.
+	// 2. Randomize the items in the list.
+	// We will continue doing this until the loop is sorted.
+	length := len(list)
+	if length < 1 {
+		return invalidLen
+	}
+
+	// This is the swap function we'll use in Shuffle.
+	swap := func(i, j int) {
+		list[i], list[j] = list[j], list[i]
+	}
+
+	var sorted bool
+	for {
+		// Check to see if the list is sorted.
+		sorted = true
+		for i := 0; i < length-1; i++ {
+			if list[i] > list[i+1] {
+				sorted = false
+				break
+			}
+		}
+
+		if sorted {
+			// All good. List is sorted.
+			break
+		}
+
+		// If we're here, then the list is not sorted yet. Randomly shuffle the list.
+		rand.Shuffle(length, swap)
 	}
 
 	return nil
