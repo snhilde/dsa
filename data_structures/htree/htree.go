@@ -38,7 +38,8 @@ func New() *Tree {
 	return new(Tree)
 }
 
-// Add inserts a value into the tree at the provided index.
+// Add inserts a value into the tree at the provided index. If an item already exists at this index, its value will
+// be updated.
 func (t *Tree) Add(value interface{}, index int) error {
 	if t == nil {
 		return badTree
@@ -48,7 +49,8 @@ func (t *Tree) Add(value interface{}, index int) error {
 	return t.AddItems(item)
 }
 
-// AddItems inserts one or more items into the tree.
+// AddItems inserts one or more items into the tree. If there is an index collision, then the item already in the tree
+// will be replaced with the new item.
 func (t *Tree) AddItems(items ...*Item) error {
 	if t == nil {
 		return badTree
@@ -87,7 +89,6 @@ func (t *Tree) AddItems(items ...*Item) error {
 			node.right = new(tnode)
 			node.right.item = item
 		}
-		t.length++
 
 		// Now we need to go back up the stack and check for an imbalance.
 		for node != nil {
@@ -109,6 +110,7 @@ func (t *Tree) AddItems(items ...*Item) error {
 			// Nothing found yet. Keep going up.
 			node = s.Pop().(*tnode)
 		}
+		t.length++
 	}
 
 	return nil
