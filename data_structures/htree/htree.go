@@ -89,28 +89,11 @@ func (t *Tree) AddItems(items ...*Item) error {
 			node.right = new(tnode)
 			node.right.item = item
 		}
-
-		// Now we need to go back up the stack and check for an imbalance.
-		for node != nil {
-			if item.index < node.item.index {
-				node.bal--
-			} else {
-				node.bal++
-			}
-
-			if node.bal == 0 {
-				// when a node's balance changes from -1 or 1 to 0, then it means that every from here on up will remain
-				// unchanged. We can stop checking balances now.
-				break
-			} else if node.bal == -2 || node.bal == 2 {
-				// We have an imbalance.
-				rebalance(&node, item.index)
-				break
-			}
-			// Nothing found yet. Keep going up.
-			node = s.Pop().(*tnode)
-		}
 		t.length++
+
+		// Add the node back to the stack and rebalance the tree (if needed).
+		s.Add(node)
+		t.rebalance(s, item.index, true)
 	}
 
 	return nil
@@ -324,10 +307,53 @@ func (n *tnode) findNode(index int) (*tnode, *hstack.Stack) {
 	return n, s
 }
 
-// rebalance will perform the necessary rotations to rebalance the tree from this node down.
-func rebalance(n **tnode, index int) {
-	rewrite:
-	all we really care about is the first and second nodes
+// rebalance will calculate the balances of the nodes in the path and perform any necessary rotation operations to
+// rebalance the tree.
+func (t *Tree) rebalance(s *hstack.Stack, index int, added bool) {
+	node := s.Pop().(*tnode)
+	for node != nil {
+		if index < node.item.index {
+			if added {
+				node.bal--
+			} else {
+				node.bal++
+			}
+		} else {
+			if added {
+				node.bal++
+			} else {
+				node.bal--
+			}
+		}
+
+		if node.bal == 0 {
+			// when a node's balance changes from -1 or 1 to 0, then it means that every from here on up will remain
+			// unchanged. We can stop checking balances now.
+			break
+		} else if node.bal == -2 || node.bal == 2 {
+			// We have an imbalance. Rotate the nodes to fix this, and then link the branch's new top node back into the
+			// tree.
+			branch := rotate(node, index)
+			node = s.Pop().(*tnode)
+			if node == nil {
+				// We're at the top of the tree.
+				t.trunk = branch
+			} else {
+				if index < node.item.index {
+					node.left = branch
+				} else {
+					node.right = branch
+				}
+			}
+			break
+		}
+		// Nothing found yet. Keep going up.
+		node = s.Pop().(*tnode)
+	}
+}
+
+// rotate will perform the necessary rotations to rebalance the tree from this node down.
+func rotate(top *tnode, index int) *tnode {
 	// When rebalancing, we only really care about two nodes: the node that first had the -2 or 2 imbalance and the node
 	// directly below it on the insertion side. We'll call these the top node and bottom node. The top node was sent as
 	// the first argument to this function. We'll get the bottom node in a bit.
@@ -335,12 +361,10 @@ func rebalance(n **tnode, index int) {
 	// to as a rotation. We'll need to do either a single rotation or a double rotation. If the insertion path is on the
 	// same side of both the top and bottom node, then we need to do only a single rotation. If the sides are different,
 	// then we'll need to do a double rotation.
-	var top    *tnode
 	var bottom *tnode
 	var left    bool
 	var double  bool
 
-	top = *n
 	if index < top.item.index {
 		left = true
 		bottom = top.left
@@ -377,18 +401,18 @@ func rebalance(n **tnode, index int) {
 	bottom.bal = 0
 	if left {
 		if bottom.right == nil {
-			top = 1
+			top.bal = 1
 		}
 		top.left = bottom.right
 		bottom.right = top
 	} else {
 		if bottom.left == nil {
-			top = -1
+			top.bal = -1
 		}
 		top.right = bottom.left
 		bottom.left = top
 	}
 
-	// Link the branch back into the tree.
-	*n = bottom
+	// Pass the new top of this branch of the tree back to the caller for proper linking.
+	return bottom
 }
