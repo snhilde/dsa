@@ -27,7 +27,7 @@ type Tree struct {
 // Internal structure of tree nodes
 type tnode struct {
 	item  *Item
-	bal    int  // Balance of node: -1 if left branch is longer, 0 if both branches are even, or 1 if right side is longer
+	bal    int   // Balance of node: -1 if left branch is longer, 0 if both branches are even, or 1 if right side is longer
 	left  *tnode // Left branch
 	right *tnode // Right branch
 }
@@ -99,6 +99,17 @@ func (t *Tree) AddItems(items ...*Item) error {
 	return nil
 }
 
+// Remove removes the item at the provided index from the tree.
+func (t *Tree) Remove(index int) error {
+	if t == nil {
+		return badTree
+	}
+
+	// TODO: implement
+
+	return nil
+}
+
 // Value returns the value of the item at the given index, or nil if no item exists at that index.
 func (t *Tree) Value(index int) interface{} {
 	if t == nil {
@@ -152,7 +163,7 @@ func (t *Tree) Match(item interface{}) bool {
 // order. The channel quit is used to communicate when iteration should be stopped. Send any value on the cnannel (or
 // close it) to break the communication. This will happen automatically when the tree is exhausted. If this is not
 // needed, pass nil as the argument.
-func (t *Tree) Yield(quit chan interface{}) chan interface{} {
+func (t *Tree) Yield(quit <-chan interface{}) <-chan interface{} {
 	if t == nil {
 		return nil
 	}
@@ -166,20 +177,20 @@ func (t *Tree) Yield(quit chan interface{}) chan interface{} {
 		for {
 			if node == nil {
 				// We've reached the end of this left branch. Grab the last node.
-				node = s.Pop().(*tnode)
-				if node == nil {
+				if s.Count() == 0 {
 					// We've traversed all the nodes.
-					return
+					break
 				}
 
 				// Send out the value.
+				node = s.Pop().(*tnode)
 				select {
 				case ch <- node.item.value:
 					// Left branch is done. Work down the right branch now.
 					node = node.right
 				case <-quit:
 					// The caller has notified us that they are done.
-					return
+					break
 				}
 			} else {
 				// Add the node to the stack and keep going down the left branch.
@@ -242,8 +253,8 @@ func (t *Tree) Length() int {
 
 // Item is the type for each item in the tree. It holds the value of the item and its index for sorting.
 type Item struct {
-	value interface{} // value
-	index int         // index for sorting
+	value interface{}
+	index int
 }
 
 // NewItem creates a new item with the provided value and index.
@@ -291,27 +302,29 @@ func (i *Item) SetValue(value interface{}) error {
 func (n *tnode) findNode(index int) (*tnode, *hstack.Stack) {
 	s := hstack.New()
 
-	for n != nil {
-		if index == n.item.index {
+	node := n
+	for node != nil {
+		if index == node.item.index {
 			break
 		}
 
-		s.Add(n)
-		if index < n.item.index {
-			n = n.left
+		s.Add(node)
+		if index < node.item.index {
+			node = node.left
 		} else {
-			n = n.right
+			node = node.right
 		}
 	}
 
-	return n, s
+	return node, s
 }
 
 // rebalance will calculate the balances of the nodes in the path and perform any necessary rotation operations to
 // rebalance the tree.
 func (t *Tree) rebalance(s *hstack.Stack, index int, added bool) {
-	node := s.Pop().(*tnode)
-	for node != nil {
+	var node *tnode
+	for s.Count() > 0 {
+		node = s.Pop().(*tnode)
 		if index < node.item.index {
 			if added {
 				node.bal--
@@ -326,29 +339,28 @@ func (t *Tree) rebalance(s *hstack.Stack, index int, added bool) {
 			}
 		}
 
-		if node.bal == 0 {
-			// when a node's balance changes from -1 or 1 to 0, then it means that every from here on up will remain
-			// unchanged. We can stop checking balances now.
+		if (added && node.bal == 0) || (!added && (node.bal == -1 || node.bal == 1)) {
+			// The operation did not change the length of the longest branch. We can stop checking for imbalance now.
 			break
 		} else if node.bal == -2 || node.bal == 2 {
-			// We have an imbalance. Rotate the nodes to fix this, and then link the branch's new top node back into the
+			// We have an imbalance. Rotate the nodes to fix this. This will change the root node of this branch, so
+			// we'll need to link it back in after the rotation operation is done.
 			// tree.
-			branch := rotate(node, index)
+			rotated := rotate(node, index)
 			node = s.Pop().(*tnode)
 			if node == nil {
 				// We're at the top of the tree.
-				t.trunk = branch
+				t.trunk = rotated
 			} else {
 				if index < node.item.index {
-					node.left = branch
+					node.left = rotated
 				} else {
-					node.right = branch
+					node.right = rotated
 				}
 			}
 			break
 		}
 		// Nothing found yet. Keep going up.
-		node = s.Pop().(*tnode)
 	}
 }
 
@@ -381,7 +393,7 @@ func rotate(top *tnode, index int) *tnode {
 
 	if double {
 		// The insertion path is on different sides of the top and bottom nodes, so we have to do a double rotation.
-		// We'll do the unique part first here, and then we'll do the shared later below.
+		// We'll do the unique part first here, and then we'll do the shared part below.
 		bottom.bal = 0
 		if left {
 			top.left = bottom.right
@@ -397,6 +409,7 @@ func rotate(top *tnode, index int) *tnode {
 	}
 
 	// Now, we'll do the shared rotation on the top node that all balance operations will need.
+	// TODO: I believe the balances are not always going to be returned to 0 here. Investigate this more.
 	top.bal = 0
 	bottom.bal = 0
 	if left {
