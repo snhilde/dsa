@@ -331,7 +331,7 @@ func (l *List) Clear() error {
 // to break the communication. This will happen automatically if the list is exhausted. If this is not needed, pass nil
 // as the argument. Use Yield if you are concerned about memory usage or don't know how far through the list you will
 // iterate; otherwise, use YieldAll.
-func (l *List) Yield(quit chan interface{}) chan interface{} {
+func (l *List) Yield(quit <-chan interface{}) <-chan interface{} {
 	if l == nil || l.head == nil {
 		return nil
 	}
@@ -355,7 +355,7 @@ func (l *List) Yield(quit chan interface{}) chan interface{} {
 
 // YieldAll provides a buffered channel that will pass successive node values until the list is exhausted.
 // Use this if you don't care greatly about memory usage and for convenience.
-func (l *List) YieldAll() chan interface{} {
+func (l *List) YieldAll() <-chan interface{} {
 	if l == nil || l.head == nil {
 		return nil
 	}
