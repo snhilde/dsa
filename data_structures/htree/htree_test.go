@@ -2,6 +2,11 @@ package htree
 
 import (
 	"testing"
+	"time"
+	"math/rand"
+	"sort"
+	"strings"
+	"fmt"
 )
 
 // --- TREE TESTS ---
@@ -96,6 +101,7 @@ func TestAdd(t *testing.T) {
 	testString(t, tr, "<empty>")
 	testLength(t, tr, 0)
 
+	// Do a few simple, hand-built tests to make sure things look right.
 	if err := tr.Add(5, 5); err != nil {
 		t.Error(err)
 	}
@@ -155,4 +161,12 @@ func testLength(t *testing.T, tr *Tree, want int) {
 		t.Error("Want", want, "items")
 		t.Error("Have", length, "items")
 	}
+}
+
+func newRand() *rand.Rand {
+	seed   := time.Now().UnixNano()
+	source := rand.NewSource(seed)
+	random := rand.New(source)
+
+	return random
 }
