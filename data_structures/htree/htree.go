@@ -347,11 +347,11 @@ func (t *Tree) rebalance(s *hstack.Stack, index int, added bool) {
 			// we'll need to link it back in after the rotation operation is done.
 			// tree.
 			rotated := rotate(node, index)
-			node = s.Pop().(*tnode)
-			if node == nil {
+			if s.Count() == 0 {
 				// We're at the top of the tree.
 				t.trunk = rotated
 			} else {
+				node = s.Pop().(*tnode)
 				if index < node.item.index {
 					node.left = rotated
 				} else {
