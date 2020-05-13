@@ -146,6 +146,28 @@ func TestList(t *testing.T) {
 // --- ITEM TESTS ---
 
 
+// --- TREE BENCHMARKS ---
+func Benchmark100(b *testing.B) {
+	_, _ = buildTree(100, false)
+}
+
+func Benchmark1000(b *testing.B) {
+	_, _ = buildTree(1000, false)
+}
+
+func Benchmark10000(b *testing.B) {
+	_, _ = buildTree(10000, false)
+}
+
+func Benchmark100000(b *testing.B) {
+	_, _ = buildTree(100000, false)
+}
+
+func Benchmark1000000(b *testing.B) {
+	_, _ = buildTree(1000000, false)
+}
+
+
 // --- HELPER FUNCTIONS ---
 func testString(t *testing.T, tr *Tree, want string) {
 	s := tr.String()
