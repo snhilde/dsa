@@ -170,3 +170,26 @@ func newRand() *rand.Rand {
 
 	return random
 }
+
+// buildTree creates a new tree and populates it with count items, either randomly or by iterating from low to high. It
+// returns the new tree as well as the indexes of all the items.
+func buildTree(count int, random bool) (*Tree, []int) {
+	tr := New()
+	indexes := make([]int, count)
+
+	if random {
+		r := newRand()
+		for i := range indexes {
+			v := r.Int()
+			tr.Add(v, v)
+			indexes[i] = v
+		}
+	} else {
+		indexes = nil
+		for i := 0; i < count; i++ {
+			tr.Add(i, i)
+		}
+	}
+
+	return tr, indexes
+}
