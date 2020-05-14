@@ -117,9 +117,66 @@ func TestAdd(t *testing.T) {
 	}
 	testString(t, tr, "1, 5, 10")
 	testLength(t, tr, 3)
+
+	// Now do a larger test to make sure items are inserted in the correct order.
+	var b strings.Builder
+	var nums []int
+	tr, nums = buildTree(100000, true)
+	sort.Ints(nums)
+	for _, v := range nums {
+		b.WriteString(fmt.Sprintf("%v, ", v))
+	}
+	s := strings.TrimSuffix(b.String(), ", ")
+	testString(t, tr, s)
+	testLength(t, tr, 100000)
 }
 
 func TestAddItems(t *testing.T) {
+	tr := New()
+
+	// Do a few simple, hand-built tests to make sure things look right.
+	item1 := NewItem(5, 5)
+	if err := tr.AddItems(item1); err != nil {
+		t.Error(err)
+	}
+	testString(t, tr, "5")
+	testLength(t, tr, 1)
+
+	item2 := NewItem(10, 10)
+	item3 := NewItem(1, 1)
+	if err := tr.AddItems(item2, item3); err != nil {
+		t.Error(err)
+	}
+	testString(t, tr, "1, 5, 10")
+	testLength(t, tr, 3)
+
+	// Now do a larger test to make sure items are inserted in the correct order.
+	var b strings.Builder
+	tr = New()
+	nums := make([]int, 10000)
+	items := make([]*Item, 10000)
+	r := newRand()
+
+	// Build all the items.
+	for i := range nums {
+		v := r.Int()
+		nums[i] = v
+		items[i] = NewItem(v, v)
+	}
+
+	// Add them all into the tree.
+	if err := tr.AddItems(items...); err != nil {
+		t.Error(err)
+	}
+
+	// Check that everything was added in sorted order.
+	sort.Ints(nums)
+	for _, v := range nums {
+		b.WriteString(fmt.Sprintf("%v, ", v))
+	}
+	s := strings.TrimSuffix(b.String(), ", ")
+	testString(t, tr, s)
+	testLength(t, tr, 10000)
 }
 
 func TestRemove(t *testing.T) {
