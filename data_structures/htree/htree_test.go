@@ -98,8 +98,6 @@ func TestBad(t *testing.T) {
 // Begin testing the various methods for Tree.
 func TestAdd(t *testing.T) {
 	tr := New()
-	testString(t, tr, "<empty>")
-	testLength(t, tr, 0)
 
 	// Do a few simple, hand-built tests to make sure things look right.
 	if err := tr.Add(5, 5); err != nil {
@@ -148,23 +146,33 @@ func TestList(t *testing.T) {
 
 // --- TREE BENCHMARKS ---
 func Benchmark100(b *testing.B) {
-	_, _ = buildTree(100, false)
+	for i := 0; i < b.N; i++ {
+		_, _ = buildTree(100, false)
+	}
 }
 
 func Benchmark1000(b *testing.B) {
-	_, _ = buildTree(1000, false)
+	for i := 0; i < b.N; i++ {
+		_, _ = buildTree(1000, false)
+	}
 }
 
 func Benchmark10000(b *testing.B) {
-	_, _ = buildTree(10000, false)
+	for i := 0; i < b.N; i++ {
+		_, _ = buildTree(10000, false)
+	}
 }
 
 func Benchmark100000(b *testing.B) {
-	_, _ = buildTree(100000, false)
+	for i := 0; i < b.N; i++ {
+		_, _ = buildTree(100000, false)
+	}
 }
 
 func Benchmark1000000(b *testing.B) {
-	_, _ = buildTree(1000000, false)
+	for i := 0; i < b.N; i++ {
+		_, _ = buildTree(1000000, false)
+	}
 }
 
 
