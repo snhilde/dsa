@@ -180,12 +180,85 @@ func TestAddItems(t *testing.T) {
 }
 
 func TestRemove(t *testing.T) {
+	// TODO
 }
 
 func TestValue(t *testing.T) {
+	tr := New()
+
+	// Do a few simple, hand-built tests to make sure things look right.
+	tr.Add(5, 5)
+	tr.Add(10, 10)
+	tr.Add(1, 1)
+	if v := tr.Value(5); v != 5 {
+		t.Error("Expected 5, Received", v)
+	}
+	if v := tr.Value(10); v != 10 {
+		t.Error("Expected 10, Received", v)
+	}
+	if v := tr.Value(1); v != 1 {
+		t.Error("Expected 1, Received", v)
+	}
+
+	// Test that some other values are not present.
+	if v := tr.Value(2); v != nil {
+		t.Error("Expected nothing, Received", v)
+	}
+	if v := tr.Value(20); v != nil {
+		t.Error("Expected nothing, Received", v)
+	}
+	if v := tr.Value(100); v != nil {
+		t.Error("Expected nothing, Received", v)
+	}
+
+	// Now do a larger test to make sure indexes and values are properly tied and look-up is correct.
+	var nums []int
+	tr, nums = buildTree(100000, true)
+	for _, v := range nums {
+		if val := tr.Value(v); val != v {
+			t.Error("Expected", v, "| Received", val)
+		}
+	}
 }
 
 func TestItem(t *testing.T) {
+	tr := New()
+
+	// Do a few simple, hand-built tests to make sure things look right.
+	tr.Add(5, 5)
+	tr.Add(10, 10)
+	tr.Add(1, 1)
+	if item := tr.Item(5); item.GetValue() != 5 {
+		t.Error("Expected 5, Received", item.GetValue())
+	}
+	if item := tr.Item(10); item.GetValue() != 10 {
+		t.Error("Expected 10, Received", item.GetValue())
+	}
+	if item := tr.Item(1); item.GetValue() != 1 {
+		t.Error("Expected 1, Received", item.GetValue())
+	}
+
+	// Test that some other values are not present.
+	if item := tr.Item(2); item != nil {
+		t.Error("Expected nothing, Received", item.GetValue())
+	}
+	if item := tr.Item(20); item != nil {
+		t.Error("Expected nothing, Received", item.GetValue())
+	}
+	if item := tr.Item(100); item != nil {
+		t.Error("Expected nothing, Received", item.GetValue())
+	}
+
+	// Now do a larger test to make sure the correct item is returned.
+	var nums []int
+	tr, nums = buildTree(100000, true)
+	for _, v := range nums {
+		if item := tr.Item(v); item.GetValue() != v {
+			t.Error("Wrong value: Expected", v, "| Received", item.GetValue())
+		} else if item.GetIndex() != v {
+			t.Error("Wrong index: Expected", v, "| Received", item.GetIndex())
+		}
+	}
 }
 
 func TestMatch(t *testing.T) {
