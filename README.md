@@ -1,3 +1,7 @@
+![Maintenance Badge](https://img.shields.io/badge/Maintained-yes-success)
+![Class Badge](https://img.shields.io/badge/Status-experimental-yellow)
+[![GoReportCard example](https://goreportcard.com/badge/github.com/snhilde/dsa)](https://goreportcard.com/report/github.com/snhilde/dsa)
+
 # dsa
 Data Structures and Algorithms
 
