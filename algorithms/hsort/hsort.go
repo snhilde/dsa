@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"github.com/snhilde/dsa/data_structures/htree"
 )
 
 
@@ -627,6 +628,28 @@ func BogoInt(list []int) error {
 
 		// If we're here, then the list is not sorted yet. Randomly shuffle the list.
 		rand.Shuffle(length, swap)
+	}
+
+	return nil
+}
+
+// Sort the list of ints using a binary search tree.
+func BinaryInt(list []int) error {
+	length := len(list)
+	if length < 1 {
+		return invalidLen
+	}
+
+	tree := htree.New()
+	for _, v := range list {
+		if err := tree.Add(v, v); err != nil {
+			return err
+		}
+	}
+
+	sorted := tree.List()
+	for i, v := range sorted {
+		list[i] = v.(int)
 	}
 
 	return nil
