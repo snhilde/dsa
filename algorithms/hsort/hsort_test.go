@@ -183,6 +183,12 @@ func TestBogo(t *testing.T) {
 	testSort(t, &s, 2, 10, false, "Bogo (string)")
 }
 
+func TestBinaryInt(t *testing.T) {
+	// Make sure that our functions sort correctly.
+	i := intSort{sortInt: BinaryInt}
+	testSort(t, &i, 100, 10000, false, "BinaryInt")
+}
+
 
 // --- SORT BENCHMARKS ---
 func BenchmarkInsertionInt100(b *testing.B) {
@@ -738,6 +744,21 @@ func BenchmarkBogo4_string(b *testing.B) {
 func BenchmarkBogo8_string(b *testing.B) {
 	s := stringSort{sort: Bogo}
 	benchmarkSort(b, &s, 8, false)
+}
+
+func BenchmarkBinaryInt100(b *testing.B) {
+	i := intSort{sortInt: BinaryInt}
+	benchmarkSort(b, &i, 100, false)
+}
+
+func BenchmarkBinaryInt1000(b *testing.B) {
+	i := intSort{sortInt: BinaryInt}
+	benchmarkSort(b, &i, 1000, false)
+}
+
+func BenchmarkBinaryInt10000(b *testing.B) {
+	i := intSort{sortInt: BinaryInt}
+	benchmarkSort(b, &i, 10000, false)
 }
 
 
