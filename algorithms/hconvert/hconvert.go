@@ -2,12 +2,19 @@
 package hconvert
 
 import (
+	"bytes"
+	"errors"
+	"math/big"
 )
 
-// Type Converter holds information about the conversion process, including the specified character sets.
+var (
+	ErrBadConverter error = errors.New("Bad Converter")
+)
+
+// Converter holds information about the conversion process, including the specified character sets.
 type Converter struct {
 	// binary representation of the number
-	bin []byte
+	buf *bytes.Buffer
 
 	// character sets to use for decoding and encoding
 	decCharSet CharSet
@@ -19,6 +26,7 @@ type Converter struct {
 func NewConverter(decode CharSet, encode CharSet) Converter {
 	c := new(Converter)
 
+	c.buf = new(bytes.Buffer)
 	c.decCharSet = decode
 	c.encCharSet = encode
 
