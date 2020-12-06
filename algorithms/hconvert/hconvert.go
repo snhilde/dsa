@@ -2,14 +2,15 @@
 package hconvert
 
 import (
-	"bytes"
 	"errors"
+	"io"
 	"io/ioutil"
 	"math/big"
 )
 
 var (
-	ErrBadConverter error = errors.New("Bad Converter")
+	ErrBadConverter = errors.New("Bad Converter")
+	ErrNoCharSet = errors.New("No character set provided")
 )
 
 // Converter holds information about the conversion process, including the specified character sets.
@@ -27,7 +28,6 @@ type Converter struct {
 func NewConverter(decode CharSet, encode CharSet) Converter {
 	c := new(Converter)
 
-	c.buf = new(bytes.Buffer)
 	c.decCharSet = decode
 	c.encCharSet = encode
 
@@ -57,7 +57,7 @@ func (c *Converter) DecodeFrom(r io.Reader) error {
 }
 
 // EncodeTo encodes the internally stored data using the encoding character set and writes it to w.
-func (c *Converter) EncodeTo(r io.Reader) error {
+func (c *Converter) EncodeTo(w io.Writer) error {
 	if c == nil {
 		return ErrBadConverter
 	}
@@ -71,15 +71,14 @@ func (c *Converter) EncodeTo(r io.Reader) error {
 		return err
 	}
 
-	if n, err := r.Write(encoded); err != nil {
+	if n, err := w.Write(encoded); err != nil {
 		return err
 	} else if n != len(encoded) {
-		return ErrShortWrite
+		return io.ErrShortWrite
 	}
 
 	return nil
 }
-
 
 // SetDecodeCharSet sets the character set to use for decoding.
 func (c *Converter) SetDecodeCharSet(charSet CharSet) {
