@@ -38,3 +38,21 @@ func (c *Converter) SetEncodeCharSet(charSet CharSet) {
 		c.encCharSet = charSet
 	}
 }
+
+// DecodeCharSet returns the CharSet used for decoding.
+func (c *Converter) DecodeCharSet() CharSet {
+	if c == nil {
+		return CharSet{}
+	}
+
+	return c.decCharSet
+}
+
+// EncodeCharSet returns the CharSet used for encoding.
+func (c *Converter) EncodeCharSet() CharSet {
+	if c == nil {
+		return CharSet{}
+	}
+
+	return c.encCharSet
+}
