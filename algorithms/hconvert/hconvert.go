@@ -4,6 +4,7 @@ package hconvert
 import (
 	"bytes"
 	"errors"
+	"io/ioutil"
 	"math/big"
 )
 
@@ -13,8 +14,8 @@ var (
 
 // Converter holds information about the conversion process, including the specified character sets.
 type Converter struct {
-	// binary representation of the number
-	buf *bytes.Buffer
+	// binary representation of the data
+	buf []byte
 
 	// character sets to use for decoding and encoding
 	decCharSet CharSet
@@ -32,6 +33,53 @@ func NewConverter(decode CharSet, encode CharSet) Converter {
 
 	return *c
 }
+
+// DecodeFrom reads encoded data from r until EOF, decodes the data using the decoding character set, and stores it
+// internally.
+func (c *Converter) DecodeFrom(r io.Reader) error {
+	if c == nil {
+		return ErrBadConverter
+	}
+
+	encoded, err := ioutil.ReadAll(r)
+	if err != nil {
+		return err
+	}
+
+	binary, err := c.Decode(encoded)
+	if err != nil {
+		return err
+	}
+
+	c.buf = binary
+
+	return nil
+}
+
+// EncodeTo encodes the internally stored data using the encoding character set and writes it to w.
+func (c *Converter) EncodeTo(r io.Reader) error {
+	if c == nil {
+		return ErrBadConverter
+	}
+
+	if len(c.buf) == 0 {
+		return nil
+	}
+
+	encoded, err := c.Encode(c.buf)
+	if err != nil {
+		return err
+	}
+
+	if n, err := r.Write(encoded); err != nil {
+		return err
+	} else if n != len(encoded) {
+		return ErrShortWrite
+	}
+
+	return nil
+}
+
 
 // SetDecodeCharSet sets the character set to use for decoding.
 func (c *Converter) SetDecodeCharSet(charSet CharSet) {
