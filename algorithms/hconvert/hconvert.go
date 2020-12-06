@@ -9,18 +9,18 @@ type Converter struct {
 	// binary representation of the number
 	bin []byte
 
-	// character sets to use for encoding and decoding
-	encCharSet CharSet
+	// character sets to use for decoding and encoding
 	decCharSet CharSet
+	encCharSet CharSet
 }
 
 // NewConverter creates a new Converter object with the provided character sets. If a character set is not needed (such
 // as when doing only encoding or only decoding), pass `CharSet{}`.
-func NewConverter(encode CharSet, decode CharSet) Converter {
+func NewConverter(decode CharSet, encode CharSet) Converter {
 	c := new(Converter)
 
-	c.encCharSet = encode
 	c.decCharSet = decode
+	c.encCharSet = encode
 
 	return *c
 }
