@@ -48,8 +48,8 @@ func (c *CharSet) SetPadding(pad rune) {
 	}
 }
 
-// Length returns the number of runes in the character set.
-func (c *CharSet) Length() int {
+// Len returns the number of runes in the character set.
+func (c *CharSet) Len() int {
 	if c == nil {
 		return -1
 	}
