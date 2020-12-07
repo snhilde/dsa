@@ -82,7 +82,7 @@ func TestLength(t *testing.T) {
 		'W', 'X', 'Y', 'Z',
 	}
 	charSet, _ := NewCharSet(set)
-	if charSet.Length() != len(set) {
+	if charSet.Len() != len(set) {
 		t.Error("Incorrect length (ASCII set)")
 	}
 
@@ -92,7 +92,7 @@ func TestLength(t *testing.T) {
 		'ᨖ', 'ᮗ', '₽', '℅', 'Ⅷ', 'ↇ', '⏏', '⏹', '▙', '☪', '☶',
 	}
 	charSet, _ = NewCharSet(set)
-	if charSet.Length() != len(set) {
+	if charSet.Len() != len(set) {
 		t.Error("Incorrect length (unicode set)")
 	}
 
@@ -103,7 +103,7 @@ func TestLength(t *testing.T) {
 		'3', 'J', '⽗', 'f', '㏙', 'a', '㤪', '䷷', '🌎', 'd', '🌱', '🦉', '🌗',
 	}
 	charSet, _ = NewCharSet(set)
-	if charSet.Length() != len(set) {
+	if charSet.Len() != len(set) {
 		t.Error("Incorrect length (mixed set)")
 	}
 }
@@ -247,10 +247,10 @@ func TestConsts(t *testing.T) {
 
 	base58 := Base58CharSet()
 	base58Test := []rune{
-		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R',
-		'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
-		'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
-		'y', 'z', '2', '3', '4', '5', '6', '7', '8', '9',
+		'1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G',
+		'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y',
+		'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'm', 'n', 'o', 'p',
+		'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 	}
 	if !reflect.DeepEqual(base58.Characters(), base58Test) {
 		t.Error("base58 character set has changed")
