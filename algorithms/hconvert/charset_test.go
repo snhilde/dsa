@@ -278,6 +278,17 @@ func TestConsts(t *testing.T) {
 		t.Error("base64 character set has changed")
 	}
 
+	base64url := Base64URLCharSet()
+	base64urlTest := []rune{
+		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+		'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
+		'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+		'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '_',
+	}
+	if !reflect.DeepEqual(base64url.Characters(), base64urlTest) {
+		t.Error("base64url character set has changed")
+	}
+
 	ascii85 := ASCII85CharSet()
 	ascii85Test := []rune{
 		'!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', '0',
