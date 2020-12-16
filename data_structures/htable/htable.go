@@ -10,7 +10,6 @@ import (
 	"strings"
 )
 
-
 var (
 	// This is the standard error message when trying to use an invalid table.
 	errBadTable = fmt.Errorf("Table must be created with New() first")
@@ -18,14 +17,12 @@ var (
 	errBadRow = fmt.Errorf("Row must be created with NewRow() first")
 )
 
-
 // Table is the main type in this package. It holds all the rows of data.
 type Table struct {
 	h     []string       // Column headers
 	types []reflect.Kind // Types of each column (must be consistent for all rows)
-	rows   *hlist.List   // Linked list of rows
+	rows  *hlist.List    // Linked list of rows
 }
-
 
 // New creates a new table. The strings will denote the names of each column, used during lookup.
 func New(headers ...string) (*Table, error) {
@@ -55,7 +52,6 @@ func New(headers ...string) (*Table, error) {
 
 	return &t, nil
 }
-
 
 // Add creates a new row with the items and adds it to the end of the table.
 func (t *Table) Add(items ...interface{}) error {
@@ -395,11 +391,10 @@ func (t *Table) WriteCSV() string {
 	return strings.TrimSuffix(b.String(), "\r\n")
 }
 
-
 // Row holds all the data for each row in the table.
 type Row struct {
 	v       []interface{} // Column values
-	enabled   bool
+	enabled bool
 }
 
 // NewRow creates a new row with the given items.
@@ -479,7 +474,6 @@ func (r *Row) Matches(index int, v interface{}) bool {
 	item := r.Item(index)
 	return reflect.DeepEqual(v, item)
 }
-
 
 func (t *Table) validateRow(r *Row) error {
 	if t == nil {
