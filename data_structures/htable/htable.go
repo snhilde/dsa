@@ -34,18 +34,19 @@ func New(headers ...string) (*Table, error) {
 		return nil, errors.New("Missing column headers")
 	}
 
+	headerMap := make(map[string]int)
+
 	// Validate the column headers.
 	for i, v := range headers {
 		// Make sure every column has a header.
 		if v == "" {
 			return nil, errors.New(fmt.Sprintf("Column %v has an empty header", i))
 		}
-		// Make sure none of the columns match each other. Not the most efficient, but necessary.
-		for j, w := range headers[i+1:] {
-			if v == w {
-				return nil, errors.New(fmt.Sprintf("Columns %v and %v have the same header", i, j))
-			}
+		// Make sure none of the columns match each other.
+		if c, found := headerMap[v]; found {
+			return nil, errors.New(fmt.Sprintf("Columns %v and %v have the same header", c, i))
 		}
+		headerMap[v] = i
 	}
 
 	var t Table
