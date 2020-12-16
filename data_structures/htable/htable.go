@@ -4,19 +4,18 @@
 package htable
 
 import (
+	"fmt"
 	"github.com/snhilde/dsa/data_structures/hlist"
 	"reflect"
-	"errors"
-	"fmt"
 	"strings"
 )
 
 
 var (
 	// This is the standard error message when trying to use an invalid table.
-	badTable = errors.New("Table must be created with New() first")
+	errBadTable = fmt.Errorf("Table must be created with New() first")
 	// This is the standard error message when trying to use an invalid row.
-	badRow = errors.New("Row must be created with NewRow() first")
+	errBadRow = fmt.Errorf("Row must be created with NewRow() first")
 )
 
 
@@ -31,7 +30,7 @@ type Table struct {
 // New creates a new table. The strings will denote the names of each column, used during lookup.
 func New(headers ...string) (*Table, error) {
 	if headers == nil || len(headers) == 0 {
-		return nil, errors.New("Missing column headers")
+		return nil, fmt.Errorf("Missing column headers")
 	}
 
 	headerMap := make(map[string]int)
@@ -40,11 +39,11 @@ func New(headers ...string) (*Table, error) {
 	for i, v := range headers {
 		// Make sure every column has a header.
 		if v == "" {
-			return nil, errors.New(fmt.Sprintf("Column %v has an empty header", i))
+			return nil, fmt.Errorf("Column %v has an empty header", i)
 		}
 		// Make sure none of the columns match each other.
 		if c, found := headerMap[v]; found {
-			return nil, errors.New(fmt.Sprintf("Columns %v and %v have the same header", c, i))
+			return nil, fmt.Errorf("Columns %v and %v have the same header", c, i)
 		}
 		headerMap[v] = i
 	}
@@ -111,14 +110,14 @@ func (t *Table) InsertRow(index int, r *Row) error {
 // RemoveRow deletes a row from the table.
 func (t *Table) RemoveRow(index int) error {
 	if t == nil {
-		return badTable
+		return errBadTable
 	}
 
 	v := t.rows.Remove(index)
 	if v == nil {
 		// hlist.Remove will return the value at the index. Because our rows can never be nil, if we receive a nil
 		// value, then it means an error occurred.
-		return errors.New(fmt.Sprintf("Failed to remove row %v", index))
+		return fmt.Errorf("Failed to remove row %v", index)
 	}
 
 	// All good
@@ -128,7 +127,7 @@ func (t *Table) RemoveRow(index int) error {
 // Clear erases the rows in the table but leaves the column headers and column types.
 func (t *Table) Clear() error {
 	if t == nil {
-		return badTable
+		return errBadTable
 	}
 
 	return t.rows.Clear()
@@ -185,21 +184,21 @@ func (t *Table) String() string {
 // SetItem changes the value of the item at the specified coordinates.
 func (t *Table) SetItem(row int, col string, value interface{}) error {
 	if t == nil {
-		return badTable
+		return errBadTable
 	} else if row < 0 || t.Rows() <= row {
-		return errors.New("Invalid row")
+		return fmt.Errorf("Invalid row")
 	}
 
 	// Grab our row.
 	r := t.rows.Value(row)
 	if r == nil {
-		return errors.New("Missing row")
+		return fmt.Errorf("Missing row")
 	}
 
 	// Figure out the index of the column.
 	i := t.ColumnToIndex(col)
 	if i < 0 {
-		return errors.New("Invalid column")
+		return fmt.Errorf("Invalid column")
 	}
 
 	// Change the value.
@@ -220,11 +219,11 @@ func (t *Table) SetItem(row int, col string, value interface{}) error {
 // SetHeader changes the specified column's header to name.
 func (t *Table) SetHeader(col string, name string) error {
 	if t == nil {
-		return badTable
+		return errBadTable
 	} else if col == "" {
-		return errors.New("Invalid column")
+		return fmt.Errorf("Invalid column")
 	} else if name == "" {
-		return errors.New("Missing name")
+		return fmt.Errorf("Missing name")
 	}
 
 	for i, v := range t.h {
@@ -235,7 +234,7 @@ func (t *Table) SetHeader(col string, name string) error {
 	}
 
 	// If we're here, then we didn't find the column.
-	return errors.New("Missing column")
+	return fmt.Errorf("Missing column")
 }
 
 // Headers returns a copy of the table's column headers.
@@ -358,12 +357,12 @@ func (t *Table) Matches(row int, col string, v interface{}) bool {
 // Toggle sets the row at the specified index to either be checked or skipped during table lookups (like Row and Count).
 func (t *Table) Toggle(row int, enabled bool) error {
 	if t == nil {
-		return badTable
+		return errBadTable
 	}
 
 	tmp := t.rows.Value(row)
 	if tmp == nil {
-		return errors.New("Invalid index")
+		return fmt.Errorf("Invalid index")
 	}
 
 	r := tmp.(*Row)
@@ -442,9 +441,9 @@ func (r *Row) String() string {
 // SetItem changes the value of the item in the specified column.
 func (r *Row) SetItem(index int, value interface{}) error {
 	if r == nil {
-		return badRow
+		return errBadRow
 	} else if index < 0 || r.Count() <= index {
-		return errors.New("Invalid column")
+		return fmt.Errorf("Invalid column")
 	}
 
 	r.v[index] = value
@@ -484,9 +483,9 @@ func (r *Row) Matches(index int, v interface{}) bool {
 
 func (t *Table) validateRow(r *Row) error {
 	if t == nil {
-		return badTable
+		return errBadTable
 	} else if n := t.Columns(); n != len(r.v) {
-		return errors.New(fmt.Sprintf("Number of items (%v) does not match number of columns (%v)", len(r.v), n))
+		return fmt.Errorf("Number of items (%v) does not match number of columns (%v)", len(r.v), n)
 	}
 
 	first := false
@@ -516,7 +515,7 @@ func (t *Table) validateRow(r *Row) error {
 		} else {
 			// Make sure the type of this element matches the prototype.
 			if k != t.types[i] {
-				return errors.New(fmt.Sprintf("Item %v's type (%v) does not match column's prototype (%v)", i, k, t.types[i]))
+				return fmt.Errorf("Item %v's type (%v) does not match column's prototype (%v)", i, k, t.types[i])
 			}
 		}
 	}
