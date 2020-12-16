@@ -139,6 +139,11 @@ func TestTBadArgs(t *testing.T) {
 	tb, _ := New("1", "2", "3")
 	tb.Add(1, 2, 3)
 
+	// Test New() - duplicate column headers.
+	if tbl, err := New("aaa", "bbb", "aaa", "ccc"); tbl != nil || err == nil {
+		t.Error("Unexpectedly passed duplicate column header test for New()")
+	}
+
 	// Test New() - missing column header.
 	if tbl, err := New(""); tbl != nil || err == nil {
 		t.Error("Unexpectedly passed missing column header test for New()")
