@@ -378,8 +378,8 @@ func (l *List) Sort(cmp func(left, right interface{}) bool) error {
 		return fmt.Errorf("missing equality comparison callback")
 	}
 
-	list_length := l.Length()
-	if list_length < 2 {
+	listLen := l.Length()
+	if listLen < 2 {
 		// Already sorted.
 		return nil
 	}
@@ -388,70 +388,70 @@ func (l *List) Sort(cmp func(left, right interface{}) bool) error {
 	// order will yield a sorted block. The smallest stack size of already-sorted nodes is 1. We'll begin to merge
 	// stacks from there and work up. When the stack size is at least as big as the entire list, then everything must be
 	// sorted.
-	for stack_len := 1; stack_len < list_length; stack_len *= 2 {
-		block_len := stack_len * 2
-		tmp_list := New()
+	for stackLen := 1; stackLen < listLen; stackLen *= 2 {
+		blockLen := stackLen * 2
+		tmpList := New()
 		block := l.head
-		num_blocks := (list_length + block_len - 1) / block_len
-		for i := 0; i < num_blocks; i++ {
+		numBlocks := (listLen + blockLen - 1) / blockLen
+		for i := 0; i < numBlocks; i++ {
 			// Get the start of the left stack.
-			left_stack := block
-			left_len := stack_len
+			leftStack := block
+			leftLen := stackLen
 			// Get the start of the right stack.
-			right_stack := block
-			right_len := stack_len
-			for j := 0; j < stack_len && right_stack != nil; j++ {
-				right_stack = right_stack.next
+			rightStack := block
+			rightLen := stackLen
+			for j := 0; j < stackLen && rightStack != nil; j++ {
+				rightStack = rightStack.next
 			}
 
 			// If this is the last block and it's not a full block, then we'll have to handle some special conditions.
-			if i+1 == num_blocks && list_length%block_len != 0 {
-				nodes_left := list_length - (i * block_len)
+			if i+1 == numBlocks && listLen%blockLen != 0 {
+				nodesLeft := listLen - (i * blockLen)
 				// If we don't even have a full stack, then this block is already in sorted order.
-				if nodes_left <= stack_len {
+				if nodesLeft <= stackLen {
 					// Add the sorted stack/block to the list and move up to the next stack size.
-					tail_list := New()
-					tail_list.head = block
-					tail_list.length = nodes_left
-					tmp_list.Merge(tail_list)
+					tailList := New()
+					tailList.head = block
+					tailList.length = nodesLeft
+					tmpList.Merge(tailList)
 					continue
 				}
 				// Shrink our right stack to the correct length.
-				right_len = nodes_left - stack_len
+				rightLen = nodesLeft - stackLen
 			}
 
 			// Merge the stacks in sorted order.
-			tmp_len := left_len + right_len
-			for j := 0; j < tmp_len; j++ {
-				if left_len == 0 {
+			tmpLen := leftLen + rightLen
+			for j := 0; j < tmpLen; j++ {
+				if leftLen == 0 {
 					// Only right stack still has nodes.
-					tmp_list.Append(right_stack.v)
-					right_stack = right_stack.next
-					right_len--
-				} else if right_len == 0 {
+					tmpList.Append(rightStack.v)
+					rightStack = rightStack.next
+					rightLen--
+				} else if rightLen == 0 {
 					// Only left stack still has nodes.
-					tmp_list.Append(left_stack.v)
-					left_stack = left_stack.next
-					left_len--
-				} else if cmp(left_stack.v, right_stack.v) {
-					tmp_list.Append(left_stack.v)
-					left_stack = left_stack.next
-					left_len--
+					tmpList.Append(leftStack.v)
+					leftStack = leftStack.next
+					leftLen--
+				} else if cmp(leftStack.v, rightStack.v) {
+					tmpList.Append(leftStack.v)
+					leftStack = leftStack.next
+					leftLen--
 				} else {
-					tmp_list.Append(right_stack.v)
-					right_stack = right_stack.next
-					right_len--
+					tmpList.Append(rightStack.v)
+					rightStack = rightStack.next
+					rightLen--
 				}
 			}
 
 			// Move to the next block.
-			for j := 0; j < tmp_len; j++ {
+			for j := 0; j < tmpLen; j++ {
 				block = block.next
 			}
 		}
 
 		// Hold on to what we have so far.
-		l.head = tmp_list.head
+		l.head = tmpList.head
 	}
 
 	return nil
@@ -462,7 +462,7 @@ func (l *List) SortInt() error {
 	return l.Sort(cmpInt)
 }
 
-// SortInt sorts the list using a modified merge algorithm. Note: all values in the list must be of type string.
+// SortStr sorts the list using a modified merge algorithm. Note: all values in the list must be of type string.
 func (l *List) SortStr() error {
 	return l.Sort(cmpStr)
 }
