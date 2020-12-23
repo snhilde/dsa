@@ -2,14 +2,14 @@
 package hstack
 
 import (
+	"fmt"
 	"github.com/snhilde/dsa/data_structures/hlist"
-	"errors"
 )
 
 
 var (
 	// This is the standard error message when trying to use an invalid stack.
-	badStack = errors.New("Must create stack with New() first")
+	errBadStack = fmt.Errorf("must create stack with New() first")
 )
 
 
@@ -30,7 +30,7 @@ func New() *Stack {
 // top.
 func (s *Stack) Add(vs ...interface{}) error {
 	if s == nil {
-		return badStack
+		return errBadStack
 	}
 
 	// If caller is trying to add own stack, duplicate it first and then add it.
@@ -70,7 +70,7 @@ func (s *Stack) Count() int {
 // Copy makes an exact copy of the stack.
 func (s *Stack) Copy() (*Stack, error) {
 	if s == nil {
-		return nil, badStack
+		return nil, errBadStack
 	}
 
 	nl, err := s.list.Copy()
@@ -87,7 +87,7 @@ func (s *Stack) Copy() (*Stack, error) {
 // Merge adds a stack below the current stack. This will take ownership of and clear the provided stack.
 func (s *Stack) Merge(ns *Stack) error {
 	if s == nil {
-		return badStack
+		return errBadStack
 	} else if ns == nil || ns.Count() == 0 {
 		// Nothing to add.
 		return nil
@@ -103,7 +103,7 @@ func (s *Stack) Merge(ns *Stack) error {
 // Clear resets the stack to its inital state.
 func (s *Stack) Clear() error {
 	if s == nil {
-		return errors.New("Stack does not exist")
+		return fmt.Errorf("stack does not exist")
 	}
 
 	return s.list.Clear()
