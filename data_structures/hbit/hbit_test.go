@@ -1,14 +1,12 @@
 package hbit
 
 import (
-	"testing"
-	"strings"
-	"io"
 	"bytes"
+	"io"
+	"strings"
+	"testing"
 )
 
-
-// TESTS
 func TestNew(t *testing.T) {
 	b := New()
 	if b == nil {
@@ -1531,7 +1529,7 @@ func TestRemoveBit(t *testing.T) {
 	// Test removing the bit at the end of the buffer.
 	b.Reset()
 	b.WriteByte(0x51)
-	if err := b.RemoveBit(b.Bits()-1); err != nil {
+	if err := b.RemoveBit(b.Bits() - 1); err != nil {
 		t.Error(err)
 	}
 	checkBits(t, b, 7)
@@ -1598,7 +1596,7 @@ func TestRemoveBit(t *testing.T) {
 	checkString(t, b, "01010")
 	checkDisplay(t, b, "0101 0")
 
-	if err := b.RemoveBit(b.Bits()-1); err != nil {
+	if err := b.RemoveBit(b.Bits() - 1); err != nil {
 		t.Error(err)
 	}
 	checkBits(t, b, 4)
@@ -2568,8 +2566,6 @@ func TestNOTBits(t *testing.T) {
 	checkDisplay(t, b, "1111 1000  1111 1000  0000 0000  1111 1111")
 }
 
-
-// HELPERS
 func checkBits(t *testing.T, b *Buffer, want int) {
 	if n := b.Bits(); n != want {
 		t.Error("Incorrect number of bits")
