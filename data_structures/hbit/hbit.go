@@ -2,7 +2,7 @@
 package hbit
 
 import (
-	"errors"
+	"fmt"
 	"strings"
 	"go/token"
 	"io"
@@ -11,7 +11,7 @@ import (
 
 var (
 	// This is the standard error message when trying to use an invalid buffer.
-	errBadBuf = errors.New("Must create bit buffer with New() first")
+	errBadBuf = fmt.Errorf("Must create bit buffer with New() first")
 )
 
 
@@ -409,7 +409,7 @@ func (b *Buffer) Advance(n int) (int, error) {
 	if b == nil {
 		return 0, errBadBuf
 	} else if n < 0 {
-		return 0, errors.New("Invalid number")
+		return 0, fmt.Errorf("Invalid number")
 	}
 
 	for i := 0; i < n; i++ {
@@ -441,7 +441,7 @@ func (b *Buffer) Rewind(n int) (int, error) {
 	if b == nil {
 		return 0, errBadBuf
 	} else if n < 0 {
-		return 0, errors.New("Invalid number")
+		return 0, fmt.Errorf("Invalid number")
 	}
 
 	for i := 0; i < n; i++ {
@@ -556,7 +556,7 @@ func (b *Buffer) XORBuffer(ref *Buffer) error {
 // ShiftLeft shifts the bits in the buffer to the left. This is equivalent to the bitwise operation '<<'.
 func (b *Buffer) ShiftLeft(n int) error {
 	if n < 0 {
-		return errors.New("Invalid number")
+		return fmt.Errorf("Invalid number")
 	}
 
 	end, err := b.getEnd()
@@ -586,7 +586,7 @@ func (b *Buffer) ShiftLeft(n int) error {
 // ShiftRight shifts the bits in the buffer to the right. This is equivalent to the bitwise operation '>>'.
 func (b *Buffer) ShiftRight(n int) error {
 	if n < 0 {
-		return errors.New("Invalid number")
+		return fmt.Errorf("Invalid number")
 	}
 
 	end, err := b.getEnd()
@@ -626,7 +626,7 @@ func (b *Buffer) NOTBit(index int) error {
 // NOTBits negates the first n bits in the buffer. This is equivalent to the bitwise operation '~'.
 func (b *Buffer) NOTBits(n int) error {
 	if n < 0 {
-		return errors.New("Invalid range")
+		return fmt.Errorf("Invalid range")
 	}
 
 	ref := make([]byte, n)
@@ -679,7 +679,7 @@ func (b *Buffer) getNode(index int) (*bnode, error) {
 	if b == nil {
 		return nil, errBadBuf
 	} else if index < 0 {
-		return nil, errors.New("Invalid index")
+		return nil, fmt.Errorf("Invalid index")
 	}
 
 	node := b.head
@@ -719,7 +719,7 @@ func opBit(bit *bnode, ref bool, t token.Token) error {
 	case token.NOT:
 		bit.v = !bit.v
 	default:
-		return errors.New("internal misuse of opBit method")
+		return fmt.Errorf("internal misuse of opBit method")
 	}
 
 	return nil
