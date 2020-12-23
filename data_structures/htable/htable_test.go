@@ -1,31 +1,31 @@
 package htable
 
 import (
-	"testing"
 	"fmt"
+	"testing"
 )
 
-
 // --- Blanket Tests ---
+
 func TestTBadPtr(t *testing.T) {
 	var tb *Table
 
-    // Test Add().
+	// Test Add().
 	if err := tb.Add("a", "b", "c"); err == nil {
 		t.Error("Unexpectedly passed bad pointer test for Add()")
 	}
 
-    // Test Insert().
+	// Test Insert().
 	if err := tb.Insert(1, "a", "b", "c"); err == nil {
 		t.Error("Unexpectedly passed bad pointer test for Insert()")
 	}
 
-    // Test AddRow().
+	// Test AddRow().
 	if err := tb.AddRow(NewRow(1, 2, 3)); err == nil {
 		t.Error("Unexpectedly passed bad pointer test for AddRow()")
 	}
 
-    // Test InsertRow().
+	// Test InsertRow().
 	if err := tb.InsertRow(0, NewRow(1, 2, 3)); err == nil {
 		t.Error("Unexpectedly passed bad pointer test for InsertRow()")
 	}
@@ -40,7 +40,7 @@ func TestTBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad pointer test for Clear()")
 	}
 
-    // Test ColumnToIndex().
+	// Test ColumnToIndex().
 	if n := tb.ColumnToIndex("1"); n != -1 {
 		t.Error("Unexpectedly passed bad pointer test for ColumnToIndex()")
 	}
@@ -65,27 +65,27 @@ func TestTBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad pointer test for Headers()")
 	}
 
-    // Test Rows().
+	// Test Rows().
 	if n := tb.Rows(); n != -1 {
 		t.Error("Unexpectedly passed bad pointer test for Rows()")
 	}
 
-    // Test Columns().
+	// Test Columns().
 	if n := tb.Columns(); n != -1 {
 		t.Error("Unexpectedly passed bad pointer test for Columns()")
 	}
 
-    // Test Count().
+	// Test Count().
 	if n := tb.Count(); n != -1 {
 		t.Error("Unexpectedly passed bad pointer test for Count()")
 	}
 
-    // Test Row().
+	// Test Row().
 	if i, r := tb.Row("a", 5); i != -1 || r != nil {
 		t.Error("Unexpectedly passed bad pointer test for Row()")
 	}
 
-    // Test Item().
+	// Test Item().
 	if v := tb.Item(5, "a"); v != nil {
 		t.Error("Unexpectedly passed bad pointer test for Item()")
 	}
@@ -174,12 +174,12 @@ func TestTBadArgs(t *testing.T) {
 		t.Error("Unexpectedly passed wrong type (last) test for Add()")
 	}
 
-    // Test Insert() - negative index.
+	// Test Insert() - negative index.
 	if err := tb.Insert(-1, 4, 5, 6); err == nil {
 		t.Error("Unexpectedly passed negative index test for Insert()")
 	}
 
-    // Test Insert() - out-of-bounds index.
+	// Test Insert() - out-of-bounds index.
 	if err := tb.Insert(100, 4, 5, 6); err == nil {
 		t.Error("Unexpectedly passed out-of-bounds index test for Insert()")
 	}
@@ -234,12 +234,12 @@ func TestTBadArgs(t *testing.T) {
 		t.Error("Unexpectedly passed wrong type (last) test for AddRow()")
 	}
 
-    // Test InsertRow() - negative index.
+	// Test InsertRow() - negative index.
 	if err := tb.InsertRow(-1, NewRow(-1, 4, 5, 6)); err == nil {
 		t.Error("Unexpectedly passed negative index test for InsertRow()")
 	}
 
-    // Test InsertRow() - out-of-bounds index.
+	// Test InsertRow() - out-of-bounds index.
 	if err := tb.InsertRow(100, NewRow(100, 4, 5, 6)); err == nil {
 		t.Error("Unexpectedly passed out-of-bounds index test for InsertRow()")
 	}
@@ -269,22 +269,22 @@ func TestTBadArgs(t *testing.T) {
 		t.Error("Unexpectedly passed wrong type (last) test for InsertRow()")
 	}
 
-    // Test RemoveRow() - negative index.
+	// Test RemoveRow() - negative index.
 	if err := tb.RemoveRow(-1); err == nil {
 		t.Error("Unexpectedly passed negative index test for RemoveRow()")
 	}
 
-    // Test RemoveRow() - out-of-bounds index.
+	// Test RemoveRow() - out-of-bounds index.
 	if err := tb.RemoveRow(100); err == nil {
 		t.Error("Unexpectedly passed out-of-bounds index test for RemoveRow()")
 	}
 
-    // Test ColumnToIndex() - empty column header.
+	// Test ColumnToIndex() - empty column header.
 	if i := tb.ColumnToIndex(""); i != -1 {
 		t.Error("Unexpectedly passed empty column header test for ColumnToIndex()")
 	}
 
-    // Test ColumnToIndex() - invalid column header.
+	// Test ColumnToIndex() - invalid column header.
 	if i := tb.ColumnToIndex("4"); i != -1 {
 		t.Error("Unexpectedly passed invalid column header test for ColumnToIndex()")
 	}
@@ -324,72 +324,72 @@ func TestTBadArgs(t *testing.T) {
 		t.Error("Unexpectedly passed empty name test for SetHeader()")
 	}
 
-    // Test Row() - empty column header.
+	// Test Row() - empty column header.
 	if i, r := tb.Row("", 5); i != -1 || r != nil {
 		t.Error("Unexpectedly passed empty column header test for Row()")
 	}
 
-    // Test Row() - invalid column header.
+	// Test Row() - invalid column header.
 	if i, r := tb.Row("4", 4); i != -1 || r != nil {
 		t.Error("Unexpectedly passed invalid column header test for Row()")
 	}
 
-    // Test Row() - missing item.
+	// Test Row() - missing item.
 	if i, r := tb.Row("1", nil); i != -1 || r != nil {
 		t.Error("Unexpectedly passed missing item test for Row()")
 	}
 
-    // Test Item() - negative index.
+	// Test Item() - negative index.
 	if v := tb.Item(-1, "1"); v != nil {
 		t.Error("Unexpectedly passed negative index test for Item()")
 	}
 
-    // Test Item() - out-of-bounds index.
+	// Test Item() - out-of-bounds index.
 	if v := tb.Item(100, "1"); v != nil {
 		t.Error("Unexpectedly passed out-of-bounds index test for Item()")
 	}
 
-    // Test Item() - empty column header.
+	// Test Item() - empty column header.
 	if v := tb.Item(0, ""); v != nil {
 		t.Error("Unexpectedly passed empty column header test for Item()")
 	}
 
-    // Test Item() - invalid column header.
+	// Test Item() - invalid column header.
 	if v := tb.Item(0, "4"); v != nil {
 		t.Error("Unexpectedly passed invalid column header test for Item()")
 	}
 
-    // Test Matches() - negative index.
+	// Test Matches() - negative index.
 	if tb.Matches(-1, "1", 1) {
 		t.Error("Unexpectedly passed negative index test for Matches()")
 	}
 
-    // Test Matches() - out-of-bounds index.
+	// Test Matches() - out-of-bounds index.
 	if tb.Matches(100, "1", 1) {
 		t.Error("Unexpectedly passed out-of-bounds index test for Matches()")
 	}
 
-    // Test Matches() - empty column header.
+	// Test Matches() - empty column header.
 	if tb.Matches(0, "", 1) {
 		t.Error("Unexpectedly passed empty column header test for Matches()")
 	}
 
-    // Test Matches() - invalid column header.
+	// Test Matches() - invalid column header.
 	if tb.Matches(0, "4", 4) {
 		t.Error("Unexpectedly passed invalid column header test for Matches()")
 	}
 
-    // Test Matches() - missing item.
+	// Test Matches() - missing item.
 	if tb.Matches(0, "1", nil) {
 		t.Error("Unexpectedly passed missing item test for Matches()")
 	}
 
-    // Test Toggle() - negative index.
+	// Test Toggle() - negative index.
 	if err := tb.Toggle(-1, true); err == nil {
 		t.Error("Unexpectedly passed negative index test for Toggle()")
 	}
 
-    // Test Toggle() - out-of-bounds index.
+	// Test Toggle() - out-of-bounds index.
 	if err := tb.Toggle(100, true); err == nil {
 		t.Error("Unexpectedly passed out-of-bounds index test for Toggle()")
 	}
@@ -431,7 +431,7 @@ func TestRBadArgs(t *testing.T) {
 
 func TestBadTypes(t *testing.T) {
 	// Make sure all signed integer types are compatible with each other.
-	rows := [][]interface{} {
+	rows := [][]interface{}{
 		{int(1), int(2), int(3)},
 		{int8(1), int8(2), int8(3)},
 		{int16(1), int16(2), int16(3)},
@@ -459,7 +459,7 @@ func TestBadTypes(t *testing.T) {
 	}
 
 	// Make sure all unsigned integer types are compatible with each other.
-	rows = [][]interface{} {
+	rows = [][]interface{}{
 		{uint(1), uint(2), uint(3)},
 		{uint8(1), uint8(2), uint8(3)},
 		{uint16(1), uint16(2), uint16(3)},
@@ -487,7 +487,7 @@ func TestBadTypes(t *testing.T) {
 	}
 
 	// Make sure all float types are compatible with each other.
-	rows = [][]interface{} {
+	rows = [][]interface{}{
 		{float32(1.1), float32(2.2), float32(3.3)},
 		{float64(1.1), float64(2.2), float64(3.3)},
 	}
@@ -512,9 +512,9 @@ func TestBadTypes(t *testing.T) {
 	}
 
 	// Make sure all complex types are compatible with each other.
-	rows = [][]interface{} {
-		{complex64(1+10i), complex64(2+20i), complex64(3+30i)},
-		{complex128(4+40i), complex128(5+50i), complex128(6+60i)},
+	rows = [][]interface{}{
+		{complex64(1 + 10i), complex64(2 + 20i), complex64(3 + 30i)},
+		{complex128(4 + 40i), complex128(5 + 50i), complex128(6 + 60i)},
 	}
 
 	for i, v := range rows {
@@ -557,9 +557,9 @@ func TestBadTypes(t *testing.T) {
 	tb.Add(s2{4, 4.4}, s1{"e", 5}, s2{6, 6.6})
 
 	// Make sure functions of different types are compatible with each other.
-	f1 := func(int)error{return nil}
-	f2 := func()string{return ""}
-	f3 := func([]int){}
+	f1 := func(int) error { return nil }
+	f2 := func() string { return "" }
+	f3 := func([]int) {}
 	items := []interface{}{f1, f2, f3}
 
 	for i, v := range items {
@@ -582,8 +582,8 @@ func TestBadTypes(t *testing.T) {
 	}
 }
 
-
 // --- Function Tests ---
+
 func TestTNew(t *testing.T) {
 	n, err := New("a", "b", "c")
 	if err != nil {
@@ -602,7 +602,7 @@ func TestRNewRow(t *testing.T) {
 		s1 string
 		s2 string
 	}
-	r = NewRow(1, 2, s{s1:"a", s2:"b"})
+	r = NewRow(1, 2, s{s1: "a", s2: "b"})
 	checkRString(t, r, "{1, 2, {a b}}")
 	checkRCount(t, r, 3)
 
@@ -612,8 +612,8 @@ func TestRNewRow(t *testing.T) {
 	checkRCount(t, r, 4)
 }
 
-
 // --- Table's Method Tests ---
+
 func TestTAdd(t *testing.T) {
 	// Testing rows of integers.
 	tb, _ := New("1", "2", "3")
@@ -1396,9 +1396,9 @@ func TestTRowItem(t *testing.T) {
 
 	// Set up a new table.
 	tb, _ = New("name", "left-handed", "age")
-	tb.Add("Swari", true,  30)
+	tb.Add("Swari", true, 30)
 	tb.Add("Kathy", false, 40)
-	tb.Add("Joe",   false, 189)
+	tb.Add("Joe", false, 189)
 
 	// Find the first person who is left-handed.
 	if i, _ := tb.Row("left-handed", true); i != 0 {
@@ -1459,7 +1459,7 @@ func TestTRowItem(t *testing.T) {
 			t.Error("Returned function is not of type func() string")
 		} else if v := ff(); v != "hello" {
 			t.Error("Function result incorrect")
-			t.Log("\tExpected:", "hello" )
+			t.Log("\tExpected:", "hello")
 			t.Log("\tReceived:", v)
 		}
 	}
@@ -1475,7 +1475,7 @@ func TestTRowItem(t *testing.T) {
 			t.Error("Returned function is not of type func(int) int")
 		} else if n := ff(2); n != 4 {
 			t.Error("Function result incorrect")
-			t.Log("\tExpected:", 4 )
+			t.Log("\tExpected:", 4)
 			t.Log("\tReceived:", n)
 		}
 	}
@@ -1501,9 +1501,9 @@ func TestTMatches(t *testing.T) {
 
 	// Set up a new table.
 	tb, _ = New("name", "left-handed", "age")
-	tb.Add("Swari", true,  30)
+	tb.Add("Swari", true, 30)
 	tb.Add("Kathy", false, 40)
-	tb.Add("Joe",   false, 189)
+	tb.Add("Joe", false, 189)
 
 	// Make sure Swari is left-handed.
 	if !tb.Matches(0, "left-handed", true) {
@@ -1637,8 +1637,8 @@ func TestTToggle(t *testing.T) {
 	checkTCount(t, tb, 0)
 }
 
-
 // --- Row's Method Tests ---
+
 func TestRSetItem(t *testing.T) {
 	r := NewRow(1, 2, 3)
 	checkRString(t, r, "{1, 2, 3}")
@@ -1742,8 +1742,8 @@ func TestRMatches(t *testing.T) {
 	}
 }
 
-
 // --- Helper Functions ---
+
 func checkTString(t *testing.T, tb *Table, want string) {
 	if s := tb.String(); s != want {
 		t.Error("Table items are incorrect")
