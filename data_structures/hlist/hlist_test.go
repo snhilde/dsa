@@ -1,69 +1,67 @@
 package hlist
 
 import (
-	"testing"
 	"reflect"
+	"testing"
 )
 
-
-// TESTS
 func TestBadPtr(t *testing.T) {
 	// Test that using a non-initialized list is handled correctly.
 	var l *List
 
-    // Test String().
+	// Test String().
 	if s := l.String(); s != "<nil>" {
 		t.Error("unexpectedly passed String() test with bad pointer")
 		t.Log("\tExpected: <nil>")
 		t.Log("\tReceived:", s)
 	}
 
-    // Test Length().
+	// Test Length().
 	if n := l.Length(); n != -1 {
 		t.Error("unexpectedly passed Length() test with bad pointer")
 		t.Log("\tExpected: -1")
 		t.Log("\tReceived:", n)
 	}
 
-    // Test Insert().
+	// Test Insert().
 	if err := l.Insert(0, "item"); err == nil {
 		t.Error("unexpectedly passed Insert() test with bad pointer")
 	}
 
-    // Test Append().
+	// Test Append().
 	if err := l.Append("item"); err == nil {
 		t.Error("unexpectedly passed Append() test with bad pointer")
 	}
 
-    // Test Index().
+	// Test Index().
 	if i := l.Index("item"); i != -1 {
 		t.Error("unexpectedly passed Index() test with bad pointer")
 		t.Log("\tExpected: -1")
 		t.Log("\tReceived:", i)
 	}
 
-    // Test Value().
+	// Test Value().
 	if v := l.Value(0); v != nil {
 		t.Error("unexpectedly passed Value() test with bad pointer")
 		t.Log("\tExpected: nil")
 		t.Log("\tReceived:", v)
 	}
 
-    // Test Exists().
+	// Test Exists().
 	if b := l.Exists("item"); b != false {
 		t.Error("unexpectedly passed Exists() test with bad pointer")
 		t.Log("\tExpected: false")
 		t.Log("\tReceived:", b)
 	}
 
-    // Test Remove().
+	// Test Remove().
 	if v := l.Remove(0); v != nil {
 		t.Error("unexpectedly passed Remove() test with bad pointer")
 		t.Log("\tExpected: nil")
 		t.Log("\tReceived:", v)
 	}
 
-    // Test Copy().
+	// Test Copy().
 	if _, err := l.Copy(); err == nil {
 		t.Error("unexpectedly passed Copy() test with bad pointer")
 	}
@@ -78,12 +76,12 @@ func TestBadPtr(t *testing.T) {
 		t.Error("unexpectedly passed Twin() test with bad pointer")
 	}
 
-    // Test Merge().
+	// Test Merge().
 	if err := l.Merge(New()); err == nil {
 		t.Error("unexpectedly passed Merge() test with bad pointer")
 	}
 
-    // Test Clear().
+	// Test Clear().
 	if err := l.Clear(); err == nil {
 		t.Error("unexpectedly passed Clear() test with bad pointer")
 	}
@@ -98,17 +96,17 @@ func TestBadPtr(t *testing.T) {
 		t.Error("unexpectedly passed YieldAll() test with bad pointer")
 	}
 
-    // Test Sort().
-	if err := l.Sort(func(l, r interface{}) bool {return false}); err == nil {
+	// Test Sort().
+	if err := l.Sort(func(l, r interface{}) bool { return false }); err == nil {
 		t.Error("unexpectedly passed Sort() test with bad pointer")
 	}
 
-    // Test SortInt().
+	// Test SortInt().
 	if err := l.SortInt(); err == nil {
 		t.Error("unexpectedly passed SortInt() test with bad pointer")
 	}
 
-    // Test SortStr().
+	// Test SortStr().
 	if err := l.SortStr(); err == nil {
 		t.Error("unexpectedly passed SortStr() test with bad pointer")
 	}
@@ -120,21 +118,21 @@ func TestBadArgs(t *testing.T) {
 	checkString(t, l, "<empty>")
 	checkLength(t, l, 0)
 
-    // Test Insert().
+	// Test Insert().
 	if err := l.Insert(-1, "item"); err == nil {
 		t.Error("unexpectedly passed Insert() test for negative index")
 	}
 	checkString(t, l, "<empty>")
 	checkLength(t, l, 0)
 
-    // Test Insert().
+	// Test Insert().
 	if err := l.Insert(100, "item"); err == nil {
 		t.Error("unexpectedly passed Insert() test for out-of-range index")
 	}
 	checkString(t, l, "<empty>")
 	checkLength(t, l, 0)
 
-    // Test Value().
+	// Test Value().
 	if v := l.Value(-1); v != nil {
 		t.Error("unexpectedly passed Value() test for negative index")
 		t.Log("\tExpected: nil")
@@ -143,7 +141,7 @@ func TestBadArgs(t *testing.T) {
 	checkString(t, l, "<empty>")
 	checkLength(t, l, 0)
 
-    // Test Value().
+	// Test Value().
 	if v := l.Value(0); v != nil {
 		t.Error("unexpectedly passed Value() test for empty list")
 		t.Log("\tExpected: nil")
@@ -152,7 +150,7 @@ func TestBadArgs(t *testing.T) {
 	checkString(t, l, "<empty>")
 	checkLength(t, l, 0)
 
-    // Test Value().
+	// Test Value().
 	if v := l.Value(100); v != nil {
 		t.Error("unexpectedly passed Value() test for out-of-range index")
 		t.Log("\tExpected: nil")
@@ -161,7 +159,7 @@ func TestBadArgs(t *testing.T) {
 	checkString(t, l, "<empty>")
 	checkLength(t, l, 0)
 
-    // Test Remove().
+	// Test Remove().
 	if v := l.Remove(-1); v != nil {
 		t.Error("unexpectedly passed Remove() test for negative index")
 		t.Log("\tExpected: nil")
@@ -170,7 +168,7 @@ func TestBadArgs(t *testing.T) {
 	checkString(t, l, "<empty>")
 	checkLength(t, l, 0)
 
-    // Test Remove().
+	// Test Remove().
 	if v := l.Remove(0); v != nil {
 		t.Error("unexpectedly passed Remove() test for empty list")
 		t.Log("\tExpected: nil")
@@ -179,7 +177,7 @@ func TestBadArgs(t *testing.T) {
 	checkString(t, l, "<empty>")
 	checkLength(t, l, 0)
 
-    // Test Remove().
+	// Test Remove().
 	if v := l.Remove(100); v != nil {
 		t.Error("unexpectedly passed Remove() test for out-of-range index")
 		t.Log("\tExpected: nil")
@@ -198,7 +196,7 @@ func TestBadArgs(t *testing.T) {
 		t.Error("unexpectedly passed Twin() test for missing arg")
 	}
 
-    // Test Sort().
+	// Test Sort().
 	if err := l.Sort(nil); err == nil {
 		t.Error("unexpectedly passed Sort() test for missing sort cb")
 	}
@@ -478,7 +476,7 @@ func TestRemove(t *testing.T) {
 	checkLength(t, l, 3)
 
 	// Remove the last item.
-	value := l.Remove(l.Length()-1)
+	value := l.Remove(l.Length() - 1)
 	if len(value.([]byte)) != 2 || value.([]byte)[0] != 0x05 || value.([]byte)[1] != 0x06 {
 		t.Error("Error removing last item")
 		t.Log("\tExpected: [0x05, 0x06")
@@ -735,7 +733,9 @@ func TestTwin(t *testing.T) {
 
 	// Make sure that typically uncomparable items can be matched.
 	type s struct {
-		r rune; i []int; n int
+		r rune
+		i []int
+		n int
 	}
 	l1 = New()
 	l1.Append("apple", []float32{1.23, 2.34, 3.45}, s{'a', []int{8, 9}, 1e3})
@@ -1257,7 +1257,7 @@ func TestSort(t *testing.T) {
 				return false
 			}
 			if v == rs[i] {
-				continue;
+				continue
 			} else if v < rs[i] {
 				return true
 			} else {
@@ -1266,7 +1266,7 @@ func TestSort(t *testing.T) {
 		}
 
 		// If we got here, then either l is a prefix of r or both slices are equal.
-		return true;
+		return true
 	}
 	l.Clear()
 	l.Append([]byte{0x0A, 0xBB}, []byte{0x0A, 0xAA}, []byte{0x0A}, []byte{0x01, 0x02, 0x03, 0x04}, []byte{0x0A, 0xAA, 0x00})
@@ -1426,8 +1426,6 @@ func TestSortStr(t *testing.T) {
 	checkLength(t, l, 7)
 }
 
-
-// HELPERS
 func checkString(t *testing.T, l *List, want string) {
 	if l.String() != want {
 		t.Error("List contents are incorrect")

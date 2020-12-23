@@ -3,36 +3,32 @@ package hlist
 
 import (
 	"errors"
-	"strings"
 	"fmt"
 	"reflect"
+	"strings"
 )
-
 
 var (
 	// This is the standard error message when trying to use an invalid list.
 	badList = errors.New("List must be created with New() first")
 )
 
-
 // List is the main type for this package. It holds the internal information about the list.
 type List struct {
 	head   *hnode
-	length  int
+	length int
 }
 
 // internal type for an individual node in the list
 type hnode struct {
-	v     interface{}
+	v    interface{}
 	next *hnode
 }
-
 
 // New creates a new linked list.
 func New() *List {
 	return new(List)
 }
-
 
 // String returns a comma-separated list of the string representations of all of the nodes in the linked list.
 func (l *List) String() string {
@@ -410,7 +406,7 @@ func (l *List) Sort(cmp func(left, right interface{}) bool) error {
 			}
 
 			// If this is the last block and it's not a full block, then we'll have to handle some special conditions.
-			if i+1 == num_blocks && list_length % block_len != 0 {
+			if i+1 == num_blocks && list_length%block_len != 0 {
 				nodes_left := list_length - (i * block_len)
 				// If we don't even have a full stack, then this block is already in sorted order.
 				if nodes_left <= stack_len {
@@ -471,7 +467,6 @@ func (l *List) SortInt() error {
 func (l *List) SortStr() error {
 	return l.Sort(cmpStr)
 }
-
 
 // internal convenience function for creating a new node
 func newNode(v interface{}) *hnode {
