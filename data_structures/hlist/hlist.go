@@ -2,7 +2,6 @@
 package hlist
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 	"strings"
@@ -10,7 +9,7 @@ import (
 
 var (
 	// This is the standard error message when trying to use an invalid list.
-	badList = errors.New("List must be created with New() first")
+	badList = fmt.Errorf("list must be created with New() first")
 )
 
 // List is the main type for this package. It holds the internal information about the list.
@@ -376,7 +375,7 @@ func (l *List) Sort(cmp func(left, right interface{}) bool) error {
 	if l == nil {
 		return badList
 	} else if cmp == nil {
-		return errors.New("Missing equality comparison callback")
+		return fmt.Errorf("missing equality comparison callback")
 	}
 
 	list_length := l.Length()
@@ -514,9 +513,9 @@ func (l *List) getPrior(index int) (*hnode, error) {
 	if l == nil {
 		return nil, badList
 	} else if index < 0 {
-		return nil, errors.New("Invalid index")
+		return nil, fmt.Errorf("invalid index")
 	} else if index > l.length {
-		return nil, errors.New("Out of bounds")
+		return nil, fmt.Errorf("out of bounds")
 	}
 
 	if l.head == nil || index == 0 {
@@ -526,7 +525,7 @@ func (l *List) getPrior(index int) (*hnode, error) {
 	n := l.head
 	for i := 0; i < index-1; i++ {
 		if n == nil {
-			return nil, errors.New("Error finding node at index")
+			return nil, fmt.Errorf("error finding node at index")
 		}
 		n = n.next
 	}
