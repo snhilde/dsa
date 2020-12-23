@@ -6,12 +6,10 @@ import (
 	"github.com/snhilde/dsa/data_structures/hlist"
 )
 
-
 var (
 	// This is the standard error message when trying to use an invalid stack.
 	errBadStack = fmt.Errorf("must create stack with New() first")
 )
-
 
 // Stack is the main type for this package. It holds the internal information about the stack.
 type Stack struct {
@@ -24,7 +22,6 @@ func New() *Stack {
 	s.list = hlist.New()
 	return s
 }
-
 
 // Add adds one or more new items to the top of the stack. If there is more than one item, the first item will be at the
 // top.

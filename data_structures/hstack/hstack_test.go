@@ -1,12 +1,10 @@
 package hstack
 
 import (
-	"testing"
 	"reflect"
+	"testing"
 )
 
-
-// TESTS
 func TestBadPtr(t *testing.T) {
 	var s *Stack
 	checkString(t, s, "<nil>")
@@ -20,14 +18,14 @@ func TestBadPtr(t *testing.T) {
 	// Test Pop().
 	if v := s.Pop(); v != nil {
 		t.Error("unexpectedly passed Pop() test with bad pointer")
-		t.Log("\tExpected: nil");
+		t.Log("\tExpected: nil")
 		t.Log("\tReceived:", v)
 	}
 
 	// Test Count().
 	if n := s.Count(); n != -1 {
 		t.Error("unexpectedly passed Count() test with bad pointer")
-		t.Log("\tExpected: -1");
+		t.Log("\tExpected: -1")
 		t.Log("\tReceived:", n)
 	}
 
@@ -49,7 +47,7 @@ func TestBadPtr(t *testing.T) {
 	// Test String().
 	if v := s.String(); v != "<nil>" {
 		t.Error("unexpectedly passed String() test with bad pointer")
-		t.Log("\tExpected: <nil>");
+		t.Log("\tExpected: <nil>")
 		t.Log("\tReceived:", v)
 	}
 }
@@ -308,8 +306,6 @@ func TestClear(t *testing.T) {
 	checkCount(t, s, 0)
 }
 
-
-// HELPERS
 func checkString(t *testing.T, s *Stack, want string) {
 	if s.String() != want {
 		t.Error("stack contents are incorrect")
