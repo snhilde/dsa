@@ -2,13 +2,13 @@
 package hqueue
 
 import (
-	"errors"
+	"fmt"
 	"github.com/snhilde/dsa/data_structures/hlist"
 )
 
 var (
 	// This is the standard error message when trying to use an invalid queue.
-	badQueue = errors.New("Must create queue with New() first")
+	badQueue = fmt.Errorf("must create queue with New() first")
 )
 
 // Queue is the main type for this package. It holds the internal information about the queue.
@@ -100,7 +100,7 @@ func (q *Queue) Merge(nq *Queue) error {
 // Clear resets the queue to its inital state.
 func (q *Queue) Clear() error {
 	if q == nil {
-		return errors.New("Queue does not exist")
+		return fmt.Errorf("queue does not exist")
 	}
 
 	return q.list.Clear()
