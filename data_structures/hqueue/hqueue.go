@@ -8,7 +8,7 @@ import (
 
 var (
 	// This is the standard error message when trying to use an invalid queue.
-	badQueue = fmt.Errorf("must create queue with New() first")
+	errBadQueue = fmt.Errorf("must create queue with New() first")
 )
 
 // Queue is the main type for this package. It holds the internal information about the queue.
@@ -26,7 +26,7 @@ func New() *Queue {
 // Add adds one or more new items to the back of the queue. The items will be added in the order provided.
 func (q *Queue) Add(vs ...interface{}) error {
 	if q == nil {
-		return badQueue
+		return errBadQueue
 	}
 
 	// If caller is trying to add own queue, duplicate it first and then add it.
@@ -66,7 +66,7 @@ func (q *Queue) Count() int {
 // Copy makes an exact copy of the queue.
 func (q *Queue) Copy() (*Queue, error) {
 	if q == nil {
-		return nil, badQueue
+		return nil, errBadQueue
 	}
 
 	nl, err := q.list.Copy()
@@ -84,7 +84,7 @@ func (q *Queue) Copy() (*Queue, error) {
 // queue.
 func (q *Queue) Merge(nq *Queue) error {
 	if q == nil {
-		return badQueue
+		return errBadQueue
 	} else if nq == nil || nq.Count() == 0 {
 		// Nothing to add.
 		return nil
