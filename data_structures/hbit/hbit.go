@@ -3,17 +3,15 @@ package hbit
 
 import (
 	"fmt"
-	"strings"
 	"go/token"
 	"io"
+	"strings"
 )
-
 
 var (
 	// This is the standard error message when trying to use an invalid buffer.
 	errBadBuf = fmt.Errorf("must create bit buffer with New() first")
 )
-
 
 // Buffer is the main type for this package. It holds the internal information about the bit buffer.
 type Buffer struct {
@@ -24,9 +22,8 @@ type Buffer struct {
 type bnode struct {
 	next *bnode
 	prev *bnode
-	v     bool
+	v    bool
 }
-
 
 // New creates a new bit buffer.
 func New() *Buffer {
@@ -147,7 +144,6 @@ func (b *Buffer) Display() string {
 	return b.stringInt(true)
 }
 
-
 // Read reads len(p) bytes of bits from the buffer into p. It will return the number of bytes read into p, or io.EOF if
 // the buffer is empty. io.EOF will only be returned if the buffer is empty before any bytes have been read into p. If
 // there are not enough bits to fill all of the last byte, then the rest of the byte will be false bits.
@@ -185,7 +181,7 @@ func (b *Buffer) Read(p []byte) (int, error) {
 
 	// Note: The calculation (cnt+7)/8 ensures that we account for untouched (and therefore false) bits in the last byte.
 	_, err := b.Advance(cnt)
-	return (cnt+7)/8, err
+	return (cnt + 7) / 8, err
 }
 
 // ReadByte reads out one byte of bits at the index. This will not advance the buffer.
@@ -492,7 +488,6 @@ func (b *Buffer) Join(nb *Buffer) error {
 	return nil
 }
 
-
 // ANDBit performs the bitwise operation AND ('&') on the specified bit with the reference bit.
 func (b *Buffer) ANDBit(index int, ref bool) error {
 	node, err := b.getNode(index)
@@ -633,7 +628,6 @@ func (b *Buffer) NOTBits(n int) error {
 	return b.opBytes(ref, token.NOT)
 }
 
-
 // Create a new node and link it after the given node.
 func (bn *bnode) appendNode(node *bnode) {
 	if node == nil {
@@ -651,7 +645,7 @@ func (bn *bnode) appendNodeVal(node *bnode, v bool) {
 
 // Check if a certain bit in a certain byte is set or not.
 func bitOn(b byte, bit int) bool {
-	if b & (1 << uint(bit)) > 0 {
+	if b&(1<<uint(bit)) > 0 {
 		return true
 	}
 
@@ -789,9 +783,9 @@ func (b *Buffer) stringInt(pretty bool) string {
 		node = node.next
 
 		if pretty {
-			if cnt % 8 == 0 {
+			if cnt%8 == 0 {
 				sb.WriteString("  ")
-			} else if cnt % 4 == 0 {
+			} else if cnt%4 == 0 {
 				sb.WriteString(" ")
 			}
 		}
