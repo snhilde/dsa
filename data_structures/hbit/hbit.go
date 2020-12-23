@@ -138,13 +138,13 @@ func (b *Buffer) Reset() error {
 
 // String gets a string representation of the binary data in the buffer.
 func (b *Buffer) String() string {
-	return b.string_int(false)
+	return b.stringInt(false)
 }
 
 // Display gets a string representation of the binary data in the buffer, with a single space between nibbles and a
 // double space between bytes.
 func (b *Buffer) Display() string {
-	return b.string_int(true)
+	return b.stringInt(true)
 }
 
 
@@ -769,7 +769,7 @@ func (b *Buffer) opBuf(ref *Buffer, t token.Token) error {
 }
 
 // Print string from data.
-func (b *Buffer) string_int(pretty bool) string {
+func (b *Buffer) stringInt(pretty bool) string {
 	var sb strings.Builder
 
 	if b == nil {
