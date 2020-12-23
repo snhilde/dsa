@@ -9,7 +9,7 @@ import (
 
 var (
 	// This is the standard error message when trying to use an invalid list.
-	badList = fmt.Errorf("list must be created with New() first")
+	errBadList = fmt.Errorf("list must be created with New() first")
 )
 
 // List is the main type for this package. It holds the internal information about the list.
@@ -99,7 +99,7 @@ func (l *List) Insert(index int, vs ...interface{}) error {
 // Append adds one or more values to the end of the list.
 func (l *List) Append(values ...interface{}) error {
 	if l == nil {
-		return badList
+		return errBadList
 	}
 
 	tmp := New()
@@ -210,7 +210,7 @@ func (l *List) RemoveMatch(v interface{}) {
 // Copy makes an exact copy of the list.
 func (l *List) Copy() (*List, error) {
 	if l == nil {
-		return nil, badList
+		return nil, errBadList
 	}
 
 	// We'll add a helper node to the beginning of the new list to make adding the other nodes easier.
@@ -282,7 +282,7 @@ func (l *List) Twin(nl *List) bool {
 // Merge appends the list to the current list, preserving order. This will take ownership of and clear the provided list.
 func (l *List) Merge(addition *List) error {
 	if l == nil {
-		return badList
+		return errBadList
 	}
 
 	if addition == nil {
@@ -312,7 +312,7 @@ func (l *List) Merge(addition *List) error {
 // Clear resets the list to its inital state.
 func (l *List) Clear() error {
 	if l == nil {
-		return badList
+		return errBadList
 	}
 
 	l.head = nil
@@ -373,7 +373,7 @@ func (l *List) Sort(cmp func(left, right interface{}) bool) error {
 	// are not going to divide the list into progressively smaller blocks. Instead, we are going to assume a block size
 	// of 2 and iteratively merge-sort blocks of greater and greater size until the list is fully sorted.
 	if l == nil {
-		return badList
+		return errBadList
 	} else if cmp == nil {
 		return fmt.Errorf("missing equality comparison callback")
 	}
@@ -511,7 +511,7 @@ func cmpStr(l, r interface{}) bool {
 // helper to get the node immediately before the specified index.
 func (l *List) getPrior(index int) (*hnode, error) {
 	if l == nil {
-		return nil, badList
+		return nil, errBadList
 	} else if index < 0 {
 		return nil, fmt.Errorf("invalid index")
 	} else if index > l.length {
