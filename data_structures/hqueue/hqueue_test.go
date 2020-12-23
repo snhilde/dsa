@@ -1,11 +1,10 @@
 package hqueue
 
 import (
-	"testing"
 	"reflect"
+	"testing"
 )
 
-// TESTS
 func TestBadPtr(t *testing.T) {
 	var q *Queue
 	checkString(t, q, "<nil>")
@@ -304,8 +303,6 @@ func TestClear(t *testing.T) {
 	checkCount(t, q, 0)
 }
 
-
-// HELPERS
 func checkString(t *testing.T, q *Queue, want string) {
 	if q.String() != want {
 		t.Error("queue contents are incorrect")
