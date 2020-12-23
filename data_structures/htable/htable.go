@@ -12,9 +12,9 @@ import (
 
 var (
 	// This is the standard error message when trying to use an invalid table.
-	errBadTable = fmt.Errorf("Table must be created with New() first")
+	errBadTable = fmt.Errorf("table must be created with New() first")
 	// This is the standard error message when trying to use an invalid row.
-	errBadRow = fmt.Errorf("Row must be created with NewRow() first")
+	errBadRow = fmt.Errorf("row must be created with NewRow() first")
 )
 
 // Table is the main type in this package. It holds all the rows of data.
@@ -27,7 +27,7 @@ type Table struct {
 // New creates a new table. The strings will denote the names of each column, used during lookup.
 func New(headers ...string) (*Table, error) {
 	if headers == nil || len(headers) == 0 {
-		return nil, fmt.Errorf("Missing column headers")
+		return nil, fmt.Errorf("missing column headers")
 	}
 
 	headerMap := make(map[string]int)
@@ -36,11 +36,11 @@ func New(headers ...string) (*Table, error) {
 	for i, v := range headers {
 		// Make sure every column has a header.
 		if v == "" {
-			return nil, fmt.Errorf("Column %v has an empty header", i)
+			return nil, fmt.Errorf("column %v has an empty header", i)
 		}
 		// Make sure none of the columns match each other.
 		if c, found := headerMap[v]; found {
-			return nil, fmt.Errorf("Columns %v and %v have the same header", c, i)
+			return nil, fmt.Errorf("columns %v and %v have the same header", c, i)
 		}
 		headerMap[v] = i
 	}
@@ -113,7 +113,7 @@ func (t *Table) RemoveRow(index int) error {
 	if v == nil {
 		// hlist.Remove will return the value at the index. Because our rows can never be nil, if we receive a nil
 		// value, then it means an error occurred.
-		return fmt.Errorf("Failed to remove row %v", index)
+		return fmt.Errorf("failed to remove row %v", index)
 	}
 
 	// All good
@@ -182,19 +182,19 @@ func (t *Table) SetItem(row int, col string, value interface{}) error {
 	if t == nil {
 		return errBadTable
 	} else if row < 0 || t.Rows() <= row {
-		return fmt.Errorf("Invalid row")
+		return fmt.Errorf("invalid row")
 	}
 
 	// Grab our row.
 	r := t.rows.Value(row)
 	if r == nil {
-		return fmt.Errorf("Missing row")
+		return fmt.Errorf("missing row")
 	}
 
 	// Figure out the index of the column.
 	i := t.ColumnToIndex(col)
 	if i < 0 {
-		return fmt.Errorf("Invalid column")
+		return fmt.Errorf("invalid column")
 	}
 
 	// Change the value.
@@ -217,9 +217,9 @@ func (t *Table) SetHeader(col string, name string) error {
 	if t == nil {
 		return errBadTable
 	} else if col == "" {
-		return fmt.Errorf("Invalid column")
+		return fmt.Errorf("invalid column")
 	} else if name == "" {
-		return fmt.Errorf("Missing name")
+		return fmt.Errorf("missing name")
 	}
 
 	for i, v := range t.h {
@@ -230,7 +230,7 @@ func (t *Table) SetHeader(col string, name string) error {
 	}
 
 	// If we're here, then we didn't find the column.
-	return fmt.Errorf("Missing column")
+	return fmt.Errorf("missing column")
 }
 
 // Headers returns a copy of the table's column headers.
@@ -358,7 +358,7 @@ func (t *Table) Toggle(row int, enabled bool) error {
 
 	tmp := t.rows.Value(row)
 	if tmp == nil {
-		return fmt.Errorf("Invalid index")
+		return fmt.Errorf("invalid index")
 	}
 
 	r := tmp.(*Row)
@@ -438,7 +438,7 @@ func (r *Row) SetItem(index int, value interface{}) error {
 	if r == nil {
 		return errBadRow
 	} else if index < 0 || r.Count() <= index {
-		return fmt.Errorf("Invalid column")
+		return fmt.Errorf("invalid column")
 	}
 
 	r.v[index] = value
@@ -479,7 +479,7 @@ func (t *Table) validateRow(r *Row) error {
 	if t == nil {
 		return errBadTable
 	} else if n := t.Columns(); n != len(r.v) {
-		return fmt.Errorf("Number of items (%v) does not match number of columns (%v)", len(r.v), n)
+		return fmt.Errorf("number of items (%v) does not match number of columns (%v)", len(r.v), n)
 	}
 
 	first := false
@@ -509,7 +509,7 @@ func (t *Table) validateRow(r *Row) error {
 		} else {
 			// Make sure the type of this element matches the prototype.
 			if k != t.types[i] {
-				return fmt.Errorf("Item %v's type (%v) does not match column's prototype (%v)", i, k, t.types[i])
+				return fmt.Errorf("item %v's type (%v) does not match column's prototype (%v)", i, k, t.types[i])
 			}
 		}
 	}
