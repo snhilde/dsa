@@ -2,7 +2,6 @@
 package htree
 
 import (
-	"errors"
 	"fmt"
 	"github.com/snhilde/dsa/data_structures/hstack"
 	"reflect"
@@ -11,9 +10,9 @@ import (
 
 var (
 	// This is the standard error message when trying to use an invalid tree.
-	badTree = errors.New("Tree must be created with New() first")
+	badTree = fmt.Errorf("tree must be created with New() first")
 	// This is the standard error message when trying to use an invalid item.
-	badItem = errors.New("Item must be created with NewItem() first")
+	badItem = fmt.Errorf("item must be created with NewItem() first")
 )
 
 // Tree is the main type for this package. It holds information about the entire AVL tree.
