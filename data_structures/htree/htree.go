@@ -2,13 +2,12 @@
 package htree
 
 import (
-	"github.com/snhilde/dsa/data_structures/hstack"
 	"errors"
+	"fmt"
+	"github.com/snhilde/dsa/data_structures/hstack"
 	"reflect"
 	"strings"
-	"fmt"
 )
-
 
 var (
 	// This is the standard error message when trying to use an invalid tree.
@@ -17,21 +16,19 @@ var (
 	badItem = errors.New("Item must be created with NewItem() first")
 )
 
-
 // Tree is the main type for this package. It holds information about the entire AVL tree.
 type Tree struct {
 	trunk  *tnode
-	length  int
+	length int
 }
 
 // Internal structure of tree nodes
 type tnode struct {
 	item  *Item
-	bal    int   // Balance of node: -1 if left branch is longer, 0 if both branches are even, or 1 if right side is longer
+	bal   int    // Balance of node: -1 if left branch is longer, 0 if both branches are even, or 1 if right side is longer
 	left  *tnode // Left branch
 	right *tnode // Right branch
 }
-
 
 // New creates a new binary tree.
 func New() *Tree {
@@ -250,7 +247,6 @@ func (t *Tree) Length() int {
 	return t.length
 }
 
-
 // Item is the type for each item in the tree. It holds the value of the item and its index for sorting.
 type Item struct {
 	value interface{}
@@ -295,7 +291,6 @@ func (i *Item) SetValue(value interface{}) error {
 
 	return nil
 }
-
 
 // findNode will iterate down a tree until it finds a matching index. If no matching index is found, then it will
 // return nil for the node. Additionally, it will build a stack of all the nodes traversed on the way.
@@ -374,8 +369,8 @@ func rotate(top *tnode, index int) *tnode {
 	// same side of both the top and bottom node, then we need to do only a single rotation. If the sides are different,
 	// then we'll need to do a double rotation.
 	var bottom *tnode
-	var left    bool
-	var double  bool
+	var left bool
+	var double bool
 
 	if index < top.item.index {
 		left = true

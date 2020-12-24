@@ -1,15 +1,16 @@
 package htree
 
 import (
-	"testing"
-	"time"
+	"fmt"
 	"math/rand"
 	"sort"
 	"strings"
-	"fmt"
+	"testing"
+	"time"
 )
 
 // --- TREE TESTS ---
+
 // Test creating a new tree object.
 func TestNew(t *testing.T) {
 	tr := New()
@@ -270,11 +271,10 @@ func TestYield(t *testing.T) {
 func TestList(t *testing.T) {
 }
 
-
 // --- ITEM TESTS ---
 
-
 // --- TREE BENCHMARKS ---
+
 func Benchmark100(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_, _ = buildTree(100, false)
@@ -305,8 +305,8 @@ func Benchmark1000000(b *testing.B) {
 	}
 }
 
-
 // --- HELPER FUNCTIONS ---
+
 func testString(t *testing.T, tr *Tree, want string) {
 	s := tr.String()
 	if s != want {
@@ -324,7 +324,7 @@ func testLength(t *testing.T, tr *Tree, want int) {
 }
 
 func newRand() *rand.Rand {
-	seed   := time.Now().UnixNano()
+	seed := time.Now().UnixNano()
 	source := rand.NewSource(seed)
 	random := rand.New(source)
 
