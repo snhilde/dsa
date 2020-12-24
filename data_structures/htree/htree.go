@@ -10,9 +10,9 @@ import (
 
 var (
 	// This is the standard error message when trying to use an invalid tree.
-	badTree = fmt.Errorf("tree must be created with New() first")
+	errBadTree = fmt.Errorf("tree must be created with New() first")
 	// This is the standard error message when trying to use an invalid item.
-	badItem = fmt.Errorf("item must be created with NewItem() first")
+	errBadItem = fmt.Errorf("item must be created with NewItem() first")
 )
 
 // Tree is the main type for this package. It holds information about the entire AVL tree.
@@ -38,7 +38,7 @@ func New() *Tree {
 // be updated.
 func (t *Tree) Add(value interface{}, index int) error {
 	if t == nil {
-		return badTree
+		return errBadTree
 	}
 
 	item := NewItem(value, index)
@@ -49,13 +49,13 @@ func (t *Tree) Add(value interface{}, index int) error {
 // will be replaced with the new item.
 func (t *Tree) AddItems(items ...*Item) error {
 	if t == nil {
-		return badTree
+		return errBadTree
 	}
 
 	for _, item := range items {
 		// Make sure we have a valid item.
 		if item == nil {
-			return badItem
+			return errBadItem
 		}
 
 		// If the tree is empty, start the trunk with this node.
@@ -98,7 +98,7 @@ func (t *Tree) AddItems(items ...*Item) error {
 // Remove removes the item at the provided index from the tree.
 func (t *Tree) Remove(index int) error {
 	if t == nil {
-		return badTree
+		return errBadTree
 	}
 
 	// TODO: implement
@@ -283,7 +283,7 @@ func (i *Item) GetIndex() int {
 // SetValue changes the value of the item to the provided value.
 func (i *Item) SetValue(value interface{}) error {
 	if i == nil {
-		return badItem
+		return errBadItem
 	}
 
 	i.value = value
