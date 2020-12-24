@@ -482,12 +482,6 @@ func (t *Table) validateRow(r *Row) error {
 		return fmt.Errorf("number of items (%v) does not match number of columns (%v)", len(r.v), n)
 	}
 
-	first := false
-	if t.Rows() == 0 {
-		// This is the first row being added to the table. It will set the type of each column in the table.
-		first = true
-	}
-
 	// Validate the types.
 	for i, v := range r.v {
 		rv := reflect.ValueOf(v)
@@ -504,7 +498,8 @@ func (t *Table) validateRow(r *Row) error {
 			k = reflect.Complex128
 		}
 
-		if first {
+		if t.Rows() == 0 {
+			// This is the first row being added to the table. It will set the type of each column in the table.
 			t.types[i] = k
 		} else {
 			// Make sure the type of this element matches the prototype.
