@@ -24,7 +24,7 @@ type Table struct {
 	rows  *hlist.List    // Linked list of rows
 }
 
-// New creates a new table. The strings will denote the names of each column, used during lookup.
+// New creates a new table. headers denotes the name of each column. Each header must be unique and not empty.
 func New(headers ...string) (*Table, error) {
 	if headers == nil || len(headers) == 0 {
 		return nil, fmt.Errorf("missing column headers")
@@ -45,12 +45,12 @@ func New(headers ...string) (*Table, error) {
 		headerMap[v] = i
 	}
 
-	var t Table
+	t := new(Table)
 	t.h = headers
 	t.types = make([]reflect.Kind, len(headers))
 	t.rows = hlist.New()
 
-	return &t, nil
+	return t, nil
 }
 
 // Add creates a new row with the items and adds it to the end of the table.
