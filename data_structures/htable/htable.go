@@ -1,6 +1,6 @@
 // Package htable is a data structure of rows and columns, with each row having the same number of items and each column
-// holding the same type of data. The tables provide easy building and quick lookup for a fast implementation of storing
-// and accessing uniform lists.
+// holding the same type of data. The tables provide easy, fast construction and lookup of uniform lists. Following the
+// go convention, all data within a column must have the same static type.
 package htable
 
 import (
@@ -20,11 +20,11 @@ var (
 // Table is the main type in this package. It holds all the rows of data.
 type Table struct {
 	h     []string       // Column headers
-	types []reflect.Kind // Types of each column (must be consistent for all rows)
+	types []reflect.Type // Types of each column (must be consistent for all rows)
 	rows  *hlist.List    // Linked list of rows
 }
 
-// New creates a new table. headers denotes the name of each column. Each header must be unique and not empty.
+// New creates a new table. headers denotes the name of each column. Each header names must be unique and not empty.
 func New(headers ...string) (*Table, error) {
 	if headers == nil || len(headers) == 0 {
 		return nil, fmt.Errorf("missing column headers")
@@ -47,7 +47,7 @@ func New(headers ...string) (*Table, error) {
 
 	t := new(Table)
 	t.h = headers
-	t.types = make([]reflect.Kind, len(headers))
+	t.types = make([]reflect.Type, len(headers))
 	t.rows = hlist.New()
 
 	return t, nil
@@ -484,27 +484,14 @@ func (t *Table) validateRow(r *Row) error {
 
 	// Validate the types.
 	for i, v := range r.v {
-		rv := reflect.ValueOf(v)
-		k := rv.Kind()
-		switch k {
-		// Always default to the common type.
-		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-			k = reflect.Int
-		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-			k = reflect.Uint
-		case reflect.Float32, reflect.Float64:
-			k = reflect.Float64
-		case reflect.Complex64, reflect.Complex128:
-			k = reflect.Complex128
-		}
-
+		typeof := reflect.TypeOf(v)
 		if t.Rows() == 0 {
 			// This is the first row being added to the table. It will set the type of each column in the table.
-			t.types[i] = k
+			t.types[i] = typeof
 		} else {
 			// Make sure the type of this element matches the prototype.
-			if k != t.types[i] {
-				return fmt.Errorf("item %v's type (%v) does not match column's prototype (%v)", i, k, t.types[i])
+			if typeof != t.types[i] {
+				return fmt.Errorf("item %v's type (%v) does not match column's prototype (%v)", i, typeof, t.types[i])
 			}
 		}
 	}

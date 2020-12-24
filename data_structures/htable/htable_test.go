@@ -2,6 +2,7 @@ package htable
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 )
 
@@ -430,113 +431,6 @@ func TestRBadArgs(t *testing.T) {
 }
 
 func TestBadTypes(t *testing.T) {
-	// Make sure all signed integer types are compatible with each other.
-	rows := [][]interface{}{
-		{int(1), int(2), int(3)},
-		{int8(1), int8(2), int8(3)},
-		{int16(1), int16(2), int16(3)},
-		{int32(1), int32(2), int32(3)},
-		{int64(1), int64(2), int64(3)},
-	}
-
-	for i, v := range rows {
-		tb, _ := New("1", "2", "3")
-
-		// Set the integer type from this row.
-		if err := tb.Add(v...); err != nil {
-			t.Error(err)
-		}
-
-		// Now try adding all the other integer types.
-		for j, w := range rows {
-			if i == j {
-				continue
-			}
-			if err := tb.Add(w...); err != nil {
-				t.Error(err)
-			}
-		}
-	}
-
-	// Make sure all unsigned integer types are compatible with each other.
-	rows = [][]interface{}{
-		{uint(1), uint(2), uint(3)},
-		{uint8(1), uint8(2), uint8(3)},
-		{uint16(1), uint16(2), uint16(3)},
-		{uint32(1), uint32(2), uint32(3)},
-		{uint64(1), uint64(2), uint64(3)},
-	}
-
-	for i, v := range rows {
-		tb, _ := New("1", "2", "3")
-
-		// Set the unsigned integer type from this row.
-		if err := tb.Add(v...); err != nil {
-			t.Error(err)
-		}
-
-		// Now try adding all the other unsigned integer types.
-		for j, w := range rows {
-			if i == j {
-				continue
-			}
-			if err := tb.Add(w...); err != nil {
-				t.Error(err)
-			}
-		}
-	}
-
-	// Make sure all float types are compatible with each other.
-	rows = [][]interface{}{
-		{float32(1.1), float32(2.2), float32(3.3)},
-		{float64(1.1), float64(2.2), float64(3.3)},
-	}
-
-	for i, v := range rows {
-		tb, _ := New("1", "2", "3")
-
-		// Set the float type from this row.
-		if err := tb.Add(v...); err != nil {
-			t.Error(err)
-		}
-
-		// Now try adding the other float type.
-		for j, w := range rows {
-			if i == j {
-				continue
-			}
-			if err := tb.Add(w...); err != nil {
-				t.Error(err)
-			}
-		}
-	}
-
-	// Make sure all complex types are compatible with each other.
-	rows = [][]interface{}{
-		{complex64(1 + 10i), complex64(2 + 20i), complex64(3 + 30i)},
-		{complex128(4 + 40i), complex128(5 + 50i), complex128(6 + 60i)},
-	}
-
-	for i, v := range rows {
-		tb, _ := New("1", "2", "3")
-
-		// Set the complex type from this row.
-		if err := tb.Add(v...); err != nil {
-			t.Error(err)
-		}
-
-		// Now try adding the other complex type.
-		for j, w := range rows {
-			if i == j {
-				continue
-			}
-			if err := tb.Add(w...); err != nil {
-				t.Error(err)
-			}
-		}
-	}
-
-	// Make sure struct types are compatible with each other.
 	type s1 struct {
 		s string
 		n int
@@ -546,37 +440,49 @@ func TestBadTypes(t *testing.T) {
 		v float32
 	}
 
-	tb, _ := New("1", "2", "3")
-	tb.Add(s1{"a", 1}, s1{"b", 2}, s1{"c", 3})
-	tb.Add(s2{4, 4.4}, s2{5, 5.5}, s2{6, 6.6})
-	tb.Add(s1{"d", 4}, s2{5, 5.5}, s1{"f", 6})
+	types := []interface{}{
+		int(1),
+		int8(1),
+		int16(1),
+		int32(1),
+		int64(1),
+		uint(1),
+		uint8(1),
+		uint16(1),
+		uint32(1),
+		uint64(1),
+		float32(1.1),
+		float64(1.1),
+		complex64(1 + 10i),
+		complex128(4 + 40i),
+		s1{"string", 1},
+		s2{2, 3.14},
+		TestTNew,
+		checkTString,
+		checkTCount,
+	}
 
-	tb, _ = New("1", "2", "3")
-	tb.Add(s2{4, 4.4}, s2{5, 5.5}, s2{6, 6.6})
-	tb.Add(s1{"a", 1}, s1{"b", 2}, s1{"c", 3})
-	tb.Add(s2{4, 4.4}, s1{"e", 5}, s2{6, 6.6})
-
-	// Make sure functions of different types are compatible with each other.
-	f1 := func(int) error { return nil }
-	f2 := func() string { return "" }
-	f3 := func([]int) {}
-	items := []interface{}{f1, f2, f3}
-
-	for i, v := range items {
-		tb, _ := New("1", "2", "3")
-
-		// Use this function as the type, to make sure that the type of the function is not important.
-		if err := tb.Add(v, v, v); err != nil {
+	for i, headerType := range types {
+		tb, err := New("1")
+		if err != nil {
 			t.Error(err)
 		}
 
-		// Now try adding the other complex type.
-		for j, w := range items {
+		// Set the type for this column.
+		if err := tb.Add(headerType); err != nil {
+			t.Error(err)
+		}
+
+		// Make sure that we can't put any other type in this column.
+		for j, newType := range types {
 			if i == j {
 				continue
 			}
-			if err := tb.Add(w, w, w); err != nil {
-				t.Error(err)
+
+			if err := tb.Add(newType); err == nil {
+				t.Error("Unexpectedly passed adding a row with the wrong type")
+				t.Log("\tHeader Type:", reflect.TypeOf(headerType))
+				t.Log("\tNew Type:", reflect.TypeOf(newType))
 			}
 		}
 	}
@@ -713,18 +619,18 @@ func TestTAdd(t *testing.T) {
 
 	// Test rows of functions.
 	tb, _ = New("1", "2", "3")
-	if err := tb.Add(TestTNew, checkTCount, TestTInsert); err != nil {
+	if err := tb.Add(TestTNew, checkTString, TestTInsert); err != nil {
 		t.Error(err)
 	}
-	checkTString(t, tb, fmt.Sprintf("{1: %p, 2: %p, 3: %p}", TestTNew, checkTCount, TestTInsert))
-	checkTCSV(t, tb, fmt.Sprintf("%p,%p,%p", TestTNew, checkTCount, TestTInsert))
+	checkTString(t, tb, fmt.Sprintf("{1: %p, 2: %p, 3: %p}", TestTNew, checkTString, TestTInsert))
+	checkTCSV(t, tb, fmt.Sprintf("%p,%p,%p", TestTNew, checkTString, TestTInsert))
 	checkTCount(t, tb, 3)
 
-	if err := tb.Add(checkTString, checkTString, TestTAdd); err != nil {
+	if err := tb.Add(TestTAdd, checkTCSV, TestTRows); err != nil {
 		t.Error(err)
 	}
-	checkTString(t, tb, fmt.Sprintf("{1: %p, 2: %p, 3: %p}, {1: %p, 2: %p, 3: %p}", TestTNew, checkTCount, TestTInsert, checkTString, checkTString, TestTAdd))
-	checkTCSV(t, tb, fmt.Sprintf("%p,%p,%p\r\n%p,%p,%p", TestTNew, checkTCount, TestTInsert, checkTString, checkTString, TestTAdd))
+	checkTString(t, tb, fmt.Sprintf("{1: %p, 2: %p, 3: %p}, {1: %p, 2: %p, 3: %p}", TestTNew, checkTString, TestTInsert, TestTAdd, checkTCSV, TestTRows))
+	checkTCSV(t, tb, fmt.Sprintf("%p,%p,%p\r\n%p,%p,%p", TestTNew, checkTString, TestTInsert, TestTAdd, checkTCSV, TestTRows))
 	checkTCount(t, tb, 6)
 }
 
@@ -1442,11 +1348,11 @@ func TestTRowItem(t *testing.T) {
 
 	// Store and run functions.
 	hi := func() string { return "hello" }
-	dbl := func(n int) int { return n * 2 }
+	reply := func() string { return "how are you" }
 
 	tb, _ = New("name", "func")
 	tb.Add("hi", hi)
-	tb.Add("dbl", dbl)
+	tb.Add("reply", reply)
 
 	// Find and run the first function.
 	if i, _ := tb.Row("name", "hi"); i != 0 {
@@ -1465,18 +1371,18 @@ func TestTRowItem(t *testing.T) {
 	}
 
 	// Find and run the second function.
-	if i, _ := tb.Row("name", "dbl"); i != 1 {
+	if i, _ := tb.Row("name", "reply"); i != 1 {
 		t.Error("Matched incorrect row")
 		t.Log("\tExpected:", 1)
 		t.Log("\tReceived:", i)
 	} else {
 		f := tb.Item(i, "func")
-		if ff, ok := f.(func(int) int); !ok {
-			t.Error("Returned function is not of type func(int) int")
-		} else if n := ff(2); n != 4 {
+		if ff, ok := f.(func() string); !ok {
+			t.Error("Returned function is not of type func() string")
+		} else if v := ff(); v != "how are you" {
 			t.Error("Function result incorrect")
-			t.Log("\tExpected:", 4)
-			t.Log("\tReceived:", n)
+			t.Log("\tExpected:", "how are you")
+			t.Log("\tReceived:", v)
 		}
 	}
 }
