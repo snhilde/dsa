@@ -498,7 +498,9 @@ func (b *Buffer) ANDBit(index int, ref bool) error {
 		return err
 	}
 
-	return opBit(node, ref, token.AND)
+	opBit(node, ref, token.AND)
+
+	return nil
 }
 
 // ORBit performs the bitwise operation OR ('|') on the specified bit with the reference bit.
@@ -508,7 +510,9 @@ func (b *Buffer) ORBit(index int, ref bool) error {
 		return err
 	}
 
-	return opBit(node, ref, token.OR)
+	opBit(node, ref, token.OR)
+
+	return nil
 }
 
 // XORBit performs the bitwise operation XOR ('^') on the specified bit with the reference bit.
@@ -518,7 +522,9 @@ func (b *Buffer) XORBit(index int, ref bool) error {
 		return err
 	}
 
-	return opBit(node, ref, token.XOR)
+	opBit(node, ref, token.XOR)
+
+	return nil
 }
 
 // ANDBytes performs the bitwise operation AND ('&') on the buffer with the reference bytes.
@@ -618,7 +624,9 @@ func (b *Buffer) NOTBit(index int) error {
 		return err
 	}
 
-	return opBit(node, false, token.NOT)
+	opBit(node, false, token.NOT)
+
+	return nil
 }
 
 // NOTBits negates the first n bits in the buffer. This is equivalent to the bitwise operation '~'.
@@ -691,8 +699,8 @@ func (b *Buffer) getNode(index int) (*bnode, error) {
 }
 
 // Perform a bitwise operation on a bit.
-func opBit(bit *bnode, ref bool, t token.Token) error {
-	switch t {
+func opBit(bit *bnode, ref bool, tok token.Token) {
+	switch tok {
 	case token.AND:
 		bit.bit = (bit.bit && ref)
 	case token.OR:
@@ -703,15 +711,11 @@ func opBit(bit *bnode, ref bool, t token.Token) error {
 		}
 	case token.NOT:
 		bit.bit = !bit.bit
-	default:
-		return fmt.Errorf("internal misuse of opBit method")
 	}
-
-	return nil
 }
 
 // Perform a bitwise operation over a byte range.
-func (b *Buffer) opBytes(ref []byte, t token.Token) error {
+func (b *Buffer) opBytes(ref []byte, tok token.Token) error {
 	if b == nil {
 		return errBadBuf
 	}
@@ -724,9 +728,7 @@ func (b *Buffer) opBytes(ref []byte, t token.Token) error {
 			}
 
 			bit := bitValue(octet, i)
-			if err := opBit(node, bit, t); err != nil {
-				return err
-			}
+			opBit(node, bit, tok)
 			node = node.next
 		}
 	}
@@ -735,7 +737,7 @@ func (b *Buffer) opBytes(ref []byte, t token.Token) error {
 }
 
 // Perform a bitwise operation using another buffer as the reference.
-func (b *Buffer) opBuf(ref *Buffer, t token.Token) error {
+func (b *Buffer) opBuf(ref *Buffer, tok token.Token) error {
 	if b == nil || ref == nil {
 		return errBadBuf
 	}
@@ -743,9 +745,7 @@ func (b *Buffer) opBuf(ref *Buffer, t token.Token) error {
 	node := b.head
 	refNode := ref.head
 	for node != nil && refNode != nil {
-		if err := opBit(node, refNode.bit, t); err != nil {
-			return err
-		}
+		opBit(node, refNode.bit, tok)
 		node = node.next
 		refNode = refNode.next
 	}
@@ -763,15 +763,13 @@ func (b *Buffer) stringInt(pretty bool) string {
 		return "<empty>"
 	}
 
-	node := b.head
 	cnt := 1
-	for node != nil {
+	for node := b.head; node != nil; node = node.next {
 		if node.bit {
 			sb.WriteString("1")
 		} else {
 			sb.WriteString("0")
 		}
-		node = node.next
 
 		if pretty {
 			if cnt%8 == 0 {
