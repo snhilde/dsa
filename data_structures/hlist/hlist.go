@@ -309,7 +309,7 @@ func (l *List) Merge(addition *List) error {
 	return nil
 }
 
-// Clear resets the list to its inital state.
+// Clear resets the list to its initial state.
 func (l *List) Clear() error {
 	if l == nil {
 		return errBadList

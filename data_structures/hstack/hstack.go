@@ -97,7 +97,7 @@ func (s *Stack) Merge(ns *Stack) error {
 	return ns.Clear()
 }
 
-// Clear resets the stack to its inital state.
+// Clear resets the stack to its initial state.
 func (s *Stack) Clear() error {
 	if s == nil {
 		return fmt.Errorf("stack does not exist")

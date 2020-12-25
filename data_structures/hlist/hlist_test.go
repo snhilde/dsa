@@ -331,7 +331,7 @@ func TestIndex(t *testing.T) {
 		t.Log("\tReceived:", i)
 	}
 
-	// Try to find a non-existant item.
+	// Try to find a non-existent item.
 	if i := l.Index(10); i != -1 {
 		t.Error("Unexpectedly passed no-match test")
 		t.Log("\tExpected: -1")
@@ -405,7 +405,7 @@ func TestValue(t *testing.T) {
 	checkString(t, l, "apples, 3, 3.14, [238 255], aardvark")
 	checkLength(t, l, 5)
 
-	// Try to find a non-existant item.
+	// Try to find a non-existent item.
 	if v := l.Value(10); v != nil {
 		t.Error("Unexpectedly passed no-match test")
 		t.Log("\tExpected: nil")
@@ -434,7 +434,7 @@ func TestExists(t *testing.T) {
 		t.Error("Expected match for 3,14, but didn't find it")
 	}
 
-	// Try to find a non-existant item.
+	// Try to find a non-existent item.
 	if ret := l.Exists(10); ret {
 		t.Error("Unexpectedly passed no-match test")
 	}
@@ -539,7 +539,7 @@ func TestRemoveMatch(t *testing.T) {
 	checkString(t, l, "[4 5]")
 	checkLength(t, l, 1)
 
-	// Try to remove a non-existant item.
+	// Try to remove a non-existent item.
 	l.RemoveMatch(10)
 	checkString(t, l, "[4 5]")
 	checkLength(t, l, 1)

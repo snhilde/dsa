@@ -97,7 +97,7 @@ func (q *Queue) Merge(nq *Queue) error {
 	return nq.Clear()
 }
 
-// Clear resets the queue to its inital state.
+// Clear resets the queue to its initial state.
 func (q *Queue) Clear() error {
 	if q == nil {
 		return fmt.Errorf("queue does not exist")
