@@ -19,6 +19,7 @@ type Buffer struct {
 	tail *bnode
 }
 
+// bnode represents an individual bit in the buffer.
 type bnode struct {
 	next *bnode
 	prev *bnode
@@ -47,26 +48,22 @@ func (b *Buffer) Bits() int {
 	}
 
 	cnt := 0
-	node := b.head
-	for node != nil {
+	for node := b.head; node != nil; node = node.next {
 		cnt++
-		node = node.next
 	}
 
 	return cnt
 }
 
-// Offset gets ther number of bits forward ther buffer has been advanced, or -1 on error.
+// Offset gets the number of bits forward the buffer has been advanced, or -1 on error.
 func (b *Buffer) Offset() int {
 	if b == nil {
 		return -1
 	}
 
 	cnt := 0
-	node := b.tail
-	for node != nil {
+	for node := b.tail; node != nil; node = node.prev {
 		cnt++
-		node = node.prev
 	}
 
 	return cnt
@@ -78,19 +75,19 @@ func (b *Buffer) Copy(n int) *Buffer {
 		return nil
 	}
 
-	// We will copy these reference values over ...
+	// We will copy these reference bits over ...
 	ref := b.head
 	// ... into this new buffer.
-	nb := New()
+	newBuf := New()
 
 	// If the buffer is empty or no nodes were requested, then we don't have anything to copy.
 	if b.head == nil || n < 1 {
-		return nb
+		return newBuf
 	}
 
 	// Set up the start of the buffer.
-	nb.head = new(bnode)
-	node := nb.head
+	newBuf.head = new(bnode)
+	node := newBuf.head
 	node.bit = ref.bit
 
 	// Go through the rest of the nodes in the original buffer.
@@ -106,7 +103,7 @@ func (b *Buffer) Copy(n int) *Buffer {
 		node = node.next
 	}
 
-	return nb
+	return newBuf
 }
 
 // Recalibrate realigns the bits to the beginning of the buffer.
@@ -127,18 +124,18 @@ func (b *Buffer) Reset() error {
 		return errBadBuf
 	}
 
-	b.head = nil
-	b.tail = nil
+	// Overwrite everything in the current buffer with a fresh buffer.
+	*b = *(New())
 
 	return nil
 }
 
-// String gets a string representation of the binary data in the buffer.
+// String returns a string representation of the binary data in the buffer.
 func (b *Buffer) String() string {
 	return b.stringInt(false)
 }
 
-// Display gets a string representation of the binary data in the buffer, with a single space between nibbles and a
+// Display returns a string representation of the binary data in the buffer, with a single space between nibbles and a
 // double space between bytes.
 func (b *Buffer) Display() string {
 	return b.stringInt(true)
@@ -146,7 +143,8 @@ func (b *Buffer) Display() string {
 
 // Read reads len(p) bytes of bits from the buffer into p. It will return the number of bytes read into p, or io.EOF if
 // the buffer is empty. io.EOF will only be returned if the buffer is empty before any bytes have been read into p. If
-// there are not enough bits to fill all of the last byte, then the rest of the byte will be false bits.
+// there are not enough bits to fill all of the last byte, then the rest of the byte will be false bits. This advances
+// the buffer.
 func (b *Buffer) Read(p []byte) (int, error) {
 	if b == nil {
 		return 0, errBadBuf
@@ -175,6 +173,9 @@ func (b *Buffer) Read(p []byte) (int, error) {
 				p[i] |= (1 << uint(j))
 			}
 			node = node.next
+
+			// Even though we're returning a count of bytes read, we need to keep track of the number of bits read so we
+			// can properly advance the buffer later.
 			cnt++
 		}
 	}
@@ -184,7 +185,8 @@ func (b *Buffer) Read(p []byte) (int, error) {
 	return (cnt + 7) / 8, err
 }
 
-// ReadByte reads out one byte of bits at the index. This will not advance the buffer.
+// ReadByte reads out one byte of bits at the index. If there are not enough bits to fill all of the byte, then the rest
+// of the byte will be false bits. This does not advance the buffer.
 func (b *Buffer) ReadByte(index int) (byte, error) {
 	node, err := b.getNode(index)
 	if err != nil {
@@ -206,7 +208,8 @@ func (b *Buffer) ReadByte(index int) (byte, error) {
 	return bt, nil
 }
 
-// ReadInt reads out the 32-bit decimal representation of the bits at the index. This will not advance the buffer.
+// ReadInt reads out the 32-bit decimal representation of the bits at the index. If there are not enough bits to fill
+// all of the 32 bits, then the rest of the bits will be false bits. This does not advance the buffer.
 func (b *Buffer) ReadInt(index int) (int, error) {
 	node, err := b.getNode(index)
 	if err != nil {
@@ -228,8 +231,8 @@ func (b *Buffer) ReadInt(index int) (int, error) {
 	return int(n), nil
 }
 
-// ReadFrom reads from r and append the bytes to the buffer. It will return the number of bytes read, and possibly an
-// error.
+// ReadFrom reads from r and appends the bytes to the buffer. It will return the number of bytes read, and possibly an
+// error. If r is nil, this will return io.EOF. If nothing is read, this will return io.ErrNoProgress.
 func (b *Buffer) ReadFrom(r io.Reader) (int, error) {
 	if b == nil {
 		return 0, errBadBuf
@@ -262,7 +265,7 @@ func (b *Buffer) Write(p []byte) (int, error) {
 	length := len(p)
 	for i := 0; i < length; i++ {
 		for j := 0; j < 8; j++ {
-			bit := bitOn(p[i], j)
+			bit := bitValue(p[i], j)
 			end.appendNodeVal(nil, bit)
 			end = end.next
 		}
@@ -337,7 +340,7 @@ func (b *Buffer) SetBytes(index int, ref []byte) error {
 			if node == nil {
 				return nil
 			}
-			node.bit = bitOn(octet, i)
+			node.bit = bitValue(octet, i)
 			node = node.next
 		}
 	}
@@ -369,7 +372,7 @@ func (b *Buffer) RemoveBit(index int) error {
 	return nil
 }
 
-// RemoveBits cuts out the bits at the index.
+// RemoveBits cuts out n bits at the index.
 func (b *Buffer) RemoveBits(index, n int) error {
 	if n < 1 {
 		return nil
@@ -431,8 +434,8 @@ func (b *Buffer) Advance(n int) (int, error) {
 	return n, nil
 }
 
-// Rewind moves the start of buffer back a number of bits, or to the initial start. It will return the number of bits
-// moved.
+// Rewind moves the start of the buffer back a number of bits, or to the initial start. It will return the number of
+// bits moved.
 func (b *Buffer) Rewind(n int) (int, error) {
 	if b == nil {
 		return 0, errBadBuf
@@ -628,7 +631,7 @@ func (b *Buffer) NOTBits(n int) error {
 	return b.opBytes(ref, token.NOT)
 }
 
-// Create a new node and link it after the given node.
+// Create a new node and link it in after the given node.
 func (bn *bnode) appendNode(node *bnode) {
 	if node == nil {
 		node = new(bnode)
@@ -644,12 +647,8 @@ func (bn *bnode) appendNodeVal(node *bnode, bit bool) {
 }
 
 // Check if a certain bit in a certain byte is set or not.
-func bitOn(b byte, bit int) bool {
-	if b&(1<<uint(bit)) > 0 {
-		return true
-	}
-
-	return false
+func bitValue(b byte, bit int) bool {
+	return b&(1<<uint(bit)) > 0
 }
 
 // Get the last node in the buffer.
@@ -724,7 +723,7 @@ func (b *Buffer) opBytes(ref []byte, t token.Token) error {
 				return nil
 			}
 
-			bit := bitOn(octet, i)
+			bit := bitValue(octet, i)
 			if err := opBit(node, bit, t); err != nil {
 				return err
 			}
@@ -785,7 +784,7 @@ func (b *Buffer) stringInt(pretty bool) string {
 	}
 
 	s := sb.String()
-	s = strings.Trim(sb.String(), " ")
+	s = strings.Trim(s, " ")
 
 	return s
 }
