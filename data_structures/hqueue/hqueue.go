@@ -93,6 +93,15 @@ func (q *Queue) Clear() error {
 	return q.list.Clear()
 }
 
+// Same checks whether or not the two queues point to the same underlying data.
+func (q *Queue) Same(queue2 *Queue) bool {
+	if q == nil || queue2 == nil {
+		return false
+	}
+
+	return q.list.Same(queue2.list)
+}
+
 // String displays the queue's contents, from the top to the bottom.
 func (q *Queue) String() string {
 	if q == nil {
