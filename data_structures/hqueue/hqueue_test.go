@@ -117,11 +117,11 @@ func TestAdd(t *testing.T) {
 	checkCount(t, q, 9)
 
 	// Test adding queue to itself.
-	if err := q.Add(q); err != nil {
-		t.Error(err)
+	if err := q.Add(q); err == nil {
+		t.Error("unexpectedly passed adding queue to itself")
 	}
-	checkString(t, q, "5, kangaroo, 3.1415, a, b, 3, [1 2 3], <empty>, orange, apple, banana, 5, kangaroo, 3.1415, a, b, 3, [1 2 3], <empty>, orange, apple, banana")
-	checkCount(t, q, 10)
+	checkString(t, q, "5, kangaroo, 3.1415, a, b, 3, [1 2 3], <empty>, orange, apple, banana")
+	checkCount(t, q, 9)
 }
 
 func TestPop(t *testing.T) {

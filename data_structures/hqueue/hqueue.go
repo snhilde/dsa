@@ -29,6 +29,15 @@ func (q *Queue) Add(items ...interface{}) error {
 		return errBadQueue
 	}
 
+	// To prevent infinite recursion, make sure that none of the items is this queue itself.
+	for _, v := range items {
+		if t, ok := v.(*Queue); ok {
+			if q.Same(t) {
+				return fmt.Errorf("can't add queue to itself")
+			}
+		}
+	}
+
 	return q.list.Append(items...)
 }
 
