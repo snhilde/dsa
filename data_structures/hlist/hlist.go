@@ -414,12 +414,18 @@ func (l *List) Sort(cmp func(left, right interface{}) bool) error {
 
 // SortInt sorts the list using a modified merge algorithm. Note: all values in the list must be of type int.
 func (l *List) SortInt() error {
-	return l.Sort(cmpInt)
+	return l.Sort(func (left, right interface{}) bool {
+		return left.(int) < right.(int)
+	})
 }
+
+// integer equality callback for SortInt() method
 
 // SortStr sorts the list using a modified merge algorithm. Note: all values in the list must be of type string.
 func (l *List) SortStr() error {
-	return l.Sort(cmpStr)
+	return l.Sort(func (l, r interface{}) bool {
+		return l.(string) < r.(string)
+	})
 }
 
 // internal convenience function for creating a new node
@@ -449,16 +455,6 @@ func buildChain(values []interface{}) (*hnode, *hnode, int) {
 	}
 
 	return anchor.next, tail, num
-}
-
-// integer equality callback for SortInt() method
-func cmpInt(left, right interface{}) bool {
-	return left.(int) < right.(int)
-}
-
-// string equality callback for SortStr() method
-func cmpStr(l, r interface{}) bool {
-	return l.(string) < r.(string)
 }
 
 // helper to get the node immediately before the specified index.
