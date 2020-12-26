@@ -12,7 +12,7 @@ var (
 	errBadList = fmt.Errorf("list must be created with New() first")
 )
 
-// List is the main type for this package. It holds the internal information about the list.
+// List is the main type for this package. It holds the internal information about the linked list.
 type List struct {
 	head   *hnode
 	length int
@@ -20,8 +20,8 @@ type List struct {
 
 // internal type for an individual node in the list
 type hnode struct {
-	v    interface{}
-	next *hnode
+	value interface{}
+	next  *hnode
 }
 
 // New creates a new linked list.
@@ -31,24 +31,21 @@ func New() *List {
 
 // String returns a comma-separated list of the string representations of all of the nodes in the linked list.
 func (l *List) String() string {
-	var b strings.Builder
-
 	if l == nil {
 		return "<nil>"
 	} else if l.head == nil {
 		return "<empty>"
 	}
 
-	n := l.head
-	for n != nil {
-		b.WriteString(fmt.Sprintf("%v", n.v))
-		n = n.next
-		if n != nil {
-			b.WriteString(", ")
+	builder := new(strings.Builder)
+	for node := l.head; node != nil; node = node.next {
+		if builder.Len() > 0 {
+			builder.WriteString(", ")
 		}
+		builder.WriteString(fmt.Sprintf("%v", node.value))
 	}
 
-	return b.String()
+	return builder.String()
 }
 
 // Length gets the number of nodes in the list, or -1 if list hasn't been created yet.
@@ -61,79 +58,47 @@ func (l *List) Length() int {
 }
 
 // Insert inserts one or more value into the list at the specified index.
-func (l *List) Insert(index int, vs ...interface{}) error {
-	n, err := l.getPrior(index)
+func (l *List) Insert(index int, values ...interface{}) error {
+	node, err := l.getPrior(index)
 	if err != nil {
 		return err
 	}
 
-	if len(vs) == 0 {
+	if len(values) == 0 {
 		return nil
 	}
 
-	// Make temporary list.
-	head := newNode(nil)
-	nn := head
-	for _, v := range vs {
-		nn.next = newNode(v)
-		nn = nn.next
-		l.length++
-	}
-
-	// Move past the node we created to make adding smoother.
-	head = head.next
-
-	// Link in the temporary list.
-	if n == nil {
-		// Handle the special case of inserting the first node.
-		nn.next = l.head
-		l.head = head
+	// Build out the chain of values, then link it in at the specified position.
+	begin, end, num := buildChain(values)
+	if node == nil {
+		// This means the list is empty.
+		end.next = l.head
+		l.head = begin
 	} else {
-		nn.next = n.next
-		n.next = head
+		end.next = node.next
+		node.next = begin
 	}
+	l.length += num
 
 	return nil
 }
 
 // Append adds one or more values to the end of the list.
 func (l *List) Append(values ...interface{}) error {
-	if l == nil {
-		return errBadList
-	}
-
-	tmp := New()
-	n := tmp.head
-	for _, v := range values {
-		if tmp.head == nil {
-			tmp.head = newNode(v)
-			tmp.length++
-			n = tmp.head
-		} else {
-			n.next = newNode(v)
-			n = n.next
-			tmp.length++
-		}
-	}
-
-	l.Merge(tmp)
-
-	return nil
+	return l.Insert(l.Length(), values...)
 }
 
 // Index gets the index of the first matching node, or -1 if not found.
-func (l *List) Index(v interface{}) int {
+func (l *List) Index(value interface{}) int {
 	if l == nil {
 		return -1
 	}
 
-	n := l.head
 	i := 0
-	for n != nil {
-		if reflect.DeepEqual(n.v, v) {
+	for node := l.head; node != nil; node = node.next {
+		if reflect.DeepEqual(node.value, value) {
 			return i
 		}
-		n = n.next
 		i++
 	}
 
@@ -143,25 +108,26 @@ func (l *List) Index(v interface{}) int {
 
 // Value gets the value at the index.
 func (l *List) Value(index int) interface{} {
-	if l == nil || l.head == nil {
-		return nil
-	}
-
-	n, err := l.getPrior(index)
+	node, err := l.getPrior(index)
 	if err != nil {
 		return nil
 	}
 
-	if n == nil {
-		return l.head.v
+	// If there isn't a node before the specified index, then that means either the index is 0 or this list is empty.
+	if node == nil {
+		if l.head == nil {
+			return nil
+		}
+		return l.head.value
 	}
 
-	return n.next.v
+	// Because we asked for the previous node, we need to move to the next one, which has the correct value.
+	return node.next.value
 }
 
 // Exists checks whether or not the value exists in the list.
-func (l *List) Exists(v interface{}) bool {
-	i := l.Index(v)
+func (l *List) Exists(value interface{}) bool {
+	i := l.Index(value)
 	if i < 0 {
 		// Index didn't find anything, or the list is invalid.
 		return false
@@ -172,39 +138,34 @@ func (l *List) Exists(v interface{}) bool {
 
 // Remove removes an item from the list and returns its value.
 func (l *List) Remove(index int) interface{} {
-	if l == nil || l.head == nil {
-		return nil
-	}
-
-	n, err := l.getPrior(index)
+	node, err := l.getPrior(index)
 	if err != nil {
 		return nil
 	}
 
+	// If there isn't a node before the specified index, then that means either the index is 0 or this list is empty.
 	var pop *hnode
-	if n == nil {
-		// Handle the special case of popping the first node.
+	if node == nil {
+		if l.head == nil {
+			return nil
+		}
 		pop = l.head
 		l.head = l.head.next
 	} else {
-		pop = n.next
-		n.next = pop.next
+		pop = node.next
+		node.next = pop.next
 	}
 
 	l.length--
-	return pop.v
+	return pop.value
 }
 
 // RemoveMatch finds the first item with a matching value and removes it from the list.
-func (l *List) RemoveMatch(v interface{}) {
-	i := l.Index(v)
-	if i < 0 {
-		// Index() didn't find anything, or the list is invalid.
-		return
+func (l *List) RemoveMatch(value interface{}) {
+	// If the value exists in the list, then remove it at the index found.
+	if i := l.Index(value); i >= 0 {
+		l.Remove(i)
 	}
-
-	l.Remove(i)
-	return
 }
 
 // Copy makes an exact copy of the list.
@@ -213,32 +174,30 @@ func (l *List) Copy() (*List, error) {
 		return nil, errBadList
 	}
 
-	// We'll add a helper node to the beginning of the new list to make adding the other nodes easier.
-	nl := New()
-	nl.head = newNode(nil)
-
-	n := l.head
-	nn := nl.head
-	for n != nil {
-		nn.next = newNode(n.v)
-		n = n.next
-		nn = nn.next
-		nl.length++
+	// We're going to build an identical chain of nodes here, and then we'll create a new List and link in the chain
+	// afterwards.
+	cp := New()
+	cp.head = newNode(nil)
+	for node1, node2 := l.head, cp.head; node1 != nil; node1, node2 = node1.next, node2.next {
+		node2.next = newNode(node1.value)
 	}
 
-	// Get rid of the helper node.
-	nl.head = nl.head.next
+	// Skip past the anchor node created at the beginning of the new list.
+	cp.head = cp.head.next
 
-	return nl, nil
+	// Match up the lengths.
+	cp.length = l.length
+
+	return cp, nil
 }
 
 // Same checks if the two lists point to the same underlying data and are therefore the same list.
-func (l *List) Same(nl *List) bool {
-	if l == nil || nl == nil {
+func (l *List) Same(list2 *List) bool {
+	if l == nil || list2 == nil {
 		return false
 	}
 
-	if l == nl {
+	if l == list2 {
 		return true
 	}
 
@@ -246,33 +205,29 @@ func (l *List) Same(nl *List) bool {
 }
 
 // Twin checks if the two lists are separate lists but hold the same contents.
-func (l *List) Twin(nl *List) bool {
-	if l == nil || nl == nil {
+func (l *List) Twin(list2 *List) bool {
+	if l == nil || list2 == nil {
 		return false
 	}
 
-	if l.Same(nl) {
+	if l.Same(list2) {
 		return false
 	}
 
 	// The lists must have the same length.
-	if l.length != nl.length {
+	if l.length != list2.length {
 		return false
 	}
 
-	// The lists must not point to the same nodes.
-	if l.head == nl.head {
-		return false
-	}
-
-	n := l.head
-	nn := nl.head
-	for n != nil {
-		if !reflect.DeepEqual(n.v, nn.v) {
+	for node1, node2 := l.head, list2.head; node1 != nil; node1, node2 = node1.next, node2.next {
+		if node2 == nil {
+			// Shouldn't ever be possible because the lists are the same length, but need to check for safety.
 			return false
 		}
-		n = n.next
-		nn = nn.next
+
+		if !reflect.DeepEqual(node1.value, node2.value) {
+			return false
+		}
 	}
 
 	// If we're here, then all the nodes matched up.
@@ -280,32 +235,34 @@ func (l *List) Twin(nl *List) bool {
 }
 
 // Merge appends the list to the current list, preserving order. This will take ownership of and clear the provided list.
-func (l *List) Merge(addition *List) error {
+func (l *List) Merge(list2 *List) error {
 	if l == nil {
 		return errBadList
 	}
 
-	if addition == nil {
+	if list2 == nil {
 		// Nothing to do.
 		return nil
 	}
 
 	// Find the end of the list.
-	n, err := l.getPrior(l.length)
+	node, err := l.getPrior(l.length)
 	if err != nil {
 		return err
 	}
 
-	if n == nil {
-		// List is empty.
-		l.head = addition.head
-		l.length = addition.length
+	if node == nil {
+		// The first list is empty.
+		l.head = list2.head
+		l.length = list2.length
 	} else {
-		n.next = addition.head
-		l.length += addition.length
+		node.next = list2.head
+		l.length += list2.length
 	}
 
-	addition.Clear()
+	// Give the first list ownership of all nodes.
+	list2.Clear()
+
 	return nil
 }
 
@@ -315,17 +272,17 @@ func (l *List) Clear() error {
 		return errBadList
 	}
 
-	l.head = nil
-	l.length = 0
+	// Reset all members.
+	*l = *(New())
 
 	return nil
 }
 
 // Yield provides an unbuffered channel that will continually pass successive node values until the list is exhausted.
-// The channel quit is used to communicate when iteration should be stopped. Send any value on the cnannel (or close it)
-// to break the communication. This will happen automatically if the list is exhausted. If this is not needed, pass nil
-// as the argument. Use Yield if you are concerned about memory usage or don't know how far through the list you will
-// iterate; otherwise, use YieldAll.
+// The channel quit is used to communicate when iteration should be stopped. Send any value on the channel to break the
+// communication. This will happen automatically if the list is exhausted. If this is not needed, pass nil as the
+// argument. Use Yield if you are concerned about memory usage or don't know how far through the list you will iterate;
+// otherwise, use YieldAll.
 func (l *List) Yield(quit <-chan interface{}) <-chan interface{} {
 	if l == nil || l.head == nil {
 		return nil
@@ -334,11 +291,11 @@ func (l *List) Yield(quit <-chan interface{}) <-chan interface{} {
 	ch := make(chan interface{})
 	go func() {
 		defer close(ch)
-		n := l.head
-		for n != nil {
+		for node := l.head; node != nil; node = node.next {
+			// Either block on sending this node's value back on the channel, or break out of the loop if the caller is
+			// done receiving values.
 			select {
-			case ch <- n.v:
-				n = n.next
+			case ch <- node.value:
 			case <-quit:
 				return
 			}
@@ -356,10 +313,8 @@ func (l *List) YieldAll() <-chan interface{} {
 	}
 
 	ch := make(chan interface{}, l.Length())
-	n := l.head
-	for n != nil {
-		ch <- n.v
-		n = n.next
+	for node := l.head; node != nil; node = node.next {
+		ch <- node.value
 	}
 	close(ch)
 
@@ -425,20 +380,20 @@ func (l *List) Sort(cmp func(left, right interface{}) bool) error {
 			for j := 0; j < tmpLen; j++ {
 				if leftLen == 0 {
 					// Only right stack still has nodes.
-					tmpList.Append(rightStack.v)
+					tmpList.Append(rightStack.value)
 					rightStack = rightStack.next
 					rightLen--
 				} else if rightLen == 0 {
 					// Only left stack still has nodes.
-					tmpList.Append(leftStack.v)
+					tmpList.Append(leftStack.value)
 					leftStack = leftStack.next
 					leftLen--
-				} else if cmp(leftStack.v, rightStack.v) {
-					tmpList.Append(leftStack.v)
+				} else if cmp(leftStack.value, rightStack.value) {
+					tmpList.Append(leftStack.value)
 					leftStack = leftStack.next
 					leftLen--
 				} else {
-					tmpList.Append(rightStack.v)
+					tmpList.Append(rightStack.value)
 					rightStack = rightStack.next
 					rightLen--
 				}
@@ -468,44 +423,42 @@ func (l *List) SortStr() error {
 }
 
 // internal convenience function for creating a new node
-func newNode(v interface{}) *hnode {
-	n := new(hnode)
-	n.v = v
+func newNode(value interface{}) *hnode {
+	node := new(hnode)
+	node.value = value
 
-	return n
+	return node
+}
+
+// buildChain strings together a new chain of linked nodes with the values provided. It returns the first and last nodes
+// in the chain as well as the number of nodes.
+func buildChain(values []interface{}) (*hnode, *hnode, int) {
+	if len(values) == 0 {
+		return nil, nil, 0
+	}
+
+	// We're going to start by creating an anchor node, and then we'll build out the chain of nodes from that. When
+	// we're done adding nodes, we'll move forward past the anchor node to get to the real start of the chain.
+	anchor := newNode(nil)
+	tail := anchor
+	num := 0
+	for _, value := range values {
+		tail.next = newNode(value)
+		tail = tail.next
+		num++
+	}
+
+	return anchor.next, tail, num
 }
 
 // integer equality callback for SortInt() method
 func cmpInt(left, right interface{}) bool {
-	if left.(int) < right.(int) {
-		return true
-	}
-
-	return false
+	return left.(int) < right.(int)
 }
 
 // string equality callback for SortStr() method
 func cmpStr(l, r interface{}) bool {
-	lv := []rune(l.(string))
-	rv := []rune(r.(string))
-
-	for i, v := range lv {
-		if i == len(rv) {
-			// If we're here, then r is a prefix of l.
-			return false
-		}
-
-		if v == rv[i] {
-			continue
-		} else if v < rv[i] {
-			return true
-		} else {
-			return false
-		}
-	}
-
-	// If we're here, then either l is a prefix of r or both strings are equal.
-	return true
+	return l.(string) < r.(string)
 }
 
 // helper to get the node immediately before the specified index.
@@ -518,17 +471,18 @@ func (l *List) getPrior(index int) (*hnode, error) {
 		return nil, fmt.Errorf("out of bounds")
 	}
 
-	if l.head == nil || index == 0 {
+	// There is no node before the first node.
+	if index == 0 {
 		return nil, nil
 	}
 
-	n := l.head
+	node := l.head
 	for i := 0; i < index-1; i++ {
-		if n == nil {
+		if node == nil {
 			return nil, fmt.Errorf("error finding node at index")
 		}
-		n = n.next
+		node = node.next
 	}
 
-	return n, nil
+	return node, nil
 }
