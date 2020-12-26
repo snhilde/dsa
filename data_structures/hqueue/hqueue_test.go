@@ -44,6 +44,11 @@ func TestBadPtr(t *testing.T) {
 		t.Error("unexpectedly passed Clear() test with bad pointer")
 	}
 
+	// Test Same().
+	if q.Same(New()) {
+		t.Error("unexpectedly passed Same() test with bad pointer")
+	}
+
 	// Test String().
 	if s := q.String(); s != "<nil>" {
 		t.Error("unexpectedly passed String() test with bad pointer")
@@ -301,6 +306,113 @@ func TestClear(t *testing.T) {
 	}
 	checkString(t, q, "<empty>")
 	checkCount(t, q, 0)
+}
+
+func TestSame(t *testing.T) {
+	q1 := New()
+	q2 := q1
+
+	// Test checking against nothing.
+	if q1.Same(nil) {
+		t.Error("unexpectedly passed Same() test for missing arg")
+	}
+
+	// Test an empty queue.
+	if !q1.Same(q2) {
+		t.Error("Queues differ (test #1)")
+	}
+	if !q2.Same(q1) {
+		t.Error("Queues differ (test #2)")
+	}
+	checkString(t, q1, "<empty>")
+	checkCount(t, q1, 0)
+	checkString(t, q2, "<empty>")
+	checkCount(t, q2, 0)
+
+	// And an item and test again.
+	q1.Add("item")
+	if !q1.Same(q2) {
+		t.Error("Queues differ (test #3)")
+	}
+	if !q2.Same(q1) {
+		t.Error("Queues differ (test #4)")
+	}
+	checkString(t, q1, "item")
+	checkCount(t, q1, 1)
+	checkString(t, q2, "item")
+	checkCount(t, q2, 1)
+
+	// And multiple items to the 2nd reference.
+	q2.Add(3.14, []int{1, 2, 3}, 5)
+	if !q1.Same(q2) {
+		t.Error("Queues differ (test #5)")
+	}
+	if !q2.Same(q1) {
+		t.Error("Queues differ (test #6)")
+	}
+	checkString(t, q1, "item, 3.14, [1 2 3], 5")
+	checkCount(t, q1, 4)
+	checkString(t, q2, "item, 3.14, [1 2 3], 5")
+	checkCount(t, q2, 4)
+
+	// Pop an item and test again.
+	q1.Pop()
+	if !q1.Same(q2) {
+		t.Error("Queues differ (test #7)")
+	}
+	if !q2.Same(q1) {
+		t.Error("Queues differ (test #8)")
+	}
+	checkString(t, q1, "3.14, [1 2 3], 5")
+	checkCount(t, q1, 3)
+	checkString(t, q2, "3.14, [1 2 3], 5")
+	checkCount(t, q2, 3)
+
+	// Test copying, and make sure that the old queues and the new queue are no longer the same.
+	q3, err := q1.Copy()
+	if err != nil {
+		t.Error(err)
+	}
+	if q1.Same(q3) {
+		t.Error("Queues are unexpectedly the same (test #9)")
+	}
+	if q2.Same(q3) {
+		t.Error("Queues are unexpectedly the same (test #10)")
+	}
+
+	// Test clearing a list.
+	q2.Clear()
+	if !q1.Same(q2) {
+		t.Error("Queues differ (test #11)")
+	}
+	if !q2.Same(q1) {
+		t.Error("Queues differ (test #12)")
+	}
+	checkString(t, q1, "<empty>")
+	checkCount(t, q1, 0)
+	checkString(t, q2, "<empty>")
+	checkCount(t, q2, 0)
+
+	// Test reassigning to make a same list.
+	q3 = q2
+	if !q1.Same(q3) {
+		t.Error("Queues differ (test #13)")
+	}
+	if !q2.Same(q3) {
+		t.Error("Queues differ (test #14)")
+	}
+
+	// Make two Queues that have the same contents but are not the same underlying Queues.
+	q1 = New()
+	q1.Add("apple", "banana", "carrot")
+	q2 = New()
+	q2.Add("apple", "banana", "carrot")
+	if q1.Same(q2) {
+		t.Error("Queues are unexpectedly the same (test #15)")
+	}
+	if q2.Same(q1) {
+		t.Error("Queues are unexpectedly the same (test #16)")
+	}
 }
 
 func checkString(t *testing.T, q *Queue, want string) {
