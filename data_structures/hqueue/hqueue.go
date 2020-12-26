@@ -24,25 +24,12 @@ func New() *Queue {
 }
 
 // Add adds one or more new items to the back of the queue. The items will be added in the order provided.
-func (q *Queue) Add(vs ...interface{}) error {
+func (q *Queue) Add(items ...interface{}) error {
 	if q == nil {
 		return errBadQueue
 	}
 
-	// If caller is trying to add own queue, duplicate it first and then add it.
-	for i, v := range vs {
-		if t, ok := v.(*Queue); ok {
-			if t == q {
-				nq, err := q.Copy()
-				if err != nil {
-					return err
-				}
-				vs[i] = nq
-			}
-		}
-	}
-
-	return q.list.Append(vs...)
+	return q.list.Append(items...)
 }
 
 // Pop removes the first item in the queue and returns its value.
