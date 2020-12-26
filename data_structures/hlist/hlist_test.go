@@ -1098,6 +1098,54 @@ func TestYield(t *testing.T) {
 		t.Log("\tExpected: nil")
 		t.Log("\tReceived:", v)
 	}
+
+	// Test that closing the quit channel does not affect the values channel.
+	l.Clear()
+	l.Append(1, 2, 3)
+	quit = make(chan interface{})
+	ch = l.Yield(quit)
+	if ch == nil {
+		t.Error("Failed to receive channel")
+	}
+
+	i = 0
+	for v := range ch {
+		switch i {
+		case 0:
+			if v != 1 {
+				t.Error("Error receiving 1st item")
+				t.Log("\tExpected: 1")
+				t.Log("\tReceived:", v)
+			}
+		case 1:
+			if v != 2 {
+				t.Error("Error receiving 2nd item")
+				t.Log("\tExpected: 2")
+				t.Log("\tReceived:", v)
+			}
+		case 2:
+			if v != 3 {
+				t.Error("Error receiving 3rd item")
+				t.Log("\tExpected: 3.14")
+				t.Log("\tReceived:", v)
+			}
+		default:
+			t.Error("Still receiving items when list should be exhausted")
+			t.Log("\tReceived:", v)
+		}
+
+		if i == 0 {
+			close(quit)
+		}
+
+		i++
+	}
+
+	if v, ok := <-ch; ok {
+		t.Error("Channel should be closed")
+		t.Log("\tExpected: nil")
+		t.Log("\tReceived:", v)
+	}
 }
 
 func TestYieldAll(t *testing.T) {
