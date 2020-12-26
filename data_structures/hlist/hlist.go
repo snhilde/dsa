@@ -419,8 +419,6 @@ func (l *List) SortInt() error {
 	})
 }
 
-// integer equality callback for SortInt() method
-
 // SortStr sorts the list using a modified merge algorithm. Note: all values in the list must be of type string.
 func (l *List) SortStr() error {
 	return l.Sort(func (l, r interface{}) bool {
