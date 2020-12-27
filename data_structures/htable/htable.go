@@ -166,21 +166,21 @@ func (t *Table) String() string {
 }
 
 // SetItem changes the value of the item at the specified coordinates.
-func (t *Table) SetItem(col string, index int, value interface{}) error {
+func (t *Table) SetItem(header string, row int, value interface{}) error {
 	if t == nil {
 		return errBadTable
-	} else if index < 0 || t.Rows() <= index {
-		return fmt.Errorf("invalid index")
+	} else if row < 0 || t.Rows() <= row {
+		return fmt.Errorf("invalid row")
 	}
 
 	// Grab our row.
-	r := t.rows.Item(index)
+	r := t.rows.Item(row)
 	if r == nil {
 		return fmt.Errorf("missing row")
 	}
 
 	// Figure out the index of the column.
-	i := t.ColumnToIndex(col)
+	i := t.ColumnToIndex(header)
 	if i < 0 {
 		return fmt.Errorf("invalid column")
 	}
@@ -190,35 +190,33 @@ func (t *Table) SetItem(col string, index int, value interface{}) error {
 	nr.SetItem(i, value)
 
 	// Add the row back in to the table, which will also validate the new value.
-	if err := t.RemoveRow(index); err != nil {
+	if err := t.RemoveRow(row); err != nil {
 		return err
 	}
-	if err := t.InsertRow(index, nr); err != nil {
+	if err := t.InsertRow(row, nr); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-// SetHeader changes the specified column's header to name.
-func (t *Table) SetHeader(col string, name string) error {
+// SetHeader changes the specified column's header.
+func (t *Table) SetHeader(oldHeader, newHeader string) error {
 	if t == nil {
 		return errBadTable
-	} else if col == "" {
-		return fmt.Errorf("invalid column")
-	} else if name == "" {
-		return fmt.Errorf("missing name")
+	} else if newHeader == "" {
+		return fmt.Errorf("missing new header")
 	}
 
 	for i, header := range t.headers {
-		if col == header {
-			t.headers[i] = name
+		if oldHeader == header {
+			t.headers[i] = newHeader
 			return nil
 		}
 	}
 
 	// If we're here, then we didn't find the column.
-	return fmt.Errorf("missing column")
+	return fmt.Errorf("invalid header")
 }
 
 // Headers returns a copy of the table's column headers.
@@ -227,7 +225,7 @@ func (t *Table) Headers() []string {
 		return nil
 	}
 
-	headers := make([]string, t.Columns())
+	headers := make([]string, len(t.headers))
 	copy(headers, t.headers)
 
 	return headers
