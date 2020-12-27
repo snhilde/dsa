@@ -22,7 +22,7 @@ func TestNew(t *testing.T) {
 		t.Error("Trunk node is not nil")
 	}
 
-	if tr.length != 0 {
+	if tr.count != 0 {
 		t.Error("Tree claims to have nodes")
 	}
 }
@@ -32,68 +32,68 @@ func TestBad(t *testing.T) {
 	var tr *Tree
 
 	testString(t, tr, "<nil>")
-	testLength(t, tr, -1)
+	testCount(t, tr, -1)
 
 	if err := tr.Add(5, 5); err == nil {
 		t.Error("Bad object test: Unexpectedly passed Add")
 	}
 	testString(t, tr, "<nil>")
-	testLength(t, tr, -1)
+	testCount(t, tr, -1)
 
 	item := NewItem(5, 5)
 	if err := tr.AddItems(item); err == nil {
 		t.Error("Bad object test: Unexpectedly passed AddItems")
 	}
 	testString(t, tr, "<nil>")
-	testLength(t, tr, -1)
+	testCount(t, tr, -1)
 
 	if err := tr.Remove(5); err == nil {
 		t.Error("Bad object test: Unexpectedly passed Remove")
 	}
 	testString(t, tr, "<nil>")
-	testLength(t, tr, -1)
+	testCount(t, tr, -1)
 
 	if v := tr.Value(5); v != nil {
 		t.Error("Bad object test: Unexpectedly passed Value")
 	}
 	testString(t, tr, "<nil>")
-	testLength(t, tr, -1)
+	testCount(t, tr, -1)
 
 	if item := tr.Item(5); item != nil {
 		t.Error("Bad object test: Unexpectedly passed Item")
 	}
 	testString(t, tr, "<nil>")
-	testLength(t, tr, -1)
+	testCount(t, tr, -1)
 
 	if ok := tr.Match(5); ok {
 		t.Error("Bad object test: Unexpectedly passed Match")
 	}
 	testString(t, tr, "<nil>")
-	testLength(t, tr, -1)
+	testCount(t, tr, -1)
 
 	if ch := tr.Yield(nil); ch != nil {
 		t.Error("Bad object test: Unexpectedly passed Yield")
 	}
 	testString(t, tr, "<nil>")
-	testLength(t, tr, -1)
+	testCount(t, tr, -1)
 
 	if l := tr.List(); l != nil {
 		t.Error("Bad object test: Unexpectedly passed List")
 	}
 	testString(t, tr, "<nil>")
-	testLength(t, tr, -1)
+	testCount(t, tr, -1)
 
 	if tr.String() != "<nil>" {
 		t.Error("Bad object test: Unexpectedly passed String")
 	}
 	testString(t, tr, "<nil>")
-	testLength(t, tr, -1)
+	testCount(t, tr, -1)
 
-	if tr.Length() != -1 {
-		t.Error("Bad object test: Unexpectedly passed Length")
+	if tr.Count() != -1 {
+		t.Error("Bad object test: Unexpectedly passed Count")
 	}
 	testString(t, tr, "<nil>")
-	testLength(t, tr, -1)
+	testCount(t, tr, -1)
 }
 
 // Begin testing the various methods for Tree.
@@ -105,19 +105,19 @@ func TestAdd(t *testing.T) {
 		t.Error(err)
 	}
 	testString(t, tr, "5")
-	testLength(t, tr, 1)
+	testCount(t, tr, 1)
 
 	if err := tr.Add(10, 10); err != nil {
 		t.Error(err)
 	}
 	testString(t, tr, "5, 10")
-	testLength(t, tr, 2)
+	testCount(t, tr, 2)
 
 	if err := tr.Add(1, 1); err != nil {
 		t.Error(err)
 	}
 	testString(t, tr, "1, 5, 10")
-	testLength(t, tr, 3)
+	testCount(t, tr, 3)
 
 	// Now do a larger test to make sure items are inserted in the correct order.
 	var b strings.Builder
@@ -129,7 +129,7 @@ func TestAdd(t *testing.T) {
 	}
 	s := strings.TrimSuffix(b.String(), ", ")
 	testString(t, tr, s)
-	testLength(t, tr, 100000)
+	testCount(t, tr, 100000)
 }
 
 func TestAddItems(t *testing.T) {
@@ -141,7 +141,7 @@ func TestAddItems(t *testing.T) {
 		t.Error(err)
 	}
 	testString(t, tr, "5")
-	testLength(t, tr, 1)
+	testCount(t, tr, 1)
 
 	item2 := NewItem(10, 10)
 	item3 := NewItem(1, 1)
@@ -149,7 +149,7 @@ func TestAddItems(t *testing.T) {
 		t.Error(err)
 	}
 	testString(t, tr, "1, 5, 10")
-	testLength(t, tr, 3)
+	testCount(t, tr, 3)
 
 	// Now do a larger test to make sure items are inserted in the correct order.
 	var b strings.Builder
@@ -177,7 +177,7 @@ func TestAddItems(t *testing.T) {
 	}
 	s := strings.TrimSuffix(b.String(), ", ")
 	testString(t, tr, s)
-	testLength(t, tr, 10000)
+	testCount(t, tr, 10000)
 }
 
 func TestRemove(t *testing.T) {
@@ -315,11 +315,11 @@ func testString(t *testing.T, tr *Tree, want string) {
 	}
 }
 
-func testLength(t *testing.T, tr *Tree, want int) {
-	length := tr.Length()
-	if length != want {
+func testCount(t *testing.T, tr *Tree, want int) {
+	count := tr.Count()
+	if count != want {
 		t.Error("Want", want, "items")
-		t.Error("Have", length, "items")
+		t.Error("Have", count, "items")
 	}
 }
 

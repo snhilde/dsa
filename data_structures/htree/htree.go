@@ -17,8 +17,8 @@ var (
 
 // Tree is the main type for this package. It holds information about the entire AVL tree.
 type Tree struct {
-	trunk  *tnode
-	length int
+	trunk *tnode
+	count int
 }
 
 // Internal structure of tree nodes
@@ -62,7 +62,7 @@ func (t *Tree) AddItems(items ...*Item) error {
 		if t.trunk == nil {
 			t.trunk = new(tnode)
 			t.trunk.item = item
-			t.length++
+			t.count++
 			continue
 		}
 
@@ -85,7 +85,7 @@ func (t *Tree) AddItems(items ...*Item) error {
 			node.right = new(tnode)
 			node.right.item = item
 		}
-		t.length++
+		t.count++
 
 		// Add the node back to the stack and rebalance the tree (if needed).
 		s.Add(node)
@@ -205,7 +205,7 @@ func (t *Tree) List() []interface{} {
 		return nil
 	}
 
-	list := make([]interface{}, t.Length())
+	list := make([]interface{}, t.Count())
 	i := 0
 
 	// By using values passed in a channel, we can be sure that the internal values are safe and not modifiable.
@@ -222,7 +222,7 @@ func (t *Tree) List() []interface{} {
 func (t *Tree) String() string {
 	if t == nil {
 		return "<nil>"
-	} else if t.Length() == 0 {
+	} else if t.Count() == 0 {
 		return "<empty>"
 	}
 
@@ -237,13 +237,13 @@ func (t *Tree) String() string {
 	return strings.TrimSuffix(s, ", ")
 }
 
-// Length returns the number of items in the tree, or -1 on error.
-func (t *Tree) Length() int {
+// Count returns the number of items in the tree, or -1 on error.
+func (t *Tree) Count() int {
 	if t == nil {
 		return -1
 	}
 
-	return t.length
+	return t.count
 }
 
 // Item is the type for each item in the tree. It holds the value of the item and its index for sorting.
