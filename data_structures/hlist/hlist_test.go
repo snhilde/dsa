@@ -202,6 +202,23 @@ func TestBadArgs(t *testing.T) {
 	}
 	checkString(t, l, "<empty>")
 	checkLength(t, l, 0)
+
+	// Test trying to add list to itself.
+	l.Append(1, 2, 3)
+	checkString(t, l, "1, 2, 3")
+	checkLength(t, l, 3)
+
+	if err := l.Append(4, l, 6); err == nil {
+		t.Error("unexpectedly passed Append() test for adding list to itself")
+	}
+	checkString(t, l, "1, 2, 3")
+	checkLength(t, l, 3)
+
+	if err := l.Insert(2, 4, l, 6); err == nil {
+		t.Error("unexpectedly passed Insert() test for adding list to itself")
+	}
+	checkString(t, l, "1, 2, 3")
+	checkLength(t, l, 3)
 }
 
 func TestNew(t *testing.T) {

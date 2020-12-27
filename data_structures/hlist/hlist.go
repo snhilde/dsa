@@ -59,6 +59,15 @@ func (l *List) Length() int {
 
 // Insert inserts one or more value into the list at the specified index.
 func (l *List) Insert(index int, values ...interface{}) error {
+	// Make sure that none of the items is this list itself.
+	for _, v := range values {
+		if nl, ok := v.(*List); ok {
+			if l.Same(nl) {
+				return fmt.Errorf("can't add list to itself")
+			}
+		}
+	}
+
 	node, err := l.getPrior(index)
 	if err != nil {
 		return err
