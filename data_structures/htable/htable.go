@@ -275,6 +275,19 @@ func (t *Table) Count() int {
 	return r * c
 }
 
+// Same checks whether or not the tables point to the same memory.
+func (t *Table) Same(nt *Table) bool {
+	if t == nil || nt == nil {
+		return false
+	}
+
+	if t == nt {
+		return true
+	}
+
+	return false
+}
+
 // Row returns the index and Row type of the first row that contains the item in the specified column, or -1 and nil if
 // not found or error.
 func (t *Table) Row(col string, item interface{}) (int, *Row) {

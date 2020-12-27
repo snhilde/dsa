@@ -81,6 +81,11 @@ func TestTBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad pointer test for Count()")
 	}
 
+	// Test Same().
+	if ok := tb.Same(nil); ok {
+		t.Error("Unexpectedly passed bad pointer test for Same()")
+	}
+
 	// Test Row().
 	if i, r := tb.Row("a", 5); i != -1 || r != nil {
 		t.Error("Unexpectedly passed bad pointer test for Row()")
@@ -358,6 +363,11 @@ func TestTBadArgs(t *testing.T) {
 	// Test Item() - invalid column header.
 	if v := tb.Item(0, "4"); v != nil {
 		t.Error("Unexpectedly passed invalid column header test for Item()")
+	}
+
+	// Test Same() - nil table.
+	if ok := tb.Same(nil); ok {
+		t.Error("Unexpectedly passed nil table test for Same()")
 	}
 
 	// Test Matches() - negative index.
@@ -1266,6 +1276,46 @@ func TestTCount(t *testing.T) {
 
 	tb.RemoveRow(0)
 	checkTCount(t, tb, 0)
+}
+
+func TestTSame(t *testing.T) {
+	// Test that the same tables are the same.
+	tb, _ := New("1", "2", "3")
+	checkTCount(t, tb, 0)
+
+	tb.Add(1, 2, 3)
+	checkTCount(t, tb, 3)
+
+	tb2 := tb
+	if !tb.Same(tb2) {
+		t.Error("tables should be the same")
+	}
+
+	// Test that identical but not clone tables are not the same.
+	tb, _ = New("1", "2", "3")
+	tb.Add(1, 2, 3)
+	checkTCount(t, tb, 3)
+
+	tb2, _ = New("1", "2", "3")
+	tb2.Add(1, 2, 3)
+	checkTCount(t, tb2, 3)
+
+	if tb.Same(tb2) {
+		t.Error("identical tables are not the same")
+	}
+
+	// Test that non-identical tables are not the same.
+	tb, _ = New("1", "2", "3")
+	tb.Add(1, 2, 3)
+	checkTCount(t, tb, 3)
+
+	tb2, _ = New("a")
+	tb2.Add("line")
+	checkTCount(t, tb2, 1)
+
+	if tb.Same(tb2) {
+		t.Error("non-identical tables are not the same")
+	}
 }
 
 func TestTRowItem(t *testing.T) {
