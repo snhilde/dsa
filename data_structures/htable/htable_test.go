@@ -102,12 +102,12 @@ func TestTBadPtr(t *testing.T) {
 	}
 
 	// Test Item().
-	if v := tb.Item(5, "a"); v != nil {
+	if v := tb.Item("a", 5); v != nil {
 		t.Error("Unexpectedly passed bad pointer test for Item()")
 	}
 
 	// Test Matches().
-	if tb.Matches(0, "a", "item") {
+	if tb.Matches("a", 0, "item") {
 		t.Error("Unexpectedly passed bad pointer test for Matches()")
 	}
 
@@ -356,22 +356,22 @@ func TestTBadArgs(t *testing.T) {
 	}
 
 	// Test Item() - negative index.
-	if v := tb.Item(-1, "1"); v != nil {
+	if v := tb.Item("1", -1); v != nil {
 		t.Error("Unexpectedly passed negative index test for Item()")
 	}
 
 	// Test Item() - out-of-bounds index.
-	if v := tb.Item(100, "1"); v != nil {
+	if v := tb.Item("1", 100); v != nil {
 		t.Error("Unexpectedly passed out-of-bounds index test for Item()")
 	}
 
 	// Test Item() - empty column header.
-	if v := tb.Item(0, ""); v != nil {
+	if v := tb.Item("", 0); v != nil {
 		t.Error("Unexpectedly passed empty column header test for Item()")
 	}
 
 	// Test Item() - invalid column header.
-	if v := tb.Item(0, "4"); v != nil {
+	if v := tb.Item("4", 0); v != nil {
 		t.Error("Unexpectedly passed invalid column header test for Item()")
 	}
 
@@ -381,27 +381,27 @@ func TestTBadArgs(t *testing.T) {
 	}
 
 	// Test Matches() - negative index.
-	if tb.Matches(-1, "1", 1) {
+	if tb.Matches("1", -1, 1) {
 		t.Error("Unexpectedly passed negative index test for Matches()")
 	}
 
 	// Test Matches() - out-of-bounds index.
-	if tb.Matches(100, "1", 1) {
+	if tb.Matches("1", 100, 1) {
 		t.Error("Unexpectedly passed out-of-bounds index test for Matches()")
 	}
 
 	// Test Matches() - empty column header.
-	if tb.Matches(0, "", 1) {
+	if tb.Matches("", 0, 1) {
 		t.Error("Unexpectedly passed empty column header test for Matches()")
 	}
 
 	// Test Matches() - invalid column header.
-	if tb.Matches(0, "4", 4) {
+	if tb.Matches("4", 0, 4) {
 		t.Error("Unexpectedly passed invalid column header test for Matches()")
 	}
 
 	// Test Matches() - missing item.
-	if tb.Matches(0, "1", nil) {
+	if tb.Matches("1", 0, nil) {
 		t.Error("Unexpectedly passed missing item test for Matches()")
 	}
 
@@ -1481,7 +1481,7 @@ func TestTRowItem(t *testing.T) {
 	for row := 0; row < 3; row++ {
 		for i, col := range cols {
 			exp := (row * 3) + i + 1
-			if v := tb.Item(row, col); v != exp {
+			if v := tb.Item(col, row); v != exp {
 				t.Error("Item value incorrect")
 				t.Log("\tExpected:", exp)
 				t.Log("\tReceived:", v)
@@ -1500,7 +1500,7 @@ func TestTRowItem(t *testing.T) {
 		t.Error("Matched incorrect row")
 		t.Log("\tExpected:", 0)
 		t.Log("\tReceived:", i)
-	} else if v := tb.Item(i, "name"); v != "Swari" {
+	} else if v := tb.Item("name", i); v != "Swari" {
 		t.Error("Item value incorrect")
 		t.Log("\tExpected:", "Swari")
 		t.Log("\tReceived:", v)
@@ -1511,7 +1511,7 @@ func TestTRowItem(t *testing.T) {
 		t.Error("Matched incorrect row")
 		t.Log("\tExpected:", 1)
 		t.Log("\tReceived:", i)
-	} else if v := tb.Item(i, "name"); v != "Kathy" {
+	} else if v := tb.Item("name", i); v != "Kathy" {
 		t.Error("Item value incorrect")
 		t.Log("\tExpected:", "Kathy")
 		t.Log("\tReceived:", v)
@@ -1529,7 +1529,7 @@ func TestTRowItem(t *testing.T) {
 		t.Error("Matched incorrect row")
 		t.Log("\tExpected:", 1)
 		t.Log("\tReceived:", i)
-	} else if v := tb.Item(i, "height"); v != nil {
+	} else if v := tb.Item("height", i); v != nil {
 		t.Error("Unexpectedly found item")
 		t.Log("\tExpected: nil")
 		t.Log("\tReceived:", v)
@@ -1549,7 +1549,7 @@ func TestTRowItem(t *testing.T) {
 		t.Log("\tExpected:", 0)
 		t.Log("\tReceived:", i)
 	} else {
-		f := tb.Item(i, "func")
+		f := tb.Item("func", i)
 		if ff, ok := f.(func() string); !ok {
 			t.Error("Returned function is not of type func() string")
 		} else if v := ff(); v != "hello" {
@@ -1565,7 +1565,7 @@ func TestTRowItem(t *testing.T) {
 		t.Log("\tExpected:", 1)
 		t.Log("\tReceived:", i)
 	} else {
-		f := tb.Item(i, "func")
+		f := tb.Item("func", i)
 		if ff, ok := f.(func() string); !ok {
 			t.Error("Returned function is not of type func() string")
 		} else if v := ff(); v != "how are you" {
@@ -1588,7 +1588,7 @@ func TestTMatches(t *testing.T) {
 	for row := 0; row < 3; row++ {
 		for i, col := range cols {
 			v := (row * 3) + i + 1
-			if !tb.Matches(row, col, v) {
+			if !tb.Matches(col, row, v) {
 				t.Error("Did not match")
 			}
 		}
@@ -1601,17 +1601,17 @@ func TestTMatches(t *testing.T) {
 	tb.Add("Joe", false, 189)
 
 	// Make sure Swari is left-handed.
-	if !tb.Matches(0, "left-handed", true) {
+	if !tb.Matches("left-handed", 0, true) {
 		t.Error("Did not match")
 	}
 
 	// Make sure Joe is 189.
-	if !tb.Matches(2, "age", 189) {
+	if !tb.Matches("age", 2, 189) {
 		t.Error("Did not match")
 	}
 
 	// Look for a name that doesn't exist.
-	if tb.Matches(0, "name", "April") {
+	if tb.Matches("name", 0, "April") {
 		t.Error("Unexpectedly matched")
 	}
 }

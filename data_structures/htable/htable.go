@@ -91,7 +91,7 @@ func (t *Table) InsertRow(index int, r *Row) error {
 	return t.rows.Insert(index, r)
 }
 
-// RemoveRow deletes a row from the table.
+// RemoveRow deletes the row at the index from the table.
 func (t *Table) RemoveRow(index int) error {
 	if t == nil {
 		return errBadTable
@@ -170,15 +170,15 @@ func (t *Table) String() string {
 }
 
 // SetItem changes the value of the item at the specified coordinates.
-func (t *Table) SetItem(header string, row int, value interface{}) error {
+func (t *Table) SetItem(header string, index int, value interface{}) error {
 	if t == nil {
 		return errBadTable
-	} else if row < 0 || t.Rows() <= row {
-		return fmt.Errorf("invalid row")
+	} else if index < 0 || t.Rows() <= index {
+		return fmt.Errorf("invalid index")
 	}
 
 	// Grab our row.
-	r := t.rows.Item(row)
+	r := t.rows.Item(index)
 	if r == nil {
 		return fmt.Errorf("missing row")
 	}
@@ -194,10 +194,10 @@ func (t *Table) SetItem(header string, row int, value interface{}) error {
 	nr.SetItem(i, value)
 
 	// Add the row back in to the table, which will also validate the new value.
-	if err := t.RemoveRow(row); err != nil {
+	if err := t.RemoveRow(index); err != nil {
 		return err
 	}
-	if err := t.InsertRow(row, nr); err != nil {
+	if err := t.InsertRow(index, nr); err != nil {
 		return err
 	}
 
@@ -373,8 +373,14 @@ func (t *Table) Row(header string, item interface{}) (int, *Row) {
 }
 
 // Item returns the item at the specified coordinates, or nil if there is no item at the coordinates.
-func (t *Table) Item(index int, col string) interface{} {
+func (t *Table) Item(header string, index int) interface{} {
 	if t == nil {
+		return nil
+	}
+
+	// Figure out the index of the column.
+	i := t.ColumnToIndex(header)
+	if i < 0 {
 		return nil
 	}
 
@@ -383,20 +389,19 @@ func (t *Table) Item(index int, col string) interface{} {
 	if r == nil {
 		return nil
 	}
+	row := r.(*Row)
 
-	// Figure out the index of the column.
-	i := t.ColumnToIndex(col)
-	if i < 0 {
-		return nil
-	}
-
-	return r.(*Row).Item(i)
+	return row.Item(i)
 }
 
 // Matches returns true if the value matches the item at the specified coordinates or false if there is no match.
 // Matching can occur on disabled rows.
-func (t *Table) Matches(index int, col string, value interface{}) bool {
-	item := t.Item(index, col)
+func (t *Table) Matches(header string, index int, value interface{}) bool {
+	item := t.Item(header, index)
+	if item == nil {
+		return false
+	}
+
 	return reflect.DeepEqual(value, item)
 }
 
