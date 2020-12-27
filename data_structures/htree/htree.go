@@ -34,8 +34,8 @@ func New() *Tree {
 	return new(Tree)
 }
 
-// Add inserts a value into the tree at the provided index. If an item already exists at this index, its value will
-// be updated.
+// Add inserts a value into the tree at the provided index. If an item already exists at the index, then it is replaced
+// with the new item.
 func (t *Tree) Add(value interface{}, index int) error {
 	if t == nil {
 		return errBadTree
@@ -45,8 +45,8 @@ func (t *Tree) Add(value interface{}, index int) error {
 	return t.AddItems(item)
 }
 
-// AddItems inserts one or more items into the tree. If there is an index collision, then the item already in the tree
-// will be replaced with the new item.
+// AddItems inserts one or more items into the tree. If an item already exists at a given index, then it is replaced
+// with the new item.
 func (t *Tree) AddItems(items ...*Item) error {
 	if t == nil {
 		return errBadTree
