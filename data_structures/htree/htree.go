@@ -69,7 +69,7 @@ func (t *Tree) AddItems(items ...Item) error {
 		}
 
 		// Find the spot where we need to insert this node.
-		node, s := t.trunk.findNode(item.index)
+		node, stack := t.trunk.findNode(item.index)
 		if node != nil {
 			// We found a matching index. We only need to update the node's value.
 			node.item = item
@@ -77,7 +77,7 @@ func (t *Tree) AddItems(items ...Item) error {
 		}
 
 		// We're at the end. Pop the last branch and add our new item.
-		node = s.Pop().(*tnode)
+		node = stack.Pop().(*tnode)
 		if item.index < node.item.index {
 			// Add a new item on the left side.
 			node.left = new(tnode)
@@ -90,8 +90,8 @@ func (t *Tree) AddItems(items ...Item) error {
 		t.count++
 
 		// Add the node back to the stack and rebalance the tree (if needed).
-		s.Add(node)
-		t.rebalance(s, item.index, true)
+		stack.Add(node)
+		t.rebalance(stack, item.index, true)
 	}
 
 	return nil
@@ -171,17 +171,17 @@ func (t *Tree) Yield(quit <-chan interface{}) <-chan interface{} {
 		defer close(ch)
 
 		node := t.trunk
-		s := hstack.New()
+		stack := hstack.New()
 		for {
 			if node == nil {
 				// We've reached the end of this left branch. Grab the last node.
-				if s.Count() == 0 {
+				if stack.Count() == 0 {
 					// We've traversed all the nodes.
 					break
 				}
 
 				// Send out the value.
-				node = s.Pop().(*tnode)
+				node = stack.Pop().(*tnode)
 				select {
 				case ch <- node.item.value:
 					// Left branch is done. Work down the right branch now.
@@ -192,7 +192,7 @@ func (t *Tree) Yield(quit <-chan interface{}) <-chan interface{} {
 				}
 			} else {
 				// Add the node to the stack and keep going down the left branch.
-				s.Add(node)
+				stack.Add(node)
 				node = node.left
 			}
 		}
@@ -296,7 +296,7 @@ func (i *Item) SetValue(value interface{}) error {
 // findNode will iterate down a tree until it finds a matching index. If no matching index is found, then it will
 // return nil for the node. Additionally, it will build a stack of all the nodes traversed on the way.
 func (n *tnode) findNode(index int) (*tnode, *hstack.Stack) {
-	s := hstack.New()
+	stack := hstack.New()
 
 	node := n
 	for node != nil {
@@ -304,7 +304,7 @@ func (n *tnode) findNode(index int) (*tnode, *hstack.Stack) {
 			break
 		}
 
-		s.Add(node)
+		stack.Add(node)
 		if index < node.item.index {
 			node = node.left
 		} else {
@@ -312,15 +312,15 @@ func (n *tnode) findNode(index int) (*tnode, *hstack.Stack) {
 		}
 	}
 
-	return node, s
+	return node, stack
 }
 
 // rebalance will calculate the balances of the nodes in the path and perform any necessary rotation operations to
 // rebalance the tree.
-func (t *Tree) rebalance(s *hstack.Stack, index int, added bool) {
+func (t *Tree) rebalance(stack *hstack.Stack, index int, added bool) {
 	var node *tnode
-	for s.Count() > 0 {
-		node = s.Pop().(*tnode)
+	for stack.Count() > 0 {
+		node = stack.Pop().(*tnode)
 		if index < node.item.index {
 			if added {
 				node.bal--
@@ -343,11 +343,11 @@ func (t *Tree) rebalance(s *hstack.Stack, index int, added bool) {
 			// we'll need to link it back in after the rotation operation is done.
 			// tree.
 			rotated := rotate(node, index)
-			if s.Count() == 0 {
+			if stack.Count() == 0 {
 				// We're at the top of the tree.
 				t.trunk = rotated
 			} else {
-				node = s.Pop().(*tnode)
+				node = stack.Pop().(*tnode)
 				if index < node.item.index {
 					node.left = rotated
 				} else {
