@@ -269,7 +269,7 @@ func NewItem(value interface{}, index int) Item {
 	return item
 }
 
-// GetValue returns the value of this item, or nil if the item is bad.
+// GetValue returns the value of this item, or nil if the item is invalid.
 func (i *Item) GetValue() interface{} {
 	if i == nil {
 		return nil
@@ -278,7 +278,7 @@ func (i *Item) GetValue() interface{} {
 	return i.value
 }
 
-// GetIndex returns the index of this item, or -1 if the item is bad.
+// GetIndex returns the index of this item, or -1 if the item is invalid.
 func (i *Item) GetIndex() int {
 	if i == nil {
 		return -1
@@ -287,7 +287,7 @@ func (i *Item) GetIndex() int {
 	return i.index
 }
 
-// SetValue changes the value of the item to the provided value.
+// SetValue sets the item's value.
 func (i *Item) SetValue(value interface{}) error {
 	if i == nil {
 		return errBadItem
@@ -298,8 +298,19 @@ func (i *Item) SetValue(value interface{}) error {
 	return nil
 }
 
-// findNode will iterate down a tree until it finds a matching index. If no matching index is found, then it will
-// return nil for the node. Additionally, it will build a stack of all the nodes traversed on the way.
+// SetIndex sets the item's index.
+func (i *Item) SetIndex(index int) error {
+	if i == nil {
+		return errBadItem
+	}
+
+	i.index = index
+
+	return nil
+}
+
+// findNode will iterate down a tree until it finds a matching index. If no matching index is found, then this returns
+// nil for the node. Additionally, it builds a stack of all the nodes traversed along the way.
 func (n *tnode) findNode(index int) (*tnode, *hstack.Stack) {
 	stack := hstack.New()
 
@@ -320,7 +331,7 @@ func (n *tnode) findNode(index int) (*tnode, *hstack.Stack) {
 	return node, stack
 }
 
-// rebalance will calculate the balances of the nodes in the path and perform any necessary rotation operations to
+// rebalance calculates the balances of the nodes in the path and performs any necessary rotation operations to
 // rebalance the tree.
 func (t *Tree) rebalance(stack *hstack.Stack, index int, added bool) {
 	var node *tnode
@@ -365,7 +376,7 @@ func (t *Tree) rebalance(stack *hstack.Stack, index int, added bool) {
 	}
 }
 
-// rotate will perform the necessary rotations to rebalance the tree from this node down.
+// rotate performs the necessary rotations to rebalance the tree from this node down.
 func rotate(top *tnode, index int) *tnode {
 	// When rebalancing, we only really care about two nodes: the node that first had the -2 or 2 imbalance and the node
 	// directly below it on the insertion side. We'll call these the top node and bottom node. The top node was sent as
