@@ -2,15 +2,16 @@
 package hconvert
 
 import (
-	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"math/big"
 )
 
 var (
-	ErrBadConverter = errors.New("Bad Converter")
-	ErrNoCharSet = errors.New("No character set provided")
+	ErrBadConverter = fmt.Errorf("bad Converter")
+	ErrNoCharSet = fmt.Errorf("no character set provided")
+	ErrBadCharSet = fmt.Errorf("character set mismatch")
 )
 
 // Converter holds information about the conversion process, including the specified character sets.
@@ -46,7 +47,7 @@ func (c *Converter) DecodeFrom(r io.Reader) error {
 		return err
 	}
 
-	binary, err := c.Decode(encoded)
+	binary, err := c.Decode(string(encoded))
 	if err != nil {
 		return err
 	}
@@ -71,7 +72,7 @@ func (c *Converter) EncodeTo(w io.Writer) error {
 		return err
 	}
 
-	if n, err := w.Write(encoded); err != nil {
+	if n, err := w.Write([]byte(encoded)); err != nil {
 		return err
 	} else if n != len(encoded) {
 		return io.ErrShortWrite

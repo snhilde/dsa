@@ -1,7 +1,7 @@
 package hconvert
 
 import (
-	"errors"
+	"fmt"
 )
 
 const (
@@ -21,9 +21,9 @@ type CharSet struct {
 func NewCharSet(set []rune) (CharSet, error) {
 	length := len(set)
 	if length == 0 {
-		return CharSet{}, errors.New("Missing character set")
+		return CharSet{}, fmt.Errorf("missing character set")
 	} else if length > maxChars {
-		return CharSet{}, errors.New("Maximum of 256 characters allowed")
+		return CharSet{}, fmt.Errorf("maximum of 256 characters allowed")
 	}
 
 	charSet := make([]rune, length)
