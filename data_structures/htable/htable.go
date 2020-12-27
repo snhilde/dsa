@@ -193,7 +193,7 @@ func (t *Table) SetItem(row int, col string, value interface{}) error {
 	}
 
 	// Grab our row.
-	r := t.rows.Value(row)
+	r := t.rows.Item(row)
 	if r == nil {
 		return fmt.Errorf("missing row")
 	}
@@ -349,7 +349,7 @@ func (t *Table) Item(row int, col string) interface{} {
 	}
 
 	// Grab our row.
-	r := t.rows.Value(row)
+	r := t.rows.Item(row)
 	if r == nil {
 		return nil
 	}
@@ -376,7 +376,7 @@ func (t *Table) Toggle(row int, enabled bool) error {
 		return errBadTable
 	}
 
-	tmp := t.rows.Value(row)
+	tmp := t.rows.Item(row)
 	if tmp == nil {
 		return fmt.Errorf("invalid index")
 	}
