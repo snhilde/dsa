@@ -143,6 +143,10 @@ func (t *Table) String() string {
 
 	var b strings.Builder
 	rowChan := t.rows.Yield(nil)
+	if rowChan == nil {
+		return "<empty>"
+	}
+
 	for r := range rowChan {
 		row := r.(*Row)
 		if row.enabled {
@@ -231,7 +235,7 @@ func (t *Table) Headers() []string {
 	return headers
 }
 
-// Rows returns the number of rows in the table, or -1 on error. This will include all rows, regardless of enabled status.
+// Rows returns the number of rows in the table, or -1 on error. This includes all rows, regardless of enabled status.
 func (t *Table) Rows() int {
 	if t == nil {
 		return -1
@@ -298,8 +302,12 @@ func (t *Table) Row(col string, item interface{}) (int, *Row) {
 	// Get our iterator to go through the rows.
 	i := 0
 	quit := make(chan interface{})
-	rows := t.rows.Yield(quit)
-	for v := range rows {
+	rowChan := t.rows.Yield(quit)
+	if rowChan == nil {
+		return -1, nil
+	}
+
+	for v := range rowChan {
 		row := v.(*Row)
 		if row.enabled {
 			if reflect.DeepEqual(item, row.items[c]) {
@@ -373,8 +381,12 @@ func (t *Table) WriteCSV() string {
 	}
 
 	var b strings.Builder
-	rows := t.rows.YieldAll()
-	for r := range rows {
+	rowChan := t.rows.YieldAll()
+	if rowChan == nil {
+		return ""
+	}
+
+	for r := range rowChan {
 		row := r.(*Row)
 		if row.enabled {
 			items := make([]string, len(row.items))
