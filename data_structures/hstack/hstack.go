@@ -42,8 +42,8 @@ func (s *Stack) Add(items ...interface{}) error {
 
 	// Reverse the items so they are added in the correct order.
 	length := len(items)
-	for i := 0; i < length / 2; i++ {
-		items[i], items[length - 1 - i] = items[length - 1 - i], items[i]
+	for i := 0; i < length/2; i++ {
+		items[i], items[length-1-i] = items[length-1-i], items[i]
 	}
 
 	return s.list.Insert(0, items...)
