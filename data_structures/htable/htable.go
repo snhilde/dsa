@@ -56,29 +56,17 @@ func New(headers ...string) (*Table, error) {
 // Add creates a new row with the items and adds it to the end of the table.
 func (t *Table) Add(items ...interface{}) error {
 	// Build the row.
-	r := NewRow(items...)
+	row := NewRow(items...)
 
-	// Validate that the overall length and the types of all the items are correct.
-	if err := t.validateRow(r); err != nil {
-		return err
-	}
-
-	// Add the row to the table.
-	return t.rows.Append(r)
+	return t.AddRow(row)
 }
 
 // Insert creates a new row with the items and inserts it into the table at the specified index.
 func (t *Table) Insert(index int, items ...interface{}) error {
 	// Build the row.
-	r := NewRow(items...)
+	row := NewRow(items...)
 
-	// Validate that the overall length and the types of all the items are correct.
-	if err := t.validateRow(r); err != nil {
-		return err
-	}
-
-	// Add the row to the table.
-	return t.rows.Insert(index, r)
+	return t.InsertRow(index, row)
 }
 
 // AddRow adds the row to the end of the table.
@@ -129,14 +117,14 @@ func (t *Table) Clear() error {
 	return t.rows.Clear()
 }
 
-// ColumnToIndex translates the column's string name to its index in the table. This will return -1 on error.
-func (t *Table) ColumnToIndex(col string) int {
+// ColumnToIndex returns the index of the column by header, or -1 if not found.
+func (t *Table) ColumnToIndex(header string) int {
 	if t == nil {
 		return -1
 	}
 
-	for i, header := range t.headers {
-		if col == header {
+	for i, h := range t.headers {
+		if header == h {
 			return i
 		}
 	}
@@ -154,8 +142,8 @@ func (t *Table) String() string {
 	}
 
 	var b strings.Builder
-	rows := t.rows.YieldAll()
-	for r := range rows {
+	rowChan := t.rows.Yield(nil)
+	for r := range rowChan {
 		row := r.(*Row)
 		if row.enabled {
 			var tmp strings.Builder
@@ -178,15 +166,15 @@ func (t *Table) String() string {
 }
 
 // SetItem changes the value of the item at the specified coordinates.
-func (t *Table) SetItem(row int, col string, value interface{}) error {
+func (t *Table) SetItem(index int, col string, value interface{}) error {
 	if t == nil {
 		return errBadTable
-	} else if row < 0 || t.Rows() <= row {
-		return fmt.Errorf("invalid row")
+	} else if index < 0 || t.Rows() <= index {
+		return fmt.Errorf("invalid index")
 	}
 
 	// Grab our row.
-	r := t.rows.Item(row)
+	r := t.rows.Item(index)
 	if r == nil {
 		return fmt.Errorf("missing row")
 	}
@@ -202,10 +190,10 @@ func (t *Table) SetItem(row int, col string, value interface{}) error {
 	nr.SetItem(i, value)
 
 	// Add the row back in to the table, which will also validate the new value.
-	if err := t.RemoveRow(row); err != nil {
+	if err := t.RemoveRow(index); err != nil {
 		return err
 	}
-	if err := t.InsertRow(row, nr); err != nil {
+	if err := t.InsertRow(index, nr); err != nil {
 		return err
 	}
 
@@ -336,13 +324,13 @@ func (t *Table) Row(col string, item interface{}) (int, *Row) {
 }
 
 // Item returns the item at the specified coordinates, or nil if there is no item at the coordinates.
-func (t *Table) Item(row int, col string) interface{} {
+func (t *Table) Item(index int, col string) interface{} {
 	if t == nil {
 		return nil
 	}
 
 	// Grab our row.
-	r := t.rows.Item(row)
+	r := t.rows.Item(index)
 	if r == nil {
 		return nil
 	}
@@ -358,24 +346,24 @@ func (t *Table) Item(row int, col string) interface{} {
 
 // Matches returns true if the value matches the item at the specified coordinates or false if there is no match.
 // Matching can occur on disabled rows.
-func (t *Table) Matches(row int, col string, value interface{}) bool {
-	item := t.Item(row, col)
+func (t *Table) Matches(index int, col string, value interface{}) bool {
+	item := t.Item(index, col)
 	return reflect.DeepEqual(value, item)
 }
 
 // Toggle sets the row at the specified index to either be checked or skipped during table lookups (like Row and Count).
-func (t *Table) Toggle(row int, enabled bool) error {
+func (t *Table) Toggle(index int, enabled bool) error {
 	if t == nil {
 		return errBadTable
 	}
 
-	tmp := t.rows.Item(row)
-	if tmp == nil {
+	r := t.rows.Item(index)
+	if r == nil {
 		return fmt.Errorf("invalid index")
 	}
 
-	r := tmp.(*Row)
-	r.enabled = enabled
+	row := r.(*Row)
+	row.enabled = enabled
 
 	return nil
 }
@@ -406,7 +394,7 @@ func (t *Table) WriteCSV() string {
 
 // Row holds all the data for each row in the table.
 type Row struct {
-	items   []interface{} // Column values
+	items   []interface{}
 	enabled bool
 }
 
@@ -446,11 +434,11 @@ func (r *Row) String() string {
 	return strings.Join([]string{"{", s, "}"}, "")
 }
 
-// SetItem changes the value of the item in the specified column.
+// SetItem changes the value of the item in the specified column index.
 func (r *Row) SetItem(index int, value interface{}) error {
 	if r == nil {
 		return errBadRow
-	} else if index < 0 || r.Count() <= index {
+	} else if index < 0 || index >= r.Count() {
 		return fmt.Errorf("invalid column")
 	}
 
@@ -468,7 +456,7 @@ func (r *Row) Count() int {
 	return len(r.items)
 }
 
-// Item returns the row's value at the specified index, or nil if not found or error.
+// Item returns the item's value at the specified index in this row, or nil if not found or error.
 func (r *Row) Item(index int) interface{} {
 	if r == nil {
 		return nil
@@ -488,19 +476,6 @@ func (r *Row) Matches(index int, value interface{}) bool {
 	return reflect.DeepEqual(value, item)
 }
 
-func (t *Table) validateItems(items []interface{}) error {
-	// Make sure that none of the items is this table itself.
-	for _, item := range items {
-		if nt, ok := item.(*Table); ok {
-			if t.Same(nt) {
-				return fmt.Errorf("can't add table to itself")
-			}
-		}
-	}
-
-	return nil
-}
-
 func (t *Table) validateRow(r *Row) error {
 	if t == nil {
 		return errBadTable
@@ -509,12 +484,15 @@ func (t *Table) validateRow(r *Row) error {
 	}
 
 	// Validate the items.
-	if err := t.validateItems(r.items); err != nil {
-		return err
-	}
-
-	// Validate the types.
 	for i, item := range r.items {
+		// Make sure that none of the items is this table itself.
+		if nt, ok := item.(*Table); ok {
+			if t.Same(nt) {
+				return fmt.Errorf("can't add table to itself")
+			}
+		}
+
+		// Validate the types.
 		typeof := reflect.TypeOf(item)
 		if t.Rows() == 0 {
 			// This is the first row being added to the table. It will set the type of each column in the table.
