@@ -54,13 +54,8 @@ func New(headers ...string) (*Table, error) {
 
 // Add creates a new row with the items and adds it to the end of the table.
 func (t *Table) Add(items ...interface{}) error {
-	// Make sure that none of the items is this table itself.
-	for _, v := range items {
-		if nt, ok := v.(*Table); ok {
-			if t.Same(nt) {
-				return fmt.Errorf("can't add table to itself")
-			}
-		}
+	if err := t.validateItems(items); err != nil {
+		return err
 	}
 
 	// Build the row.
@@ -77,13 +72,8 @@ func (t *Table) Add(items ...interface{}) error {
 
 // Insert creates a new row with the items and inserts it into the table at the specified index.
 func (t *Table) Insert(index int, items ...interface{}) error {
-	// Make sure that none of the items is this table itself.
-	for _, v := range items {
-		if nt, ok := v.(*Table); ok {
-			if t.Same(nt) {
-				return fmt.Errorf("can't add table to itself")
-			}
-		}
+	if err := t.validateItems(items); err != nil {
+		return err
 	}
 
 	// Build the row.
@@ -503,6 +493,19 @@ func (r *Row) Item(index int) interface{} {
 func (r *Row) Matches(index int, v interface{}) bool {
 	item := r.Item(index)
 	return reflect.DeepEqual(v, item)
+}
+
+func (t *Table) validateItems(items []interface{}) error {
+	// Make sure that none of the items is this table itself.
+	for _, v := range items {
+		if nt, ok := v.(*Table); ok {
+			if t.Same(nt) {
+				return fmt.Errorf("can't add table to itself")
+			}
+		}
+	}
+
+	return nil
 }
 
 func (t *Table) validateRow(r *Row) error {
