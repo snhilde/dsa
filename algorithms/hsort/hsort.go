@@ -2,7 +2,6 @@
 package hsort
 
 import (
-	"errors"
 	"reflect"
 	"fmt"
 	"math"
@@ -12,7 +11,7 @@ import (
 
 
 var (
-	invalidLen = errors.New("Invalid list size")
+	invalidLen = fmt.Errorf("invalid list size")
 )
 
 
@@ -667,7 +666,7 @@ func initSort(list interface{}) (length int, at func(int) reflect.Value, greater
 	// Pull out the underlying Value, and make sure it's a slice.
 	v := reflect.ValueOf(list)
 	if v.Kind() != reflect.Slice {
-		err = errors.New("List must be slice")
+		err = fmt.Errorf("list must be slice")
 		return
 	}
 
@@ -722,7 +721,7 @@ func initSort(list interface{}) (length int, at func(int) reflect.Value, greater
 			return false
 		}
 	default:
-		err = errors.New(fmt.Sprintf("Invalid underlying type (%s)", v))
+		err = fmt.Errorf(fmt.Sprintf("invalid underlying type (%s)", v))
 		return
 	}
 
