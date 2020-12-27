@@ -45,7 +45,7 @@ func TestBad(t *testing.T) {
 		t.Error("Bad object test: Unexpectedly passed Value")
 	}
 
-	if item := tr.Item(5); item != nil {
+	if item := tr.Item(5); item != (Item{}) {
 		t.Error("Bad object test: Unexpectedly passed Item")
 	}
 
@@ -129,7 +129,7 @@ func TestAddItems(t *testing.T) {
 	var b strings.Builder
 	tr = New()
 	nums := make([]int, 10000)
-	items := make([]*Item, 10000)
+	items := make([]Item, 10000)
 	r := newRand()
 
 	// Build all the items.
@@ -214,13 +214,13 @@ func TestItem(t *testing.T) {
 	}
 
 	// Test that some other values are not present.
-	if item := tr.Item(2); item != nil {
+	if item := tr.Item(2); item != (Item{}) {
 		t.Error("Expected nothing, Received", item.GetValue())
 	}
-	if item := tr.Item(20); item != nil {
+	if item := tr.Item(20); item != (Item{}) {
 		t.Error("Expected nothing, Received", item.GetValue())
 	}
-	if item := tr.Item(100); item != nil {
+	if item := tr.Item(100); item != (Item{}) {
 		t.Error("Expected nothing, Received", item.GetValue())
 	}
 

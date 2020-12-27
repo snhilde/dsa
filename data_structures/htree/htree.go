@@ -23,7 +23,7 @@ type Tree struct {
 
 // Internal structure of tree nodes
 type tnode struct {
-	item  *Item
+	item  Item
 	bal   int    // Balance of node: -1 if left branch is longer, 0 if both branches are even, or 1 if right side is longer
 	left  *tnode // Left branch
 	right *tnode // Right branch
@@ -48,14 +48,14 @@ func (t *Tree) Add(value interface{}, index int) error {
 
 // AddItems inserts one or more items into the tree. If an item already exists at a given index, then it is replaced
 // with the new item.
-func (t *Tree) AddItems(items ...*Item) error {
+func (t *Tree) AddItems(items ...Item) error {
 	if t == nil {
 		return errBadTree
 	}
 
 	for _, item := range items {
 		// Make sure we have a valid item.
-		if item == nil {
+		if item == (Item{}) {
 			return errBadItem
 		}
 
@@ -121,16 +121,16 @@ func (t *Tree) Value(index int) interface{} {
 	return node.item.value
 }
 
-// Item provides a reference to the item at the index, or nil if no item exists at that index. The item reference can be
-// used to set/get the value within the tree using Item's SetValue and GetValue methods.
-func (t *Tree) Item(index int) *Item {
+// Item returns the item at the index, or nothing if no item exists at that index. The item can be used to set/get the
+// value within the tree using Item's SetValue and GetValue methods.
+func (t *Tree) Item(index int) Item {
 	if t == nil {
-		return nil
+		return Item{}
 	}
 
 	node, _ := t.trunk.findNode(index)
 	if node == nil {
-		return nil
+		return Item{}
 	}
 
 	return node.item
@@ -254,13 +254,13 @@ type Item struct {
 }
 
 // NewItem creates a new item with the provided value and index.
-func NewItem(value interface{}, index int) *Item {
+func NewItem(value interface{}, index int) Item {
 	item := new(Item)
 
 	item.value = value
 	item.index = index
 
-	return item
+	return *item
 }
 
 // GetValue returns the value of this item, or nil if the item is bad.
