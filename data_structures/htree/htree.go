@@ -30,8 +30,9 @@ type tnode struct {
 }
 
 // New creates a new binary tree.
-func New() *Tree {
-	return new(Tree)
+func New() Tree {
+	t := new(Tree)
+	return *t
 }
 
 // Add inserts a value into the tree at the provided index. If an item already exists at the index, then it is replaced

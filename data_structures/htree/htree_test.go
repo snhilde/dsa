@@ -14,9 +14,6 @@ import (
 // Test creating a new tree object.
 func TestNew(t *testing.T) {
 	tr := New()
-	if tr == nil {
-		t.Error("Failed to create tree")
-	}
 
 	if tr.trunk != nil {
 		t.Error("Trunk node is not nil")
@@ -31,69 +28,46 @@ func TestNew(t *testing.T) {
 func TestBad(t *testing.T) {
 	var tr *Tree
 
-	testString(t, tr, "<nil>")
-	testCount(t, tr, -1)
-
 	if err := tr.Add(5, 5); err == nil {
 		t.Error("Bad object test: Unexpectedly passed Add")
 	}
-	testString(t, tr, "<nil>")
-	testCount(t, tr, -1)
 
 	item := NewItem(5, 5)
 	if err := tr.AddItems(item); err == nil {
 		t.Error("Bad object test: Unexpectedly passed AddItems")
 	}
-	testString(t, tr, "<nil>")
-	testCount(t, tr, -1)
 
 	if err := tr.Remove(5); err == nil {
 		t.Error("Bad object test: Unexpectedly passed Remove")
 	}
-	testString(t, tr, "<nil>")
-	testCount(t, tr, -1)
 
 	if v := tr.Value(5); v != nil {
 		t.Error("Bad object test: Unexpectedly passed Value")
 	}
-	testString(t, tr, "<nil>")
-	testCount(t, tr, -1)
 
 	if item := tr.Item(5); item != nil {
 		t.Error("Bad object test: Unexpectedly passed Item")
 	}
-	testString(t, tr, "<nil>")
-	testCount(t, tr, -1)
 
 	if ok := tr.Match(5); ok {
 		t.Error("Bad object test: Unexpectedly passed Match")
 	}
-	testString(t, tr, "<nil>")
-	testCount(t, tr, -1)
 
 	if ch := tr.Yield(nil); ch != nil {
 		t.Error("Bad object test: Unexpectedly passed Yield")
 	}
-	testString(t, tr, "<nil>")
-	testCount(t, tr, -1)
 
 	if l := tr.List(); l != nil {
 		t.Error("Bad object test: Unexpectedly passed List")
 	}
-	testString(t, tr, "<nil>")
-	testCount(t, tr, -1)
 
 	if tr.String() != "<nil>" {
 		t.Error("Bad object test: Unexpectedly passed String")
 	}
-	testString(t, tr, "<nil>")
-	testCount(t, tr, -1)
 
 	if tr.Count() != -1 {
 		t.Error("Bad object test: Unexpectedly passed Count")
 	}
-	testString(t, tr, "<nil>")
-	testCount(t, tr, -1)
 }
 
 // Begin testing the various methods for Tree.
@@ -307,7 +281,7 @@ func Benchmark1000000(b *testing.B) {
 
 // --- HELPER FUNCTIONS ---
 
-func testString(t *testing.T, tr *Tree, want string) {
+func testString(t *testing.T, tr Tree, want string) {
 	s := tr.String()
 	if s != want {
 		t.Error("Expected:", want)
@@ -315,7 +289,7 @@ func testString(t *testing.T, tr *Tree, want string) {
 	}
 }
 
-func testCount(t *testing.T, tr *Tree, want int) {
+func testCount(t *testing.T, tr Tree, want int) {
 	count := tr.Count()
 	if count != want {
 		t.Error("Want", want, "items")
@@ -333,7 +307,7 @@ func newRand() *rand.Rand {
 
 // buildTree creates a new tree and populates it with count items, either randomly or by iterating from low to high. It
 // returns the new tree as well as the indexes of all the items.
-func buildTree(count int, random bool) (*Tree, []int) {
+func buildTree(count int, random bool) (Tree, []int) {
 	tr := New()
 	indexes := make([]int, count)
 
