@@ -77,6 +77,15 @@ func (t *Table) Add(items ...interface{}) error {
 
 // Insert creates a new row with the items and inserts it into the table at the specified index.
 func (t *Table) Insert(index int, items ...interface{}) error {
+	// Make sure that none of the items is this table itself.
+	for _, v := range items {
+		if nt, ok := v.(*Table); ok {
+			if t.Same(nt) {
+				return fmt.Errorf("can't add table to itself")
+			}
+		}
+	}
+
 	// Build the row.
 	r := NewRow(items...)
 
