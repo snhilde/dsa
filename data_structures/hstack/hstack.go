@@ -23,15 +23,16 @@ func New() *Stack {
 	return s
 }
 
-// Add adds one or more new items to the top of the stack. If there is more than one item, the first item will be at the
-// top.
-func (s *Stack) Add(values ...interface{}) error {
+// Add adds one or more new items to the top of the stack. Items are pushed in order, so the first argument is pushed
+// first, and the second, second, and so on. This means that the last argument to Add will be the first item returned
+// wtih Pop.
+func (s *Stack) Add(items ...interface{}) error {
 	if s == nil {
 		return errBadStack
 	}
 
 	// To prevent infinite recursion, make sure that none of the items is this stack itself.
-	for _, v := range values {
+	for _, v := range items {
 		if t, ok := v.(*Stack); ok {
 			if s.Same(t) {
 				return fmt.Errorf("can't add stack to itself")
@@ -39,7 +40,13 @@ func (s *Stack) Add(values ...interface{}) error {
 		}
 	}
 
-	return s.list.Insert(0, values...)
+	// Reverse the items so they are added in the correct order.
+	length := len(items)
+	for i := 0; i < length / 2; i++ {
+		items[i], items[length - 1 - i] = items[length - 1 - i], items[i]
+	}
+
+	return s.list.Insert(0, items...)
 }
 
 // Pop removes the top item from the stack and returns its value.
@@ -126,7 +133,8 @@ func (s *Stack) Same(ns *Stack) bool {
 	return s.list.Same(ns.list)
 }
 
-// String displays the stack's contents, from the top to the bottom.
+// String displays the stack's contents, from the top to the bottom, with the top item being at the beginning of the
+// string and the bottom item at the end.
 func (s *Stack) String() string {
 	if s == nil {
 		return "<nil>"

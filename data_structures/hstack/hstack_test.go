@@ -94,21 +94,21 @@ func TestAdd(t *testing.T) {
 	if err := s.Add("a", "b", 3); err != nil {
 		t.Error(err)
 	}
-	checkString(t, s, "a, b, 3, 3.1415, kangaroo, 5")
+	checkString(t, s, "3, b, a, 3.1415, kangaroo, 5")
 	checkCount(t, s, 6)
 
 	// Test adding a slice.
 	if err := s.Add([]int{1, 2, 3}); err != nil {
 		t.Error(err)
 	}
-	checkString(t, s, "[1 2 3], a, b, 3, 3.1415, kangaroo, 5")
+	checkString(t, s, "[1 2 3], 3, b, a, 3.1415, kangaroo, 5")
 	checkCount(t, s, 7)
 
 	// Testing adding an empty stack.
 	if err := s.Add(New()); err != nil {
 		t.Error(err)
 	}
-	checkString(t, s, "<empty>, [1 2 3], a, b, 3, 3.1415, kangaroo, 5")
+	checkString(t, s, "<empty>, [1 2 3], 3, b, a, 3.1415, kangaroo, 5")
 	checkCount(t, s, 8)
 
 	// Test adding a non-empty stack.
@@ -117,14 +117,14 @@ func TestAdd(t *testing.T) {
 	if err := s.Add(a); err != nil {
 		t.Error(err)
 	}
-	checkString(t, s, "orange, apple, banana, <empty>, [1 2 3], a, b, 3, 3.1415, kangaroo, 5")
+	checkString(t, s, "orange, apple, banana, <empty>, [1 2 3], 3, b, a, 3.1415, kangaroo, 5")
 	checkCount(t, s, 9)
 
 	// Test adding stack to itself. This should fail.
 	if err := s.Add(s); err == nil {
 		t.Error("should not be able to add a stack to itself")
 	}
-	checkString(t, s, "orange, apple, banana, <empty>, [1 2 3], a, b, 3, 3.1415, kangaroo, 5")
+	checkString(t, s, "orange, apple, banana, <empty>, [1 2 3], 3, b, a, 3.1415, kangaroo, 5")
 	checkCount(t, s, 9)
 }
 
@@ -198,6 +198,9 @@ func TestPop(t *testing.T) {
 	// Test popping a stack.
 	a := New()
 	a.Add("orange, apple, banana")
+	checkString(t, a, "orange, apple, banana")
+	checkCount(t, a, 1)
+
 	s.Add(a)
 	checkString(t, s, "orange, apple, banana")
 	checkCount(t, s, 1)
@@ -226,16 +229,16 @@ func TestCopy(t *testing.T) {
 
 	// Copy a non-empty stack.
 	s.Add("sizzle", 1e5, 3.1415, 15)
-	checkString(t, s, "sizzle, 100000, 3.1415, 15")
+	checkString(t, s, "15, 3.1415, 100000, sizzle")
 	checkCount(t, s, 4)
 
 	ns, err = s.Copy()
 	if err != nil {
 		t.Error(err)
 	}
-	checkString(t, s, "sizzle, 100000, 3.1415, 15")
+	checkString(t, s, "15, 3.1415, 100000, sizzle")
 	checkCount(t, s, 4)
-	checkString(t, ns, "sizzle, 100000, 3.1415, 15")
+	checkString(t, ns, "15, 3.1415, 100000, sizzle")
 	checkCount(t, ns, 4)
 
 }
@@ -300,7 +303,7 @@ func TestClear(t *testing.T) {
 
 	// Add some items first.
 	s.Add("kangaroo", 5, 3.1415)
-	checkString(t, s, "kangaroo, 5, 3.1415")
+	checkString(t, s, "3.1415, 5, kangaroo")
 	checkCount(t, s, 3)
 
 	// Test out clearing the stack.
@@ -323,14 +326,14 @@ func TestSame(t *testing.T) {
 
 	// Add some items first.
 	s.Add("kangaroo", 5, 3.1415)
-	checkString(t, s, "kangaroo, 5, 3.1415")
+	checkString(t, s, "3.1415, 5, kangaroo")
 	checkCount(t, s, 3)
 
 	// Test out with the same stack.
 	ns := s
-	checkString(t, s, "kangaroo, 5, 3.1415")
+	checkString(t, s, "3.1415, 5, kangaroo")
 	checkCount(t, s, 3)
-	checkString(t, ns, "kangaroo, 5, 3.1415")
+	checkString(t, ns, "3.1415, 5, kangaroo")
 	checkCount(t, ns, 3)
 	if ok := s.Same(ns); !ok {
 		t.Error("identical stacks should pass Same")
@@ -339,9 +342,9 @@ func TestSame(t *testing.T) {
 	// Test out with two different stacks that have the same contents.
 	ns = New()
 	ns.Add("kangaroo", 5, 3.1415)
-	checkString(t, s, "kangaroo, 5, 3.1415")
+	checkString(t, s, "3.1415, 5, kangaroo")
 	checkCount(t, s, 3)
-	checkString(t, ns, "kangaroo, 5, 3.1415")
+	checkString(t, ns, "3.1415, 5, kangaroo")
 	checkCount(t, ns, 3)
 	if ok := s.Same(ns); ok {
 		t.Error("similar stacks should not pass Same")
@@ -350,9 +353,9 @@ func TestSame(t *testing.T) {
 	// Test out with two different stacks with different contents.
 	ns = New()
 	ns.Add(struct{}{}, 10, rune('b'))
-	checkString(t, s, "kangaroo, 5, 3.1415")
+	checkString(t, s, "3.1415, 5, kangaroo")
 	checkCount(t, s, 3)
-	checkString(t, ns, "{}, 10, 98")
+	checkString(t, ns, "98, 10, {}")
 	checkCount(t, ns, 3)
 	if ok := s.Same(ns); ok {
 		t.Error("different stacks should not pass Same")
