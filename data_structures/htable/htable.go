@@ -32,20 +32,21 @@ func New(headers ...string) (*Table, error) {
 
 	// Validate the column headers.
 	headerMap := make(map[string]int)
-	for i, v := range headers {
+	for i, header := range headers {
 		// Make sure every column has a header.
-		if v == "" {
+		if header == "" {
 			return nil, fmt.Errorf("column %v has an empty header", i)
 		}
 		// Make sure none of the columns match each other.
-		if c, found := headerMap[v]; found {
+		if c, found := headerMap[header]; found {
 			return nil, fmt.Errorf("columns %v and %v have the same header", c, i)
 		}
-		headerMap[v] = i
+		headerMap[header] = i
 	}
 
 	t := new(Table)
-	t.headers = headers
+	t.headers = make([]string, len(headers))
+	copy(t.headers, headers)
 	t.types = make([]reflect.Type, len(headers))
 	t.rows = hlist.New()
 
@@ -54,10 +55,6 @@ func New(headers ...string) (*Table, error) {
 
 // Add creates a new row with the items and adds it to the end of the table.
 func (t *Table) Add(items ...interface{}) error {
-	if err := t.validateItems(items); err != nil {
-		return err
-	}
-
 	// Build the row.
 	r := NewRow(items...)
 
@@ -72,10 +69,6 @@ func (t *Table) Add(items ...interface{}) error {
 
 // Insert creates a new row with the items and inserts it into the table at the specified index.
 func (t *Table) Insert(index int, items ...interface{}) error {
-	if err := t.validateItems(items); err != nil {
-		return err
-	}
-
 	// Build the row.
 	r := NewRow(items...)
 
@@ -116,8 +109,8 @@ func (t *Table) RemoveRow(index int) error {
 		return errBadTable
 	}
 
-	v := t.rows.Remove(index)
-	if v == nil {
+	row := t.rows.Remove(index)
+	if row == nil {
 		// hlist.Remove will return the value at the index. Because our rows can never be nil, if we receive a nil
 		// value, then it means an error occurred.
 		return fmt.Errorf("failed to remove row %v", index)
@@ -142,8 +135,8 @@ func (t *Table) ColumnToIndex(col string) int {
 		return -1
 	}
 
-	for i, v := range t.headers {
-		if col == v {
+	for i, header := range t.headers {
+		if col == header {
 			return i
 		}
 	}
@@ -166,8 +159,8 @@ func (t *Table) String() string {
 		row := r.(*Row)
 		if row.enabled {
 			var tmp strings.Builder
-			for i, v := range row.v {
-				tmp.WriteString(fmt.Sprintf("%v: %v, ", t.headers[i], v))
+			for i, item := range row.items {
+				tmp.WriteString(fmt.Sprintf("%v: %v, ", t.headers[i], item))
 			}
 			s := tmp.String()
 			s = strings.TrimSuffix(s, ", ")
@@ -229,8 +222,8 @@ func (t *Table) SetHeader(col string, name string) error {
 		return fmt.Errorf("missing name")
 	}
 
-	for i, v := range t.headers {
-		if col == v {
+	for i, header := range t.headers {
+		if col == header {
 			t.headers[i] = name
 			return nil
 		}
@@ -304,8 +297,8 @@ func (t *Table) Row(col string, item interface{}) (int, *Row) {
 
 	// Find out which column we need to match on.
 	c := -1
-	for i, v := range t.headers {
-		if col == v {
+	for i, header := range t.headers {
+		if col == header {
 			c = i
 			break
 		}
@@ -323,7 +316,7 @@ func (t *Table) Row(col string, item interface{}) (int, *Row) {
 	for v := range rows {
 		row := v.(*Row)
 		if row.enabled {
-			if reflect.DeepEqual(item, row.v[c]) {
+			if reflect.DeepEqual(item, row.items[c]) {
 				// Break out of the list iteration. If Yield's goroutine has already exited (because the list was fully
 				// traversed), then it won't receive the message to quit. We'll try to send the quit message, and then
 				// we'll exit.
@@ -365,9 +358,9 @@ func (t *Table) Item(row int, col string) interface{} {
 
 // Matches returns true if the value matches the item at the specified coordinates or false if there is no match.
 // Matching can occur on disabled rows.
-func (t *Table) Matches(row int, col string, v interface{}) bool {
+func (t *Table) Matches(row int, col string, value interface{}) bool {
 	item := t.Item(row, col)
-	return reflect.DeepEqual(v, item)
+	return reflect.DeepEqual(value, item)
 }
 
 // Toggle sets the row at the specified index to either be checked or skipped during table lookups (like Row and Count).
@@ -398,9 +391,9 @@ func (t *Table) WriteCSV() string {
 	for r := range rows {
 		row := r.(*Row)
 		if row.enabled {
-			items := make([]string, len(row.v))
-			for i, v := range row.v {
-				items[i] = fmt.Sprintf("%v", v)
+			items := make([]string, len(row.items))
+			for i, item := range row.items {
+				items[i] = fmt.Sprintf("%v", item)
 			}
 			b.WriteString(strings.Join(items, ","))
 			b.WriteString("\r\n")
@@ -413,7 +406,7 @@ func (t *Table) WriteCSV() string {
 
 // Row holds all the data for each row in the table.
 type Row struct {
-	v       []interface{} // Column values
+	items   []interface{} // Column values
 	enabled bool
 }
 
@@ -426,8 +419,8 @@ func NewRow(items ...interface{}) *Row {
 	r := new(Row)
 
 	// Add the items.
-	r.v = make([]interface{}, len(items))
-	copy(r.v, items)
+	r.items = make([]interface{}, len(items))
+	copy(r.items, items)
 
 	// Default to enabling this row.
 	r.enabled = true
@@ -439,13 +432,13 @@ func NewRow(items ...interface{}) *Row {
 func (r *Row) String() string {
 	if r == nil {
 		return "<nil>"
-	} else if len(r.v) == 0 {
+	} else if len(r.items) == 0 {
 		return "<empty>"
 	}
 
 	var b strings.Builder
-	for _, v := range r.v {
-		b.WriteString(fmt.Sprintf("%v, ", v))
+	for _, item := range r.items {
+		b.WriteString(fmt.Sprintf("%v, ", item))
 	}
 
 	s := strings.TrimSuffix(b.String(), ", ")
@@ -461,7 +454,7 @@ func (r *Row) SetItem(index int, value interface{}) error {
 		return fmt.Errorf("invalid column")
 	}
 
-	r.v[index] = value
+	r.items[index] = value
 
 	return nil
 }
@@ -472,7 +465,7 @@ func (r *Row) Count() int {
 		return -1
 	}
 
-	return len(r.v)
+	return len(r.items)
 }
 
 // Item returns the row's value at the specified index, or nil if not found or error.
@@ -481,24 +474,24 @@ func (r *Row) Item(index int) interface{} {
 		return nil
 	} else if index < 0 {
 		return nil
-	} else if index >= len(r.v) {
+	} else if index >= len(r.items) {
 		return nil
 	}
 
-	return r.v[index]
+	return r.items[index]
 }
 
 // Matches returns true if the value matches the item in the specified column or false if there is no match.
 // Matching can occur on disabled rows.
-func (r *Row) Matches(index int, v interface{}) bool {
+func (r *Row) Matches(index int, value interface{}) bool {
 	item := r.Item(index)
-	return reflect.DeepEqual(v, item)
+	return reflect.DeepEqual(value, item)
 }
 
 func (t *Table) validateItems(items []interface{}) error {
 	// Make sure that none of the items is this table itself.
-	for _, v := range items {
-		if nt, ok := v.(*Table); ok {
+	for _, item := range items {
+		if nt, ok := item.(*Table); ok {
 			if t.Same(nt) {
 				return fmt.Errorf("can't add table to itself")
 			}
@@ -511,13 +504,18 @@ func (t *Table) validateItems(items []interface{}) error {
 func (t *Table) validateRow(r *Row) error {
 	if t == nil {
 		return errBadTable
-	} else if n := t.Columns(); n != len(r.v) {
-		return fmt.Errorf("number of items (%v) does not match number of columns (%v)", len(r.v), n)
+	} else if n := t.Columns(); n != len(r.items) {
+		return fmt.Errorf("number of items (%v) does not match number of columns (%v)", len(r.items), n)
+	}
+
+	// Validate the items.
+	if err := t.validateItems(r.items); err != nil {
+		return err
 	}
 
 	// Validate the types.
-	for i, v := range r.v {
-		typeof := reflect.TypeOf(v)
+	for i, item := range r.items {
+		typeof := reflect.TypeOf(item)
 		if t.Rows() == 0 {
 			// This is the first row being added to the table. It will set the type of each column in the table.
 			t.types[i] = typeof
