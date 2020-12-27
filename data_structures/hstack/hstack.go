@@ -81,7 +81,7 @@ func (s *Stack) Copy() (*Stack, error) {
 	return ns, nil
 }
 
-// Merge adds a stack below the current stack. This will take ownership of and clear the provided stack.
+// Merge adds a stack on top of the current stack. This will take ownership of and clear the provided stack.
 func (s *Stack) Merge(ns *Stack) error {
 	if s == nil {
 		return errBadStack
@@ -90,9 +90,14 @@ func (s *Stack) Merge(ns *Stack) error {
 		return nil
 	}
 
-	if err := s.list.Merge(ns.list); err != nil {
+	// Merge the new list on top of the current list.
+	newList := ns.list
+	currList := s.list
+	if err := newList.Merge(currList); err != nil {
 		return err
 	}
+
+	s.list = newList
 
 	return ns.Clear()
 }

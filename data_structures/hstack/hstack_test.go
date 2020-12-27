@@ -255,7 +255,7 @@ func TestMerge(t *testing.T) {
 	if err := s.Merge(tmp); err != nil {
 		t.Error(err)
 	}
-	checkString(t, s, "131, gazelle, monkey, [5 6 7], 16, 3.14")
+	checkString(t, s, "[5 6 7], 16, 3.14, 131, gazelle, monkey")
 	checkCount(t, s, 6)
 	checkString(t, tmp, "<empty>")
 	checkCount(t, tmp, 0)
@@ -268,7 +268,7 @@ func TestMerge(t *testing.T) {
 	if err := s.Merge(ns); err != nil {
 		t.Error(err)
 	}
-	checkString(t, s, "131, gazelle, monkey, [5 6 7], 16, 3.14")
+	checkString(t, s, "[5 6 7], 16, 3.14, 131, gazelle, monkey")
 	checkCount(t, s, 6)
 	checkString(t, ns, "<nil>")
 	checkCount(t, ns, -1)
@@ -279,7 +279,7 @@ func TestMerge(t *testing.T) {
 	}
 	checkString(t, ns, "<nil>")
 	checkCount(t, ns, -1)
-	checkString(t, s, "131, gazelle, monkey, [5 6 7], 16, 3.14")
+	checkString(t, s, "[5 6 7], 16, 3.14, 131, gazelle, monkey")
 	checkCount(t, s, 6)
 }
 
