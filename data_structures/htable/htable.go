@@ -19,9 +19,9 @@ var (
 
 // Table is the main type in this package. It holds all the rows of data.
 type Table struct {
-	h     []string       // Column headers
-	types []reflect.Type // Types of each column (must be consistent for all rows)
-	rows  *hlist.List    // Linked list of rows
+	headers []string       // Column headers
+	types   []reflect.Type // Types of each column (must be consistent for all rows)
+	rows    *hlist.List    // Linked list of rows
 }
 
 // New creates a new table. headers denotes the name of each column. Each header names must be unique and not empty.
@@ -46,7 +46,7 @@ func New(headers ...string) (*Table, error) {
 	}
 
 	t := new(Table)
-	t.h = headers
+	t.headers = headers
 	t.types = make([]reflect.Type, len(headers))
 	t.rows = hlist.New()
 
@@ -135,7 +135,7 @@ func (t *Table) ColumnToIndex(col string) int {
 		return -1
 	}
 
-	for i, v := range t.h {
+	for i, v := range t.headers {
 		if col == v {
 			return i
 		}
@@ -160,7 +160,7 @@ func (t *Table) String() string {
 		if row.enabled {
 			var tmp strings.Builder
 			for i, v := range row.v {
-				tmp.WriteString(fmt.Sprintf("%v: %v, ", t.h[i], v))
+				tmp.WriteString(fmt.Sprintf("%v: %v, ", t.headers[i], v))
 			}
 			s := tmp.String()
 			s = strings.TrimSuffix(s, ", ")
@@ -222,9 +222,9 @@ func (t *Table) SetHeader(col string, name string) error {
 		return fmt.Errorf("missing name")
 	}
 
-	for i, v := range t.h {
+	for i, v := range t.headers {
 		if col == v {
-			t.h[i] = name
+			t.headers[i] = name
 			return nil
 		}
 	}
@@ -239,10 +239,10 @@ func (t *Table) Headers() []string {
 		return nil
 	}
 
-	h := make([]string, t.Columns())
-	copy(h, t.h)
+	headers := make([]string, t.Columns())
+	copy(headers, t.headers)
 
-	return h
+	return headers
 }
 
 // Rows returns the number of rows in the table, or -1 on error. This will include all rows, regardless of enabled status.
@@ -260,7 +260,7 @@ func (t *Table) Columns() int {
 		return -1
 	}
 
-	return len(t.h)
+	return len(t.headers)
 }
 
 // Count returns the number of items in the table, or -1 on error. This will include all items, regardless of enabled status.
@@ -284,7 +284,7 @@ func (t *Table) Row(col string, item interface{}) (int, *Row) {
 
 	// Find out which column we need to match on.
 	c := -1
-	for i, v := range t.h {
+	for i, v := range t.headers {
 		if col == v {
 			c = i
 			break
