@@ -71,6 +71,16 @@ func TestTBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad pointer test for Rows()")
 	}
 
+	// Test Enabled().
+	if n := tb.Enabled(); n != -1 {
+		t.Error("Unexpectedly passed bad pointer test for Enabled()")
+	}
+
+	// Test Disabled().
+	if n := tb.Disabled(); n != -1 {
+		t.Error("Unexpectedly passed bad pointer test for Disabled()")
+	}
+
 	// Test Columns().
 	if n := tb.Columns(); n != -1 {
 		t.Error("Unexpectedly passed bad pointer test for Columns()")
@@ -1210,6 +1220,115 @@ func TestTRows(t *testing.T) {
 	if n := tb.Rows(); n != 2 {
 		t.Error("Row count is incorrect")
 		t.Log("\tExpected:", 2)
+		t.Log("\tReceived:", n)
+	}
+}
+
+func TestTEnabled(t *testing.T) {
+	tb, _ := New("1", "2", "3")
+	if n := tb.Enabled(); n != 0 {
+		t.Error("Enabled count is incorrect")
+		t.Log("\tExpected:", 0)
+		t.Log("\tReceived:", n)
+	}
+
+	tb.Add(1, 2, 3)
+	if n := tb.Enabled(); n != 1 {
+		t.Error("Enabled count is incorrect")
+		t.Log("\tExpected:", 1)
+		t.Log("\tReceived:", n)
+	}
+
+	tb.Toggle(0, false)
+	if n := tb.Enabled(); n != 0 {
+		t.Error("Enabled count is incorrect")
+		t.Log("\tExpected:", 0)
+		t.Log("\tReceived:", n)
+	}
+
+	tb.Toggle(0, true)
+	if n := tb.Enabled(); n != 1 {
+		t.Error("Enabled count is incorrect")
+		t.Log("\tExpected:", 1)
+		t.Log("\tReceived:", n)
+	}
+
+	tb.Add(4, 5, 6)
+	if n := tb.Enabled(); n != 2 {
+		t.Error("Enabled count is incorrect")
+		t.Log("\tExpected:", 2)
+		t.Log("\tReceived:", n)
+	}
+
+	tb.RemoveRow(0)
+	if n := tb.Enabled(); n != 1 {
+		t.Error("Enabled count is incorrect")
+		t.Log("\tExpected:", 1)
+		t.Log("\tReceived:", n)
+	}
+
+	tb.Insert(1, 7, 8, 9)
+	if n := tb.Enabled(); n != 2 {
+		t.Error("Enabled count is incorrect")
+		t.Log("\tExpected:", 2)
+		t.Log("\tReceived:", n)
+	}
+}
+
+func TestTDisabled(t *testing.T) {
+	tb, _ := New("1", "2", "3")
+	if n := tb.Disabled(); n != 0 {
+		t.Error("Disabled count is incorrect")
+		t.Log("\tExpected:", 0)
+		t.Log("\tReceived:", n)
+	}
+
+	tb.Add(1, 2, 3)
+	if n := tb.Disabled(); n != 0 {
+		t.Error("Disabled count is incorrect")
+		t.Log("\tExpected:", 0)
+		t.Log("\tReceived:", n)
+	}
+
+	tb.Toggle(0, false)
+	if n := tb.Disabled(); n != 1 {
+		t.Error("Disabled count is incorrect")
+		t.Log("\tExpected:", 1)
+		t.Log("\tReceived:", n)
+	}
+
+	tb.Toggle(0, true)
+	if n := tb.Disabled(); n != 0 {
+		t.Error("Disabled count is incorrect")
+		t.Log("\tExpected:", 0)
+		t.Log("\tReceived:", n)
+	}
+
+	tb.Add(4, 5, 6)
+	if n := tb.Disabled(); n != 0 {
+		t.Error("Disabled count is incorrect")
+		t.Log("\tExpected:", 0)
+		t.Log("\tReceived:", n)
+	}
+
+	tb.Toggle(0, false)
+	if n := tb.Disabled(); n != 1 {
+		t.Error("Disabled count is incorrect")
+		t.Log("\tExpected:", 1)
+		t.Log("\tReceived:", n)
+	}
+
+	tb.RemoveRow(0)
+	if n := tb.Disabled(); n != 0 {
+		t.Error("Disabled count is incorrect")
+		t.Log("\tExpected:", 0)
+		t.Log("\tReceived:", n)
+	}
+
+	tb.Insert(1, 7, 8, 9)
+	if n := tb.Disabled(); n != 0 {
+		t.Error("Disabled count is incorrect")
+		t.Log("\tExpected:", 0)
 		t.Log("\tReceived:", n)
 	}
 }

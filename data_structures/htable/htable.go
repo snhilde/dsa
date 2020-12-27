@@ -244,6 +244,50 @@ func (t *Table) Rows() int {
 	return t.rows.Length()
 }
 
+// Enabled returns the number of enabled rows in the table, or -1 on error.
+func (t *Table) Enabled() int {
+	if t == nil {
+		return -1
+	}
+
+	rowChan := t.rows.Yield(nil)
+	if rowChan == nil {
+		return 0
+	}
+
+	numEnabled := 0
+	for r := range rowChan {
+		row := r.(*Row)
+		if row.enabled {
+			numEnabled++
+		}
+	}
+
+	return numEnabled
+}
+
+// Disabled returns the number of disabled rows in the table, or -1 on error.
+func (t *Table) Disabled() int {
+	if t == nil {
+		return -1
+	}
+
+	rowChan := t.rows.Yield(nil)
+	if rowChan == nil {
+		return 0
+	}
+
+	numDisabled := 0
+	for r := range rowChan {
+		row := r.(*Row)
+		if !row.enabled {
+			numDisabled++
+		}
+	}
+
+	return numDisabled
+}
+
 // Columns returns the number of columns in the table, or -1 on error.
 func (t *Table) Columns() int {
 	if t == nil {
