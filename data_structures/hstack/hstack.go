@@ -30,15 +30,11 @@ func (s *Stack) Add(values ...interface{}) error {
 		return errBadStack
 	}
 
-	// If caller is trying to add own stack, duplicate it first and then add it.
-	for i, v := range values {
+	// To prevent infinite recursion, make sure that none of the items is this stack itself.
+	for _, v := range values {
 		if t, ok := v.(*Stack); ok {
-			if t == s {
-				ns, err := s.Copy()
-				if err != nil {
-					return err
-				}
-				values[i] = ns
+			if s.Same(t) {
+				return fmt.Errorf("can't add stack to itself")
 			}
 		}
 	}
@@ -88,6 +84,15 @@ func (s *Stack) Merge(ns *Stack) error {
 	} else if ns == nil || ns.Count() == 0 {
 		// Nothing to add.
 		return nil
+	}
+
+	// If we have the same stack, then we need to duplicate it first, or else the stack will get cleared at the end.
+	if s.Same(ns) {
+		dup, err := s.Copy()
+		if err != nil {
+			return err
+		}
+		ns = dup
 	}
 
 	// Merge the new list on top of the current list.

@@ -120,12 +120,12 @@ func TestAdd(t *testing.T) {
 	checkString(t, s, "orange, apple, banana, <empty>, [1 2 3], a, b, 3, 3.1415, kangaroo, 5")
 	checkCount(t, s, 9)
 
-	// Test adding stack to itself.
-	if err := s.Add(s); err != nil {
-		t.Error(err)
+	// Test adding stack to itself. This should fail.
+	if err := s.Add(s); err == nil {
+		t.Error("should not be able to add a stack to itself")
 	}
-	checkString(t, s, "orange, apple, banana, <empty>, [1 2 3], a, b, 3, 3.1415, kangaroo, 5, orange, apple, banana, <empty>, [1 2 3], a, b, 3, 3.1415, kangaroo, 5")
-	checkCount(t, s, 10)
+	checkString(t, s, "orange, apple, banana, <empty>, [1 2 3], a, b, 3, 3.1415, kangaroo, 5")
+	checkCount(t, s, 9)
 }
 
 func TestPop(t *testing.T) {
@@ -288,11 +288,11 @@ func TestMerge(t *testing.T) {
 	checkCount(t, s, 6)
 
 	// Test merging a stack with itself.
-	if err := s.Merge(s); err == nil {
-		t.Error("unexpectedly passed merge with same stack")
+	if err := s.Merge(s); err != nil {
+		t.Error(err)
 	}
-	checkString(t, s, "[5 6 7], 16, 3.14, 131, gazelle, monkey")
-	checkCount(t, s, 6)
+	checkString(t, s, "[5 6 7], 16, 3.14, 131, gazelle, monkey, [5 6 7], 16, 3.14, 131, gazelle, monkey")
+	checkCount(t, s, 12)
 }
 
 func TestClear(t *testing.T) {
