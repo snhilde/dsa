@@ -166,7 +166,7 @@ func (t *Table) String() string {
 }
 
 // SetItem changes the value of the item at the specified coordinates.
-func (t *Table) SetItem(index int, col string, value interface{}) error {
+func (t *Table) SetItem(col string, index int, value interface{}) error {
 	if t == nil {
 		return errBadTable
 	} else if index < 0 || t.Rows() <= index {

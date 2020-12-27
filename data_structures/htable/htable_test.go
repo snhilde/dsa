@@ -52,7 +52,7 @@ func TestTBadPtr(t *testing.T) {
 	}
 
 	// Test SetItem().
-	if err := tb.SetItem(0, "1", 1); err == nil {
+	if err := tb.SetItem("1", 0, 1); err == nil {
 		t.Error("Unexpectedly passed bad pointer test for SetItem()")
 	}
 
@@ -296,22 +296,22 @@ func TestTBadArgs(t *testing.T) {
 	}
 
 	// Test SetItem() - negative index.
-	if err := tb.SetItem(-1, "1", "value"); err == nil {
+	if err := tb.SetItem("1", -1, "value"); err == nil {
 		t.Error("Unexpectedly passed negative index test for SetItem()")
 	}
 
 	// Test SetItem() - out-of-bounds index.
-	if err := tb.SetItem(100, "1", "value"); err == nil {
+	if err := tb.SetItem("1", 100, "value"); err == nil {
 		t.Error("Unexpectedly passed out-of-bounds index test for SetItem()")
 	}
 
 	// Test SetItem() - missing column header.
-	if err := tb.SetItem(0, "", "value"); err == nil {
+	if err := tb.SetItem("", 0, "value"); err == nil {
 		t.Error("Unexpectedly passed missing column header test for SetItem()")
 	}
 
 	// Test SetItem() - invalid column header.
-	if err := tb.SetItem(0, "4", "value"); err == nil {
+	if err := tb.SetItem("4", 0, "value"); err == nil {
 		t.Error("Unexpectedly passed invalid column header test for SetItem()")
 	}
 
@@ -1097,7 +1097,7 @@ func TestTSetItem(t *testing.T) {
 	checkTCount(t, tb, 0)
 
 	// Make sure you can't set any values with an empty table.
-	if err := tb.SetItem(0, "1", 5); err == nil {
+	if err := tb.SetItem("1", 0, 5); err == nil {
 		t.Error("Unexpectedly passed setting a value with an empty table")
 	}
 
@@ -1112,7 +1112,7 @@ func TestTSetItem(t *testing.T) {
 	for row := 0; row < 3; row++ {
 		for i, v := range []string{"1", "2", "3"} {
 			n := ((row * 3) + i + 1) * 10
-			if err := tb.SetItem(row, v, n); err != nil {
+			if err := tb.SetItem(v, row, n); err != nil {
 				t.Error(err)
 			}
 		}
@@ -1122,7 +1122,7 @@ func TestTSetItem(t *testing.T) {
 	checkTCount(t, tb, 9)
 
 	// Make sure you can't change an item's type.
-	if err := tb.SetItem(0, "1", "a"); err == nil {
+	if err := tb.SetItem("1", 0, "a"); err == nil {
 		t.Error("Unexpectedly passed changing an item's type")
 	}
 }
