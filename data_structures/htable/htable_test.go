@@ -404,6 +404,26 @@ func TestTBadArgs(t *testing.T) {
 	if err := tb.Toggle(100, true); err == nil {
 		t.Error("Unexpectedly passed out-of-bounds index test for Toggle()")
 	}
+
+	// Test Add() - adding table to itself.
+	tb, _ = New("1")
+	tb2, _ := New("2")
+	if err := tb.Add(tb2); err != nil {
+		t.Error(err)
+	}
+	if err := tb.Add(tb); err == nil {
+		t.Error("Unexpectedly passed adding table to itself test for Add()")
+	}
+
+	// Test Insert() - adding table to itself.
+	tb, _ = New("1")
+	tb2, _ = New("2")
+	if err := tb.Add(tb2); err != nil {
+		t.Error(err)
+	}
+	if err := tb.Insert(0, tb); err == nil {
+		t.Error("Unexpectedly passed adding table to itself test for Insert()")
+	}
 }
 
 func TestRBadArgs(t *testing.T) {
