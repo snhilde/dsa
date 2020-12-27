@@ -66,7 +66,7 @@ func testSearch(t *testing.T, searchFunc func([]int, int)(int, error), iters int
 			t.Error("Found unexpected target in list B")
 		} else if err == nil {
 			t.Error("Unexpectedly passed Test 2")
-		} else if err.Error() != "Not found" {
+		} else if err.Error() != "not found" {
 			t.Error("Received unexpected error:")
 			t.Error(err)
 		}
