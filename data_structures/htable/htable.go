@@ -531,6 +531,10 @@ func (r *Row) Item(index int) interface{} {
 // Matching can occur on disabled rows.
 func (r *Row) Matches(index int, value interface{}) bool {
 	item := r.Item(index)
+	if item == nil {
+		return false
+	}
+
 	return reflect.DeepEqual(value, item)
 }
 
