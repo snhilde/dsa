@@ -40,9 +40,9 @@ func TestBadPtr(t *testing.T) {
 		t.Log("\tReceived:", i)
 	}
 
-	// Test Value().
-	if v := l.Value(0); v != nil {
-		t.Error("unexpectedly passed Value() test with bad pointer")
+	// Test Item().
+	if v := l.Item(0); v != nil {
+		t.Error("unexpectedly passed Item() test with bad pointer")
 		t.Log("\tExpected: nil")
 		t.Log("\tReceived:", v)
 	}
@@ -132,27 +132,27 @@ func TestBadArgs(t *testing.T) {
 	checkString(t, l, "<empty>")
 	checkLength(t, l, 0)
 
-	// Test Value().
-	if v := l.Value(-1); v != nil {
-		t.Error("unexpectedly passed Value() test for negative index")
+	// Test Item().
+	if v := l.Item(-1); v != nil {
+		t.Error("unexpectedly passed Item() test for negative index")
 		t.Log("\tExpected: nil")
 		t.Log("\tReceived:", v)
 	}
 	checkString(t, l, "<empty>")
 	checkLength(t, l, 0)
 
-	// Test Value().
-	if v := l.Value(0); v != nil {
-		t.Error("unexpectedly passed Value() test for empty list")
+	// Test Item().
+	if v := l.Item(0); v != nil {
+		t.Error("unexpectedly passed Item() test for empty list")
 		t.Log("\tExpected: nil")
 		t.Log("\tReceived:", v)
 	}
 	checkString(t, l, "<empty>")
 	checkLength(t, l, 0)
 
-	// Test Value().
-	if v := l.Value(100); v != nil {
-		t.Error("unexpectedly passed Value() test for out-of-range index")
+	// Test Item().
+	if v := l.Item(100); v != nil {
+		t.Error("unexpectedly passed Item() test for out-of-range index")
 		t.Log("\tExpected: nil")
 		t.Log("\tReceived:", v)
 	}
@@ -376,36 +376,36 @@ func TestValue(t *testing.T) {
 	checkString(t, l, "apples, 1, 3, 3.14, [238 255], aardvark")
 	checkLength(t, l, 6)
 
-	// Check value at first position.
-	if v := l.Value(0); v != "apples" {
-		t.Error("Incorrect value for index 0")
+	// Check Item at first position.
+	if v := l.Item(0); v != "apples" {
+		t.Error("Incorrect Item for index 0")
 		t.Log("\tExpected: apples")
 		t.Log("\tReceived:", v)
 	}
 	checkString(t, l, "apples, 1, 3, 3.14, [238 255], aardvark")
 	checkLength(t, l, 6)
 
-	// Check value at 3rd position.
-	if v := l.Value(2); v != 3 {
-		t.Error("Incorrect value for index 2")
+	// Check Item at 3rd position.
+	if v := l.Item(2); v != 3 {
+		t.Error("Incorrect Item for index 2")
 		t.Log("\tExpected: 3")
 		t.Log("\tReceived:", v)
 	}
 	checkString(t, l, "apples, 1, 3, 3.14, [238 255], aardvark")
 	checkLength(t, l, 6)
 
-	// Check value at 4th position.
-	if v := l.Value(3); v != 3.14 {
-		t.Error("Incorrect value for index 3")
+	// Check Item at 4th position.
+	if v := l.Item(3); v != 3.14 {
+		t.Error("Incorrect Item for index 3")
 		t.Log("\tExpected: 3.14")
 		t.Log("\tReceived:", v)
 	}
 	checkString(t, l, "apples, 1, 3, 3.14, [238 255], aardvark")
 	checkLength(t, l, 6)
 
-	// Check value at last position.
-	if v := l.Value(5); v != "aardvark" {
-		t.Error("Incorrect value for index 5")
+	// Check Item at last position.
+	if v := l.Item(5); v != "aardvark" {
+		t.Error("Incorrect Item for index 5")
 		t.Log("\tExpected: aardvark")
 		t.Log("\tReceived:", v)
 	}
@@ -414,7 +414,7 @@ func TestValue(t *testing.T) {
 
 	// Remove an item and check value at index 3 again.
 	l.Remove(1)
-	if v := l.Value(3); !reflect.DeepEqual(v, []byte{0xEE, 0xFF}) {
+	if v := l.Item(3); !reflect.DeepEqual(v, []byte{0xEE, 0xFF}) {
 		t.Error("Incorrect value for index 3")
 		t.Log("\tExpected: [238 255]")
 		t.Log("\tReceived:", v)
@@ -423,7 +423,7 @@ func TestValue(t *testing.T) {
 	checkLength(t, l, 5)
 
 	// Try to find a non-existent item.
-	if v := l.Value(10); v != nil {
+	if v := l.Item(10); v != nil {
 		t.Error("Unexpectedly passed no-match test")
 		t.Log("\tExpected: nil")
 		t.Log("\tReceived:", v)
