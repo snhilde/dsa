@@ -297,16 +297,16 @@ func (t *Table) Columns() int {
 	return len(t.headers)
 }
 
-// Count returns the number of items in the table, or -1 on error. This will include all items, regardless of enabled status.
+// Count returns the number of items in the table, or -1 on error. This includes all items, regardless of enabled status.
 func (t *Table) Count() int {
-	r := t.Rows()
 	c := t.Columns()
+	r := t.Rows()
 
-	if r == -1 || c == -1 {
+	if c == -1 || r == -1 {
 		return -1
 	}
 
-	return r * c
+	return c * r
 }
 
 // Same checks whether or not the tables point to the same memory.
@@ -322,24 +322,24 @@ func (t *Table) Same(nt *Table) bool {
 	return false
 }
 
-// Row returns the index and Row type of the first row that contains the item in the specified column, or -1 and nil if
-// not found or error.
-func (t *Table) Row(col string, item interface{}) (int, *Row) {
+// Row returns the index and Row of the first enabled row that contains the item in the specified column, or -1 and nil
+// if not found or error.
+func (t *Table) Row(header string, item interface{}) (int, *Row) {
 	if t == nil {
 		return -1, nil
 	}
 
 	// Find out which column we need to match on.
 	c := -1
-	for i, header := range t.headers {
-		if col == header {
+	for i, h := range t.headers {
+		if header == h {
 			c = i
 			break
 		}
 	}
 
 	// Make sure we found a column.
-	if c == -1 {
+	if c < 0 {
 		return -1, nil
 	}
 
@@ -361,7 +361,6 @@ func (t *Table) Row(col string, item interface{}) (int, *Row) {
 				select {
 				case quit <- 0:
 				default:
-					break
 				}
 				return i, row
 			}
