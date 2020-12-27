@@ -108,22 +108,7 @@ func (t *Tree) Remove(index int) error {
 	return nil
 }
 
-// Value returns the value of the item at the given index, or nil if no item exists at that index.
-func (t *Tree) Value(index int) interface{} {
-	if t == nil {
-		return nil
-	}
-
-	node, _ := t.trunk.findNode(index)
-	if node == nil {
-		return nil
-	}
-
-	return node.item.value
-}
-
-// Item returns the item at the index, or nothing if no item exists at that index. The item can be used to set/get the
-// value within the tree using Item's SetValue and GetValue methods.
+// Item returns the item at the index, or nothing if no item exists at that index.
 func (t *Tree) Item(index int) Item {
 	if t == nil {
 		return Item{}
@@ -137,6 +122,16 @@ func (t *Tree) Item(index int) Item {
 	return node.item
 }
 
+// Value returns the value of the item at the given index, or nil if no item exists at that index.
+func (t *Tree) Value(index int) interface{} {
+	item := t.Item(index)
+	if item == (Item{}) {
+		return nil
+	}
+
+	return item.value
+}
+
 // Match returns true if the item exists in the tree or false if it does not.
 func (t *Tree) Match(item interface{}) bool {
 	if t == nil {
@@ -144,11 +139,15 @@ func (t *Tree) Match(item interface{}) bool {
 	}
 
 	quit := make(chan interface{})
-	ch := t.Yield(quit)
-	for v := range ch {
+	itemChan := t.Yield(quit)
+	if itemChan == nil {
+		return false
+	}
+
+	for v := range itemChan {
 		if reflect.DeepEqual(item, v) {
 			// Close the communication and return true.
-			quit <- 1
+			quit <- struct{}{}
 			return true
 		}
 	}
