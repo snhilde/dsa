@@ -30,9 +30,8 @@ func New(headers ...string) (*Table, error) {
 		return nil, fmt.Errorf("missing column headers")
 	}
 
-	headerMap := make(map[string]int)
-
 	// Validate the column headers.
+	headerMap := make(map[string]int)
 	for i, v := range headers {
 		// Make sure every column has a header.
 		if v == "" {
@@ -55,6 +54,15 @@ func New(headers ...string) (*Table, error) {
 
 // Add creates a new row with the items and adds it to the end of the table.
 func (t *Table) Add(items ...interface{}) error {
+	// Make sure that none of the items is this table itself.
+	for _, v := range items {
+		if nt, ok := v.(*Table); ok {
+			if t.Same(nt) {
+				return fmt.Errorf("can't add table to itself")
+			}
+		}
+	}
+
 	// Build the row.
 	r := NewRow(items...)
 
