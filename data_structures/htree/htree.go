@@ -132,8 +132,8 @@ func (t *Tree) Value(index int) interface{} {
 	return item.value
 }
 
-// Match returns true if the item exists in the tree or false if it does not.
-func (t *Tree) Match(item interface{}) bool {
+// Match returns true if the value exists in the tree or false if it does not.
+func (t *Tree) Match(value interface{}) bool {
 	if t == nil {
 		return false
 	}
@@ -144,8 +144,8 @@ func (t *Tree) Match(item interface{}) bool {
 		return false
 	}
 
-	for v := range itemChan {
-		if reflect.DeepEqual(item, v) {
+	for item := range itemChan {
+		if reflect.DeepEqual(value, item.value) {
 			// Close the communication and return true.
 			quit <- struct{}{}
 			return true
@@ -157,17 +157,16 @@ func (t *Tree) Match(item interface{}) bool {
 }
 
 // Yield provides an unbuffered channel that will continually pass successive items as the tree is traversed in sorted
-// order. The channel quit is used to communicate when iteration should be stopped. Send any value on the cnannel (or
-// close it) to break the communication. This will happen automatically when the tree is exhausted. If this is not
-// needed, pass nil as the argument.
-func (t *Tree) Yield(quit <-chan interface{}) <-chan interface{} {
+// order. The channel quit is used to communicate when iteration should be stopped. Send any value on the cnannel to
+// break the communication. If this is not needed, pass nil.
+func (t *Tree) Yield(quit <-chan interface{}) <-chan Item {
 	if t == nil {
 		return nil
 	}
 
-	ch := make(chan interface{})
+	itemChan := make(chan Item)
 	go func() {
-		defer close(ch)
+		defer close(itemChan)
 
 		node := t.trunk
 		stack := hstack.New()
@@ -182,7 +181,7 @@ func (t *Tree) Yield(quit <-chan interface{}) <-chan interface{} {
 				// Send out the value.
 				node = stack.Pop().(*tnode)
 				select {
-				case ch <- node.item.value:
+				case itemChan <- node.item:
 					// Left branch is done. Work down the right branch now.
 					node = node.right
 				case <-quit:
@@ -197,22 +196,25 @@ func (t *Tree) Yield(quit <-chan interface{}) <-chan interface{} {
 		}
 	}()
 
-	return ch
+	return itemChan
 }
 
 // List returns copies of all the items in the tree in sorted order.
-func (t *Tree) List() []interface{} {
+func (t *Tree) List() []Item {
 	if t == nil {
 		return nil
 	}
 
-	list := make([]interface{}, t.Count())
-	i := 0
-
 	// By using values passed in a channel, we can be sure that the internal values are safe and not modifiable.
-	ch := t.Yield(nil)
-	for v := range ch {
-		list[i] = v
+	itemChan := t.Yield(nil)
+	if itemChan == nil {
+		return nil
+	}
+
+	list := make([]Item, t.Count())
+	i := 0
+	for item := range itemChan {
+		list[i] = item
 		i++
 	}
 
@@ -227,10 +229,14 @@ func (t *Tree) String() string {
 		return "<empty>"
 	}
 
+	itemChan := t.Yield(nil)
+	if itemChan == nil {
+		return "<nil>"
+	}
+
 	var b strings.Builder
-	ch := t.Yield(nil)
-	for v := range ch {
-		b.WriteString(fmt.Sprintf("%v, ", v))
+	for item := range itemChan {
+		b.WriteString(fmt.Sprintf("%v, ", item.value))
 	}
 
 	// Remove the last comma/space before returning the string.
