@@ -25,25 +25,25 @@ func New() *Stack {
 
 // Add adds one or more new items to the top of the stack. If there is more than one item, the first item will be at the
 // top.
-func (s *Stack) Add(vs ...interface{}) error {
+func (s *Stack) Add(values ...interface{}) error {
 	if s == nil {
 		return errBadStack
 	}
 
 	// If caller is trying to add own stack, duplicate it first and then add it.
-	for i, v := range vs {
+	for i, v := range values {
 		if t, ok := v.(*Stack); ok {
 			if t == s {
 				ns, err := s.Copy()
 				if err != nil {
 					return err
 				}
-				vs[i] = ns
+				values[i] = ns
 			}
 		}
 	}
 
-	return s.list.Insert(0, vs...)
+	return s.list.Insert(0, values...)
 }
 
 // Pop removes the top item from the stack and returns its value.
@@ -103,7 +103,8 @@ func (s *Stack) Clear() error {
 		return fmt.Errorf("stack does not exist")
 	}
 
-	return s.list.Clear()
+	*s = *(New())
+	return nil
 }
 
 // String displays the stack's contents, from the top to the bottom.
