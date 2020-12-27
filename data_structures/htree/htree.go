@@ -31,8 +31,9 @@ type tnode struct {
 
 // New creates a new binary tree.
 func New() Tree {
-	t := new(Tree)
-	return *t
+	t := Tree{}
+
+	return t
 }
 
 // Add inserts a value into the tree at the provided index. If an item already exists at the index, then it is replaced
@@ -255,12 +256,12 @@ type Item struct {
 
 // NewItem creates a new item with the provided value and index.
 func NewItem(value interface{}, index int) Item {
-	item := new(Item)
+	item := Item{
+		value: value,
+		index: index,
+	}
 
-	item.value = value
-	item.index = index
-
-	return *item
+	return item
 }
 
 // GetValue returns the value of this item, or nil if the item is bad.
