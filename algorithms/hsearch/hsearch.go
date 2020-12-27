@@ -2,7 +2,7 @@
 package hsearch
 
 import (
-	"errors"
+	"fmt"
 )
 
 
@@ -10,7 +10,7 @@ import (
 // Search progresses linearly.
 func LinearInt(haystack []int, needle int) (int, error) {
 	if len(haystack) < 1 {
-		return -1, errors.New("Invalid haystack size")
+		return -1, fmt.Errorf("invalid haystack size")
 	}
 
 	for i, v := range haystack {
@@ -19,7 +19,7 @@ func LinearInt(haystack []int, needle int) (int, error) {
 		}
 	}
 
-	return -1, errors.New("Not found")
+	return -1, fmt.Errorf("not found")
 }
 
 // Find needle's position in haystack (which must be sorted).
@@ -32,7 +32,7 @@ func BinaryInt(haystack []int, needle int) (int, error) {
 	//     2b. If it's greater than the value we're looking for, shift the block down so the end is right before it.
 	//     2c. If it's less than the value we're looking for, shift the block up so the beginning is right after it.
 	if len(haystack) < 1 {
-		return -1, errors.New("Invalid haystack size")
+		return -1, fmt.Errorf("invalid haystack size")
 	}
 
 	start := 0
@@ -53,5 +53,5 @@ func BinaryInt(haystack []int, needle int) (int, error) {
 		}
 	}
 
-	return -1, errors.New("Not found")
+	return -1, fmt.Errorf("not found")
 }
