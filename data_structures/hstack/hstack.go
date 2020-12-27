@@ -112,6 +112,15 @@ func (s *Stack) Clear() error {
 	return nil
 }
 
+// Same checks whether or not the two stacks point to the same memory.
+func (s *Stack) Same(ns *Stack) bool {
+	if s == nil || ns == nil {
+		return false
+	}
+
+	return s.list.Same(ns.list)
+}
+
 // String displays the stack's contents, from the top to the bottom.
 func (s *Stack) String() string {
 	if s == nil {

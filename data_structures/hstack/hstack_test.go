@@ -44,6 +44,11 @@ func TestBadPtr(t *testing.T) {
 		t.Error("unexpectedly passed Clear() test with bad pointer")
 	}
 
+	// Test Same().
+	if ok := s.Same(New()); ok {
+		t.Error("unexpectedly passed Same() test with bad pointer")
+	}
+
 	// Test String().
 	if v := s.String(); v != "<nil>" {
 		t.Error("unexpectedly passed String() test with bad pointer")
@@ -281,6 +286,13 @@ func TestMerge(t *testing.T) {
 	checkCount(t, ns, -1)
 	checkString(t, s, "[5 6 7], 16, 3.14, 131, gazelle, monkey")
 	checkCount(t, s, 6)
+
+	// Test merging a stack with itself.
+	if err := s.Merge(s); err == nil {
+		t.Error("unexpectedly passed merge with same stack")
+	}
+	checkString(t, s, "[5 6 7], 16, 3.14, 131, gazelle, monkey")
+	checkCount(t, s, 6)
 }
 
 func TestClear(t *testing.T) {
@@ -304,6 +316,47 @@ func TestClear(t *testing.T) {
 	}
 	checkString(t, s, "<empty>")
 	checkCount(t, s, 0)
+}
+
+func TestSame(t *testing.T) {
+	s := New()
+
+	// Add some items first.
+	s.Add("kangaroo", 5, 3.1415)
+	checkString(t, s, "kangaroo, 5, 3.1415")
+	checkCount(t, s, 3)
+
+	// Test out with the same stack.
+	ns := s
+	checkString(t, s, "kangaroo, 5, 3.1415")
+	checkCount(t, s, 3)
+	checkString(t, ns, "kangaroo, 5, 3.1415")
+	checkCount(t, ns, 3)
+	if ok := s.Same(ns); !ok {
+		t.Error("identical stacks should pass Same")
+	}
+
+	// Test out with two different stacks that have the same contents.
+	ns = New()
+	ns.Add("kangaroo", 5, 3.1415)
+	checkString(t, s, "kangaroo, 5, 3.1415")
+	checkCount(t, s, 3)
+	checkString(t, ns, "kangaroo, 5, 3.1415")
+	checkCount(t, ns, 3)
+	if ok := s.Same(ns); ok {
+		t.Error("similar stacks should not pass Same")
+	}
+
+	// Test out with two different stacks with different contents.
+	ns = New()
+	ns.Add(struct{}{}, 10, rune('b'))
+	checkString(t, s, "kangaroo, 5, 3.1415")
+	checkCount(t, s, 3)
+	checkString(t, ns, "{}, 10, 98")
+	checkCount(t, ns, 3)
+	if ok := s.Same(ns); ok {
+		t.Error("different stacks should not pass Same")
+	}
 }
 
 func checkString(t *testing.T, s *Stack, want string) {
