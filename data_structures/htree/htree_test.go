@@ -155,6 +155,37 @@ func TestAddItems(t *testing.T) {
 	s := strings.TrimSuffix(b.String(), ", ")
 	testString(t, tr, s)
 	testCount(t, tr, 10000)
+
+	// Test that setting a new value for an item doesn't affect the tree's value until the item is added to the tree
+	// again. We're going to get a value from the tree, change its value, and then grab it again to make sure nothing's
+	// changed. After that, we're going to add the item again at the same index and then grab it again to make sure the
+	// value has been updated.
+	tr, items = buildMiscTree(500)
+	testCount(t, tr, 500)
+
+	for _, v := range items {
+		index := v.GetIndex()
+		item := tr.Item(index)
+		if item == (Item{}) {
+			t.Error("Bad item")
+			continue
+		}
+		item.SetValue("new value")
+		item = tr.Item(index)
+		value := item.GetValue()
+		if val, ok := value.(string); ok && val == "new value" {
+			t.Error("Item in tree has been unexpectedly updated")
+			continue
+		}
+
+		item.SetValue("new value")
+		tr.AddItems(item)
+		item = tr.Item(index)
+		if value := item.GetValue(); value.(string) != "new value" {
+			t.Error("Item's value was not updated")
+			continue
+		}
+	}
 }
 
 func TestRemove(t *testing.T) {
@@ -460,8 +491,14 @@ func TestNewItem(t *testing.T) {
 func TestBadItem(t *testing.T) {
 	var item *Item
 
+	// GetValue
 	if value := item.GetValue(); value != nil {
 		t.Error("Unexpectedly passed bad item test for GetValue")
+	}
+
+	// SetValue
+	if err := item.SetValue(5); err == nil {
+		t.Error("Unexpectedly passed bad item test for SetValue")
 	}
 }
 
@@ -475,7 +512,7 @@ func TestGetValue(t *testing.T) {
 
 	for i, item := range items {
 		if value := item.GetValue(); !reflect.DeepEqual(values[i], value) {
-			t.Error("Item", i, "returned the wrong values")
+			t.Error("Item", i, "returned the wrong value")
 		}
 	}
 
@@ -507,7 +544,35 @@ func TestGetIndex(t *testing.T) {
 }
 
 func TestSetValue(t *testing.T) {
-	// TODO
+	// Test that new values are correctly reflected in the item.
+	values := buildValues(500)
+	items := make([]Item, 500)
+	for i := 0; i < 500; i++ {
+		items[i] = NewItem(values[i], i)
+	}
+
+	for i, item := range items {
+		if value := item.GetValue(); !reflect.DeepEqual(values[i], value) {
+			t.Error("Item", i, "returned the wrong value")
+		}
+	}
+
+	newValues := buildValues(500)
+	for i, item := range items {
+		if err := item.SetValue(newValues[i]); err != nil {
+			t.Error(err)
+		}
+		// Save the modified item.
+		items[i] = item
+	}
+
+	for i, item := range items {
+		if value := item.GetValue(); !reflect.DeepEqual(newValues[i], value) {
+			t.Error("Item", i, "returned the wrong new value")
+		}
+	}
+
+	// Make sure that setting a new value for an item doesn't affect the item's value in the tree.
 }
 
 func TestSetIndex(t *testing.T) {
