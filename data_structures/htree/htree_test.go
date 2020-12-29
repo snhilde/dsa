@@ -236,7 +236,92 @@ func TestValue(t *testing.T) {
 }
 
 func TestMatch(t *testing.T) {
-	// TODO
+	tr := New()
+	r := newRand()
+
+	// Make two lists of 500 items each. One list will be added to the tree, and the other won't. We'll then check that the
+	// added ones do match and the not-added ones don't match.
+	presentItems := make([]Item, 500)
+	absentItems := make([]Item, 500)
+	for i := 0; i < 1000; i++ {
+		value := r.Int()
+		item := NewItem(value, value)
+		index := i / 2
+		if i % 2 == 0 {
+			presentItems[index] = item
+		} else {
+			absentItems[index] = item
+		}
+	}
+
+	if err := tr.AddItems(presentItems...); err != nil {
+		t.Error(err)
+		return
+	}
+	testCount(t, tr, 500)
+
+	// Make sure that all of these items match.
+	for i, item := range presentItems {
+		if !tr.Match(item.GetValue()) {
+			t.Error("Missing item at index", i)
+		}
+	}
+
+	// Make sure that none of these items match. (There's a very low probablity that we'll have a value collision with
+	// r.Int(), and we can just run the tests again if we do).
+	for i, item := range absentItems {
+		if tr.Match(item.GetValue()) {
+			t.Error("Unexpected item at index", i)
+		}
+	}
+
+	// Test items with different types.
+	tr.Clear()
+	for i := 0; i < 1000; i++ {
+		var value interface{}
+		switch i % 12 {
+		case 0, 1:
+			value = r.Int()
+		case 2, 3:
+			value = r.Float64()
+		case 4, 5:
+			value = r.Uint32()
+		case 6, 7:
+			value = rune(r.Int31())
+		case 8, 9:
+			value = string([]byte{byte(r.Int31n(94) + 32), byte(r.Int31n(94) + 32), byte(r.Int31n(94) + 32), byte(r.Int31n(94) + 32)})
+		case 10, 11:
+			value = []int{r.Int(), r.Int(), r.Int(), r.Int(), r.Int(), r.Int(), r.Int()}
+		}
+		item := NewItem(value, r.Int())
+		index := i / 2
+		if i % 2 == 0 {
+			presentItems[index] = item
+		} else {
+			absentItems[index] = item
+		}
+	}
+
+	if err := tr.AddItems(presentItems...); err != nil {
+		t.Error(err)
+		return
+	}
+	testCount(t, tr, 500)
+
+	// Make sure that all of these items match.
+	for i, item := range presentItems {
+		if !tr.Match(item.GetValue()) {
+			t.Error("Missing item at index", i)
+		}
+	}
+
+	// Make sure that none of these items match. (There's a very low probablity that we'll have a value collision with
+	// r.Int(), and we can just run the tests again if we do).
+	for i, item := range absentItems {
+		if tr.Match(item.GetValue()) {
+			t.Error("Unexpected item at index", i)
+		}
+	}
 }
 
 func TestYield(t *testing.T) {
