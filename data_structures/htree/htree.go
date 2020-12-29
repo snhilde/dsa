@@ -108,6 +108,13 @@ func (t *Tree) Remove(index int) error {
 	return nil
 }
 
+// Clear clears all items in the tree and resets it to a new state.
+func (t *Tree) Clear() {
+	if t != nil {
+		*t = (New())
+	}
+}
+
 // Item returns the item at the index, or nothing if no item exists at that index.
 func (t *Tree) Item(index int) Item {
 	if t == nil {

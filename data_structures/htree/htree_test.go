@@ -41,6 +41,9 @@ func TestBad(t *testing.T) {
 		t.Error("Bad object test: Unexpectedly passed Remove")
 	}
 
+	// Make sure it doesn't crash anything.
+	tr.Clear()
+
 	if item := tr.Item(5); item != (Item{}) {
 		t.Error("Bad object test: Unexpectedly passed Item")
 	}
@@ -155,6 +158,48 @@ func TestAddItems(t *testing.T) {
 
 func TestRemove(t *testing.T) {
 	// TODO
+}
+
+func TestClear(t *testing.T) {
+	tr := New()
+
+	// Do a few simple, hand-built tests to make sure things look right.
+	item1 := NewItem(5, 5)
+	if err := tr.AddItems(item1); err != nil {
+		t.Error(err)
+	}
+	testString(t, tr, "5")
+	testCount(t, tr, 1)
+
+	tr.Clear()
+	testString(t, tr, "<empty>")
+	testCount(t, tr, 0)
+
+	// Add 500 items of various types.
+	r := newRand()
+	for i := 0; i < 500; i++ {
+		var value interface{}
+		switch i % 12 {
+		case 0, 1:
+			value = r.Int()
+		case 2, 3:
+			value = r.Float64()
+		case 4, 5:
+			value = r.Uint32()
+		case 6, 7:
+			value = rune(r.Int31())
+		case 8, 9:
+			value = string([]byte{byte(r.Int31n(94) + 32), byte(r.Int31n(94) + 32), byte(r.Int31n(94) + 32), byte(r.Int31n(94) + 32)})
+		case 10, 11:
+			value = []int{r.Int(), r.Int(), r.Int(), r.Int(), r.Int(), r.Int(), r.Int()}
+		}
+		item := NewItem(value, r.Int())
+		tr.AddItems(item)
+	}
+	testCount(t, tr, 500)
+
+	tr.Clear()
+	testCount(t, tr, 0)
 }
 
 func TestItem(t *testing.T) {
