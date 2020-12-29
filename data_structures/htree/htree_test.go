@@ -3,6 +3,7 @@ package htree
 import (
 	"fmt"
 	"math/rand"
+	"reflect"
 	"sort"
 	"strings"
 	"testing"
@@ -98,7 +99,7 @@ func TestAdd(t *testing.T) {
 	// Now do a larger test to make sure items are inserted in the correct order.
 	var b strings.Builder
 	var nums []int
-	tr, nums = buildTree(100000, true)
+	tr, nums = buildNumTree(100000, true)
 	sort.Ints(nums)
 	for _, v := range nums {
 		b.WriteString(fmt.Sprintf("%v, ", v))
@@ -176,29 +177,11 @@ func TestClear(t *testing.T) {
 	testCount(t, tr, 0)
 
 	// Add 500 items of various types.
-	r := newRand()
-	for i := 0; i < 500; i++ {
-		var value interface{}
-		switch i % 12 {
-		case 0, 1:
-			value = r.Int()
-		case 2, 3:
-			value = r.Float64()
-		case 4, 5:
-			value = r.Uint32()
-		case 6, 7:
-			value = rune(r.Int31())
-		case 8, 9:
-			value = string([]byte{byte(r.Int31n(94) + 32), byte(r.Int31n(94) + 32), byte(r.Int31n(94) + 32), byte(r.Int31n(94) + 32)})
-		case 10, 11:
-			value = []int{r.Int(), r.Int(), r.Int(), r.Int(), r.Int(), r.Int(), r.Int()}
-		}
-		item := NewItem(value, r.Int())
-		tr.AddItems(item)
-	}
+	tr, _ = buildMiscTree(500)
 	testCount(t, tr, 500)
 
 	tr.Clear()
+	testString(t, tr, "<empty>")
 	testCount(t, tr, 0)
 }
 
@@ -232,7 +215,7 @@ func TestItem(t *testing.T) {
 
 	// Now do a larger test to make sure the correct item is returned.
 	var nums []int
-	tr, nums = buildTree(100000, true)
+	tr, nums = buildNumTree(100000, true)
 	for _, v := range nums {
 		if item := tr.Item(v); item.GetValue() != v {
 			t.Error("Wrong value: Expected", v, "| Received", item.GetValue())
@@ -272,7 +255,7 @@ func TestValue(t *testing.T) {
 
 	// Now do a larger test to make sure indexes and values are properly tied and look-up is correct.
 	var nums []int
-	tr, nums = buildTree(100000, true)
+	tr, nums = buildNumTree(100000, true)
 	for _, v := range nums {
 		if val := tr.Value(v); val != v {
 			t.Error("Expected", v, "| Received", val)
@@ -370,7 +353,72 @@ func TestMatch(t *testing.T) {
 }
 
 func TestYield(t *testing.T) {
-	// TODO
+	tr := New()
+
+	// Test that the capacity of the quit channel doesn't matter.
+	if ch := tr.Yield(nil); ch == nil {
+		t.Error("Received nil channel with nil quit")
+	}
+	quit := make(chan interface{}, 0)
+	if ch := tr.Yield(quit); ch == nil {
+		t.Error("Received nil channel with quit with a buffer of 0")
+	}
+	quit = make(chan interface{}, 1)
+	if ch := tr.Yield(quit); ch == nil {
+		t.Error("Received nil channel with quit with a buffer of 1")
+	}
+	quit = make(chan interface{}, 10)
+	if ch := tr.Yield(quit); ch == nil {
+		t.Error("Received nil channel with quit with a buffer of 10")
+	}
+
+	// Test that indexes are sorted and the correct items are returned.
+	tr, items := buildMiscTree(500)
+	sort.Slice(items, func(i, j int) bool {
+		return items[i].index < items[j].index
+	})
+	testCount(t, tr, 500)
+
+	yieldChan := tr.Yield(nil)
+	if yieldChan == nil {
+		t.Error("Yield returned nil channel")
+		return
+	}
+
+	i := 0
+	for item := range yieldChan {
+		if !reflect.DeepEqual(items[i].GetValue(), item.GetValue()) {
+			t.Error("Items differ at index", i)
+		}
+		i++
+	}
+
+	// Test that sending on quit channel also closes the yield channel.
+	quit = make(chan interface{}, 0)
+	yieldChan = tr.Yield(quit)
+	if yieldChan == nil {
+		t.Error("Yield returned nil channel")
+		return
+	}
+	testCount(t, tr, 500)
+
+	// Grab the first two items.
+	for i := 0; i < 2; i++ {
+		<-yieldChan
+	}
+
+	// Send on the channel, grab the last item, and make sure that we can't grab another item.
+	quit <- struct{}{}
+	select {
+	case <- yieldChan:
+	default:
+		t.Error("Did not receive last item")
+	}
+	select {
+	case <- yieldChan:
+		t.Error("Unexpectedly received item 4")
+	default:
+	}
 }
 
 func TestList(t *testing.T) {
@@ -407,31 +455,31 @@ func TestSetIndex(t *testing.T) {
 
 func Benchmark100(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_, _ = buildTree(100, false)
+		_, _ = buildNumTree(100, false)
 	}
 }
 
 func Benchmark1000(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_, _ = buildTree(1000, false)
+		_, _ = buildNumTree(1000, false)
 	}
 }
 
 func Benchmark10000(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_, _ = buildTree(10000, false)
+		_, _ = buildNumTree(10000, false)
 	}
 }
 
 func Benchmark100000(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_, _ = buildTree(100000, false)
+		_, _ = buildNumTree(100000, false)
 	}
 }
 
 func Benchmark1000000(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_, _ = buildTree(1000000, false)
+		_, _ = buildNumTree(1000000, false)
 	}
 }
 
@@ -461,9 +509,9 @@ func newRand() *rand.Rand {
 	return random
 }
 
-// buildTree creates a new tree and populates it with count items, either randomly or by iterating from low to high. It
-// returns the new tree as well as the indexes of all the items.
-func buildTree(count int, random bool) (Tree, []int) {
+// buildNumTree creates a new tree and populates it with count items, either randomly or by iterating from low to high.
+// It returns the new tree as well as the indexes of all the items.
+func buildNumTree(count int, random bool) (Tree, []int) {
 	tr := New()
 	indexes := make([]int, count)
 
@@ -482,4 +530,37 @@ func buildTree(count int, random bool) (Tree, []int) {
 	}
 
 	return tr, indexes
+}
+
+// buildMiscTree creates a new tree and populates it with count items with random values of various types. It returns
+// the new tree as well as all the items.
+func buildMiscTree(count int) (Tree, []Item) {
+	// Build out the items first.
+	r := newRand()
+	items := make([]Item, count)
+	for i := 0; i < count; i++ {
+		var value interface{}
+		switch i % 6 {
+		case 0:
+			value = r.Int()
+		case 1:
+			value = r.Float64()
+		case 2:
+			value = r.Uint32()
+		case 3:
+			value = rune(r.Int31())
+		case 4:
+			value = string([]byte{byte(r.Int31n(94) + 32), byte(r.Int31n(94) + 32), byte(r.Int31n(94) + 32), byte(r.Int31n(94) + 32)})
+		case 5:
+			value = []int{r.Int(), r.Int(), r.Int(), r.Int(), r.Int(), r.Int(), r.Int()}
+		}
+		items[i] = NewItem(value, r.Int())
+	}
+
+	// Add the items to a tree.
+	t := New()
+	if err := t.AddItems(items...); err != nil {
+		return Tree{}, nil
+	}
+	return t, items
 }
