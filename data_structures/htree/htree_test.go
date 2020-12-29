@@ -458,11 +458,48 @@ func TestNewItem(t *testing.T) {
 }
 
 func TestBadItem(t *testing.T) {
-	// TODO
+	var item *Item
+
+	if value := item.GetValue(); value != nil {
+		t.Error("Unexpectedly passed bad item test for GetValue")
+	}
 }
 
 func TestGetValue(t *testing.T) {
-	// TODO
+	// Make 500 items, and test that they have the proper values.
+	values := buildValues(500)
+	items := make([]Item, 500)
+	for i := 0; i < 500; i++ {
+		items[i] = NewItem(values[i], i)
+	}
+
+	for i, item := range items {
+		if value := item.GetValue(); !reflect.DeepEqual(values[i], value) {
+			t.Error("Item", i, "returned the wrong values")
+		}
+	}
+
+	// Test that we can get an empty value.
+	item := NewItem(nil, 0)
+	if value := item.GetValue(); value != nil {
+		t.Error("Empty item did not return nil value")
+	}
+
+	// Test that we can build a tree and get the same item values.
+	tr, items := buildMiscTree(500)
+	for i, v := range items {
+		index := v.GetIndex()
+		item := tr.Item(index)
+		if item == (Item{}) {
+			t.Error("Invalid item at index", i)
+		} else {
+			val1 := v.GetValue()
+			val2 := item.GetValue()
+			if !reflect.DeepEqual(val1, val2) {
+				t.Error("Item value is different than tree's value")
+			}
+		}
+	}
 }
 
 func TestGetIndex(t *testing.T) {
@@ -561,9 +598,33 @@ func buildNumTree(count int, random bool) (Tree, []int) {
 // buildMiscTree creates a new tree and populates it with count items with random values of various types. It returns
 // the new tree as well as all the items.
 func buildMiscTree(count int) (Tree, []Item) {
+	if count < 1 {
+		return Tree{}, nil
+	}
+
 	// Build out the items first.
-	r := newRand()
+	values := buildValues(count)
 	items := make([]Item, count)
+	r := newRand()
+	for i := 0; i < count; i++ {
+		items[i] = NewItem(values[i], r.Int())
+	}
+
+	// Add the items to a tree.
+	t := New()
+	if err := t.AddItems(items...); err != nil {
+		return Tree{}, nil
+	}
+	return t, items
+}
+
+func buildValues(count int) []interface{} {
+	if count < 1 {
+		return nil
+	}
+
+	r := newRand()
+	values := make([]interface{}, count)
 	for i := 0; i < count; i++ {
 		var value interface{}
 		switch i % 6 {
@@ -580,13 +641,8 @@ func buildMiscTree(count int) (Tree, []Item) {
 		case 5:
 			value = []int{r.Int(), r.Int(), r.Int(), r.Int(), r.Int(), r.Int(), r.Int()}
 		}
-		items[i] = NewItem(value, r.Int())
+		values[i] = value
 	}
 
-	// Add the items to a tree.
-	t := New()
-	if err := t.AddItems(items...); err != nil {
-		return Tree{}, nil
-	}
-	return t, items
+	return values
 }
