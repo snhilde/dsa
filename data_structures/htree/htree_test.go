@@ -70,7 +70,6 @@ func TestBad(t *testing.T) {
 	}
 }
 
-// Begin testing the various methods for Tree.
 func TestAdd(t *testing.T) {
 	tr := New()
 
