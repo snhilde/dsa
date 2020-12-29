@@ -422,7 +422,25 @@ func TestYield(t *testing.T) {
 }
 
 func TestList(t *testing.T) {
-	// TODO
+	// Make sure that the items are returned in sorted order.
+	tr, items := buildMiscTree(1000)
+	testCount(t, tr, 1000)
+
+	sort.Slice(items, func(i, j int) bool {
+		return items[i].index < items[j].index
+	})
+
+	listItems := tr.List()
+	if len(listItems) != 1000 {
+		t.Error("List did not return all items")
+		return
+	}
+
+	for i, item := range listItems {
+		if !reflect.DeepEqual(items[i].GetValue(), item.GetValue()) {
+			t.Error("Items differ at index", i)
+		}
+	}
 }
 
 // --- ITEM TESTS ---
