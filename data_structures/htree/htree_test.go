@@ -41,12 +41,12 @@ func TestBad(t *testing.T) {
 		t.Error("Bad object test: Unexpectedly passed Remove")
 	}
 
-	if v := tr.Value(5); v != nil {
-		t.Error("Bad object test: Unexpectedly passed Value")
-	}
-
 	if item := tr.Item(5); item != (Item{}) {
 		t.Error("Bad object test: Unexpectedly passed Item")
+	}
+
+	if v := tr.Value(5); v != nil {
+		t.Error("Bad object test: Unexpectedly passed Value")
 	}
 
 	if ok := tr.Match(5); ok {
@@ -157,44 +157,6 @@ func TestRemove(t *testing.T) {
 	// TODO
 }
 
-func TestValue(t *testing.T) {
-	tr := New()
-
-	// Do a few simple, hand-built tests to make sure things look right.
-	tr.Add(5, 5)
-	tr.Add(10, 10)
-	tr.Add(1, 1)
-	if v := tr.Value(5); v != 5 {
-		t.Error("Expected 5, Received", v)
-	}
-	if v := tr.Value(10); v != 10 {
-		t.Error("Expected 10, Received", v)
-	}
-	if v := tr.Value(1); v != 1 {
-		t.Error("Expected 1, Received", v)
-	}
-
-	// Test that some other values are not present.
-	if v := tr.Value(2); v != nil {
-		t.Error("Expected nothing, Received", v)
-	}
-	if v := tr.Value(20); v != nil {
-		t.Error("Expected nothing, Received", v)
-	}
-	if v := tr.Value(100); v != nil {
-		t.Error("Expected nothing, Received", v)
-	}
-
-	// Now do a larger test to make sure indexes and values are properly tied and look-up is correct.
-	var nums []int
-	tr, nums = buildTree(100000, true)
-	for _, v := range nums {
-		if val := tr.Value(v); val != v {
-			t.Error("Expected", v, "| Received", val)
-		}
-	}
-}
-
 func TestItem(t *testing.T) {
 	tr := New()
 
@@ -235,16 +197,81 @@ func TestItem(t *testing.T) {
 	}
 }
 
+func TestValue(t *testing.T) {
+	tr := New()
+
+	// Do a few simple, hand-built tests to make sure things look right.
+	tr.Add(5, 5)
+	tr.Add(10, 10)
+	tr.Add(1, 1)
+	if v := tr.Value(5); v != 5 {
+		t.Error("Expected 5, Received", v)
+	}
+	if v := tr.Value(10); v != 10 {
+		t.Error("Expected 10, Received", v)
+	}
+	if v := tr.Value(1); v != 1 {
+		t.Error("Expected 1, Received", v)
+	}
+
+	// Test that some other values are not present.
+	if v := tr.Value(2); v != nil {
+		t.Error("Expected nothing, Received", v)
+	}
+	if v := tr.Value(20); v != nil {
+		t.Error("Expected nothing, Received", v)
+	}
+	if v := tr.Value(100); v != nil {
+		t.Error("Expected nothing, Received", v)
+	}
+
+	// Now do a larger test to make sure indexes and values are properly tied and look-up is correct.
+	var nums []int
+	tr, nums = buildTree(100000, true)
+	for _, v := range nums {
+		if val := tr.Value(v); val != v {
+			t.Error("Expected", v, "| Received", val)
+		}
+	}
+}
+
 func TestMatch(t *testing.T) {
+	// TODO
 }
 
 func TestYield(t *testing.T) {
+	// TODO
 }
 
 func TestList(t *testing.T) {
+	// TODO
 }
 
 // --- ITEM TESTS ---
+
+func TestNewItem(t *testing.T) {
+	// TODO
+}
+
+func TestBadItem(t *testing.T) {
+	// TODO
+}
+
+func TestGetValue(t *testing.T) {
+	// TODO
+}
+
+func TestGetIndex(t *testing.T) {
+	// TODO
+}
+
+func TestSetValue(t *testing.T) {
+	// TODO
+}
+
+func TestSetIndex(t *testing.T) {
+	// TODO
+}
 
 // --- TREE BENCHMARKS ---
 
