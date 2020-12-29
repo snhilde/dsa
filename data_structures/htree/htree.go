@@ -270,7 +270,7 @@ type Item struct {
 	index int
 }
 
-// NewItem creates a new item with the provided value and index.
+// NewItem creates a new item with the provided value, stored at index.
 func NewItem(value interface{}, index int) Item {
 	item := Item{
 		value: value,

@@ -446,7 +446,15 @@ func TestList(t *testing.T) {
 // --- ITEM TESTS ---
 
 func TestNewItem(t *testing.T) {
-	// TODO
+	item := NewItem("a", 1)
+	if item == (Item{}) {
+		t.Error("New item is empty")
+	}
+
+	// Test that default values yields an empty object.
+	if item := NewItem(nil, 0); item != (Item{}) {
+		t.Error("Default item is not empty")
+	}
 }
 
 func TestBadItem(t *testing.T) {
