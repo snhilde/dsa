@@ -146,8 +146,12 @@ func (t *Tree) Match(value interface{}) bool {
 
 	for item := range itemChan {
 		if reflect.DeepEqual(value, item.value) {
-			// Close the communication and return true.
-			quit <- struct{}{}
+			// Close the communication and return true. If Yield has finished sending everything, then it won't be
+			// listening on quit anymore.
+			select {
+			case quit <- struct{}{}:
+			default:
+			}
 			return true
 		}
 	}
