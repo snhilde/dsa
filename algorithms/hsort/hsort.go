@@ -2,18 +2,16 @@
 package hsort
 
 import (
-	"reflect"
 	"fmt"
+	"github.com/snhilde/dsa/data_structures/htree"
 	"math"
 	"math/rand"
-	"github.com/snhilde/dsa/data_structures/htree"
+	"reflect"
 )
-
 
 var (
 	invalidLen = fmt.Errorf("invalid list size")
 )
-
 
 // Sort the list using an insertion algorithm. The list must be a slice of a uniform data type.
 func Insertion(list interface{}) error {
@@ -31,7 +29,7 @@ func Insertion(list interface{}) error {
 		for j := i; j > 0; j-- {
 			// Scan down the section of the list that is now sorted until we find the insertion point.
 			curr := at(j)
-			prev := at(j-1)
+			prev := at(j - 1)
 			if greater(prev, curr) {
 				swap(j, j-1)
 			} else {
@@ -84,7 +82,7 @@ func Selection(list interface{}) error {
 
 	for i := 0; i < length; i++ {
 		pos := i
-		for j := i+1; j < length; j++ {
+		for j := i + 1; j < length; j++ {
 			// Check each value to see if it's lower than our current lowest.
 			low := at(pos)
 			try := at(j)
@@ -112,7 +110,7 @@ func SelectionInt(list []int) error {
 
 	for i := range list {
 		pos := i
-		for j := i+1; j < length; j++ {
+		for j := i + 1; j < length; j++ {
 			// Check each value to see if it's lower than our current lowest.
 			if list[j] < list[pos] {
 				// We found a value lower than we currently have. Select it.
@@ -142,11 +140,11 @@ func Bubble(list interface{}) error {
 	for !clean {
 		clean = true
 		for i := 0; i < length; i++ {
-			if i + 1 == length {
+			if i+1 == length {
 				break
 			}
 			curr := at(i)
-			next := at(i+1)
+			next := at(i + 1)
 			if greater(curr, next) {
 				swap(i, i+1)
 				clean = false
@@ -173,7 +171,7 @@ func BubbleInt(list []int) error {
 	for !clean {
 		clean = true
 		for i, v := range list {
-			if i + 1 == length {
+			if i+1 == length {
 				break
 			}
 			if v > list[i+1] {
@@ -217,7 +215,7 @@ func Merge(list interface{}) error {
 	for len(s) > 0 {
 		// Pop the top block.
 		b = s[len(s)-1]
-		s = s[:(len(s)-1)]
+		s = s[:(len(s) - 1)]
 
 		leftIndex := b.index
 		leftLen := b.length / 2
@@ -226,7 +224,7 @@ func Merge(list interface{}) error {
 		rightLen := b.length - leftLen
 		if b.merge {
 			// Calculate the sorted order of each item.
-			for i := b.index; i < b.index + b.length; i++ {
+			for i := b.index; i < b.index+b.length; i++ {
 				if leftLen == 0 {
 					// We only have values on the right side still.
 					moveTo[rightIndex] = i
@@ -247,7 +245,7 @@ func Merge(list interface{}) error {
 			}
 
 			// Now that everything is calculated, put the items into sorted order.
-			for i := b.index; i < b.index + b.length; i++ {
+			for i := b.index; i < b.index+b.length; i++ {
 				// Keep swapping items until the one at this index should be in this index.
 				for i != moveTo[i] {
 					// The item at this index needs to be moved to this index:
@@ -304,7 +302,7 @@ func MergeInt(list []int) error {
 	for len(s) > 0 {
 		// Pop the top block.
 		b = s[len(s)-1]
-		s = s[:(len(s)-1)]
+		s = s[:(len(s) - 1)]
 
 		leftIndex := b.index
 		leftLen := b.length / 2
@@ -384,7 +382,7 @@ func MergeOptimized(list interface{}) error {
 		for i := 0; i < numBlocks; i++ {
 			index := blockSize * i
 			// If this is the last block in the row, we have to compensate for potentially not having a full block.
-			if i == numBlocks - 1 {
+			if i == numBlocks-1 {
 				blockSize = length - index
 				if blockSize <= stackSize {
 					// Already sorted
@@ -399,7 +397,7 @@ func MergeOptimized(list interface{}) error {
 			rightLen := blockSize - stackSize
 
 			// Merge both stacks together.
-			for j := index; j < index + blockSize; j++ {
+			for j := index; j < index+blockSize; j++ {
 				if leftLen == 0 {
 					// We only have values on the right side still.
 					moveTo[rightIndex] = j
@@ -420,7 +418,7 @@ func MergeOptimized(list interface{}) error {
 			}
 
 			// Now that everything is calculated, put the items into sorted order.
-			for j := index; j < index + blockSize; j++ {
+			for j := index; j < index+blockSize; j++ {
 				// Keep swapping items until the one at this index should be in this index.
 				for j != moveTo[j] {
 					// The item at this index needs to be moved to this index:
@@ -466,7 +464,7 @@ func MergeIntOptimized(list []int) error {
 		for i := 0; i < numBlocks; i++ {
 			index := blockSize * i
 			// If this is the last block in the row, we have to compensate for potentially not having a full block.
-			if i == numBlocks - 1 {
+			if i == numBlocks-1 {
 				blockSize = length - index
 				if blockSize <= stackSize {
 					// Already sorted
@@ -653,7 +651,6 @@ func BinaryInt(list []int) error {
 
 	return nil
 }
-
 
 // Helper function that will set up all the variables and functions necessary for determining the list's underlying type
 // and acting on that type appropriately. It will return these values:

@@ -1,12 +1,11 @@
 package hsort
 
 import (
-	"testing"
-	"time"
 	"math/rand"
 	"sort"
+	"testing"
+	"time"
 )
-
 
 // sorter is the main interface for this test package. It allows for different types to be used with the same sorting
 // test harness.
@@ -24,8 +23,8 @@ type sorter interface {
 	Cmp(*testing.T) bool
 }
 
-
 // --- SORT TESTS ---
+
 func TestInsertion(t *testing.T) {
 	// Make sure that we can only pass a slice of certain types.
 	testBadArg(t, Insertion)
@@ -189,8 +188,8 @@ func TestBinaryInt(t *testing.T) {
 	testSort(t, &i, 100, 10000, false, "BinaryInt")
 }
 
-
 // --- SORT BENCHMARKS ---
+
 func BenchmarkInsertionInt100(b *testing.B) {
 	i := intSort{sortInt: InsertionInt}
 	benchmarkSort(b, &i, 100, false)
@@ -761,8 +760,8 @@ func BenchmarkBinaryInt10000(b *testing.B) {
 	benchmarkSort(b, &i, 10000, false)
 }
 
-
 // --- HELPER FUNCTIONS ---
+
 func testBadArg(t *testing.T, sort func(interface{}) error) {
 	// Make sure the function won't accept any of the types below.
 
@@ -925,20 +924,20 @@ func benchmarkSort(b *testing.B, s sorter, n int, isHash bool) {
 }
 
 func newRand() *rand.Rand {
-	seed   := time.Now().UnixNano()
+	seed := time.Now().UnixNano()
 	source := rand.NewSource(seed)
 	random := rand.New(source)
 
 	return random
 }
 
-
 // --- TYPES THAT IMPLEMENT SORTER INTERFACE ---
+
 type intSort struct {
 	dev     []int
 	std     []int
-	sort      func(interface{}) error
-	sortInt   func([]int) error
+	sort    func(interface{}) error
+	sortInt func([]int) error
 }
 
 func (s *intSort) Build(length int, isHash bool) {
@@ -986,11 +985,10 @@ func (s *intSort) Cmp(t *testing.T) bool {
 	return good
 }
 
-
 type uintSort struct {
 	dev  []uint
 	std  []int
-	sort   func(interface{}) error
+	sort func(interface{}) error
 }
 
 func (s *uintSort) Build(length int, isHash bool) {
@@ -1032,11 +1030,10 @@ func (s *uintSort) Cmp(t *testing.T) bool {
 	return good
 }
 
-
 type floatSort struct {
 	dev  []float64
 	std  []float64
-	sort   func(interface{}) error
+	sort func(interface{}) error
 }
 
 func (s *floatSort) Build(length int, isHash bool) {
@@ -1081,11 +1078,10 @@ func (s *floatSort) Cmp(t *testing.T) bool {
 	return good
 }
 
-
 type boolSort struct {
 	dev  []bool
 	std  []int
-	sort   func(interface{}) error
+	sort func(interface{}) error
 }
 
 func (s *boolSort) Build(length int, isHash bool) {
@@ -1096,7 +1092,7 @@ func (s *boolSort) Build(length int, isHash bool) {
 
 	for i := 0; i < length; i++ {
 		r := r.Int()
-		if r % 2 == 1 {
+		if r%2 == 1 {
 			s.dev[i] = true
 			s.std[i] = 1
 		} else {
@@ -1132,11 +1128,10 @@ func (s *boolSort) Cmp(t *testing.T) bool {
 	return good
 }
 
-
 type stringSort struct {
 	dev  []string
 	std  []string
-	sort   func(interface{}) error
+	sort func(interface{}) error
 }
 
 func (s *stringSort) Build(length int, isHash bool) {
