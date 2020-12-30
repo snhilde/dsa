@@ -38,7 +38,7 @@ func TestBad(t *testing.T) {
 		t.Error("Bad object test: Unexpectedly passed AddItems")
 	}
 
-	if err := tr.Remove(5); err == nil {
+	if item := tr.Remove(5); item != (Item{}) {
 		t.Error("Bad object test: Unexpectedly passed Remove")
 	}
 
@@ -172,7 +172,39 @@ func TestAddItems(t *testing.T) {
 }
 
 func TestRemove(t *testing.T) {
-	// TODO
+	// Build a random tree, and test that removing 10 random items one-by-one works as expected.
+	count := 500
+	tr, items := buildMiscTree(count)
+	testSort(t, tr, items)
+	testCount(t, tr, count)
+
+	r := newRand()
+	for i := 0; i < 10; i++ {
+		index := int(r.Int31n(int32(count - 1)))
+		if item := tr.Remove(items[index].GetIndex()); item == (Item{}) {
+			t.Error("Failed to remove item", i)
+			return
+		}
+
+		count--
+		tmp := make([]Item, count)
+		copy(tmp, items[:index])
+		copy(tmp[index:], items[index+1:])
+		items = tmp
+
+		testSort(t, tr, items)
+		testCount(t, tr, count)
+	}
+
+	// Test adding some items back in to make sure the tree can still balance itself.
+	_, newItems := buildMiscTree(count)
+	if err := tr.AddItems(newItems...); err != nil {
+		t.Error(err)
+		return
+	}
+	items = append(items, newItems...)
+	testSort(t, tr, items)
+	testCount(t, tr, len(items))
 }
 
 func TestClear(t *testing.T) {

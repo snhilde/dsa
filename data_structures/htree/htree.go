@@ -97,15 +97,15 @@ func (t *Tree) AddItems(items ...Item) error {
 	return nil
 }
 
-// Remove removes the item at the provided index from the tree.
-func (t *Tree) Remove(index int) error {
+// Remove removes and returns the item at the provided index from the tree.
+func (t *Tree) Remove(index int) Item {
 	if t == nil {
-		return errBadTree
+		return Item{}
 	}
 
 	// TODO: implement
 
-	return nil
+	return Item{}
 }
 
 // Clear clears all items in the tree and resets it to a new state.
