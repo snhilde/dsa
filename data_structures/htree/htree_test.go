@@ -97,15 +97,16 @@ func TestAdd(t *testing.T) {
 	testCount(t, tr, 3)
 
 	// Now do a larger test to make sure items are inserted in the correct order.
-	var b strings.Builder
-	var nums []int
-	tr, nums = buildNumTree(100000, true)
-	sort.Ints(nums)
-	for _, v := range nums {
-		b.WriteString(fmt.Sprintf("%v, ", v))
+	tr.Clear()
+	_, items := buildMiscTree(100000)
+	for _, item := range items {
+		value := item.GetValue()
+		index := item.GetIndex()
+		if err := tr.Add(value, index); err != nil {
+			t.Error(err)
+		}
 	}
-	s := strings.TrimSuffix(b.String(), ", ")
-	testString(t, tr, s)
+	testSort(t, tr, items)
 	testCount(t, tr, 100000)
 }
 
@@ -129,37 +130,19 @@ func TestAddItems(t *testing.T) {
 	testCount(t, tr, 3)
 
 	// Now do a larger test to make sure items are inserted in the correct order.
-	var b strings.Builder
-	tr = New()
-	nums := make([]int, 10000)
-	items := make([]Item, 10000)
-	r := newRand()
-
-	// Build all the items.
-	for i := range nums {
-		v := r.Int()
-		nums[i] = v
-		items[i] = NewItem(v, v)
-	}
-
-	// Add them all into the tree.
+	tr.Clear()
+	_, items := buildMiscTree(100000)
 	if err := tr.AddItems(items...); err != nil {
 		t.Error(err)
 	}
-
-	// Check that everything was added in sorted order.
-	sort.Ints(nums)
-	for _, v := range nums {
-		b.WriteString(fmt.Sprintf("%v, ", v))
-	}
-	s := strings.TrimSuffix(b.String(), ", ")
-	testString(t, tr, s)
-	testCount(t, tr, 10000)
+	testSort(t, tr, items)
+	testCount(t, tr, 100000)
 
 	// Test that setting a new value for an item doesn't affect the tree's value until the item is added to the tree
 	// again. We're going to get a value from the tree, change its value, and then grab it again to make sure nothing's
 	// changed. After that, we're going to add the item again at the same index and then grab it again to make sure the
 	// value has been updated.
+	tr.Clear()
 	tr, items = buildMiscTree(500)
 	testCount(t, tr, 500)
 
@@ -245,13 +228,19 @@ func TestItem(t *testing.T) {
 	}
 
 	// Now do a larger test to make sure the correct item is returned.
-	var nums []int
-	tr, nums = buildNumTree(100000, true)
-	for _, v := range nums {
-		if item := tr.Item(v); item.GetValue() != v {
-			t.Error("Wrong value: Expected", v, "| Received", item.GetValue())
-		} else if item.GetIndex() != v {
-			t.Error("Wrong index: Expected", v, "| Received", item.GetIndex())
+	tr, items := buildMiscTree(100000)
+	for _, item := range items {
+		value := item.GetValue()
+		index := item.GetIndex()
+		treeItem := tr.Item(index)
+		if !reflect.DeepEqual(treeItem.GetValue(), value) {
+			t.Error("Wrong value")
+			t.Log("Expected:", value)
+			t.Log("Received:", treeItem.GetValue())
+		} else if treeItem.GetIndex() != index {
+			t.Error("Wrong index")
+			t.Log("Expected:", index)
+			t.Log("Received:", treeItem.GetIndex())
 		}
 	}
 }
@@ -285,11 +274,15 @@ func TestValue(t *testing.T) {
 	}
 
 	// Now do a larger test to make sure indexes and values are properly tied and look-up is correct.
-	var nums []int
-	tr, nums = buildNumTree(100000, true)
-	for _, v := range nums {
-		if val := tr.Value(v); val != v {
-			t.Error("Expected", v, "| Received", val)
+	tr, items := buildMiscTree(100000)
+	for _, item := range items {
+		value := item.GetValue()
+		index := item.GetIndex()
+		treeItem := tr.Item(index)
+		if !reflect.DeepEqual(treeItem.GetValue(), value) {
+			t.Error("Wrong value")
+			t.Log("Expected:", value)
+			t.Log("Received:", treeItem.GetValue())
 		}
 	}
 }
@@ -298,8 +291,8 @@ func TestMatch(t *testing.T) {
 	tr := New()
 	r := newRand()
 
-	// Make two lists of 500 items each. One list will be added to the tree, and the other won't. We'll then check that the
-	// added ones do match and the not-added ones don't match.
+	// Make two lists of 500 items each. One list will be added to the tree, and the other won't. We'll then check that
+	// the added ones do match and the not-added ones don't match.
 	presentItems := make([]Item, 500)
 	absentItems := make([]Item, 500)
 	for i := 0; i < 1000; i++ {
@@ -336,23 +329,8 @@ func TestMatch(t *testing.T) {
 
 	// Test items with different types.
 	tr.Clear()
-	for i := 0; i < 1000; i++ {
-		var value interface{}
-		switch i % 12 {
-		case 0, 1:
-			value = r.Int()
-		case 2, 3:
-			value = r.Float64()
-		case 4, 5:
-			value = r.Uint32()
-		case 6, 7:
-			value = rune(r.Int31())
-		case 8, 9:
-			value = string([]byte{byte(r.Int31n(94) + 32), byte(r.Int31n(94) + 32), byte(r.Int31n(94) + 32), byte(r.Int31n(94) + 32)})
-		case 10, 11:
-			value = []int{r.Int(), r.Int(), r.Int(), r.Int(), r.Int(), r.Int(), r.Int()}
-		}
-		item := NewItem(value, r.Int())
+	_, items := buildMiscTree(1000)
+	for i, item := range items {
 		index := i / 2
 		if i % 2 == 0 {
 			presentItems[index] = item
@@ -365,6 +343,7 @@ func TestMatch(t *testing.T) {
 		t.Error(err)
 		return
 	}
+	testSort(t, tr, presentItems)
 	testCount(t, tr, 500)
 
 	// Make sure that all of these items match.
@@ -405,9 +384,7 @@ func TestYield(t *testing.T) {
 
 	// Test that indexes are sorted and the correct items are returned.
 	tr, items := buildMiscTree(500)
-	sort.Slice(items, func(i, j int) bool {
-		return items[i].index < items[j].index
-	})
+	testSort(t, tr, items)
 	testCount(t, tr, 500)
 
 	yieldChan := tr.Yield(nil)
@@ -420,6 +397,8 @@ func TestYield(t *testing.T) {
 	for item := range yieldChan {
 		if !reflect.DeepEqual(items[i].GetValue(), item.GetValue()) {
 			t.Error("Items differ at index", i)
+			t.Log("Expected:", items[i].GetValue())
+			t.Log("Received:", item.GetValue())
 		}
 		i++
 	}
@@ -455,11 +434,8 @@ func TestYield(t *testing.T) {
 func TestList(t *testing.T) {
 	// Make sure that the items are returned in sorted order.
 	tr, items := buildMiscTree(1000)
+	testSort(t, tr, items)
 	testCount(t, tr, 1000)
-
-	sort.Slice(items, func(i, j int) bool {
-		return items[i].index < items[j].index
-	})
 
 	listItems := tr.List()
 	if len(listItems) != 1000 {
@@ -503,7 +479,7 @@ func TestBadItem(t *testing.T) {
 }
 
 func TestGetValue(t *testing.T) {
-	// Make 500 items, and test that they have the proper values.
+	// Make 500 items by hand, and test that they have the proper values.
 	values := buildValues(500)
 	items := make([]Item, 500)
 	for i := 0; i < 500; i++ {
@@ -524,6 +500,8 @@ func TestGetValue(t *testing.T) {
 
 	// Test that we can build a tree and get the same item values.
 	tr, items := buildMiscTree(500)
+	testSort(t, tr, items)
+	testCount(t, tr, 500)
 	for i, v := range items {
 		index := v.GetIndex()
 		item := tr.Item(index)
@@ -629,6 +607,23 @@ func testCount(t *testing.T, tr Tree, want int) {
 	}
 }
 
+func testSort(t *testing.T, tr Tree, items []Item) {
+	// Sort the list of items.
+	sort.Slice(items, func(i, j int) bool {
+		return items[i].index < items[j].index
+	})
+
+	// Build a string of values from the items.
+	var b strings.Builder
+	for _, item := range items {
+		fmt.Fprintf(&b, "%v, ", item.GetValue())
+	}
+	s := strings.TrimSuffix(b.String(), ", ")
+
+	// Check that the string is the same as the tree's string.
+	testString(t, tr, s)
+}
+
 func newRand() *rand.Rand {
 	seed := time.Now().UnixNano()
 	source := rand.NewSource(seed)
@@ -669,13 +664,18 @@ func buildMiscTree(count int) (Tree, []Item) {
 
 	// Build out the items first.
 	values := buildValues(count)
-	items := make([]Item, count)
+	if values == nil {
+		return Tree{}, nil
+	}
+
+	// Make all the items.
 	r := newRand()
+	items := make([]Item, count)
 	for i := 0; i < count; i++ {
 		items[i] = NewItem(values[i], r.Int())
 	}
 
-	// Add the items to a tree.
+	// Add the items to a new tree.
 	t := New()
 	if err := t.AddItems(items...); err != nil {
 		return Tree{}, nil
