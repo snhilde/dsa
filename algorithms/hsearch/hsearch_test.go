@@ -1,12 +1,11 @@
 package hsearch
 
 import (
-	"testing"
-	"time"
 	"math/rand"
 	"sort"
+	"testing"
+	"time"
 )
-
 
 // Build two slices of random numbers: one with our target value and one without.
 // Send each slice and target value through the provided search function.
@@ -15,9 +14,9 @@ import (
 // iters      num of iterations to run
 // length     length of slice to sort
 // sorted     whether or not to sort the arrays before searching
-func testSearch(t *testing.T, searchFunc func([]int, int)(int, error), iters int, length int, sorted bool) {
+func testSearch(t *testing.T, searchFunc func([]int, int) (int, error), iters int, length int, sorted bool) {
 	for i := 0; i < iters; i++ {
-		seed   := time.Now().UnixNano()
+		seed := time.Now().UnixNano()
 		source := rand.NewSource(seed)
 		random := rand.New(source)
 

@@ -5,7 +5,6 @@ import (
 	"fmt"
 )
 
-
 // Find needle's position in haystack.
 // Search progresses linearly.
 func LinearInt(haystack []int, needle int) (int, error) {
