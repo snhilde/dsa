@@ -10,7 +10,8 @@ import (
 )
 
 var (
-	invalidLen = fmt.Errorf("invalid list size")
+	// errBadLength is the error message for an invalid list size.
+	errBadLength = fmt.Errorf("invalid list size")
 )
 
 // Sort the list using an insertion algorithm. The list must be a slice of a uniform data type.
@@ -49,7 +50,7 @@ func InsertionInt(list []int) error {
 	//    if the item at the index has a greater value, then shift it one to the right.
 	// 3. Insert the value at the now-open index.
 	if len(list) < 1 {
-		return invalidLen
+		return errBadLength
 	}
 
 	for i, v := range list {
@@ -105,7 +106,7 @@ func SelectionInt(list []int) error {
 	// 2. Swap the current value and the lowest value.
 	length := len(list)
 	if length < 1 {
-		return invalidLen
+		return errBadLength
 	}
 
 	for i := range list {
@@ -162,7 +163,7 @@ func BubbleInt(list []int) error {
 	// doing this until we have one pass with no swaps.
 	length := len(list)
 	if length < 1 {
-		return invalidLen
+		return errBadLength
 	}
 
 	// At the beginning of every pass, we'll set clean to true. If we perform any operation during the pass, we'll
@@ -291,7 +292,7 @@ func MergeInt(list []int) error {
 
 	length := len(list)
 	if length < 1 {
-		return invalidLen
+		return errBadLength
 	}
 
 	// Create a space to hold our new list while we are merging stacks.
@@ -448,7 +449,7 @@ func MergeIntOptimized(list []int) error {
 	// and everything is sorted.
 	length := len(list)
 	if length < 1 {
-		return invalidLen
+		return errBadLength
 	}
 
 	// Create a space to hold our new list while we are merging stacks.
@@ -519,7 +520,7 @@ func HashInt(list []int) error {
 	// ranges. The time complexity is linear for input size AND linear for value range.
 	length := len(list)
 	if length < 1 {
-		return invalidLen
+		return errBadLength
 	}
 
 	// Give the table a 75% fill to decrease the number of collisions and subsequent append operations.
@@ -599,7 +600,7 @@ func BogoInt(list []int) error {
 	// We will continue doing this until the loop is sorted.
 	length := len(list)
 	if length < 1 {
-		return invalidLen
+		return errBadLength
 	}
 
 	// This is the swap function we'll use in Shuffle.
@@ -634,7 +635,7 @@ func BogoInt(list []int) error {
 func BinaryInt(list []int) error {
 	length := len(list)
 	if length < 1 {
-		return invalidLen
+		return errBadLength
 	}
 
 	tree := htree.New()
@@ -670,7 +671,7 @@ func initSort(list interface{}) (length int, at func(int) reflect.Value, greater
 	// Find out how long our list is.
 	length = v.Len()
 	if length < 1 {
-		err = invalidLen
+		err = errBadLength
 		return
 	}
 
