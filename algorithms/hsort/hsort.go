@@ -14,7 +14,7 @@ var (
 	errBadLength = fmt.Errorf("invalid list size")
 )
 
-// Sort the list using an insertion algorithm. The list must be a slice of a uniform data type.
+// Insertion sorts the list using an insertion algorithm. The list must be a slice of a uniform data type.
 func Insertion(list interface{}) error {
 	// We're going to follow this sequence for each item in the list:
 	// 1. Get the value at the current index.
@@ -42,7 +42,7 @@ func Insertion(list interface{}) error {
 	return nil
 }
 
-// Sort the list of ints using an insertion algorithm.
+// InsertionInt sorts the list of ints using an insertion algorithm.
 func InsertionInt(list []int) error {
 	// We're going to follow this sequence for each item in the list:
 	// 1. Get the value at the current index.
@@ -71,7 +71,7 @@ func InsertionInt(list []int) error {
 	return nil
 }
 
-// Sort the list using a selection algorithm. The list must be a slice of a uniform data type.
+// Selection sorts the list using a selection algorithm. The list must be a slice of a uniform data type.
 func Selection(list interface{}) error {
 	// We're going to follow this sequence for each item in the list:
 	// 1. Scan the entire list from the current position forward for the lowest value.
@@ -99,7 +99,7 @@ func Selection(list interface{}) error {
 	return nil
 }
 
-// Sort the list of ints using a selection algorithm.
+// SelectionInt sorts the list of ints using a selection algorithm.
 func SelectionInt(list []int) error {
 	// We're going to follow this sequence for each item in the list:
 	// 1. Scan the entire list from the current position forward for the lowest value.
@@ -125,7 +125,7 @@ func SelectionInt(list []int) error {
 	return nil
 }
 
-// Sort the list using a bubble algorithm. The list must be a slice of a uniform data type.
+// Bubble sorts the list using a bubble algorithm. The list must be a slice of a uniform data type.
 func Bubble(list interface{}) error {
 	// For this function, we're going to iterate through every item in the list. If an item has a greater value than its
 	// neighbor to the right, then we'll swap them. When we get to the end, we'll start again at the beginning and keep
@@ -156,7 +156,7 @@ func Bubble(list interface{}) error {
 	return nil
 }
 
-// Sort the list of ints using a bubble algorithm.
+// BubbleInt sorts the list of ints using a bubble algorithm.
 func BubbleInt(list []int) error {
 	// For this function, we're going to iterate through every item in the list. If an item has a greater value than its
 	// neighbor to the right, then we'll swap them. When we get to the end, we'll start again at the beginning and keep
@@ -185,7 +185,7 @@ func BubbleInt(list []int) error {
 	return nil
 }
 
-// Sort the list using a merging algorithm. The list must be a slice of a uniform data type.
+// Merge sorts the list using a merging algorithm. The list must be a slice of a uniform data type.
 func Merge(list interface{}) error {
 	// For this sorting function, we're going to focus on a stack of blocks. A block is a subsection of the total list.
 	// First, we're going to create a block for the entire list. Then we're going to follow this sequence for each sub-block:
@@ -277,7 +277,7 @@ func Merge(list interface{}) error {
 	return nil
 }
 
-// Sort the list of ints using a merging algorithm.
+// MergeInt sorts the list of ints using a merging algorithm.
 func MergeInt(list []int) error {
 	// For this sorting function, we're going to focus on a stack of blocks. A block is a subsection of the total list.
 	// First, we're going to create a block for the entire list. Then we're going to follow this sequence for each sub-block:
@@ -350,7 +350,8 @@ func MergeInt(list []int) error {
 	return nil
 }
 
-// Sort the list using a merging algorithm that is optimized for low memory use. The list must be a slice of a uniform data type.
+// MergeOptimized sorts the list using a merging algorithm that is optimized for low memory use. The list must be a
+// slice of a uniform data type.
 func MergeOptimized(list interface{}) error {
 	// While the standard merging algorithm first divides the list to be sorted into iteratively smaller blocks and then
 	// merges back up the tree, this implementation starts at the bottom and merges upward immediately. This reduces
@@ -437,7 +438,7 @@ func MergeOptimized(list interface{}) error {
 	return nil
 }
 
-// Sort the list of ints using a merging algorithm that is optimized for low memory use.
+// MergeIntOptimized sorts the list of ints using a merging algorithm that is optimized for low memory use.
 func MergeIntOptimized(list []int) error {
 	// While the standard merging algorithm first divides the list to be sorted into iteratively smaller blocks and then
 	// merges back up the tree, this implementation starts at the bottom and merges upward immediately. This reduces
@@ -506,7 +507,7 @@ func MergeIntOptimized(list []int) error {
 	return nil
 }
 
-// Sort the list of ints using a hashing algorithm.
+// HashInt sorts the list of ints using a hashing algorithm.
 // Note: The efficiency of this algorithm decreases as the range of possible values in the list increases.
 func HashInt(list []int) error {
 	// We're going to follow this sequence:
@@ -556,7 +557,7 @@ func HashInt(list []int) error {
 	return nil
 }
 
-// Sort the list using a bogo algorithm. The list must be a slice of a uniform data type.
+// Bogo sorts the list using a bogo algorithm. The list must be a slice of a uniform data type.
 // Note: This is a bogus algorithm intended to be highly inefficient.
 func Bogo(list interface{}) error {
 	// The loop for this process is simple:
@@ -591,7 +592,7 @@ func Bogo(list interface{}) error {
 	return nil
 }
 
-// Sort the list of ints using a bogosort algorithm.
+// BogoInt sorts the list of ints using a bogosort algorithm.
 // Note: Please don't use this.
 func BogoInt(list []int) error {
 	// The loop for this process is simple:
@@ -631,7 +632,7 @@ func BogoInt(list []int) error {
 	return nil
 }
 
-// Sort the list of ints using a binary search tree.
+// BinaryInt sorts the list of ints using a binary search tree.
 func BinaryInt(list []int) error {
 	length := len(list)
 	if length < 1 {
