@@ -589,6 +589,33 @@ func TestSetValue(t *testing.T) {
 	}
 
 	// Make sure that setting a new value for an item doesn't affect the item's value in the tree.
+	tr, items := buildMiscTree(1000)
+	testSort(t, tr, items)
+	testCount(t, tr, 1000)
+
+	for _, v := range items {
+		index := v.GetIndex()
+		item := tr.Item(index)
+		if item == (Item{}) {
+			t.Error("Bad item")
+			continue
+		}
+		item.SetValue("new value")
+		item = tr.Item(index)
+		value := item.GetValue()
+		if val, ok := value.(string); ok && val == "new value" {
+			t.Error("Item in tree has been unexpectedly updated")
+			continue
+		}
+
+		item.SetValue("new value")
+		tr.AddItems(item)
+		item = tr.Item(index)
+		if value := item.GetValue(); value.(string) != "new value" {
+			t.Error("Item's value was not updated")
+			continue
+		}
+	}
 }
 
 func TestSetIndex(t *testing.T) {
@@ -622,7 +649,35 @@ func TestSetIndex(t *testing.T) {
 		}
 	}
 
-	// Make sure that setting a new value for an item doesn't affect the item's value in the tree.
+	// Make sure that setting a new index for an item doesn't affect the item's index in the tree.
+	tr, items := buildMiscTree(1000)
+	testSort(t, tr, items)
+	testCount(t, tr, 1000)
+
+	for i, v := range items {
+		index := v.GetIndex()
+		newIndex := i
+		item := tr.Item(index)
+		if item == (Item{}) {
+			t.Error("Bad item")
+			continue
+		}
+		item.SetIndex(newIndex)
+		item = tr.Item(index)
+		if item.GetIndex() == newIndex {
+			t.Error("Item in tree has been unexpectedly updated")
+			continue
+		}
+
+		item.SetIndex(newIndex)
+		tr.AddItems(item)
+		item = tr.Item(newIndex)
+		if item == (Item{}) {
+			t.Error("Bad item at new index")
+		} else if item.GetIndex() != newIndex {
+			t.Error("Item's index was not updated")
+		}
+	}
 }
 
 // --- TREE BENCHMARKS ---
