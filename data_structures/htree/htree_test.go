@@ -482,13 +482,15 @@ func TestGetValue(t *testing.T) {
 	// Make 500 items by hand, and test that they have the proper values.
 	values := buildValues(500)
 	items := make([]Item, 500)
-	for i := 0; i < 500; i++ {
+	for i := range items {
 		items[i] = NewItem(values[i], i)
 	}
 
 	for i, item := range items {
 		if value := item.GetValue(); !reflect.DeepEqual(values[i], value) {
 			t.Error("Item", i, "returned the wrong value")
+			t.Error("Expected:", values[i])
+			t.Error("Received:", value)
 		}
 	}
 
@@ -511,27 +513,61 @@ func TestGetValue(t *testing.T) {
 			val1 := v.GetValue()
 			val2 := item.GetValue()
 			if !reflect.DeepEqual(val1, val2) {
-				t.Error("Item value is different than tree's value")
+				t.Error("Item's value is different than tree's value")
+				t.Error("Expected:", val1)
+				t.Error("Received:", val2)
 			}
 		}
 	}
 }
 
 func TestGetIndex(t *testing.T) {
-	// TODO
+	// Make 500 items by hand, and test that they have the proper indexes.
+	items := make([]Item, 500)
+	for i := range items {
+		items[i] = NewItem(i, i)
+	}
+
+	for i, item := range items {
+		if item.GetIndex() != i {
+			t.Error("Item", i, "returned the wrong index")
+			t.Error("Expected:", i)
+			t.Error("Received:", item.GetIndex())
+		}
+	}
+
+	// Test that we can build a tree and get the same item indexes.
+	tr, items := buildMiscTree(500)
+	testSort(t, tr, items)
+	testCount(t, tr, 500)
+	for i, v := range items {
+		index := v.GetIndex()
+		item := tr.Item(index)
+		if item == (Item{}) {
+			t.Error("Invalid item at index", i)
+		} else {
+			if item.GetIndex() != index {
+				t.Error("Item's index is different than tree's index")
+				t.Error("Expected:", index)
+				t.Error("Received:", item.GetIndex())
+			}
+		}
+	}
 }
 
 func TestSetValue(t *testing.T) {
-	// Test that new values are correctly reflected in the item.
+	// Test that a new value is correctly reflected in the item.
 	values := buildValues(500)
 	items := make([]Item, 500)
-	for i := 0; i < 500; i++ {
+	for i := range items {
 		items[i] = NewItem(values[i], i)
 	}
 
 	for i, item := range items {
 		if value := item.GetValue(); !reflect.DeepEqual(values[i], value) {
 			t.Error("Item", i, "returned the wrong value")
+			t.Error("Expected:", values[i])
+			t.Error("Received:", value)
 		}
 	}
 
@@ -547,6 +583,8 @@ func TestSetValue(t *testing.T) {
 	for i, item := range items {
 		if value := item.GetValue(); !reflect.DeepEqual(newValues[i], value) {
 			t.Error("Item", i, "returned the wrong new value")
+			t.Error("Expected:", newValues[i])
+			t.Error("Received:", value)
 		}
 	}
 
@@ -554,7 +592,37 @@ func TestSetValue(t *testing.T) {
 }
 
 func TestSetIndex(t *testing.T) {
-	// TODO
+	// Test that a new index is correctly reflected in the item.
+	items := make([]Item, 500)
+	for i := range items {
+		items[i] = NewItem(i, i)
+	}
+
+	for i, item := range items {
+		if item.GetIndex() != i {
+			t.Error("Item", i, "returned the wrong index")
+			t.Error("Expected:", i)
+			t.Error("Received:", item.GetIndex())
+		}
+	}
+
+	for i, item := range items {
+		if err := item.SetIndex(i + 1000); err != nil {
+			t.Error(err)
+		}
+		// Save the modified item.
+		items[i] = item
+	}
+
+	for i, item := range items {
+		if item.GetIndex() != i + 1000 {
+			t.Error("Item", i, "returned the wrong new index")
+			t.Error("Expected:", i + 1000)
+			t.Error("Received:", item.GetIndex())
+		}
+	}
+
+	// Make sure that setting a new value for an item doesn't affect the item's value in the tree.
 }
 
 // --- TREE BENCHMARKS ---
