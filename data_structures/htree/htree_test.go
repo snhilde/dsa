@@ -331,7 +331,7 @@ func TestMatch(t *testing.T) {
 		value := r.Int()
 		item := NewItem(value, value)
 		index := i / 2
-		if i % 2 == 0 {
+		if i%2 == 0 {
 			presentItems[index] = item
 		} else {
 			absentItems[index] = item
@@ -364,7 +364,7 @@ func TestMatch(t *testing.T) {
 	_, items := buildMiscTree(1000)
 	for i, item := range items {
 		index := i / 2
-		if i % 2 == 0 {
+		if i%2 == 0 {
 			presentItems[index] = item
 		} else {
 			absentItems[index] = item
@@ -452,12 +452,12 @@ func TestYield(t *testing.T) {
 	// Send on the channel, grab the last item, and make sure that we can't grab another item.
 	quit <- struct{}{}
 	select {
-	case <- yieldChan:
+	case <-yieldChan:
 	default:
 		t.Error("Did not receive last item")
 	}
 	select {
-	case <- yieldChan:
+	case <-yieldChan:
 		t.Error("Unexpectedly received item 4")
 	default:
 	}
@@ -674,9 +674,9 @@ func TestSetIndex(t *testing.T) {
 	}
 
 	for i, item := range items {
-		if item.GetIndex() != i + 1000 {
+		if item.GetIndex() != i+1000 {
 			t.Error("Item", i, "returned the wrong new index")
-			t.Error("Expected:", i + 1000)
+			t.Error("Expected:", i+1000)
 			t.Error("Received:", item.GetIndex())
 		}
 	}
