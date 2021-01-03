@@ -1,8 +1,9 @@
 // This file provides some widely used character sets.
+
 package hconvert
 
-// AsciiCharSet creates a new CharSet with all 128 ASCII characters.
-func AsciiCharSet() CharSet {
+// ASCIICharSet creates a new CharSet with all 128 ASCII characters.
+func ASCIICharSet() CharSet {
 	c := make([]rune, 128)
 	for i := range c {
 		c[i] = rune(i)
@@ -133,7 +134,7 @@ func Base64URLCharSet() CharSet {
 	return charSet
 }
 
-// ASCII85CharSet creates a new CharSet with the Ascii85 character set.
+// ASCII85CharSet creates a new CharSet with the ASCII85 character set.
 func ASCII85CharSet() CharSet {
 	c := []rune{
 		'!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', '0',
