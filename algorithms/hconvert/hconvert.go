@@ -9,9 +9,9 @@ import (
 )
 
 var (
-	ErrBadConverter = fmt.Errorf("bad Converter")
-	ErrNoCharSet = fmt.Errorf("no character set provided")
-	ErrBadCharSet = fmt.Errorf("character set mismatch")
+	errBadConverter = fmt.Errorf("bad Converter")
+	errNoCharSet = fmt.Errorf("no character set provided")
+	errBadCharSet = fmt.Errorf("character set mismatch")
 )
 
 // Converter holds information about the conversion process, including the specified character sets.
@@ -39,7 +39,7 @@ func NewConverter(decode CharSet, encode CharSet) Converter {
 // internally.
 func (c *Converter) DecodeFrom(r io.Reader) error {
 	if c == nil {
-		return ErrBadConverter
+		return errBadConverter
 	}
 
 	encoded, err := ioutil.ReadAll(r)
@@ -60,7 +60,7 @@ func (c *Converter) DecodeFrom(r io.Reader) error {
 // EncodeTo encodes the internally stored data using the encoding character set and writes it to w.
 func (c *Converter) EncodeTo(w io.Writer) error {
 	if c == nil {
-		return ErrBadConverter
+		return errBadConverter
 	}
 
 	if len(c.buf) == 0 {
