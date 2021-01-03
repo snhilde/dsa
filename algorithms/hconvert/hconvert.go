@@ -10,8 +10,8 @@ import (
 
 var (
 	errBadConverter = fmt.Errorf("bad Converter")
-	errNoCharSet = fmt.Errorf("no character set provided")
-	errBadCharSet = fmt.Errorf("character set mismatch")
+	errNoCharSet    = fmt.Errorf("no character set provided")
+	errBadCharSet   = fmt.Errorf("character set mismatch")
 )
 
 // Converter holds information about the conversion process, including the specified character sets.
