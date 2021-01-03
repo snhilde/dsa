@@ -368,7 +368,6 @@ func (t *Tree) rebalance(stack *hstack.Stack, index int, added bool) {
 		} else if node.bal == -2 || node.bal == 2 {
 			// We have an imbalance. Rotate the nodes to fix this. This will change the root node of this branch, so
 			// we'll need to link it back in after the rotation operation is done.
-			// tree.
 			rotated := rotate(node, index)
 			if stack.Count() == 0 {
 				// We're at the top of the tree.
