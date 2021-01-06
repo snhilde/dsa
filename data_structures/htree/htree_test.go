@@ -83,18 +83,21 @@ func TestAdd(t *testing.T) {
 	}
 	testString(t, tr, "5")
 	testCount(t, tr, 1)
+	testBalance(t, tr.trunk)
 
 	if err := tr.Add(10, 10); err != nil {
 		t.Error(err)
 	}
 	testString(t, tr, "5, 10")
 	testCount(t, tr, 2)
+	testBalance(t, tr.trunk)
 
 	if err := tr.Add(1, 1); err != nil {
 		t.Error(err)
 	}
 	testString(t, tr, "1, 5, 10")
 	testCount(t, tr, 3)
+	testBalance(t, tr.trunk)
 
 	// Now do a larger test to make sure items are inserted in the correct order.
 	tr.Clear()
@@ -108,6 +111,7 @@ func TestAdd(t *testing.T) {
 	}
 	testSort(t, tr, items)
 	testCount(t, tr, 100000)
+	testBalance(t, tr.trunk)
 }
 
 func TestAddItems(t *testing.T) {
@@ -120,6 +124,7 @@ func TestAddItems(t *testing.T) {
 	}
 	testString(t, tr, "5")
 	testCount(t, tr, 1)
+	testBalance(t, tr.trunk)
 
 	item2 := NewItem(10, 10)
 	item3 := NewItem(1, 1)
@@ -128,6 +133,7 @@ func TestAddItems(t *testing.T) {
 	}
 	testString(t, tr, "1, 5, 10")
 	testCount(t, tr, 3)
+	testBalance(t, tr.trunk)
 
 	// Now do a larger test to make sure items are inserted in the correct order.
 	tr.Clear()
@@ -137,6 +143,7 @@ func TestAddItems(t *testing.T) {
 	}
 	testSort(t, tr, items)
 	testCount(t, tr, 100000)
+	testBalance(t, tr.trunk)
 
 	// Test that setting a new value for an item doesn't affect the tree's value until the item is added to the tree
 	// again. We're going to get a value from the tree, change its value, and then grab it again to make sure nothing's
@@ -145,6 +152,7 @@ func TestAddItems(t *testing.T) {
 	tr.Clear()
 	tr, items = buildMiscTree(500)
 	testCount(t, tr, 500)
+	testBalance(t, tr.trunk)
 
 	for _, v := range items {
 		index := v.GetIndex()
@@ -171,12 +179,42 @@ func TestAddItems(t *testing.T) {
 	}
 }
 
+func TestBalance(t *testing.T) {
+	tr := New()
+
+	// By adding numbers from low to high, we're only going to be performing single left rotations during the
+	// rebalances. This will test specifically that single left rotations properly rebalance the branch. We're going to
+	// test the balance after every addition.
+	for i := 1; i < 1000; i++ {
+		tr.Add(i, i)
+		testCount(t, tr, i)
+		testBalance(t, tr.trunk)
+	}
+
+	// By adding numbers from high to low, we're only going to be performing single right rotations during the
+	// rebalances. This will test specifically that single right rotations properly rebalance the branch. We're going to
+	// test the balance after every addition.
+	tr.Clear()
+	for i := 1000; i > 0; i-- {
+		tr.Add(i, i)
+		testCount(t, tr, 1001-i)
+		testBalance(t, tr.trunk)
+	}
+
+	// Now go through a slew of random numbers to catch all types of rotations and imbalances.
+	for i := 0; i < 1000; i++ {
+		tr, items := buildNumTree(i, true)
+		testBalance(t, tr.trunk)
+	}
+}
+
 func TestRemove(t *testing.T) {
 	// Build a random tree, and test that removing 10 random items one-by-one works as expected.
 	count := 500
 	tr, items := buildMiscTree(count)
 	testSort(t, tr, items)
 	testCount(t, tr, count)
+	testBalance(t, tr.trunk)
 
 	r := newRand()
 	for i := 0; i < 10; i++ {
@@ -205,6 +243,7 @@ func TestRemove(t *testing.T) {
 	items = append(items, newItems...)
 	testSort(t, tr, items)
 	testCount(t, tr, len(items))
+	testBalance(t, tr.trunk)
 }
 
 func TestClear(t *testing.T) {
@@ -217,10 +256,12 @@ func TestClear(t *testing.T) {
 	}
 	testString(t, tr, "5")
 	testCount(t, tr, 1)
+	testBalance(t, tr.trunk)
 
 	tr.Clear()
 	testString(t, tr, "<empty>")
 	testCount(t, tr, 0)
+	testBalance(t, tr.trunk)
 
 	// Add 500 items of various types.
 	tr, _ = buildMiscTree(500)
@@ -229,6 +270,7 @@ func TestClear(t *testing.T) {
 	tr.Clear()
 	testString(t, tr, "<empty>")
 	testCount(t, tr, 0)
+	testBalance(t, tr.trunk)
 }
 
 func TestItem(t *testing.T) {
@@ -343,6 +385,7 @@ func TestMatch(t *testing.T) {
 		return
 	}
 	testCount(t, tr, 500)
+	testBalance(t, tr.trunk)
 
 	// Make sure that all of these items match.
 	for i, item := range presentItems {
@@ -377,6 +420,7 @@ func TestMatch(t *testing.T) {
 	}
 	testSort(t, tr, presentItems)
 	testCount(t, tr, 500)
+	testBalance(t, tr.trunk)
 
 	// Make sure that all of these items match.
 	for i, item := range presentItems {
@@ -418,6 +462,7 @@ func TestYield(t *testing.T) {
 	tr, items := buildMiscTree(500)
 	testSort(t, tr, items)
 	testCount(t, tr, 500)
+	testBalance(t, tr.trunk)
 
 	yieldChan := tr.Yield(nil)
 	if yieldChan == nil {
@@ -443,6 +488,7 @@ func TestYield(t *testing.T) {
 		return
 	}
 	testCount(t, tr, 500)
+	testBalance(t, tr.trunk)
 
 	// Grab the first two items.
 	for i := 0; i < 2; i++ {
@@ -468,6 +514,7 @@ func TestList(t *testing.T) {
 	tr, items := buildMiscTree(1000)
 	testSort(t, tr, items)
 	testCount(t, tr, 1000)
+	testBalance(t, tr.trunk)
 
 	listItems := tr.List()
 	if len(listItems) != 1000 {
@@ -685,6 +732,7 @@ func TestSetIndex(t *testing.T) {
 	tr, items := buildMiscTree(1000)
 	testSort(t, tr, items)
 	testCount(t, tr, 1000)
+	testBalance(t, tr.trunk)
 
 	for i, v := range items {
 		index := v.GetIndex()
@@ -710,6 +758,9 @@ func TestSetIndex(t *testing.T) {
 			t.Error("Item's index was not updated")
 		}
 	}
+	testSort(t, tr, items)
+	testCount(t, tr, 1000)
+	testBalance(t, tr.trunk)
 }
 
 // --- TREE BENCHMARKS ---
@@ -777,6 +828,35 @@ func testSort(t *testing.T, tr Tree, items []Item) {
 
 	// Check that the string is the same as the tree's string.
 	testString(t, tr, s)
+}
+
+func testBalance(t *testing.T, node *tnode) int {
+	if node == nil {
+		return 0
+	}
+
+	leftCount := testBalance(t, node.left)
+	rightCount := testBalance(t, node.right)
+
+	balance := rightCount - leftCount
+	if balance != node.balance() {
+		t.Error("Node at index", node.item.index, "has wrong balance")
+		t.Log("Should be:", balance)
+		t.Log("Node says:", node.balance())
+	}
+
+	height := leftCount
+	if rightCount > leftCount {
+		height = rightCount
+	}
+	height++
+	if height != node.height {
+		t.Error("Node at index", node.item.index, "has wrong height")
+		t.Log("Should be:", height)
+		t.Log("Node says:", node.height)
+	}
+
+	return height
 }
 
 func newRand() *rand.Rand {
