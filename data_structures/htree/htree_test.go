@@ -797,6 +797,7 @@ func Benchmark1000000(b *testing.B) {
 
 // --- HELPER FUNCTIONS ---
 
+// testString checks whether or not the string representation of the tree is the same as expected.
 func testString(t *testing.T, tr Tree, want string) {
 	s := tr.String()
 	if s != want {
@@ -805,6 +806,7 @@ func testString(t *testing.T, tr Tree, want string) {
 	}
 }
 
+// testCount checks whether or not the tree has the expected number of nodes.
 func testCount(t *testing.T, tr Tree, want int) {
 	count := tr.Count()
 	if count != want {
@@ -813,6 +815,7 @@ func testCount(t *testing.T, tr Tree, want int) {
 	}
 }
 
+// testSort sorts the provided items and then checks that the tree has the same order of items in it.
 func testSort(t *testing.T, tr Tree, items []Item) {
 	// Sort the list of items.
 	sort.Slice(items, func(i, j int) bool {
@@ -830,6 +833,7 @@ func testSort(t *testing.T, tr Tree, items []Item) {
 	testString(t, tr, s)
 }
 
+// testBalance checks whether or not all the nodes in the tree have the correct balance.
 func testBalance(t *testing.T, node *tnode) int {
 	if node == nil {
 		return 0
