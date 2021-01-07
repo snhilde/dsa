@@ -265,6 +265,7 @@ type tnode struct {
 func newNode(item Item) *tnode {
 	n := new(tnode)
 	n.item = item
+	n.height = 1
 
 	return n
 }
