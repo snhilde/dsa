@@ -371,24 +371,20 @@ func (n *tnode) findNode(index int) (*tnode, *hstack.Stack) {
 func (t *Tree) rebalance(stack *hstack.Stack, index int, added bool) {
 	for stack.Count() > 0 {
 		node := stack.Pop().(*tnode)
-		if index < node.item.index {
-			if added {
-				node.bal--
-			} else {
-				node.bal++
-			}
-		} else {
-			if added {
-				node.bal++
-			} else {
-				node.bal--
-			}
-		}
 
-		if (added && node.bal == 0) || (!added && (node.bal == -1 || node.bal == 1)) {
+		bal := node.balance()
+		if (added && bal == 0) || (!added && (bal == -1 || bal == 1)) {
 			// The operation did not change the length of the longest branch. We can stop checking for imbalance now.
 			break
-		} else if node.bal == -2 || node.bal == 2 {
+		}
+
+		if added {
+			node.height++
+		} else {
+			node.height--
+		}
+
+		if bal == -2 || bal == 2 {
 			// We have an imbalance. Rotate the nodes to fix this. This will change the root node of this branch, so
 			// we'll need to link it back in after the rotation operation is done.
 			rotated := rotate(node, index)
@@ -439,7 +435,6 @@ func rotate(top *tnode, index int) *tnode {
 	if double {
 		// The insertion path is on different sides of the top and bottom nodes, so we have to do a double rotation.
 		// We'll do the unique part first here, and then we'll do the shared part below.
-		bottom.bal = 0
 		if left {
 			top.left = bottom.right
 			bottom.right = top.left.left
@@ -454,19 +449,10 @@ func rotate(top *tnode, index int) *tnode {
 	}
 
 	// Now, we'll do the shared rotation on the top node that all balance operations will need.
-	// TODO: I believe the balances are not always going to be returned to 0 here. Investigate this more.
-	top.bal = 0
-	bottom.bal = 0
 	if left {
-		if bottom.right == nil {
-			top.bal = 1
-		}
 		top.left = bottom.right
 		bottom.right = top
 	} else {
-		if bottom.left == nil {
-			top.bal = -1
-		}
 		top.right = bottom.left
 		bottom.left = top
 	}
