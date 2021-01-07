@@ -54,8 +54,7 @@ func (t *Tree) AddItems(items ...Item) error {
 
 		// If the tree is empty, start the trunk with this node.
 		if t.trunk == nil {
-			t.trunk = new(tnode)
-			t.trunk.item = item
+			t.trunk = newNode(item)
 			t.count++
 			continue
 		}
@@ -72,12 +71,10 @@ func (t *Tree) AddItems(items ...Item) error {
 		node = stack.Pop().(*tnode)
 		if item.index < node.item.index {
 			// Add a new item on the left side.
-			node.left = new(tnode)
-			node.left.item = item
+			node.left = newNode(item)
 		} else {
 			// Add a new item on the right side.
-			node.right = new(tnode)
-			node.right.item = item
+			node.right = newNode(item)
 		}
 		t.count++
 
@@ -264,6 +261,14 @@ type tnode struct {
 	right  *tnode // Right branch
 }
 
+// newNode returns a new tnode with item item.
+func newNode(item Item) *tnode {
+	n := new(tnode)
+	n.item = item
+
+	return n
+}
+
 // balance returns the balance of the tree in the set {-2,-1,0,1,2} as per the rules of AVL trees.
 func (n *tnode) balance() int {
 	if n == nil {
@@ -364,9 +369,8 @@ func (n *tnode) findNode(index int) (*tnode, *hstack.Stack) {
 // rebalance calculates the balances of the nodes in the path and performs any necessary rotation operations to
 // rebalance the tree.
 func (t *Tree) rebalance(stack *hstack.Stack, index int, added bool) {
-	var node *tnode
 	for stack.Count() > 0 {
-		node = stack.Pop().(*tnode)
+		node := stack.Pop().(*tnode)
 		if index < node.item.index {
 			if added {
 				node.bal--
