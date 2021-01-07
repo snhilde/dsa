@@ -276,17 +276,7 @@ func (n *tnode) balance() int {
 		return 0
 	}
 
-	leftCount := 0
-	if n.left != nil {
-		leftCount = n.left.height
-	}
-
-	rightCount := 0
-	if n.right != nil {
-		rightCount = n.right.height
-	}
-
-	return rightCount - leftCount
+	return n.rightCount() - n.leftCount()
 }
 
 // leftCount returns the number of nodes on the left side of this node.
@@ -303,15 +293,6 @@ func (n *tnode) rightCount() int {
 		return n.right.height
 	}
 	return 0
-}
-
-
-// updateHeight recalculates the node's height.
-func (n *tnode) updateHeight() {
-	if n != nil {
-		leftCount := n.leftCount()
-		rightCount := n.rightCount()
-	}
 }
 
 // Item is the type for each item in the tree. It holds the value of the item and its index for sorting.
@@ -397,7 +378,6 @@ func (n *tnode) findNode(index int) (*tnode, *hstack.Stack) {
 func (t *Tree) rebalance(stack *hstack.Stack, index int, added bool) {
 	for stack.Count() > 0 {
 		node := stack.Pop().(*tnode)
-		node.updateHeight()
 
 		bal := node.balance()
 		if (added && bal == 0) || (!added && (bal == -1 || bal == 1)) {
@@ -405,30 +385,28 @@ func (t *Tree) rebalance(stack *hstack.Stack, index int, added bool) {
 			break
 		}
 
-		if added {
+		if (added && (bal == -1 || bal == 1)) || (!added && bal == 0) {
+			// The longest branch below this node is now one node longer. We'll increase the height of this branch by
+			// one and keep moving up the insertion/deletion path.
 			node.height++
-		} else {
-			node.height--
+			continue
 		}
 
-		if bal == -2 || bal == 2 {
-			// We have an imbalance. Rotate the nodes to fix this. This will change the root node of this branch, so
-			// we'll need to link it back in after the rotation operation is done.
-			rotated := rotate(node, index)
-			if stack.Count() == 0 {
-				// We're at the top of the tree.
-				t.trunk = rotated
+		// We have an imbalance. Rotate the nodes to fix this. This will change the root node of this branch, so
+		// we'll need to link it back in after the rotation operation is done.
+		rotated := rotate(node, index)
+		if stack.Count() == 0 {
+			// We're at the top of the tree.
+			t.trunk = rotated
+		} else {
+			node = stack.Pop().(*tnode)
+			if index < node.item.index {
+				node.left = rotated
 			} else {
-				node = stack.Pop().(*tnode)
-				if index < node.item.index {
-					node.left = rotated
-				} else {
-					node.right = rotated
-				}
+				node.right = rotated
 			}
-			break
 		}
-		// Nothing found yet. Keep going up.
+		break
 	}
 }
 
@@ -461,21 +439,25 @@ func rotate(top *tnode, index int) *tnode {
 
 	if double {
 		// The insertion path is on different sides of the top and bottom nodes, so we have to do a double rotation.
-		// We'll do the unique part first here, and then we'll do the shared part below.
+		// We'll do the unique part first here, and then we'll do the common part below.
+		oldBottom := bottom
 		if left {
-			top.left = bottom.right
-			bottom.right = top.left.left
-			top.left.left = bottom
-			bottom = top.left
+			newBottom := oldBottom.right
+			top.left = newBottom
+			oldBottom.right = newBottom.left
+			newBottom.left = oldBottom
+			bottom = newBottom
 		} else {
-			top.right = bottom.left
-			bottom.left = top.right.right
-			top.right.right = bottom
-			bottom = top.right
+			newBottom := oldBottom.left
+			top.right = newBottom
+			oldBottom.left = newBottom.right
+			newBottom.right = oldBottom
+			bottom = newBottom
 		}
+		updateHeight(oldBottom)
 	}
 
-	// Now, we'll do the shared rotation on the top node that all balance operations will need.
+	// Now, we'll do the common rotation on the top node that all balance operations will need.
 	if left {
 		top.left = bottom.right
 		bottom.right = top
@@ -483,7 +465,23 @@ func rotate(top *tnode, index int) *tnode {
 		top.right = bottom.left
 		bottom.left = top
 	}
+	updateHeight(top)
+	updateHeight(bottom)
 
 	// Pass the new top of this branch of the tree back to the caller for proper linking.
 	return bottom
+}
+
+// updateHeight recalculates and sets the node's height.
+func updateHeight(n *tnode) {
+	if n != nil {
+		leftCount := n.leftCount()
+		rightCount := n.rightCount()
+
+		if leftCount > rightCount {
+			n.height = leftCount + 1
+		} else {
+			n.height = rightCount + 1
+		}
+	}
 }
