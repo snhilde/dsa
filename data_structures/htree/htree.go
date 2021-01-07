@@ -21,14 +21,6 @@ type Tree struct {
 	count int
 }
 
-// Internal structure of tree nodes
-type tnode struct {
-	item  Item
-	bal   int    // Balance of node: -1 if left branch is longer, 0 if both branches are even, or 1 if right side is longer
-	left  *tnode // Left branch
-	right *tnode // Right branch
-}
-
 // New creates a new binary tree.
 func New() Tree {
 	t := Tree{}
@@ -262,6 +254,33 @@ func (t *Tree) Count() int {
 	}
 
 	return t.count
+}
+
+// Internal structure of tree nodes
+type tnode struct {
+	item   Item
+	height int    // Longest height of subtree from this node down
+	left   *tnode // Left branch
+	right  *tnode // Right branch
+}
+
+// balance returns the balance of the tree in the set {-2,-1,0,1,2} as per the rules of AVL trees.
+func (n *tnode) balance() int {
+	if n == nil {
+		return 0
+	}
+
+	leftCount := 0
+	if n.left != nil {
+		leftCount = n.left.height
+	}
+
+	rightCount := 0
+	if n.right != nil {
+		rightCount = n.right.height
+	}
+
+	return rightCount - leftCount
 }
 
 // Item is the type for each item in the tree. It holds the value of the item and its index for sorting.
