@@ -289,6 +289,31 @@ func (n *tnode) balance() int {
 	return rightCount - leftCount
 }
 
+// leftCount returns the number of nodes on the left side of this node.
+func (n *tnode) leftCount() int {
+	if n != nil && n.left != nil {
+		return n.left.height
+	}
+	return 0
+}
+
+// rightCount returns the number of nodes on the right side of this node.
+func (n *tnode) rightCount() int {
+	if n != nil && n.right != nil {
+		return n.right.height
+	}
+	return 0
+}
+
+
+// updateHeight recalculates the node's height.
+func (n *tnode) updateHeight() {
+	if n != nil {
+		leftCount := n.leftCount()
+		rightCount := n.rightCount()
+	}
+}
+
 // Item is the type for each item in the tree. It holds the value of the item and its index for sorting.
 type Item struct {
 	value interface{}
@@ -372,6 +397,7 @@ func (n *tnode) findNode(index int) (*tnode, *hstack.Stack) {
 func (t *Tree) rebalance(stack *hstack.Stack, index int, added bool) {
 	for stack.Count() > 0 {
 		node := stack.Pop().(*tnode)
+		node.updateHeight()
 
 		bal := node.balance()
 		if (added && bal == 0) || (!added && (bal == -1 || bal == 1)) {
