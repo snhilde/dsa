@@ -571,6 +571,66 @@ func TestDFS(t *testing.T) {
 	}
 }
 
+func TestBFS(t *testing.T) {
+	// Make sure an empty tree returns nil.
+	tr := New()
+	if values := tr.BFS(); values != nil {
+		t.Error("Should have received nothing")
+	}
+
+	// Do a quick, easily provable test to make sure that the basics are not broken.
+	for i := 1; i <= 11; i++ {
+		tr.Add(i, i)
+	}
+	testCount(t, tr, 11)
+	testString(t, tr, "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11")
+
+	knownGood := []interface{}{4, 2, 8, 1, 3, 6, 10, 5, 7, 9, 11}
+	if values := tr.BFS(); !reflect.DeepEqual(values, knownGood) {
+		t.Error("BFS failed easy test")
+		return
+	}
+
+	// We can use this simple formula to manually build the correct values for a tree whose count is one less than a
+	// power of 2:
+	// 1. The first level of the tree is the power of 2 down minus 1.
+	// 2. Build out every level after that by going through the nodes from the previous level and adding and subtracting
+	//    the current step, which is decremented every level to the next power of 2 down.
+	// 3. Add each level to the master list.
+	count := 65535
+	root := count / 2
+	priorLevel := []int{root}
+	set1 := priorLevel
+	for step := (root + 1) / 2; step > 0; step /= 2 {
+		currentLevel := make([]int, 0)
+		for _, v := range priorLevel {
+			currentLevel = append(currentLevel, v - step)
+			currentLevel = append(currentLevel, v + step)
+		}
+		set1 = append(set1, currentLevel...)
+		priorLevel = currentLevel
+	}
+
+	// Now that we have the values, let's build out the tree.
+	tr, _ = buildNumTree(count, false)
+	testCount(t, tr, count)
+	testBalance(t, tr.root)
+
+	// Check that both sets of values are equal.
+	set2 := tr.BFS()
+	if len(set1) != len(set2) {
+		t.Error("BFS sets have different lengths")
+		t.Log("Set 1:", len(set1))
+		t.Log("Set 2:", len(set2))
+		return
+	}
+	for i, v := range set1 {
+		if v != set2[i].(int) {
+			t.Error("BFS failed manual test at index", i)
+		}
+	}
+}
+
 // --- ITEM TESTS ---
 
 func TestNewItem(t *testing.T) {
