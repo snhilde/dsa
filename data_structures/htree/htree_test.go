@@ -201,9 +201,10 @@ func TestBalance(t *testing.T) {
 		testBalance(t, tr.trunk)
 	}
 
-	// Now go through a slew of random numbers to catch all types of rotations and imbalances.
-	for i := 0; i < 1000; i++ {
-		tr, items := buildNumTree(i, true)
+	// Now let's run through trees of increasing size to make sure that all sizes within the range are properly balanced
+	// and have the correct height at each node.
+	for i := 1; i < 1000; i++ {
+		tr, _ := buildNumTree(i, true)
 		testBalance(t, tr.trunk)
 	}
 }
@@ -734,6 +735,7 @@ func TestSetIndex(t *testing.T) {
 	testCount(t, tr, 1000)
 	testBalance(t, tr.trunk)
 
+	newItems := make([]Item, len(items))
 	for i, v := range items {
 		index := v.GetIndex()
 		newIndex := i
@@ -750,7 +752,9 @@ func TestSetIndex(t *testing.T) {
 		}
 
 		item.SetIndex(newIndex)
+		newItems[i] = item
 		tr.AddItems(item)
+
 		item = tr.Item(newIndex)
 		if item == (Item{}) {
 			t.Error("Bad item at new index")
@@ -758,8 +762,9 @@ func TestSetIndex(t *testing.T) {
 			t.Error("Item's index was not updated")
 		}
 	}
+	items = append(items, newItems...)
 	testSort(t, tr, items)
-	testCount(t, tr, 1000)
+	testCount(t, tr, 2000)
 	testBalance(t, tr.trunk)
 }
 
@@ -880,7 +885,8 @@ func buildNumTree(count int, random bool) (Tree, []int) {
 	if random {
 		r := newRand()
 		for i := range indexes {
-			v := r.Int()
+			// v := r.Int()
+			v := int(r.Int31n(999))
 			tr.Add(v, v)
 			indexes[i] = v
 		}
