@@ -160,7 +160,7 @@ func (t *Tree) Match(value interface{}) bool {
 // order. The channel quit is used to communicate when iteration should be stopped. Send any value on the cnannel to
 // break the communication. If this is not needed, pass nil.
 func (t *Tree) Yield(quit <-chan interface{}) <-chan Item {
-	if t == nil {
+	if t == nil || t.Count() == 0 {
 		return nil
 	}
 
@@ -201,7 +201,7 @@ func (t *Tree) Yield(quit <-chan interface{}) <-chan Item {
 
 // List returns copies of all the items in the tree in sorted order.
 func (t *Tree) List() []Item {
-	if t == nil {
+	if t == nil || t.Count() == 0 {
 		return nil
 	}
 

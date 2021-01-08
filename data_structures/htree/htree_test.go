@@ -445,6 +445,7 @@ func TestMatch(t *testing.T) {
 
 func TestYield(t *testing.T) {
 	tr := New()
+	tr.Add(1, 1)
 
 	// Test that the capacity of the quit channel doesn't matter.
 	if ch := tr.Yield(nil); ch == nil {
@@ -515,6 +516,12 @@ func TestYield(t *testing.T) {
 }
 
 func TestList(t *testing.T) {
+	// Make sure an empty tree returns nil.
+	tr := New()
+	if items := tr.List(); items != nil {
+		t.Error("Should have received nothing")
+	}
+
 	// Make sure that the items are returned in sorted order.
 	tr, items := buildMiscTree(1000)
 	testSort(t, tr, items)
@@ -535,6 +542,12 @@ func TestList(t *testing.T) {
 }
 
 func TestDFS(t *testing.T) {
+	// Make sure an empty tree returns nil.
+	tr := New()
+	if items := tr.DFS(); items != nil {
+		t.Error("Should have received nothing")
+	}
+
 	// Make sure that the items are returned in sorted order.
 	tr, items := buildMiscTree(1000)
 	testSort(t, tr, items)
