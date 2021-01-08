@@ -223,16 +223,29 @@ func (t *Tree) List() []Item {
 
 // DFS traverses the tree in a depth-first search pattern and returns all values in the order encountered.
 func (t *Tree) DFS() []interface{} {
-	// All we need to do is grab the items from List, which already goes through the tree in binary sorted order.
-	items := t.List()
-	if len(items) == 0 {
+	// Even though we could use other methods here like List or Yield, we're going to do a direct implementation for
+	// better performance.
+	if t == nil || t.Count() == 0 {
 		return nil
 	}
 
-	// Pull out the values of all the items.
-	values := make([]interface{}, len(items))
-	for i, item := range items {
-		values[i] = item.value
+	numNodes := t.Count()
+	values := make([]interface{}, numNodes)
+
+	stack := hstack.New()
+	node := t.trunk
+
+	i := 0
+	for i < numNodes {
+		if node == nil {
+			node = stack.Pop().(*tnode)
+			values[i] = node.item.GetValue()
+			i++
+			node = node.right
+		} else {
+			stack.Add(node)
+			node = node.left
+		}
 	}
 
 	return values
