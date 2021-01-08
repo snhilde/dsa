@@ -824,6 +824,20 @@ func Benchmark1000000(b *testing.B) {
 	}
 }
 
+func BenchmarkList(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		tr, _ := buildMiscTree(1000)
+		_ = tr.List()
+	}
+}
+
+func BenchmarkDFS(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		tr, _ := buildMiscTree(1000)
+		_ = tr.DFS()
+	}
+}
+
 // --- HELPER FUNCTIONS ---
 
 // testString checks whether or not the string representation of the tree is the same as expected.
