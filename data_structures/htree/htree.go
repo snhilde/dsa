@@ -221,6 +221,23 @@ func (t *Tree) List() []Item {
 	return list
 }
 
+// DFS traverses the tree in a depth-first search pattern and returns all values in the order encountered.
+func (t *Tree) DFS() []interface{} {
+	// All we need to do is grab the items from List, which already goes through the tree in binary sorted order.
+	items := t.List()
+	if len(items) == 0 {
+		return nil
+	}
+
+	// Pull out the values of all the items.
+	values := make([]interface{}, len(items))
+	for i, item := range items {
+		values[i] = item.value
+	}
+
+	return values
+}
+
 // String returns a printable representation of the items in the tree in sorted order.
 func (t *Tree) String() string {
 	if t == nil {

@@ -65,6 +65,10 @@ func TestBad(t *testing.T) {
 		t.Error("Bad object test: Unexpectedly passed List")
 	}
 
+	if l := tr.DFS(); l != nil {
+		t.Error("Bad object test: Unexpectedly passed DFS")
+	}
+
 	if tr.String() != "<nil>" {
 		t.Error("Bad object test: Unexpectedly passed String")
 	}
@@ -525,6 +529,26 @@ func TestList(t *testing.T) {
 
 	for i, item := range listItems {
 		if !reflect.DeepEqual(items[i].GetValue(), item.GetValue()) {
+			t.Error("Items differ at index", i)
+		}
+	}
+}
+
+func TestDFS(t *testing.T) {
+	// Make sure that the items are returned in sorted order.
+	tr, items := buildMiscTree(1000)
+	testSort(t, tr, items)
+	testCount(t, tr, 1000)
+	testBalance(t, tr.trunk)
+
+	traversed := tr.DFS()
+	if len(traversed) != 1000 {
+		t.Error("DFS did not return all items")
+		return
+	}
+
+	for i, item := range traversed {
+		if !reflect.DeepEqual(item, items[i].GetValue()) {
 			t.Error("Items differ at index", i)
 		}
 	}
