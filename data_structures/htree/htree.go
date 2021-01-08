@@ -61,27 +61,27 @@ func (t *Tree) AddItems(items ...Item) error {
 		}
 
 		// Find the spot where we need to insert this node.
-		node, stack := t.root.findNode(item.index)
+		node, stack := t.root.findNode(item.GetIndex())
 		if node != nil {
 			// We found a matching index. We only need to update the node's value.
 			node.item = item
 			continue
 		}
 
-		// We're at the end. Pop the last branch and add our new item.
-		node = stack.Pop().(*tnode)
-		if item.index < node.item.index {
+		// We're at the end. Pop the last node and add our new item.
+		parent := stack.Pop().(*tnode)
+		if item.index < parent.index() {
 			// Add a new item on the left side.
-			node.left = newNode(item)
+			parent.left = newNode(item)
 		} else {
 			// Add a new item on the right side.
-			node.right = newNode(item)
+			parent.right = newNode(item)
 		}
 		t.count++
 
-		// Add the node back to the stack and rebalance the tree (if needed).
-		stack.Add(node)
-		t.rebalance(stack, item.index, true)
+		// Add the parent back to the stack and rebalance the tree (if needed).
+		stack.Add(parent)
+		t.rebalance(stack, item.GetIndex(), true)
 	}
 
 	return nil
@@ -93,7 +93,7 @@ func (t *Tree) Remove(index int) Item {
 		return Item{}
 	}
 
-	// TODO: implement
+	// TODO
 
 	return Item{}
 }
@@ -328,6 +328,15 @@ func newNode(item Item) *tnode {
 	return n
 }
 
+// index returns the index of the item at this node.
+func (n *tnode) index() int {
+	if n == nil {
+		return 0
+	}
+
+	return n.item.GetIndex()
+}
+
 // balance returns the balance of the tree in the set {-2,-1,0,1,2} as per the rules of AVL trees.
 func (n *tnode) balance() int {
 	if n == nil {
@@ -378,10 +387,10 @@ func (i *Item) GetValue() interface{} {
 	return i.value
 }
 
-// GetIndex returns the index of this item, or -1 if the item is invalid.
+// GetIndex returns the index of this item, or 0 if the item is invalid.
 func (i *Item) GetIndex() int {
 	if i == nil {
-		return -1
+		return 0
 	}
 
 	return i.index
@@ -416,12 +425,12 @@ func (n *tnode) findNode(index int) (*tnode, *hstack.Stack) {
 
 	node := n
 	for node != nil {
-		if index == node.item.index {
+		if index == node.index() {
 			break
 		}
 
 		stack.Add(node)
-		if index < node.item.index {
+		if index < node.index() {
 			node = node.left
 		} else {
 			node = node.right
@@ -458,7 +467,7 @@ func (t *Tree) rebalance(stack *hstack.Stack, index int, added bool) {
 			t.root = rotated
 		} else {
 			node = stack.Pop().(*tnode)
-			if index < node.item.index {
+			if index < node.index() {
 				node.left = rotated
 			} else {
 				node.right = rotated
@@ -481,16 +490,16 @@ func rotate(top *tnode, index int) *tnode {
 	var left bool
 	var double bool
 
-	if index < top.item.index {
+	if index < top.index() {
 		left = true
 		bottom = top.left
-		if index > bottom.item.index {
+		if index > bottom.index() {
 			double = true
 		}
 	} else {
 		left = false
 		bottom = top.right
-		if index < bottom.item.index {
+		if index < bottom.index() {
 			double = true
 		}
 	}
