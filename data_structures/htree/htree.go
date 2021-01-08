@@ -4,6 +4,7 @@ package htree
 import (
 	"fmt"
 	"github.com/snhilde/dsa/data_structures/hstack"
+	"github.com/snhilde/dsa/data_structures/hqueue"
 	"reflect"
 	"strings"
 )
@@ -245,6 +246,33 @@ func (t *Tree) DFS() []interface{} {
 		} else {
 			stack.Add(node)
 			node = node.left
+		}
+	}
+
+	return values
+}
+
+// BFS traverses the tree in a breadth-first search pattern and returns all values in the order encountered.
+func (t *Tree) BFS() []interface{} {
+	if t == nil || t.Count() == 0 {
+		return nil
+	}
+
+	values := make([]interface{}, t.Count())
+	queue := hqueue.New()
+	queue.Add(t.root)
+
+	i := 0
+	for queue.Count() > 0 {
+		node := queue.Pop().(*tnode)
+		values[i] = node.item.GetValue()
+		i++
+
+		if node.left != nil {
+			queue.Add(node.left)
+		}
+		if node.right != nil {
+			queue.Add(node.right)
 		}
 	}
 
