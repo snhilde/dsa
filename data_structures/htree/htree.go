@@ -17,7 +17,7 @@ var (
 
 // Tree is the main type for this package. It holds information about the entire AVL tree.
 type Tree struct {
-	trunk *tnode
+	root  *tnode
 	count int
 }
 
@@ -52,15 +52,15 @@ func (t *Tree) AddItems(items ...Item) error {
 			return errBadItem
 		}
 
-		// If the tree is empty, start the trunk with this node.
-		if t.trunk == nil {
-			t.trunk = newNode(item)
+		// If the tree is empty, start the root with this node.
+		if t.root == nil {
+			t.root = newNode(item)
 			t.count++
 			continue
 		}
 
 		// Find the spot where we need to insert this node.
-		node, stack := t.trunk.findNode(item.index)
+		node, stack := t.root.findNode(item.index)
 		if node != nil {
 			// We found a matching index. We only need to update the node's value.
 			node.item = item
@@ -110,7 +110,7 @@ func (t *Tree) Item(index int) Item {
 		return Item{}
 	}
 
-	node, _ := t.trunk.findNode(index)
+	node, _ := t.root.findNode(index)
 	if node == nil {
 		return Item{}
 	}
@@ -168,7 +168,7 @@ func (t *Tree) Yield(quit <-chan interface{}) <-chan Item {
 	go func() {
 		defer close(itemChan)
 
-		node := t.trunk
+		node := t.root
 		stack := hstack.New()
 		for {
 			if node == nil {
@@ -233,7 +233,7 @@ func (t *Tree) DFS() []interface{} {
 	values := make([]interface{}, numNodes)
 
 	stack := hstack.New()
-	node := t.trunk
+	node := t.root
 
 	i := 0
 	for i < numNodes {
@@ -427,7 +427,7 @@ func (t *Tree) rebalance(stack *hstack.Stack, index int, added bool) {
 		rotated := rotate(node, index)
 		if stack.Count() == 0 {
 			// We're at the top of the tree.
-			t.trunk = rotated
+			t.root = rotated
 		} else {
 			node = stack.Pop().(*tnode)
 			if index < node.item.index {
