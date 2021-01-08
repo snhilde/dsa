@@ -227,20 +227,27 @@ func TestRemove(t *testing.T) {
 
 	r := newRand()
 	for i := 0; i < 10; i++ {
-		index := int(r.Int31n(int32(count - 1)))
-		if item := tr.Remove(items[index].GetIndex()); item == (Item{}) {
-			t.Error("Failed to remove item", i)
+		// Pull out a random item from the list, and get its value.
+		item := items[int(r.Int31n(int32(count - 1)))]
+		index := item.GetIndex()
+
+		// Make sure we removed the correct item.
+		if deletion := tr.Remove(index); deletion == (Item{}) || deletion.GetIndex() != index {
+			t.Error("Failed to remove item", i, "with index", index)
 			return
 		}
 
+		// Pop the item from the list so we can't pick it again on the next iteration.
 		count--
 		tmp := make([]Item, count)
 		copy(tmp, items[:index])
 		copy(tmp[index:], items[index+1:])
 		items = tmp
 
+		// Check that everything still looks good with the tree, including the balance and height of all nodes.
 		testSort(t, tr, items)
 		testCount(t, tr, count)
+		testBalance(t, tr.root)
 	}
 
 	// Test adding some items back in to make sure the tree can still balance itself.
