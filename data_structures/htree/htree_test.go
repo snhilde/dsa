@@ -38,9 +38,8 @@ func TestBad(t *testing.T) {
 		t.Error("Bad object test: Unexpectedly passed AddItems")
 	}
 
-	if item := tr.Remove(5); item != (Item{}) {
-		t.Error("Bad object test: Unexpectedly passed Remove")
-	}
+	// Make sure it doesn't crash anything.
+	tr.Remove(5)
 
 	// Make sure it doesn't crash anything.
 	tr.Clear()
@@ -218,48 +217,67 @@ func TestBalance(t *testing.T) {
 }
 
 func TestRemove(t *testing.T) {
-	// Build a random tree, and test that removing 10 random items one-by-one works as expected.
-	count := 500
-	tr, items := buildMiscTree(count)
-	testSort(t, tr, items)
-	testCount(t, tr, count)
-	testBalance(t, tr.root)
-
-	r := newRand()
-	for i := 0; i < 10; i++ {
-		// Pull out a random item from the list, and get its value.
-		sliceIndex := int(r.Int31n(int32(count - 1)))
-		item := items[sliceIndex]
-		treeIndex := item.GetIndex()
-
-		// Make sure we removed the correct item.
-		if deletion := tr.Remove(treeIndex); deletion == (Item{}) || deletion.GetIndex() != treeIndex {
-			t.Error("Failed to remove item", i, "with index", treeIndex)
-			return
-		}
-
-		// Pop the item from the list so we can't pick it again on the next iteration.
-		count--
-		tmp := make([]Item, count)
-		copy(tmp, items[:sliceIndex])
-		copy(tmp[sliceIndex:], items[sliceIndex+1:])
-		items = tmp
-
-		// Check that everything still looks good with the tree, including the balance and height of all nodes.
-		testSort(t, tr, items)
+	// Make sure that a missing index has no effect on the tree.
+	count := 100
+	tr, _ := buildNumTree(count, false)
+	for i := count; i < count * 2; i++ {
+		tr.Remove(count)
 		testCount(t, tr, count)
 		testBalance(t, tr.root)
 	}
 
-	// Test adding some items back in to make sure the tree can still balance itself.
-	_, newItems := buildMiscTree(count)
-	if err := tr.AddItems(newItems...); err != nil {
-		t.Error(err)
-		return
+	// We'll use this tree to test the ability to remove a node without children.
+	tr.Clear()
+	count = 15
+
+	// First in one direction.
+	for i := 1; i <= count; i++ {
+		tr.Add(i, i)
 	}
-	items = append(items, newItems...)
-	testSort(t, tr, items)
-	testCount(t, tr, len(items))
+	leaves := []int{1, 3, 5, 7, 9, 11, 13, 15}
+	for i, leaf := range leaves {
+		tr.Remove(leaf)
+		testCount(t, tr, count-1-i)
+		testBalance(t, tr.root)
+	}
+
+	// And then in the other direction.
+	tr.Clear()
+	for i := 1; i <= count; i++ {
+		tr.Add(i, i)
+	}
+	for i := range leaves {
+		index := leaves[len(leaves)-1-i]
+		tr.Remove(index)
+		testCount(t, tr, count-1-i)
+		testBalance(t, tr.root)
+	}
+
+	// Let's also test the ability to remove a root node with no children.
+	tr.Clear()
+	tr.Add(1, 1)
+	testCount(t, tr, 1)
+	testBalance(t, tr.root)
+
+	tr.Remove(1)
+	testCount(t, tr, 0)
+	testBalance(t, tr.root)
+
+	// We'll use this tree to test the ability to remove a node with one child.
+	tr.Clear()
+	indexes := []int{3, 2, 4, 1, 5}
+	for _, index := range indexes {
+		tr.Add(index, index)
+	}
+	testCount(t, tr, len(indexes))
+	testBalance(t, tr.root)
+
+	tr.Remove(2)
+	testCount(t, tr, len(indexes)-1)
+	testBalance(t, tr.root)
+
+	tr.Remove(4)
+	testCount(t, tr, len(indexes)-2)
 	testBalance(t, tr.root)
 }
 
