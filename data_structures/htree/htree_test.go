@@ -237,6 +237,13 @@ func TestRemove(t *testing.T) {
 	leaves := []int{1, 3, 5, 7, 9, 11, 13, 15}
 	for i, leaf := range leaves {
 		tr.Remove(leaf)
+
+		// Make sure the node was actually removed.
+		if tr.Match(leaf) {
+			t.Error("Did not remove", leaf)
+		}
+
+		// Make sure that the tree is still in good shape.
 		testCount(t, tr, count-1-i)
 		testBalance(t, tr.root)
 	}
@@ -249,6 +256,13 @@ func TestRemove(t *testing.T) {
 	for i := range leaves {
 		index := leaves[len(leaves)-1-i]
 		tr.Remove(index)
+
+		// Make sure the node was actually removed.
+		if tr.Match(index) {
+			t.Error("Did not remove", index)
+		}
+
+		// Make sure that the tree is still in good shape.
 		testCount(t, tr, count-1-i)
 		testBalance(t, tr.root)
 	}
@@ -275,9 +289,82 @@ func TestRemove(t *testing.T) {
 	tr.Remove(2)
 	testCount(t, tr, len(indexes)-1)
 	testBalance(t, tr.root)
+	if tr.Match(2) {
+		t.Error("Did not remove 2")
+	}
 
 	tr.Remove(4)
 	testCount(t, tr, len(indexes)-2)
+	testBalance(t, tr.root)
+	if tr.Match(4) {
+		t.Error("Did not remove 4")
+	}
+
+	// Let's also test the ability to remove a root node with one child.
+	tr.Clear()
+	tr.Add(1, 1)
+	tr.Add(2, 2)
+	testCount(t, tr, 2)
+	testBalance(t, tr.root)
+
+	tr.Remove(1)
+	testCount(t, tr, 1)
+	testBalance(t, tr.root)
+	if tr.Match(1) {
+		t.Error("Did not remove 1")
+	}
+
+	// We'll use this tree to test the ability to remove a node with two children.
+	tr.Clear()
+	count = 15
+
+	// First in one direction.
+	for i := 1; i <= count; i++ {
+		tr.Add(i, i)
+	}
+	parents := []int{2, 6, 10, 14, 4, 12}
+	for i, parent := range parents {
+		tr.Remove(parent)
+
+		// Make sure the node was actually removed.
+		if tr.Match(parent) {
+			t.Error("Did not remove", parent)
+		}
+
+		// Make sure that the tree is still in good shape.
+		testCount(t, tr, count-1-i)
+		testBalance(t, tr.root)
+	}
+
+	// And then in the other direction.
+	tr.Clear()
+	for i := 1; i <= count; i++ {
+		tr.Add(i, i)
+	}
+	for i := range parents {
+		index := parents[len(parents)-1-i]
+		tr.Remove(index)
+
+		// Make sure the node was actually removed.
+		if tr.Match(index) {
+			t.Error("Did not remove", index)
+		}
+
+		// Make sure that the tree is still in good shape.
+		testCount(t, tr, count-1-i)
+		testBalance(t, tr.root)
+	}
+
+	// Let's also test the ability to remove a root node with two children.
+	tr.Clear()
+	tr.Add(2, 2)
+	tr.Add(1, 1)
+	tr.Add(3, 3)
+	testCount(t, tr, 3)
+	testBalance(t, tr.root)
+
+	tr.Remove(2)
+	testCount(t, tr, 2)
 	testBalance(t, tr.root)
 }
 
