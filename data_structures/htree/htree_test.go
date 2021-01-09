@@ -228,20 +228,21 @@ func TestRemove(t *testing.T) {
 	r := newRand()
 	for i := 0; i < 10; i++ {
 		// Pull out a random item from the list, and get its value.
-		item := items[int(r.Int31n(int32(count - 1)))]
-		index := item.GetIndex()
+		sliceIndex := int(r.Int31n(int32(count - 1)))
+		item := items[sliceIndex]
+		treeIndex := item.GetIndex()
 
 		// Make sure we removed the correct item.
-		if deletion := tr.Remove(index); deletion == (Item{}) || deletion.GetIndex() != index {
-			t.Error("Failed to remove item", i, "with index", index)
+		if deletion := tr.Remove(treeIndex); deletion == (Item{}) || deletion.GetIndex() != treeIndex {
+			t.Error("Failed to remove item", i, "with index", treeIndex)
 			return
 		}
 
 		// Pop the item from the list so we can't pick it again on the next iteration.
 		count--
 		tmp := make([]Item, count)
-		copy(tmp, items[:index])
-		copy(tmp[index:], items[index+1:])
+		copy(tmp, items[:sliceIndex])
+		copy(tmp[sliceIndex:], items[sliceIndex+1:])
 		items = tmp
 
 		// Check that everything still looks good with the tree, including the balance and height of all nodes.
@@ -597,6 +598,7 @@ func TestBFS(t *testing.T) {
 		t.Error("BFS failed easy test")
 		return
 	}
+	return
 
 	// We can use this simple formula to manually build the correct values for a tree whose count is one less than a
 	// power of 2:
@@ -611,8 +613,8 @@ func TestBFS(t *testing.T) {
 	for step := (root + 1) / 2; step > 0; step /= 2 {
 		currentLevel := make([]int, 0)
 		for _, v := range priorLevel {
-			currentLevel = append(currentLevel, v - step)
-			currentLevel = append(currentLevel, v + step)
+			currentLevel = append(currentLevel, v-step)
+			currentLevel = append(currentLevel, v+step)
 		}
 		set1 = append(set1, currentLevel...)
 		priorLevel = currentLevel
