@@ -3,8 +3,8 @@ package htree
 
 import (
 	"fmt"
-	"github.com/snhilde/dsa/data_structures/hstack"
 	"github.com/snhilde/dsa/data_structures/hqueue"
+	"github.com/snhilde/dsa/data_structures/hstack"
 	"reflect"
 	"strings"
 )
@@ -259,20 +259,217 @@ func (t *Tree) BFS() []interface{} {
 	}
 
 	values := make([]interface{}, t.Count())
+
 	queue := hqueue.New()
 	queue.Add(t.root)
 
-	i := 0
-	for queue.Count() > 0 {
+	for i := 0; i < t.Count(); i++ {
 		node := queue.Pop().(*tnode)
-		values[i] = node.item.GetValue()
-		i++
+		values[i] = node.value()
 
 		if node.left != nil {
 			queue.Add(node.left)
 		}
 		if node.right != nil {
 			queue.Add(node.right)
+		}
+	}
+
+	return values
+}
+
+// LeftCenterRight traverses the tree in a left-center-right search pattern and returns all values in the order
+// encountered. When a node is reached, this descends to the left first, then reads the value at the current node, then
+// descends to the right. This is equivalent to a depth-first search.
+func (t *Tree) LeftCenterRight() []interface{} {
+	if t == nil || t.Count() == 0 {
+		return nil
+	}
+
+	values := make([]interface{}, t.Count())
+
+	stack := hstack.New()
+	node := t.root
+
+	i := 0
+	for i < t.Count() {
+		if node == nil {
+			node = stack.Pop().(*tnode)
+			values[i] = node.value()
+			i++
+			node = node.right
+		} else {
+			stack.Add(node)
+			node = node.left
+		}
+	}
+
+	return values
+}
+
+// CenterLeftRight traverses the tree in a center-left-right search pattern and returns all values in the order
+// encountered. When a node is reached, this reads the value at the current node first, then descends to the left, then
+// descends to the right.
+func (t *Tree) CenterLeftRight() []interface{} {
+	if t == nil || t.Count() == 0 {
+		return nil
+	}
+
+	values := make([]interface{}, t.Count())
+
+	stack := hstack.New()
+	node := t.root
+
+	i := 0
+	for i < t.Count() {
+		if node == nil {
+			node = stack.Pop().(*tnode)
+			node = node.right
+		} else {
+			values[i] = node.value()
+			i++
+			stack.Add(node)
+			node = node.left
+		}
+	}
+
+	return values
+}
+
+// LeftRightCenter traverses the tree in a left-right-center search pattern and returns all values in the order
+// encountered. When a node is reached, this descends to the left first, then descends to the right, then reads the
+// value at the current node.
+func (t *Tree) LeftRightCenter() []interface{} {
+	type wrapper struct {
+		node      *tnode
+		rightDone bool
+	}
+
+	if t == nil || t.Count() == 0 {
+		return nil
+	}
+
+	values := make([]interface{}, t.Count())
+
+	stack := hstack.New()
+	node := t.root
+
+	i := 0
+	for i < t.Count() {
+		if node == nil {
+			d := stack.Pop().(wrapper)
+			node = d.node
+			if d.rightDone {
+				values[i] = node.value()
+				i++
+				node = nil
+			} else {
+				d.rightDone = true
+				stack.Add(d)
+				node = node.right
+			}
+		} else {
+			stack.Add(wrapper{node, false})
+			node = node.left
+		}
+	}
+
+	return values
+}
+
+// RightCenterLeft traverses the tree in a right-center-left search pattern and returns all values in the order
+// encountered. When a node is reached, this descends to the right first, then reads the value at the current node, then
+// descends to the left. This is equivalent to a reverse depth-first search.
+func (t *Tree) RightCenterLeft() []interface{} {
+	if t == nil || t.Count() == 0 {
+		return nil
+	}
+
+	values := make([]interface{}, t.Count())
+
+	stack := hstack.New()
+	node := t.root
+
+	i := 0
+	for i < t.Count() {
+		if node == nil {
+			node = stack.Pop().(*tnode)
+			values[i] = node.value()
+			i++
+			node = node.left
+		} else {
+			stack.Add(node)
+			node = node.right
+		}
+	}
+
+	return values
+}
+
+// CenterRightLeft traverses the tree in a center-right-left search pattern and returns all values in the order
+// encountered. When a node is reached, this reads the value at the current node first, then descends to the right, then
+// descends to the left.
+func (t *Tree) CenterRightLeft() []interface{} {
+	if t == nil || t.Count() == 0 {
+		return nil
+	}
+
+	values := make([]interface{}, t.Count())
+
+	stack := hstack.New()
+	node := t.root
+
+	i := 0
+	for i < t.Count() {
+		if node == nil {
+			node = stack.Pop().(*tnode)
+			node = node.left
+		} else {
+			values[i] = node.value()
+			i++
+			stack.Add(node)
+			node = node.right
+		}
+	}
+
+	return values
+}
+
+// RightLeftCenter traverses the tree in a right-left-center search pattern and returns all values in the order
+// encountered. When a node is reached, this descends to the right first, then descends to the left, then reads the
+// value at the current node.
+func (t *Tree) RightLeftCenter() []interface{} {
+	type wrapper struct {
+		node     *tnode
+		leftDone bool
+	}
+
+	if t == nil || t.Count() == 0 {
+		return nil
+	}
+
+	values := make([]interface{}, t.Count())
+
+	stack := hstack.New()
+	node := t.root
+
+	i := 0
+	for i < t.Count() {
+		if node == nil {
+			d := stack.Pop().(wrapper)
+			node = d.node
+			if d.leftDone {
+				values[i] = node.value()
+				i++
+				node = nil
+			} else {
+				d.leftDone = true
+				stack.Add(d)
+				node = node.left
+			}
+		} else {
+			stack.Add(wrapper{node, false})
+			node = node.right
 		}
 	}
 
@@ -302,10 +499,10 @@ func (t *Tree) String() string {
 	return strings.TrimSuffix(s, ", ")
 }
 
-// Count returns the number of items in the tree, or -1 on error.
+// Count returns the number of items in the tree.
 func (t *Tree) Count() int {
 	if t == nil {
-		return -1
+		return 0
 	}
 
 	return t.count
@@ -326,6 +523,15 @@ func newNode(item Item) *tnode {
 	n.height = 1
 
 	return n
+}
+
+// value returns the value of the item at this node.
+func (n *tnode) value() interface{} {
+	if n == nil {
+		return nil
+	}
+
+	return n.item.GetValue()
 }
 
 // index returns the index of the item at this node.
@@ -448,18 +654,22 @@ func (t *Tree) rebalance(stack *hstack.Stack, index int, added bool) {
 
 		bal := node.balance()
 		if (added && bal == 0) || (!added && (bal == -1 || bal == 1)) {
-			// The operation did not change the length of the longest branch. We can stop checking for imbalance now.
+			// The operation did not change the length of the longest sub-branch. We can stop checking for imbalance now.
 			break
 		}
 
 		if (added && (bal == -1 || bal == 1)) || (!added && bal == 0) {
-			// The longest branch below this node is now one node longer. We'll increase the height of this branch by
-			// one and keep moving up the insertion/deletion path.
-			node.height++
+			// The longest sub-branch below this node is now one node longer/shorter. We'll change the height of this
+			// sub-branch by one and keep moving up the insertion/deletion path.
+			if added {
+				node.height++
+			} else {
+				node.height--
+			}
 			continue
 		}
 
-		// We have an imbalance. Rotate the nodes to fix this. This will change the root node of this branch, so
+		// We have an imbalance. Rotate the nodes to fix this. This will change the root node of this sub-branch, so
 		// we'll need to link it back in after the rotation operation is done.
 		rotated := rotate(node, index)
 		if stack.Count() == 0 {
@@ -473,7 +683,11 @@ func (t *Tree) rebalance(stack *hstack.Stack, index int, added bool) {
 				node.right = rotated
 			}
 		}
-		break
+
+		// If we had to rebalance after adding a node, then the tree is now correct and we can stop.
+		if added {
+			break
+		}
 	}
 }
 
