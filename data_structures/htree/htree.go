@@ -508,6 +508,15 @@ func (t *Tree) Count() int {
 	return t.count
 }
 
+// Height returns the length of the longest branch from root to leaf.
+func (t *Tree) Height() int {
+	if t == nil || t.root == nil {
+		return 0
+	}
+
+	return t.root.height
+}
+
 // Internal structure of tree nodes
 type tnode struct {
 	item   Item

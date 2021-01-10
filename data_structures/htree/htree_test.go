@@ -103,6 +103,10 @@ func TestBad(t *testing.T) {
 	if tr.Count() != 0 {
 		t.Error("Bad object test: Unexpectedly passed Count")
 	}
+
+	if tr.Height() != 0 {
+		t.Error("Bad object test: Unexpectedly passed Height")
+	}
 }
 
 func TestAdd(t *testing.T) {
@@ -114,21 +118,21 @@ func TestAdd(t *testing.T) {
 	}
 	testString(t, tr, "5")
 	testCount(t, tr, 1)
-	testBalance(t, tr.root)
+	testHeightBalance(t, tr)
 
 	if err := tr.Add(10, 10); err != nil {
 		t.Error(err)
 	}
 	testString(t, tr, "5, 10")
 	testCount(t, tr, 2)
-	testBalance(t, tr.root)
+	testHeightBalance(t, tr)
 
 	if err := tr.Add(1, 1); err != nil {
 		t.Error(err)
 	}
 	testString(t, tr, "1, 5, 10")
 	testCount(t, tr, 3)
-	testBalance(t, tr.root)
+	testHeightBalance(t, tr)
 
 	// Now do a larger test to make sure items are inserted in the correct order.
 	tr.Clear()
@@ -142,7 +146,7 @@ func TestAdd(t *testing.T) {
 	}
 	testSort(t, tr, items)
 	testCount(t, tr, 100000)
-	testBalance(t, tr.root)
+	testHeightBalance(t, tr)
 }
 
 func TestAddItems(t *testing.T) {
@@ -155,7 +159,7 @@ func TestAddItems(t *testing.T) {
 	}
 	testString(t, tr, "5")
 	testCount(t, tr, 1)
-	testBalance(t, tr.root)
+	testHeightBalance(t, tr)
 
 	item2 := NewItem(10, 10)
 	item3 := NewItem(1, 1)
@@ -164,7 +168,7 @@ func TestAddItems(t *testing.T) {
 	}
 	testString(t, tr, "1, 5, 10")
 	testCount(t, tr, 3)
-	testBalance(t, tr.root)
+	testHeightBalance(t, tr)
 
 	// Now do a larger test to make sure items are inserted in the correct order.
 	tr.Clear()
@@ -174,7 +178,7 @@ func TestAddItems(t *testing.T) {
 	}
 	testSort(t, tr, items)
 	testCount(t, tr, 100000)
-	testBalance(t, tr.root)
+	testHeightBalance(t, tr)
 
 	// Test that setting a new value for an item doesn't affect the tree's value until the item is added to the tree
 	// again. We're going to get a value from the tree, change its value, and then grab it again to make sure nothing's
@@ -183,7 +187,7 @@ func TestAddItems(t *testing.T) {
 	tr.Clear()
 	tr, items = buildMiscTree(500)
 	testCount(t, tr, 500)
-	testBalance(t, tr.root)
+	testHeightBalance(t, tr)
 
 	for _, v := range items {
 		index := v.GetIndex()
@@ -219,7 +223,7 @@ func TestBalance(t *testing.T) {
 	for i := 1; i < 1000; i++ {
 		tr.Add(i, i)
 		testCount(t, tr, i)
-		testBalance(t, tr.root)
+		testHeightBalance(t, tr)
 	}
 
 	// By adding numbers from high to low, we're only going to be performing single right rotations during the
@@ -229,14 +233,14 @@ func TestBalance(t *testing.T) {
 	for i := 1000; i > 0; i-- {
 		tr.Add(i, i)
 		testCount(t, tr, 1001-i)
-		testBalance(t, tr.root)
+		testHeightBalance(t, tr)
 	}
 
 	// Now let's run through trees of increasing size to make sure that all sizes within the range are properly balanced
 	// and have the correct height at each node.
 	for i := 1; i < 1000; i++ {
 		tr, _ := buildNumTree(i, true)
-		testBalance(t, tr.root)
+		testHeightBalance(t, tr)
 	}
 }
 
@@ -247,7 +251,7 @@ func TestRemove(t *testing.T) {
 	for i := count; i < count*2; i++ {
 		tr.Remove(count)
 		testCount(t, tr, count)
-		testBalance(t, tr.root)
+		testHeightBalance(t, tr)
 	}
 
 	// We'll use this tree to test the ability to remove a node without children.
@@ -269,7 +273,7 @@ func TestRemove(t *testing.T) {
 
 		// Make sure that the tree is still in good shape.
 		testCount(t, tr, count-1-i)
-		testBalance(t, tr.root)
+		testHeightBalance(t, tr)
 	}
 
 	// And then in the other direction.
@@ -288,18 +292,18 @@ func TestRemove(t *testing.T) {
 
 		// Make sure that the tree is still in good shape.
 		testCount(t, tr, count-1-i)
-		testBalance(t, tr.root)
+		testHeightBalance(t, tr)
 	}
 
 	// Let's also test the ability to remove a root node with no children.
 	tr.Clear()
 	tr.Add(1, 1)
 	testCount(t, tr, 1)
-	testBalance(t, tr.root)
+	testHeightBalance(t, tr)
 
 	tr.Remove(1)
 	testCount(t, tr, 0)
-	testBalance(t, tr.root)
+	testHeightBalance(t, tr)
 
 	// We'll use this tree to test the ability to remove a node with one child.
 	tr.Clear()
@@ -308,18 +312,18 @@ func TestRemove(t *testing.T) {
 		tr.Add(index, index)
 	}
 	testCount(t, tr, len(indexes))
-	testBalance(t, tr.root)
+	testHeightBalance(t, tr)
 
 	tr.Remove(2)
 	testCount(t, tr, len(indexes)-1)
-	testBalance(t, tr.root)
+	testHeightBalance(t, tr)
 	if tr.Match(2) {
 		t.Error("Did not remove 2")
 	}
 
 	tr.Remove(4)
 	testCount(t, tr, len(indexes)-2)
-	testBalance(t, tr.root)
+	testHeightBalance(t, tr)
 	if tr.Match(4) {
 		t.Error("Did not remove 4")
 	}
@@ -329,11 +333,11 @@ func TestRemove(t *testing.T) {
 	tr.Add(1, 1)
 	tr.Add(2, 2)
 	testCount(t, tr, 2)
-	testBalance(t, tr.root)
+	testHeightBalance(t, tr)
 
 	tr.Remove(1)
 	testCount(t, tr, 1)
-	testBalance(t, tr.root)
+	testHeightBalance(t, tr)
 	if tr.Match(1) {
 		t.Error("Did not remove 1")
 	}
@@ -357,7 +361,7 @@ func TestRemove(t *testing.T) {
 
 		// Make sure that the tree is still in good shape.
 		testCount(t, tr, count-1-i)
-		testBalance(t, tr.root)
+		testHeightBalance(t, tr)
 	}
 
 	// And then in the other direction.
@@ -376,7 +380,7 @@ func TestRemove(t *testing.T) {
 
 		// Make sure that the tree is still in good shape.
 		testCount(t, tr, count-1-i)
-		testBalance(t, tr.root)
+		testHeightBalance(t, tr)
 	}
 
 	// Let's also test the ability to remove a root node with two children.
@@ -385,11 +389,11 @@ func TestRemove(t *testing.T) {
 	tr.Add(1, 1)
 	tr.Add(3, 3)
 	testCount(t, tr, 3)
-	testBalance(t, tr.root)
+	testHeightBalance(t, tr)
 
 	tr.Remove(2)
 	testCount(t, tr, 2)
-	testBalance(t, tr.root)
+	testHeightBalance(t, tr)
 }
 
 func TestClear(t *testing.T) {
@@ -402,12 +406,12 @@ func TestClear(t *testing.T) {
 	}
 	testString(t, tr, "5")
 	testCount(t, tr, 1)
-	testBalance(t, tr.root)
+	testHeightBalance(t, tr)
 
 	tr.Clear()
 	testString(t, tr, "<empty>")
 	testCount(t, tr, 0)
-	testBalance(t, tr.root)
+	testHeightBalance(t, tr)
 
 	// Add 500 items of various types.
 	tr, _ = buildMiscTree(500)
@@ -416,7 +420,7 @@ func TestClear(t *testing.T) {
 	tr.Clear()
 	testString(t, tr, "<empty>")
 	testCount(t, tr, 0)
-	testBalance(t, tr.root)
+	testHeightBalance(t, tr)
 }
 
 func TestItem(t *testing.T) {
@@ -531,7 +535,7 @@ func TestMatch(t *testing.T) {
 		return
 	}
 	testCount(t, tr, 500)
-	testBalance(t, tr.root)
+	testHeightBalance(t, tr)
 
 	// Make sure that all of these items match.
 	for i, item := range presentItems {
@@ -566,7 +570,7 @@ func TestMatch(t *testing.T) {
 	}
 	testSort(t, tr, presentItems)
 	testCount(t, tr, 500)
-	testBalance(t, tr.root)
+	testHeightBalance(t, tr)
 
 	// Make sure that all of these items match.
 	for i, item := range presentItems {
@@ -609,7 +613,7 @@ func TestYield(t *testing.T) {
 	tr, items := buildMiscTree(500)
 	testSort(t, tr, items)
 	testCount(t, tr, 500)
-	testBalance(t, tr.root)
+	testHeightBalance(t, tr)
 
 	yieldChan := tr.Yield(nil)
 	if yieldChan == nil {
@@ -635,7 +639,7 @@ func TestYield(t *testing.T) {
 		return
 	}
 	testCount(t, tr, 500)
-	testBalance(t, tr.root)
+	testHeightBalance(t, tr)
 
 	// Grab the first two items.
 	for i := 0; i < 2; i++ {
@@ -667,7 +671,7 @@ func TestList(t *testing.T) {
 	tr, items := buildMiscTree(1000)
 	testSort(t, tr, items)
 	testCount(t, tr, 1000)
-	testBalance(t, tr.root)
+	testHeightBalance(t, tr)
 
 	listItems := tr.List()
 	if len(listItems) != 1000 {
@@ -693,7 +697,7 @@ func TestDFS(t *testing.T) {
 	tr, items := buildMiscTree(1000)
 	testSort(t, tr, items)
 	testCount(t, tr, 1000)
-	testBalance(t, tr.root)
+	testHeightBalance(t, tr)
 
 	traversed := tr.DFS()
 	if len(traversed) != 1000 {
@@ -752,7 +756,7 @@ func TestBFS(t *testing.T) {
 	// Now that we have the values, let's build out the tree.
 	tr, _ = buildNumTree(count, false)
 	testCount(t, tr, count)
-	testBalance(t, tr.root)
+	testHeightBalance(t, tr)
 
 	// Check that both sets of values are equal.
 	set2 := tr.BFS()
@@ -996,7 +1000,7 @@ func TestSetIndex(t *testing.T) {
 	tr, items := buildMiscTree(1000)
 	testSort(t, tr, items)
 	testCount(t, tr, 1000)
-	testBalance(t, tr.root)
+	testHeightBalance(t, tr)
 
 	newItems := make([]Item, len(items))
 	for i, v := range items {
@@ -1028,7 +1032,7 @@ func TestSetIndex(t *testing.T) {
 	items = append(items, newItems...)
 	testSort(t, tr, items)
 	testCount(t, tr, 2000)
-	testBalance(t, tr.root)
+	testHeightBalance(t, tr)
 }
 
 // --- TREE BENCHMARKS ---
@@ -1115,7 +1119,18 @@ func testSort(t *testing.T, tr Tree, items []Item) {
 	testString(t, tr, s)
 }
 
-// testBalance checks whether or not all the nodes in the tree have the correct balance.
+// testHeightBalance checks the height and balance of the tree.
+func testHeightBalance(t *testing.T, tr Tree) {
+	height := testBalance(t, tr.root)
+	if height != tr.Height() {
+		t.Error("Tree is reporting wrong height")
+		t.Log("Expected", height)
+		t.Log("Received", tr.Height())
+	}
+}
+
+// testBalance checks whether or not all the nodes in the tree have the correct balance and returns the longest
+// sub-branch at this node.
 func testBalance(t *testing.T, node *tnode) int {
 	if node == nil {
 		return 0
