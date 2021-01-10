@@ -72,6 +72,30 @@ func TestBad(t *testing.T) {
 		t.Error("Bad object test: Unexpectedly passed BFS")
 	}
 
+	if tr.LeftCenterRight() != nil {
+		t.Error("Bad object test: Unexpectedly passed LeftCenterRight")
+	}
+
+	if tr.CenterLeftRight() != nil {
+		t.Error("Bad object test: Unexpectedly passed CenterLeftRight")
+	}
+
+	if tr.LeftRightCenter() != nil {
+		t.Error("Bad object test: Unexpectedly passed LeftRightCenter")
+	}
+
+	if tr.RightCenterLeft() != nil {
+		t.Error("Bad object test: Unexpectedly passed RightCenterLeft")
+	}
+
+	if tr.CenterRightLeft() != nil {
+		t.Error("Bad object test: Unexpectedly passed CenterRightLeft")
+	}
+
+	if tr.RightLeftCenter() != nil {
+		t.Error("Bad object test: Unexpectedly passed RightLeftCenter")
+	}
+
 	if tr.String() != "<nil>" {
 		t.Error("Bad object test: Unexpectedly passed String")
 	}
@@ -745,6 +769,30 @@ func TestBFS(t *testing.T) {
 	}
 }
 
+func TestLeftCenterRight(t *testing.T) {
+	testTraversal(t, (*Tree).LeftCenterRight, []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15})
+}
+
+func TestCenterLeftRight(t *testing.T) {
+	testTraversal(t, (*Tree).CenterLeftRight, []int{7, 3, 1, 0, 2, 5, 4, 6, 11, 9, 8, 10, 13, 12, 14, 15})
+}
+
+func TestLeftRightCenter(t *testing.T) {
+	testTraversal(t, (*Tree).LeftRightCenter, []int{0, 2, 1, 4, 6, 5, 3, 8, 10, 9, 12, 15, 14, 13, 11, 7})
+}
+
+func TestRightCenterLeft(t *testing.T) {
+	testTraversal(t, (*Tree).RightCenterLeft, []int{15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0})
+}
+
+func TestCenterRightLeft(t *testing.T) {
+	testTraversal(t, (*Tree).CenterRightLeft, []int{7, 11, 13, 14, 15, 12, 9, 10, 8, 3, 5, 6, 4, 1, 2, 0})
+}
+
+func TestRightLeftCenter(t *testing.T) {
+	testTraversal(t, (*Tree).RightLeftCenter, []int{15, 14, 12, 13, 10, 8, 9, 11, 6, 4, 5, 2, 0, 1, 3, 7})
+}
+
 // --- ITEM TESTS ---
 
 func TestNewItem(t *testing.T) {
@@ -1097,6 +1145,30 @@ func testBalance(t *testing.T, node *tnode) int {
 	return height
 }
 
+// testTraversal runs through a tree traversal using the specified Tree method and checks that the output is the same as
+// expected. This uses only int types.
+func testTraversal(t *testing.T, method func (*Tree) []interface{}, expect []int) {
+	tr, _ := buildNumTree(len(expect), false)
+	testCount(t, tr, len(expect))
+
+	values := method(&tr)
+
+	if len(expect) != len(values) {
+		t.Error("Lengths do not match")
+		t.Log("Expected:", len(expect))
+		t.Log("Received:", len(values))
+	}
+
+	for i, value := range values {
+		if value != expect[i] {
+			t.Error("Values do not match at index", i)
+			t.Log("Expected:", expect[i])
+			t.Log("Received:", value)
+		}
+	}
+}
+
+// newRand returns a new random number generator.
 func newRand() *rand.Rand {
 	seed := time.Now().UnixNano()
 	source := rand.NewSource(seed)
@@ -1157,6 +1229,7 @@ func buildMiscTree(count int) (Tree, []Item) {
 	return t, items
 }
 
+// buildValues build out a slice of random values of length count.
 func buildValues(count int) []interface{} {
 	if count < 1 {
 		return nil
