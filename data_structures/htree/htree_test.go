@@ -72,27 +72,27 @@ func TestBad(t *testing.T) {
 		t.Error("Bad object test: Unexpectedly passed BFS")
 	}
 
-	if tr.LeftCenterRight() != nil {
+	if values := tr.LeftCenterRight(); values != nil {
 		t.Error("Bad object test: Unexpectedly passed LeftCenterRight")
 	}
 
-	if tr.CenterLeftRight() != nil {
+	if values := tr.CenterLeftRight(); values != nil {
 		t.Error("Bad object test: Unexpectedly passed CenterLeftRight")
 	}
 
-	if tr.LeftRightCenter() != nil {
+	if values := tr.LeftRightCenter(); values != nil {
 		t.Error("Bad object test: Unexpectedly passed LeftRightCenter")
 	}
 
-	if tr.RightCenterLeft() != nil {
+	if values := tr.RightCenterLeft(); values != nil {
 		t.Error("Bad object test: Unexpectedly passed RightCenterLeft")
 	}
 
-	if tr.CenterRightLeft() != nil {
+	if values := tr.CenterRightLeft(); values != nil {
 		t.Error("Bad object test: Unexpectedly passed CenterRightLeft")
 	}
 
-	if tr.RightLeftCenter() != nil {
+	if values := tr.RightLeftCenter(); values != nil {
 		t.Error("Bad object test: Unexpectedly passed RightLeftCenter")
 	}
 
@@ -244,7 +244,7 @@ func TestRemove(t *testing.T) {
 	// Make sure that a missing index has no effect on the tree.
 	count := 100
 	tr, _ := buildNumTree(count, false)
-	for i := count; i < count * 2; i++ {
+	for i := count; i < count*2; i++ {
 		tr.Remove(count)
 		testCount(t, tr, count)
 		testBalance(t, tr.root)
@@ -1147,7 +1147,7 @@ func testBalance(t *testing.T, node *tnode) int {
 
 // testTraversal runs through a tree traversal using the specified Tree method and checks that the output is the same as
 // expected. This uses only int types.
-func testTraversal(t *testing.T, method func (*Tree) []interface{}, expect []int) {
+func testTraversal(t *testing.T, method func(*Tree) []interface{}, expect []int) {
 	tr, _ := buildNumTree(len(expect), false)
 	testCount(t, tr, len(expect))
 
