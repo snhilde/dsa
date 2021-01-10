@@ -76,7 +76,7 @@ func TestBad(t *testing.T) {
 		t.Error("Bad object test: Unexpectedly passed String")
 	}
 
-	if tr.Count() != -1 {
+	if tr.Count() != 0 {
 		t.Error("Bad object test: Unexpectedly passed Count")
 	}
 }
