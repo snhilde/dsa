@@ -81,13 +81,13 @@ func (t *Tree) AddItems(items ...Item) error {
 
 		// Add the parent back to the stack and rebalance the tree (if needed).
 		stack.Add(parent)
-		t.rebalance(stack, item.GetIndex(), true)
+		t.root = rebalance(stack, true)
 	}
 
 	return nil
 }
 
-// Remove removes and returns the item at the provided index from the tree.
+// Remove removes the item from the tree at the provided index.
 func (t *Tree) Remove(index int) Item {
 	if t == nil {
 		return Item{}
@@ -656,10 +656,11 @@ func (n *tnode) findNode(index int) (*tnode, *hstack.Stack) {
 }
 
 // rebalance calculates the balances of the nodes in the path and performs any necessary rotation operations to
-// rebalance the tree.
-func (t *Tree) rebalance(stack *hstack.Stack, index int, added bool) {
+// rebalance the branch.
+func rebalance(stack *hstack.Stack, added bool) *tnode {
+	var node *tnode
 	for stack.Count() > 0 {
-		node := stack.Pop().(*tnode)
+		node = stack.Pop().(*tnode)
 
 		bal := node.balance()
 		if (added && bal == 0) || (!added && (bal == -1 || bal == 1)) {
@@ -668,29 +669,26 @@ func (t *Tree) rebalance(stack *hstack.Stack, index int, added bool) {
 		}
 
 		if (added && (bal == -1 || bal == 1)) || (!added && bal == 0) {
-			// The longest sub-branch below this node is now one node longer/shorter. We'll change the height of this
-			// sub-branch by one and keep moving up the insertion/deletion path.
-			if added {
-				node.height++
-			} else {
-				node.height--
-			}
+			// The longest sub-branch below this node is now one node longer/shorter. We'll update the height of this
+			// sub-branch and keep moving up the path.
+			updateHeight(node)
 			continue
 		}
 
 		// We have an imbalance. Rotate the nodes to fix this. This will change the root node of this sub-branch, so
 		// we'll need to link it back in after the rotation operation is done.
-		rotated := rotate(node, index)
+		rotated := rotate(node)
 		if stack.Count() == 0 {
 			// We're at the top of the tree.
-			t.root = rotated
+			node = rotated
+			break
+		}
+
+		node = stack.Pop().(*tnode)
+		if rotated.index() < node.index() {
+			node.left = rotated
 		} else {
-			node = stack.Pop().(*tnode)
-			if index < node.index() {
-				node.left = rotated
-			} else {
-				node.right = rotated
-			}
+			node.right = rotated
 		}
 
 		// If we had to rebalance after adding a node, then the tree is now correct and we can stop.
@@ -698,10 +696,17 @@ func (t *Tree) rebalance(stack *hstack.Stack, index int, added bool) {
 			break
 		}
 	}
+
+	// Go back up the tree to find the root of this branch.
+	for stack.Count() > 0 {
+		node = stack.Pop().(*tnode)
+	}
+
+	return node
 }
 
 // rotate performs the necessary rotations to rebalance the tree from this node down.
-func rotate(top *tnode, index int) *tnode {
+func rotate(top *tnode) *tnode {
 	// When rebalancing, we only really care about two nodes: the node that first had the -2 or 2 imbalance and the node
 	// directly below it on the insertion side. We'll call these the top node and bottom node. The top node was sent as
 	// the first argument to this function. We'll get the bottom node in a bit.
@@ -713,16 +718,16 @@ func rotate(top *tnode, index int) *tnode {
 	var left bool
 	var double bool
 
-	if index < top.index() {
+	if top.balance() < 0 {
 		left = true
 		bottom = top.left
-		if index > bottom.index() {
+		if bottom.balance() > 0 {
 			double = true
 		}
 	} else {
 		left = false
 		bottom = top.right
-		if index < bottom.index() {
+		if bottom.balance() < 0 {
 			double = true
 		}
 	}
