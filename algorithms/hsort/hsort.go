@@ -646,7 +646,7 @@ func BinaryInt(list []int) error {
 		}
 	}
 
-	sorted := tree.List()
+	sorted := tree.DFS()
 	for i, v := range sorted {
 		list[i] = v.(int)
 	}
