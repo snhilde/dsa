@@ -194,14 +194,14 @@ func TestAddItems(t *testing.T) {
 		item := tr.Item(index)
 		if item == (Item{}) {
 			t.Error("Bad item")
-			continue
+			return
 		}
 		item.SetValue("new value")
 		item = tr.Item(index)
 		value := item.GetValue()
 		if val, ok := value.(string); ok && val == "new value" {
 			t.Error("Item in tree has been unexpectedly updated")
-			continue
+			return
 		}
 
 		item.SetValue("new value")
@@ -209,7 +209,7 @@ func TestAddItems(t *testing.T) {
 		item = tr.Item(index)
 		if value := item.GetValue(); value.(string) != "new value" {
 			t.Error("Item's value was not updated")
-			continue
+			return
 		}
 	}
 }
@@ -389,11 +389,52 @@ func TestRemove(t *testing.T) {
 	tr.Add(1, 1)
 	tr.Add(3, 3)
 	testCount(t, tr, 3)
+	testString(t, tr, "1, 2, 3")
 	testHeightBalance(t, tr)
 
 	tr.Remove(2)
 	testCount(t, tr, 2)
+	testString(t, tr, "1, 3")
 	testHeightBalance(t, tr)
+
+	// And a root node with two children that will need rebalancing after removal.
+	tr.Clear()
+	tr.Add(3, 3)
+	tr.Add(2, 2)
+	tr.Add(4, 4)
+	tr.Add(1, 1)
+	testCount(t, tr, 4)
+	testString(t, tr, "1, 2, 3, 4")
+	testHeightBalance(t, tr)
+
+	tr.Remove(4)
+	testCount(t, tr, 3)
+	testString(t, tr, "1, 2, 3")
+	testHeightBalance(t, tr)
+
+	// Now that everything looks good, let's set up a large table with non-sequential indexes and remove all nodes from
+	// it. We're going to put all the indexes into a hash table so we can have random look up when deciding which node
+	// to remove next.
+	count = 10000
+	indexMap := make(map[int]bool, count)
+	tr, items := buildMiscTree(count)
+	for _, item := range items {
+		indexMap[item.GetIndex()] = true
+	}
+
+	for index := range indexMap {
+		tr.Remove(index)
+
+		// Make sure the node was actually removed.
+		if tr.Value(index) != nil {
+			t.Error("Did not remove", index)
+		}
+		count--
+
+		// Make sure that the tree is still in good shape.
+		testCount(t, tr, count)
+		testHeightBalance(t, tr)
+	}
 }
 
 func TestClear(t *testing.T) {
@@ -1136,23 +1177,33 @@ func testBalance(t *testing.T, node *tnode) int {
 		return 0
 	}
 
+	// Make sure the indexes are in proper order.
+	if node.left != nil && node.left.index() >= node.index() {
+		t.Error(node.left.index(), "is not less than", node.index())
+	}
+	if node.right != nil && node.right.index() <= node.index() {
+		t.Error(node.right.index(), "is not less than", node.index())
+	}
+
+	// Make sure the balance is being correctly calculated.
 	leftCount := testBalance(t, node.left)
 	rightCount := testBalance(t, node.right)
 
 	balance := rightCount - leftCount
 	if balance != node.balance() {
-		t.Error("Node at index", node.item.index, "has wrong balance")
+		t.Error("Node at index", node.index(), "has wrong balance")
 		t.Log("Should be:", balance)
 		t.Log("Node says:", node.balance())
 	}
 
+	// Make sure the height is being correctly calculated.
 	height := leftCount
 	if rightCount > leftCount {
 		height = rightCount
 	}
 	height++
 	if height != node.height {
-		t.Error("Node at index", node.item.index, "has wrong height")
+		t.Error("Node at index", node.index(), "has wrong height")
 		t.Log("Should be:", height)
 		t.Log("Node says:", node.height)
 	}
