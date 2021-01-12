@@ -216,6 +216,30 @@ func (t *Tree) Match(value interface{}) bool {
 	return false
 }
 
+// Min returns the Item with the lowest index in the tree.
+func (t *Tree) Min() Item {
+	if t == nil || t.root == nil {
+		return Item{}
+	}
+
+	var node *tnode
+	for node = t.root; node.left != nil; node = node.left {}
+
+	return node.item
+}
+
+// Max returns the Item with the highest index in the tree.
+func (t *Tree) Max() Item {
+	if t == nil || t.root == nil {
+		return Item{}
+	}
+
+	var node *tnode
+	for node = t.root; node.right != nil; node = node.right {}
+
+	return node.item
+}
+
 // Yield provides an unbuffered channel that will continually pass successive items as the tree is traversed in sorted
 // order. The channel quit is used to communicate when iteration should be stopped. Send any value on the cnannel to
 // break the communication. If this is not needed, pass nil.
