@@ -88,14 +88,73 @@ func (t *Tree) AddItems(items ...Item) error {
 }
 
 // Remove removes the item from the tree at the provided index.
-func (t *Tree) Remove(index int) Item {
+func (t *Tree) Remove(index int) {
 	if t == nil {
-		return Item{}
+		return
 	}
 
-	// TODO
+	// Find the node we want to remove.
+	node, stack := t.root.findNode(index)
+	if node == nil {
+		// A node with the provided index does not exist in this tree.
+		return
+	}
 
-	return Item{}
+	var swap *tnode
+	if node.left != nil && node.right != nil {
+		// The node we need to remove has two children. We need to find and promote the node with the next highest
+		// index. We'll start by finding the node we need to swap up and keeping track of the path to it for potential
+		// rebalance operations later.
+		substack := hstack.New()
+		for swap = node.right; swap.left != nil; swap = swap.left {
+			substack.Add(swap)
+		}
+
+		// Link in the left side. This won't change anything below the node that we're swapping up.
+		swap.left = node.left
+
+		// Link in the right side (if needed). This can change the sub-branch if the swap node had a node on its right
+		// side, and a rebalance/rotation might be needed.
+		if substack.Count() > 0 {
+			parent := substack.Pop().(*tnode)
+			parent.left = swap.right
+			substack.Add(parent)
+			swap.right = rebalance(substack, false)
+		}
+
+		index = swap.index()
+	} else {
+		// The node we need to remove has either one child or no children. Either way, the removal process is the same.
+		// First, we need to figure out what node (if any) will replace this node.
+		if node.left != nil {
+			swap = node.left
+		} else {
+			swap = node.right
+		}
+	}
+
+	// Now that we have our node (or nil) to swap with the deleted node, let's make the swap.
+	if stack.Count() == 0 {
+		// We need to replace the root node.
+		t.root = swap
+	} else {
+		// We need to link in the swapped node by getting its parent and putting it on the appropriate side.
+		parent := stack.Pop().(*tnode)
+		if index < parent.index() {
+			parent.left = swap
+		} else {
+			parent.right = swap
+		}
+
+		// Add the parent node back to the stack for rebalancing/rotation (if needed).
+		stack.Add(parent)
+	}
+
+	// Finally, check the rest of the path for any needed rotations.
+	stack.Add(swap)
+	t.root = rebalance(stack, false)
+
+	t.count--
 }
 
 // Clear clears all items in the tree and resets it to a new state.
@@ -661,45 +720,25 @@ func rebalance(stack *hstack.Stack, added bool) *tnode {
 	var node *tnode
 	for stack.Count() > 0 {
 		node = stack.Pop().(*tnode)
-
-		bal := node.balance()
-		if (added && bal == 0) || (!added && (bal == -1 || bal == 1)) {
-			// The operation did not change the length of the longest sub-branch. We can stop checking for imbalance now.
-			break
-		}
-
-		if (added && (bal == -1 || bal == 1)) || (!added && bal == 0) {
-			// The longest sub-branch below this node is now one node longer/shorter. We'll update the height of this
-			// sub-branch and keep moving up the path.
+		updateHeight(node)
+		balance := node.balance()
+		if balance < -1 || balance > 1 {
+			// We have an imbalance. Rotate the nodes to fix this. This will change the root node of this sub-branch, so
+			// we'll need to link it back in after the rotation operation is done.
+			rotated := rotate(node)
+			if stack.Count() == 0 {
+				// We're at the top of the tree.
+				node = rotated
+			} else {
+				node = stack.Pop().(*tnode)
+				if rotated.index() < node.index() {
+					node.left = rotated
+				} else {
+					node.right = rotated
+				}
+			}
 			updateHeight(node)
-			continue
 		}
-
-		// We have an imbalance. Rotate the nodes to fix this. This will change the root node of this sub-branch, so
-		// we'll need to link it back in after the rotation operation is done.
-		rotated := rotate(node)
-		if stack.Count() == 0 {
-			// We're at the top of the tree.
-			node = rotated
-			break
-		}
-
-		node = stack.Pop().(*tnode)
-		if rotated.index() < node.index() {
-			node.left = rotated
-		} else {
-			node.right = rotated
-		}
-
-		// If we had to rebalance after adding a node, then the tree is now correct and we can stop.
-		if added {
-			break
-		}
-	}
-
-	// Go back up the tree to find the root of this branch.
-	for stack.Count() > 0 {
-		node = stack.Pop().(*tnode)
 	}
 
 	return node
@@ -768,15 +807,15 @@ func rotate(top *tnode) *tnode {
 }
 
 // updateHeight recalculates and sets the node's height.
-func updateHeight(n *tnode) {
-	if n != nil {
-		leftCount := n.leftCount()
-		rightCount := n.rightCount()
+func updateHeight(node *tnode) {
+	if node != nil {
+		leftCount := node.leftCount()
+		rightCount := node.rightCount()
 
 		if leftCount > rightCount {
-			n.height = leftCount + 1
+			node.height = leftCount + 1
 		} else {
-			n.height = rightCount + 1
+			node.height = rightCount + 1
 		}
 	}
 }
