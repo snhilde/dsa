@@ -1,13 +1,14 @@
 ![Maintenance Badge](https://img.shields.io/badge/Maintained-yes-success)
 ![Class Badge](https://img.shields.io/badge/Status-experimental-yellow)
-[![GoDoc reference example](https://img.shields.io/badge/godoc-reference-blue.svg)](https://godoc.org/github.com/snhilde/dsa)
-[![GoReportCard example](https://goreportcard.com/badge/github.com/snhilde/dsa)](https://goreportcard.com/report/github.com/snhilde/dsa)
+[![PkgGoDev Doc](https://pkg.go.dev/badge/github.com/snhilde/dsa)](https://pkg.go.dev/github.com/snhilde/dsa)
+[![GoReportCard](https://goreportcard.com/badge/github.com/snhilde/dsa)](https://goreportcard.com/report/github.com/snhilde/dsa)
+[![Build Status](https://travis-ci.com/snhilde/getcast.svg?branch=master)](https://travis-ci.com/snhilde/getcast)
 
 # dsa
 
 Data Structures and Algorithms
 
-These are example modules for increasing my knowledge and practicing.
+These are example modules for increasing knowledge and practicing.
 
 
 ## Current Packages
