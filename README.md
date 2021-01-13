@@ -8,6 +8,7 @@ Data Structures and Algorithms
 	* [Stack (hstack)](https://pkg.go.dev/github.com/snhilde/dsa/data_structures/hstack)
 	* [Binary Buffer (hbit)](https://pkg.go.dev/github.com/snhilde/dsa/data_structures/hbit)
 	* [Data Table (htable)](https://pkg.go.dev/github.com/snhilde/dsa/data_structures/htable)
+	* [Binary Tree (htree)](https://pkg.go.dev/github.com/snhilde/dsa/data_structures/htree)
 * Algorithms
 	* [Search (hsearch)](https://pkg.go.dev/github.com/snhilde/dsa/algorithms/hsearch)
 	* [Sort (hsort)](https://pkg.go.dev/github.com/snhilde/dsa/algorithms/hsort)
