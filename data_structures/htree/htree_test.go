@@ -56,6 +56,14 @@ func TestBad(t *testing.T) {
 		t.Error("Bad object test: Unexpectedly passed Match")
 	}
 
+	if item := tr.Min(); item != (Item{}) {
+		t.Error("Bad object test: Unexpectedly passed Min")
+	}
+
+	if item := tr.Max(); item != (Item{}) {
+		t.Error("Bad object test: Unexpectedly passed Max")
+	}
+
 	if ch := tr.Yield(nil); ch != nil {
 		t.Error("Bad object test: Unexpectedly passed Yield")
 	}
@@ -625,6 +633,94 @@ func TestMatch(t *testing.T) {
 	for i, item := range absentItems {
 		if tr.Match(item.GetValue()) {
 			t.Error("Unexpected item at index", i)
+		}
+	}
+}
+
+func TestMin(t *testing.T) {
+	count := 500
+	tr, items := buildMiscTree(count)
+	testSort(t, tr, items)
+	testCount(t, tr, count)
+
+	item := items[0]
+	if min := tr.Min(); !reflect.DeepEqual(min, item) {
+		t.Error("Minimum items differ")
+		t.Log("Expected:", item)
+		t.Log("Received:", min)
+	}
+
+	// Add some items and keep checking
+	_, additions := buildMiscTree(count)
+	for i, addition := range additions {
+		tr.AddItems(addition)
+		items = append(items, addition)
+		testSort(t, tr, items)
+		testCount(t, tr, count+i+1)
+		testHeightBalance(t, tr)
+
+		item := items[0]
+		if min := tr.Min(); !reflect.DeepEqual(min, item) {
+			t.Error("Minimum items differ")
+			t.Log("Expected:", item)
+			t.Log("Received:", min)
+		}
+	}
+
+	// Remove all of the min nodes while continuosly checking.
+	for i := 0; i < len(items)-1; i++ {
+		item := items[i]
+		tr.Remove(item.GetIndex())
+
+		item = items[i+1]
+		if min := tr.Min(); !reflect.DeepEqual(min, item) {
+			t.Error("Minimum items differ", item)
+			t.Log("Expected:", item)
+			t.Log("Received:", min)
+		}
+	}
+}
+
+func TestMax(t *testing.T) {
+	count := 500
+	tr, items := buildMiscTree(count)
+	testSort(t, tr, items)
+	testCount(t, tr, count)
+
+	item := items[len(items)-1]
+	if max := tr.Max(); !reflect.DeepEqual(max, item) {
+		t.Error("Maximum items differ")
+		t.Log("Expected:", item)
+		t.Log("Received:", max)
+	}
+
+	// Add some items and keep checking
+	_, additions := buildMiscTree(count)
+	for i, addition := range additions {
+		tr.AddItems(addition)
+		items = append(items, addition)
+		testSort(t, tr, items)
+		testCount(t, tr, count+i+1)
+		testHeightBalance(t, tr)
+
+		item := items[len(items)-1]
+		if max := tr.Max(); !reflect.DeepEqual(max, item) {
+			t.Error("Maximum items differ")
+			t.Log("Expected:", item)
+			t.Log("Received:", max)
+		}
+	}
+
+	// Remove all of the max nodes while continuosly checking.
+	for i := len(items)-1; i > 0; i-- {
+		item := items[i]
+		tr.Remove(item.GetIndex())
+
+		item = items[i-1]
+		if max := tr.Max(); !reflect.DeepEqual(max, item) {
+			t.Error("Maximum items differ", item)
+			t.Log("Expected:", item)
+			t.Log("Received:", max)
 		}
 	}
 }
