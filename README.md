@@ -1,6 +1,8 @@
 # dsa
 Data Structures and Algorithms
 
+These are example modules for increasing my knowledge and practicing.
+
 
 ## Current Packages #
 * Data Structures
