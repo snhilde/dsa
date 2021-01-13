@@ -71,3 +71,29 @@ func (c *CharSet) String() string {
 	}
 	return string(c.charSet)
 }
+
+// mapEncode builds a map for converting from value to rune.
+func (c *CharSet) mapEncode() map[int]rune {
+	m := make(map[int]rune)
+
+	if c != nil {
+		for i, v := range c.Characters() {
+			m[i] = v
+		}
+	}
+
+	return m
+}
+
+// mapDecode builds a map for converting from rune to value.
+func (c *CharSet) mapDecode() map[rune]int {
+	m := make(map[rune]int, c.Len()*2)
+
+	if c != nil {
+		for i, v := range c.Characters() {
+			m[v] = i
+		}
+	}
+
+	return m
+}
