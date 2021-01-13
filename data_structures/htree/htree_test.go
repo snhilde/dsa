@@ -667,7 +667,7 @@ func TestMin(t *testing.T) {
 		}
 	}
 
-	// Remove all of the min nodes while continuosly checking.
+	// Remove all of the min nodes while continuously checking.
 	for i := 0; i < len(items)-1; i++ {
 		item := items[i]
 		tr.Remove(item.GetIndex())
@@ -711,7 +711,7 @@ func TestMax(t *testing.T) {
 		}
 	}
 
-	// Remove all of the max nodes while continuosly checking.
+	// Remove all of the max nodes while continuously checking.
 	for i := len(items) - 1; i > 0; i-- {
 		item := items[i]
 		tr.Remove(item.GetIndex())

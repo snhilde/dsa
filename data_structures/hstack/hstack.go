@@ -25,7 +25,7 @@ func New() *Stack {
 
 // Add adds one or more new items to the top of the stack. Items are pushed in order, so the first argument is pushed
 // first, and the second, second, and so on. This means that the last argument to Add will be the first item returned
-// wtih Pop.
+// with Pop.
 func (s *Stack) Add(items ...interface{}) error {
 	if s == nil {
 		return errBadStack
