@@ -17,7 +17,6 @@ fmt-check:
 lint-check:
 	@failed=0; \
 	for file in $(GOFILES); do \
-		echo $$file; \
 		golint -min_confidence 0.3 -set_exit_status $$file || failed=1; \
 	done; \
 	if [ $$failed -ne 0 ]; then \
