@@ -223,7 +223,8 @@ func (t *Tree) Min() Item {
 	}
 
 	var node *tnode
-	for node = t.root; node.left != nil; node = node.left {}
+	for node = t.root; node.left != nil; node = node.left {
+	}
 
 	return node.item
 }
@@ -235,7 +236,8 @@ func (t *Tree) Max() Item {
 	}
 
 	var node *tnode
-	for node = t.root; node.right != nil; node = node.right {}
+	for node = t.root; node.right != nil; node = node.right {
+	}
 
 	return node.item
 }

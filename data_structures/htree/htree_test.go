@@ -712,7 +712,7 @@ func TestMax(t *testing.T) {
 	}
 
 	// Remove all of the max nodes while continuosly checking.
-	for i := len(items)-1; i > 0; i-- {
+	for i := len(items) - 1; i > 0; i-- {
 		item := items[i]
 		tr.Remove(item.GetIndex())
 
