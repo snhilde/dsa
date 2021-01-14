@@ -288,11 +288,11 @@ func (l *List) Clear() error {
 }
 
 // Yield provides an unbuffered channel that will continually pass successive items until the list is exhausted. The
-// channel quit is used to communicate when iteration should be stopped. Send any value on the channel to break the
-// communication. This will happen automatically if the list is exhausted. If this is not needed, pass nil as the
-// argument. Use Yield if you are concerned about memory usage or don't know how far through the list you will iterate;
-// otherwise, use YieldAll.
-func (l *List) Yield(quit <-chan interface{}) <-chan interface{} {
+// channel quit is used to communicate when iteration should be stopped. Send an empty struct (struct{}{}) on the
+// channel to break the communication. This will happen automatically if the list is exhausted. If this is not needed,
+// pass nil as the argument. Use Yield if you are concerned about memory usage or don't know how far through the list
+// you will iterate; otherwise, use YieldAll.
+func (l *List) Yield(quit <-chan struct{}) <-chan interface{} {
 	if l == nil || l.head == nil {
 		return nil
 	}

@@ -345,7 +345,7 @@ func (t *Table) Row(header string, item interface{}) (int, *Row) {
 
 	// Get our iterator to go through the rows.
 	i := 0
-	quit := make(chan interface{})
+	quit := make(chan struct{})
 	rowChan := t.rows.Yield(quit)
 	if rowChan == nil {
 		return -1, nil
@@ -359,7 +359,7 @@ func (t *Table) Row(header string, item interface{}) (int, *Row) {
 				// traversed), then it won't receive the message to quit. We'll try to send the quit message, and then
 				// we'll exit.
 				select {
-				case quit <- 0:
+				case quit <- struct{}{}:
 				default:
 				}
 				return i, row

@@ -1033,12 +1033,12 @@ func TestYield(t *testing.T) {
 	// Test breaking iteration before receiving any values.
 	l.Clear()
 	l.Append(1, 2, 3)
-	quit := make(chan interface{})
+	quit := make(chan struct{})
 	ch = l.Yield(quit)
 	if ch == nil {
 		t.Error("Failed to receive channel")
 	}
-	quit <- 0
+	quit <- struct{}{}
 	if v, ok := <-ch; ok {
 		t.Error("Channel should be closed")
 		t.Log("\tExpected: nil")
@@ -1048,7 +1048,7 @@ func TestYield(t *testing.T) {
 	// Test breaking iteration after receiving one value.
 	l.Clear()
 	l.Append(1, 2, 3)
-	quit = make(chan interface{})
+	quit = make(chan struct{})
 	ch = l.Yield(quit)
 	if ch == nil {
 		t.Error("Failed to receive channel")
@@ -1060,7 +1060,7 @@ func TestYield(t *testing.T) {
 		t.Log("\tReceived:", v)
 	}
 
-	quit <- 0
+	quit <- struct{}{}
 	if v, ok := <-ch; ok {
 		t.Error("Channel should be closed")
 		t.Log("\tExpected: nil")
@@ -1070,7 +1070,7 @@ func TestYield(t *testing.T) {
 	// Test breaking iteration after receiving all values.
 	l.Clear()
 	l.Append(1, 2, 3)
-	quit = make(chan interface{})
+	quit = make(chan struct{})
 	ch = l.Yield(quit)
 	if ch == nil {
 		t.Error("Failed to receive channel")
@@ -1105,7 +1105,7 @@ func TestYield(t *testing.T) {
 	}
 
 	select {
-	case quit <- 0:
+	case quit <- struct{}{}:
 		t.Error("nothing should be receiving on quit")
 	default:
 	}
@@ -1119,7 +1119,7 @@ func TestYield(t *testing.T) {
 	// Test that closing the quit channel does not affect the values channel.
 	l.Clear()
 	l.Append(1, 2, 3)
-	quit = make(chan interface{})
+	quit = make(chan struct{})
 	ch = l.Yield(quit)
 	if ch == nil {
 		t.Error("Failed to receive channel")

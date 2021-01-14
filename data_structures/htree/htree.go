@@ -194,7 +194,7 @@ func (t *Tree) Match(value interface{}) bool {
 		return false
 	}
 
-	quit := make(chan interface{})
+	quit := make(chan struct{})
 	itemChan := t.Yield(quit)
 	if itemChan == nil {
 		return false
@@ -243,9 +243,9 @@ func (t *Tree) Max() Item {
 }
 
 // Yield provides an unbuffered channel that will continually pass successive items as the tree is traversed in sorted
-// order. The channel quit is used to communicate when iteration should be stopped. Send any value on the cnannel to
-// break the communication. If this is not needed, pass nil.
-func (t *Tree) Yield(quit <-chan interface{}) <-chan Item {
+// order. The channel quit is used to communicate when iteration should be stopped. Send an empty struct (struct{}{}) on
+// the channel to break the communication. If this is not needed, pass nil.
+func (t *Tree) Yield(quit <-chan struct{}) <-chan Item {
 	if t == nil || t.Count() == 0 {
 		return nil
 	}
