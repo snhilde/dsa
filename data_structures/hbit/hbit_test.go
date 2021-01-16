@@ -1391,58 +1391,54 @@ func TestSetBit(t *testing.T) {
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
 
-	b.WriteByte(0x50)
-	checkBits(t, b, 8)
-	checkString(t, b, "00001010")
-	checkDisplay(t, b, "0000 1010")
-
 	// Test setting the first bit.
-	if err := b.SetBit(0, true); err != nil {
+	b.WriteByte(0xFF)
+	if err := b.SetBit(0, false); err != nil {
 		t.Error(err)
 	}
 	checkBits(t, b, 8)
-	checkString(t, b, "10001010")
-	checkDisplay(t, b, "1000 1010")
+	checkString(t, b, "01111111")
+	checkDisplay(t, b, "0111 1111")
 
 	// Test setting the last bit.
 	b.Reset()
-	b.WriteByte(0x50)
-	if err := b.SetBit(0, true); err != nil {
+	b.WriteByte(0xFF)
+	if err := b.SetBit(7, false); err != nil {
 		t.Error(err)
 	}
 	checkBits(t, b, 8)
-	checkString(t, b, "00001011")
-	checkDisplay(t, b, "0000 1011")
+	checkString(t, b, "11111110")
+	checkDisplay(t, b, "1111 1110")
 
 	// Test setting a middle bit.
 	b.Reset()
-	b.WriteByte(0x50)
-	if err := b.SetBit(4, true); err != nil {
+	b.WriteByte(0xFF)
+	if err := b.SetBit(3, false); err != nil {
 		t.Error(err)
 	}
 	checkBits(t, b, 8)
-	checkString(t, b, "00000011")
-	checkDisplay(t, b, "0000 0011")
+	checkString(t, b, "11101111")
+	checkDisplay(t, b, "1110 1111")
 
 	// Test advancing and setting a bit.
 	b.Reset()
-	b.WriteByte(0x51)
+	b.WriteByte(0xFF)
 	b.Advance(3)
 	checkBits(t, b, 5)
-	checkString(t, b, "01010")
-	checkDisplay(t, b, "0101 0")
+	checkString(t, b, "11111")
+	checkDisplay(t, b, "1111 1")
 
 	if err := b.SetBit(0, false); err != nil {
 		t.Error(err)
 	}
-	checkBits(t, b, 4)
-	checkString(t, b, "0010")
-	checkDisplay(t, b, "0010")
+	checkBits(t, b, 5)
+	checkString(t, b, "01111")
+	checkDisplay(t, b, "0111 1")
 
 	b.Rewind(3)
-	checkBits(t, b, 7)
-	checkString(t, b, "1000010")
-	checkDisplay(t, b, "1000 010")
+	checkBits(t, b, 8)
+	checkString(t, b, "11101111")
+	checkDisplay(t, b, "1110 1111")
 }
 
 func TestSetBytes(t *testing.T) {
