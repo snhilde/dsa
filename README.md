@@ -2,7 +2,7 @@
 ![Class Badge](https://img.shields.io/badge/Status-experimental-yellow)
 [![PkgGoDev Doc](https://pkg.go.dev/badge/github.com/snhilde/dsa)](https://pkg.go.dev/github.com/snhilde/dsa)
 [![GoReportCard](https://goreportcard.com/badge/github.com/snhilde/dsa)](https://goreportcard.com/report/github.com/snhilde/dsa)
-[![Build Status](https://travis-ci.com/snhilde/getcast.svg?branch=master)](https://travis-ci.com/snhilde/getcast)
+[![Build Status](https://travis-ci.com/snhilde/dsa.svg?branch=master)](https://travis-ci.com/snhilde/dsa)
 
 # dsa
 
