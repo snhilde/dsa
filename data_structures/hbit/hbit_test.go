@@ -1385,7 +1385,7 @@ func TestWriteString(t *testing.T) {
 	checkDisplay(t, b, "0010 1110  1010 0110  1100 1110  0010 1110  0000 0100  1100 1110  0010 1110  0100 1110  1001 0110  0111 0110  1110 0110  1111 0110  1101 0110")
 }
 
-func testSetBit(t *testing.T) {
+func TestSetBit(t *testing.T) {
 	b := New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
@@ -1445,7 +1445,7 @@ func testSetBit(t *testing.T) {
 	checkDisplay(t, b, "1000 010")
 }
 
-func testSetBytes(t *testing.T) {
+func TestSetBytes(t *testing.T) {
 	b := New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
@@ -1487,9 +1487,9 @@ func testSetBytes(t *testing.T) {
 	if err := b.SetBytes(0, []byte{0x00}); err != nil {
 		t.Error(err)
 	}
-	checkBits(t, b, 4)
-	checkString(t, b, "0000")
-	checkDisplay(t, b, "0000")
+	checkBits(t, b, 5)
+	checkString(t, b, "00000")
+	checkDisplay(t, b, "0000 0")
 
 	b.Rewind(5)
 	checkBits(t, b, 8)
