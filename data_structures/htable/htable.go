@@ -26,7 +26,7 @@ type Table struct {
 
 // New creates a new table. headers denotes the name of each column. Each header names must be unique and not empty.
 func New(headers ...string) (*Table, error) {
-	if headers == nil || len(headers) == 0 {
+	if len(headers) == 0 {
 		return nil, fmt.Errorf("missing column headers")
 	}
 
@@ -458,7 +458,7 @@ type Row struct {
 
 // NewRow creates a new row with the given items.
 func NewRow(items ...interface{}) *Row {
-	if items == nil || len(items) == 0 {
+	if len(items) == 0 {
 		return nil
 	}
 

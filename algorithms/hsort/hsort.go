@@ -686,38 +686,23 @@ func initSort(list interface{}) (length int, at func(int) reflect.Value, greater
 	switch k := v.Index(0).Kind(); k {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		greater = func(i, j reflect.Value) bool {
-			if i.Int() > j.Int() {
-				return true
-			}
-			return false
+			return i.Int() > j.Int() {
 		}
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		greater = func(i, j reflect.Value) bool {
-			if i.Uint() > j.Uint() {
-				return true
-			}
-			return false
+			return i.Uint() > j.Uint() {
 		}
 	case reflect.Float32, reflect.Float64:
 		greater = func(i, j reflect.Value) bool {
-			if i.Float() > j.Float() {
-				return true
-			}
-			return false
+			return i.Float() > j.Float() {
 		}
 	case reflect.Bool:
 		greater = func(i, j reflect.Value) bool {
-			if i.Bool() && !j.Bool() {
-				return true
-			}
-			return false
+			return i.Bool() && !j.Bool() {
 		}
 	case reflect.String:
 		greater = func(i, j reflect.Value) bool {
-			if i.String() > j.String() {
-				return true
-			}
-			return false
+			return i.String() > j.String() {
 		}
 	default:
 		err = fmt.Errorf(fmt.Sprintf("invalid underlying type (%s)", v))

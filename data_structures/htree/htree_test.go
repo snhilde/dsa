@@ -733,7 +733,7 @@ func TestYield(t *testing.T) {
 	if ch := tr.Yield(nil); ch == nil {
 		t.Error("Received nil channel with nil quit")
 	}
-	quit := make(chan struct{}, 0)
+	quit := make(chan struct{})
 	if ch := tr.Yield(quit); ch == nil {
 		t.Error("Received nil channel with quit with a buffer of 0")
 	}
@@ -769,7 +769,7 @@ func TestYield(t *testing.T) {
 	}
 
 	// Test that sending on quit channel also closes the yield channel.
-	quit = make(chan struct{}, 0)
+	quit = make(chan struct{})
 	yieldChan = tr.Yield(quit)
 	if yieldChan == nil {
 		t.Error("Yield returned nil channel")
