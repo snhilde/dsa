@@ -1298,10 +1298,7 @@ func TestSort(t *testing.T) {
 
 	// Test floats.
 	cmp := func(l, r interface{}) bool {
-		if l.(float64) < r.(float64) {
-			return true
-		}
-		return false
+		return l.(float64) < r.(float64)
 	}
 	l.Append(6.1, 7.1, 4.1, 2.1, 3.1, 5.1, 1.1, 8.1)
 	checkString(t, l, "6.1, 7.1, 4.1, 2.1, 3.1, 5.1, 1.1, 8.1")
