@@ -868,7 +868,6 @@ func TestBFS(t *testing.T) {
 		t.Error("BFS failed easy test")
 		return
 	}
-	return
 
 	// We can use this simple formula to manually build the correct values for a tree whose count is one less than a
 	// power of 2:
