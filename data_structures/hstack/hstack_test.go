@@ -1,12 +1,14 @@
-package hstack
+package hstack_test
 
 import (
 	"reflect"
 	"testing"
+
+	"github.com/snhilde/dsa/data_structures/hstack"
 )
 
 func TestBadPtr(t *testing.T) {
-	var s *Stack
+	var s *hstack.Stack
 	checkString(t, s, "<nil>")
 	checkCount(t, s, -1)
 
@@ -35,7 +37,7 @@ func TestBadPtr(t *testing.T) {
 	}
 
 	// Test Merge().
-	if err := s.Merge(New()); err == nil {
+	if err := s.Merge(hstack.New()); err == nil {
 		t.Error("unexpectedly passed Merge() test with bad pointer")
 	}
 
@@ -45,7 +47,7 @@ func TestBadPtr(t *testing.T) {
 	}
 
 	// Test Same().
-	if ok := s.Same(New()); ok {
+	if ok := s.Same(hstack.New()); ok {
 		t.Error("unexpectedly passed Same() test with bad pointer")
 	}
 
@@ -58,7 +60,7 @@ func TestBadPtr(t *testing.T) {
 }
 
 func TestNew(t *testing.T) {
-	s := New()
+	s := hstack.New()
 	if s == nil {
 		t.Error("new stack unexpectedly nil")
 	}
@@ -67,7 +69,7 @@ func TestNew(t *testing.T) {
 }
 
 func TestAdd(t *testing.T) {
-	s := New()
+	s := hstack.New()
 
 	// Testing adding an int.
 	if err := s.Add(5); err != nil {
@@ -105,14 +107,14 @@ func TestAdd(t *testing.T) {
 	checkCount(t, s, 7)
 
 	// Testing adding an empty stack.
-	if err := s.Add(New()); err != nil {
+	if err := s.Add(hstack.New()); err != nil {
 		t.Error(err)
 	}
 	checkString(t, s, "<empty>, [1 2 3], 3, b, a, 3.1415, kangaroo, 5")
 	checkCount(t, s, 8)
 
 	// Test adding a non-empty stack.
-	a := New()
+	a := hstack.New()
 	if err := a.Add("orange, apple, banana"); err != nil {
 		t.Error(err)
 	}
@@ -131,7 +133,7 @@ func TestAdd(t *testing.T) {
 }
 
 func TestPop(t *testing.T) {
-	s := New()
+	s := hstack.New()
 
 	// Add some items first.
 	if err := s.Add("sizzle"); err != nil {
@@ -208,7 +210,7 @@ func TestPop(t *testing.T) {
 	checkCount(t, s, 0)
 
 	// Test popping a stack.
-	a := New()
+	a := hstack.New()
 	if err := a.Add("orange, apple, banana"); err != nil {
 		t.Error(err)
 	}
@@ -221,7 +223,7 @@ func TestPop(t *testing.T) {
 	checkString(t, s, "orange, apple, banana")
 	checkCount(t, s, 1)
 
-	if val := s.Pop(); val.(*Stack) != a {
+	if val := s.Pop(); val.(*hstack.Stack) != a {
 		t.Error("Incorrect value from pop")
 		t.Log("\tExpected:", a)
 		t.Log("\tReceived:", val)
@@ -231,7 +233,7 @@ func TestPop(t *testing.T) {
 }
 
 func TestCopy(t *testing.T) {
-	s := New()
+	s := hstack.New()
 
 	// Copy an empty stack.
 	ns, err := s.Copy()
@@ -263,7 +265,7 @@ func TestCopy(t *testing.T) {
 
 func TestMerge(t *testing.T) {
 	// Create two stacks and merge them.
-	s := New()
+	s := hstack.New()
 	if err := s.Add("monkey"); err != nil {
 		t.Error(err)
 	}
@@ -276,7 +278,7 @@ func TestMerge(t *testing.T) {
 	checkString(t, s, "131, gazelle, monkey")
 	checkCount(t, s, 3)
 
-	tmp := New()
+	tmp := hstack.New()
 	if err := tmp.Add(3.14); err != nil {
 		t.Error(err)
 	}
@@ -299,7 +301,7 @@ func TestMerge(t *testing.T) {
 	checkCount(t, tmp, 0)
 
 	// Test merging an invalid stack on top of a good one. Merge should succeed, but everything should remain untouched.
-	var ns *Stack
+	var ns *hstack.Stack
 	checkString(t, ns, "<nil>")
 	checkCount(t, ns, -1)
 
@@ -329,7 +331,7 @@ func TestMerge(t *testing.T) {
 }
 
 func TestClear(t *testing.T) {
-	s := New()
+	s := hstack.New()
 
 	// Add some items first.
 	if err := s.Add("kangaroo", 5, 3.1415); err != nil {
@@ -354,7 +356,7 @@ func TestClear(t *testing.T) {
 }
 
 func TestSame(t *testing.T) {
-	s := New()
+	s := hstack.New()
 
 	// Add some items first.
 	if err := s.Add("kangaroo", 5, 3.1415); err != nil {
@@ -374,7 +376,7 @@ func TestSame(t *testing.T) {
 	}
 
 	// Test out with two different stacks that have the same contents.
-	ns = New()
+	ns = hstack.New()
 	if err := ns.Add("kangaroo", 5, 3.1415); err != nil {
 		t.Error(err)
 	}
@@ -387,7 +389,7 @@ func TestSame(t *testing.T) {
 	}
 
 	// Test out with two different stacks with different contents.
-	ns = New()
+	ns = hstack.New()
 	if err := ns.Add(struct{}{}, 10, rune('b')); err != nil {
 		t.Error(err)
 	}
@@ -400,7 +402,7 @@ func TestSame(t *testing.T) {
 	}
 }
 
-func checkString(t *testing.T, s *Stack, want string) {
+func checkString(t *testing.T, s *hstack.Stack, want string) {
 	if s.String() != want {
 		t.Error("stack contents are incorrect")
 		t.Log("\tExpected:", want)
@@ -408,7 +410,7 @@ func checkString(t *testing.T, s *Stack, want string) {
 	}
 }
 
-func checkCount(t *testing.T, s *Stack, want int) {
+func checkCount(t *testing.T, s *hstack.Stack, want int) {
 	if s.Count() != want {
 		t.Error("Incorrect length")
 		t.Log("\tExpected:", want)
