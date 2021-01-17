@@ -1,24 +1,18 @@
-package hbit
+package hbit_test
 
 import (
 	"bytes"
 	"io"
 	"strings"
 	"testing"
+
+	"github.com/snhilde/dsa/data_structures/hbit"
 )
 
 func TestNew(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	if b == nil {
 		t.Error("Unexpectedly failed New() test")
-	}
-
-	if b.head != nil {
-		t.Error("Somehow created a head")
-	}
-
-	if b.tail != nil {
-		t.Error("Somehow created a tail")
 	}
 
 	if num := b.Bits(); num != 0 {
@@ -36,7 +30,7 @@ func TestNew(t *testing.T) {
 
 func TestBadPtr(t *testing.T) {
 	// Make sure that a Buffer not created with New() is handled properly.
-	var b *Buffer
+	var b *hbit.Buffer
 
 	// Test Bit().
 	if val := b.Bit(8); val != false {
@@ -166,7 +160,7 @@ func TestBadPtr(t *testing.T) {
 	}
 
 	// Test Join().
-	if err := b.Join(New()); err == nil {
+	if err := b.Join(hbit.New()); err == nil {
 		t.Error("Unexpectedly passed bad Buffer test for Join()")
 	}
 
@@ -201,17 +195,17 @@ func TestBadPtr(t *testing.T) {
 	}
 
 	// Test ANDBuffer().
-	if err := b.ANDBuffer(New()); err == nil {
+	if err := b.ANDBuffer(hbit.New()); err == nil {
 		t.Error("Unexpectedly passed bad Buffer test for ANDBuffer()")
 	}
 
 	// Test ORBuffer().
-	if err := b.ORBuffer(New()); err == nil {
+	if err := b.ORBuffer(hbit.New()); err == nil {
 		t.Error("Unexpectedly passed bad Buffer test for ORBuffer()")
 	}
 
 	// Test XORBuffer().
-	if err := b.XORBuffer(New()); err == nil {
+	if err := b.XORBuffer(hbit.New()); err == nil {
 		t.Error("Unexpectedly passed bad Buffer test for XORBuffer()")
 	}
 
@@ -238,7 +232,7 @@ func TestBadPtr(t *testing.T) {
 
 func TestInvalidArgs(t *testing.T) {
 	// Make sure that every method is capable of handling bad arguments.
-	b := New()
+	b := hbit.New()
 	b.WriteBytes(0xFF, 0xEE, 0xDD)
 
 	// Test Bit() - negative index.
@@ -611,7 +605,7 @@ func TestInvalidArgs(t *testing.T) {
 }
 
 func TestBit(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -646,7 +640,7 @@ func TestBit(t *testing.T) {
 }
 
 func TestBits(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -686,7 +680,7 @@ func TestBits(t *testing.T) {
 }
 
 func TestOffset(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -732,7 +726,7 @@ func TestOffset(t *testing.T) {
 }
 
 func TestCopy(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -770,7 +764,7 @@ func TestCopy(t *testing.T) {
 }
 
 func TestRecalibrate(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -812,7 +806,7 @@ func TestRecalibrate(t *testing.T) {
 }
 
 func TestReset(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -850,7 +844,7 @@ func TestReset(t *testing.T) {
 }
 
 func TestStringAndDisplay(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -871,14 +865,14 @@ func TestStringAndDisplay(t *testing.T) {
 	checkDisplay(t, b, "1011 1111  11")
 
 	// Make sure that a single byte does not have any spaces around it.
-	b = New()
+	b = hbit.New()
 	b.WriteByte(0x00)
 	checkBits(t, b, 8)
 	checkString(t, b, "00000000")
 	checkDisplay(t, b, "0000 0000")
 
 	// Test out multiple bytes and bit order.
-	b = New()
+	b = hbit.New()
 	b.WriteBytes(0x1A, 0x2B, 0x3C)
 	checkBits(t, b, 24)
 	checkString(t, b, "010110001101010000111100")
@@ -910,7 +904,7 @@ func TestStringAndDisplay(t *testing.T) {
 }
 
 func TestRead(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -1039,7 +1033,7 @@ func TestRead(t *testing.T) {
 }
 
 func TestReadByte(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -1095,7 +1089,7 @@ func TestReadByte(t *testing.T) {
 }
 
 func TestReadInt(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -1137,7 +1131,7 @@ func TestReadInt(t *testing.T) {
 }
 
 func TestReadFrom(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -1176,7 +1170,7 @@ func TestReadFrom(t *testing.T) {
 }
 
 func TestWrite(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -1204,7 +1198,7 @@ func TestWrite(t *testing.T) {
 }
 
 func TestWriteBit(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -1260,7 +1254,7 @@ func TestWriteBit(t *testing.T) {
 }
 
 func TestWriteByte(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -1309,7 +1303,7 @@ func TestWriteByte(t *testing.T) {
 }
 
 func TestWriteBytes(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -1358,7 +1352,7 @@ func TestWriteBytes(t *testing.T) {
 }
 
 func TestWriteString(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -1386,7 +1380,7 @@ func TestWriteString(t *testing.T) {
 }
 
 func TestSetBit(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -1442,7 +1436,7 @@ func TestSetBit(t *testing.T) {
 }
 
 func TestSetBytes(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -1494,7 +1488,7 @@ func TestSetBytes(t *testing.T) {
 }
 
 func TestRemoveBit(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -1606,7 +1600,7 @@ func TestRemoveBit(t *testing.T) {
 }
 
 func TestRemoveBits(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -1758,7 +1752,7 @@ func TestRemoveBits(t *testing.T) {
 }
 
 func TestAdvance(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -1799,7 +1793,7 @@ func TestAdvance(t *testing.T) {
 }
 
 func TestRewind(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -1839,7 +1833,7 @@ func TestRewind(t *testing.T) {
 }
 
 func TestJoin(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -1850,7 +1844,7 @@ func TestJoin(t *testing.T) {
 	checkString(t, b, "100010000100010011001100")
 	checkDisplay(t, b, "1000 1000  0100 0100  1100 1100")
 
-	nb := New()
+	nb := hbit.New()
 	checkBits(t, nb, 0)
 	checkString(t, nb, "<empty>")
 	checkDisplay(t, nb, "<empty>")
@@ -1966,7 +1960,7 @@ func TestJoin(t *testing.T) {
 }
 
 func TestANDBit(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -2010,7 +2004,7 @@ func TestANDBit(t *testing.T) {
 }
 
 func TestORBit(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -2054,7 +2048,7 @@ func TestORBit(t *testing.T) {
 }
 
 func TestXORBit(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -2098,7 +2092,7 @@ func TestXORBit(t *testing.T) {
 }
 
 func TestANDBytes(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -2131,7 +2125,7 @@ func TestANDBytes(t *testing.T) {
 }
 
 func TestORBytes(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -2164,7 +2158,7 @@ func TestORBytes(t *testing.T) {
 }
 
 func TestXORBytes(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -2197,7 +2191,7 @@ func TestXORBytes(t *testing.T) {
 }
 
 func TestANDBuffer(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -2207,7 +2201,7 @@ func TestANDBuffer(t *testing.T) {
 	checkString(t, b, "11111111000000001111111100000000")
 	checkDisplay(t, b, "1111 1111  0000 0000  1111 1111  0000 0000")
 
-	ref := New()
+	ref := hbit.New()
 	checkBits(t, ref, 0)
 	checkString(t, ref, "<empty>")
 	checkDisplay(t, ref, "<empty>")
@@ -2256,7 +2250,7 @@ func TestANDBuffer(t *testing.T) {
 }
 
 func TestORBuffer(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -2266,7 +2260,7 @@ func TestORBuffer(t *testing.T) {
 	checkString(t, b, "11111111000000001111111100000000")
 	checkDisplay(t, b, "1111 1111  0000 0000  1111 1111  0000 0000")
 
-	ref := New()
+	ref := hbit.New()
 	checkBits(t, ref, 0)
 	checkString(t, ref, "<empty>")
 	checkDisplay(t, ref, "<empty>")
@@ -2315,7 +2309,7 @@ func TestORBuffer(t *testing.T) {
 }
 
 func TestXORBuffer(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -2325,7 +2319,7 @@ func TestXORBuffer(t *testing.T) {
 	checkString(t, b, "11111111000000001111111100000000")
 	checkDisplay(t, b, "1111 1111  0000 0000  1111 1111  0000 0000")
 
-	ref := New()
+	ref := hbit.New()
 	checkBits(t, ref, 0)
 	checkString(t, ref, "<empty>")
 	checkDisplay(t, ref, "<empty>")
@@ -2374,7 +2368,7 @@ func TestXORBuffer(t *testing.T) {
 }
 
 func TestShiftLeft(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -2434,7 +2428,7 @@ func TestShiftLeft(t *testing.T) {
 }
 
 func TestShiftRight(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -2494,7 +2488,7 @@ func TestShiftRight(t *testing.T) {
 }
 
 func TestNOTBit(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -2522,7 +2516,7 @@ func TestNOTBit(t *testing.T) {
 }
 
 func TestNOTBits(t *testing.T) {
-	b := New()
+	b := hbit.New()
 	checkBits(t, b, 0)
 	checkString(t, b, "<empty>")
 	checkDisplay(t, b, "<empty>")
@@ -2562,7 +2556,7 @@ func TestNOTBits(t *testing.T) {
 	checkDisplay(t, b, "1111 1000  1111 1000  0000 0000  1111 1111")
 }
 
-func checkBits(t *testing.T, b *Buffer, want int) {
+func checkBits(t *testing.T, b *hbit.Buffer, want int) {
 	if n := b.Bits(); n != want {
 		t.Error("Incorrect number of bits")
 		t.Log("\tExpected:", want)
@@ -2570,7 +2564,7 @@ func checkBits(t *testing.T, b *Buffer, want int) {
 	}
 }
 
-func checkString(t *testing.T, b *Buffer, want string) {
+func checkString(t *testing.T, b *hbit.Buffer, want string) {
 	if s := b.String(); s != want {
 		t.Error("Incorrect string")
 		t.Log("\tExpected:", want)
@@ -2578,7 +2572,7 @@ func checkString(t *testing.T, b *Buffer, want string) {
 	}
 }
 
-func checkDisplay(t *testing.T, b *Buffer, want string) {
+func checkDisplay(t *testing.T, b *hbit.Buffer, want string) {
 	if s := b.Display(); s != want {
 		t.Error("Incorrect display")
 		t.Log("\tExpected:", want)
