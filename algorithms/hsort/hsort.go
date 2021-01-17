@@ -687,6 +687,7 @@ func initSort(list interface{}) (length int, at func(int) reflect.Value, greater
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		greater = func(i, j reflect.Value) bool {
 			return i.Int() > j.Int()
+		}
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		greater = func(i, j reflect.Value) bool {
 			return i.Uint() > j.Uint()
