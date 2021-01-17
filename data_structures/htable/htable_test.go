@@ -1,15 +1,17 @@
-package htable
+package htable_test
 
 import (
 	"fmt"
 	"reflect"
 	"testing"
+
+	"github.com/snhilde/dsa/data_structures/htable"
 )
 
 // --- Blanket Tests ---
 
 func TestTBadPtr(t *testing.T) {
-	var tb *Table
+	var tb *htable.Table
 
 	// Test Add().
 	if err := tb.Add("a", "b", "c"); err == nil {
@@ -22,12 +24,12 @@ func TestTBadPtr(t *testing.T) {
 	}
 
 	// Test AddRow().
-	if err := tb.AddRow(NewRow(1, 2, 3)); err == nil {
+	if err := tb.AddRow(htable.NewRow(1, 2, 3)); err == nil {
 		t.Error("Unexpectedly passed bad pointer test for AddRow()")
 	}
 
 	// Test InsertRow().
-	if err := tb.InsertRow(0, NewRow(1, 2, 3)); err == nil {
+	if err := tb.InsertRow(0, htable.NewRow(1, 2, 3)); err == nil {
 		t.Error("Unexpectedly passed bad pointer test for InsertRow()")
 	}
 
@@ -123,7 +125,7 @@ func TestTBadPtr(t *testing.T) {
 }
 
 func TestRBadPtr(t *testing.T) {
-	var r *Row
+	var r *htable.Row
 
 	// Test String().
 	if r.String() != "<nil>" {
@@ -152,16 +154,16 @@ func TestRBadPtr(t *testing.T) {
 }
 
 func TestTBadArgs(t *testing.T) {
-	tb, _ := New("1", "2", "3")
+	tb, _ := htable.New("1", "2", "3")
 	tb.Add(1, 2, 3)
 
 	// Test New() - duplicate column headers.
-	if tbl, err := New("aaa", "bbb", "aaa", "ccc"); tbl != nil || err == nil {
+	if tbl, err := htable.New("aaa", "bbb", "aaa", "ccc"); tbl != nil || err == nil {
 		t.Error("Unexpectedly passed duplicate column header test for New()")
 	}
 
 	// Test New() - missing column header.
-	if tbl, err := New(""); tbl != nil || err == nil {
+	if tbl, err := htable.New(""); tbl != nil || err == nil {
 		t.Error("Unexpectedly passed missing column header test for New()")
 	}
 
@@ -226,62 +228,62 @@ func TestTBadArgs(t *testing.T) {
 	}
 
 	// Test AddRow() - too few columns.
-	if err := tb.AddRow(NewRow(1, 2)); err == nil {
+	if err := tb.AddRow(htable.NewRow(1, 2)); err == nil {
 		t.Error("Unexpectedly passed too few columns test for AddRow()")
 	}
 
 	// Test AddRow() - too many columns.
-	if err := tb.AddRow(NewRow(1, 2, 3, 4)); err == nil {
+	if err := tb.AddRow(htable.NewRow(1, 2, 3, 4)); err == nil {
 		t.Error("Unexpectedly passed too many columns test for AddRow()")
 	}
 
 	// Test AddRow() - wrong type in first position.
-	if err := tb.AddRow(NewRow("item1", 5, 6)); err == nil {
+	if err := tb.AddRow(htable.NewRow("item1", 5, 6)); err == nil {
 		t.Error("Unexpectedly passed wrong type (first) test for AddRow()")
 	}
 
 	// Test AddRow() - wrong type in middle position.
-	if err := tb.AddRow(NewRow(4, "item5", 6)); err == nil {
+	if err := tb.AddRow(htable.NewRow(4, "item5", 6)); err == nil {
 		t.Error("Unexpectedly passed wrong type (middle) test for AddRow()")
 	}
 
 	// Test AddRow() - wrong type in last position.
-	if err := tb.AddRow(NewRow(4, 5, "item6")); err == nil {
+	if err := tb.AddRow(htable.NewRow(4, 5, "item6")); err == nil {
 		t.Error("Unexpectedly passed wrong type (last) test for AddRow()")
 	}
 
 	// Test InsertRow() - negative index.
-	if err := tb.InsertRow(-1, NewRow(-1, 4, 5, 6)); err == nil {
+	if err := tb.InsertRow(-1, htable.NewRow(-1, 4, 5, 6)); err == nil {
 		t.Error("Unexpectedly passed negative index test for InsertRow()")
 	}
 
 	// Test InsertRow() - out-of-bounds index.
-	if err := tb.InsertRow(100, NewRow(100, 4, 5, 6)); err == nil {
+	if err := tb.InsertRow(100, htable.NewRow(100, 4, 5, 6)); err == nil {
 		t.Error("Unexpectedly passed out-of-bounds index test for InsertRow()")
 	}
 
 	// Test InsertRow() - too few columns.
-	if err := tb.InsertRow(0, NewRow(1, 2)); err == nil {
+	if err := tb.InsertRow(0, htable.NewRow(1, 2)); err == nil {
 		t.Error("Unexpectedly passed too few columns test for InsertRow()")
 	}
 
 	// Test InsertRow() - too many columns.
-	if err := tb.InsertRow(0, NewRow(1, 2, 3, 4)); err == nil {
+	if err := tb.InsertRow(0, htable.NewRow(1, 2, 3, 4)); err == nil {
 		t.Error("Unexpectedly passed too many columns test for InsertRow()")
 	}
 
 	// Test InsertRow() - wrong type in first position.
-	if err := tb.InsertRow(0, NewRow("item1", 5, 6)); err == nil {
+	if err := tb.InsertRow(0, htable.NewRow("item1", 5, 6)); err == nil {
 		t.Error("Unexpectedly passed wrong type (first) test for InsertRow()")
 	}
 
 	// Test InsertRow() - wrong type in middle position.
-	if err := tb.InsertRow(0, NewRow(4, "item5", 6)); err == nil {
+	if err := tb.InsertRow(0, htable.NewRow(4, "item5", 6)); err == nil {
 		t.Error("Unexpectedly passed wrong type (middle) test for InsertRow()")
 	}
 
 	// Test InsertRow() - wrong type in last position.
-	if err := tb.InsertRow(0, NewRow(4, 5, "item6")); err == nil {
+	if err := tb.InsertRow(0, htable.NewRow(4, 5, "item6")); err == nil {
 		t.Error("Unexpectedly passed wrong type (last) test for InsertRow()")
 	}
 
@@ -416,8 +418,8 @@ func TestTBadArgs(t *testing.T) {
 	}
 
 	// Test Add() - adding table to itself.
-	tb, _ = New("1")
-	tb2, _ := New("2")
+	tb, _ = htable.New("1")
+	tb2, _ := htable.New("2")
 	if err := tb.Add(tb2); err != nil {
 		t.Error(err)
 	}
@@ -426,8 +428,8 @@ func TestTBadArgs(t *testing.T) {
 	}
 
 	// Test Insert() - adding table to itself.
-	tb, _ = New("1")
-	tb2, _ = New("2")
+	tb, _ = htable.New("1")
+	tb2, _ = htable.New("2")
 	if err := tb.Add(tb2); err != nil {
 		t.Error(err)
 	}
@@ -437,7 +439,7 @@ func TestTBadArgs(t *testing.T) {
 }
 
 func TestRBadArgs(t *testing.T) {
-	r := NewRow(1, 2, 3)
+	r := htable.NewRow(1, 2, 3)
 
 	// Test SetItem() - negative index.
 	if err := r.SetItem(-1, nil); err == nil {
@@ -503,7 +505,7 @@ func TestBadTypes(t *testing.T) {
 	}
 
 	for i, headerType := range types {
-		tb, err := New("1")
+		tb, err := htable.New("1")
 		if err != nil {
 			t.Error(err)
 		}
@@ -531,7 +533,7 @@ func TestBadTypes(t *testing.T) {
 // --- Function Tests ---
 
 func TestTNew(t *testing.T) {
-	n, err := New("a", "b", "c")
+	n, err := htable.New("a", "b", "c")
 	if err != nil {
 		t.Error(err)
 	} else if n == nil {
@@ -540,7 +542,7 @@ func TestTNew(t *testing.T) {
 }
 
 func TestRNewRow(t *testing.T) {
-	r := NewRow(1, 2, 3)
+	r := htable.NewRow(1, 2, 3)
 	checkRString(t, r, "{1, 2, 3}")
 	checkRCount(t, r, 3)
 
@@ -548,12 +550,12 @@ func TestRNewRow(t *testing.T) {
 		s1 string
 		s2 string
 	}
-	r = NewRow(1, 2, s{s1: "a", s2: "b"})
+	r = htable.NewRow(1, 2, s{s1: "a", s2: "b"})
 	checkRString(t, r, "{1, 2, {a b}}")
 	checkRCount(t, r, 3)
 
-	tmp := NewRow("other", "row")
-	r = NewRow("this row", "here", 5, tmp)
+	tmp := htable.NewRow("other", "row")
+	r = htable.NewRow("this row", "here", 5, tmp)
 	checkRString(t, r, "{this row, here, 5, {other, row}}")
 	checkRCount(t, r, 4)
 }
@@ -562,7 +564,7 @@ func TestRNewRow(t *testing.T) {
 
 func TestTAdd(t *testing.T) {
 	// Testing rows of integers.
-	tb, _ := New("1", "2", "3")
+	tb, _ := htable.New("1", "2", "3")
 	if err := tb.Add(1, 2, 3); err != nil {
 		t.Error(err)
 	}
@@ -578,7 +580,7 @@ func TestTAdd(t *testing.T) {
 	checkTCount(t, tb, 6)
 
 	// Test rows of characters.
-	tb, _ = New("1", "2", "3")
+	tb, _ = htable.New("1", "2", "3")
 	if err := tb.Add('a', 'b', 'c'); err != nil {
 		t.Error(err)
 	}
@@ -594,7 +596,7 @@ func TestTAdd(t *testing.T) {
 	checkTCount(t, tb, 6)
 
 	// Test rows of int slices.
-	tb, _ = New("1", "2", "3")
+	tb, _ = htable.New("1", "2", "3")
 	if err := tb.Add([]int{10, 20}, []int{30, 40}, []int{50, 60}); err != nil {
 		t.Error(err)
 	}
@@ -610,7 +612,7 @@ func TestTAdd(t *testing.T) {
 	checkTCount(t, tb, 6)
 
 	// Test mixed-value rows.
-	tb, _ = New("1", "2", "3")
+	tb, _ = htable.New("1", "2", "3")
 	if err := tb.Add(1.1, "b", []byte{0x03}); err != nil {
 		t.Error(err)
 	}
@@ -626,7 +628,7 @@ func TestTAdd(t *testing.T) {
 	checkTCount(t, tb, 6)
 
 	// Test rows of strings with spaces.
-	tb, _ = New("1", "2", "3")
+	tb, _ = htable.New("1", "2", "3")
 	if err := tb.Add("before ", "in between", " after"); err != nil {
 		t.Error(err)
 	}
@@ -642,7 +644,7 @@ func TestTAdd(t *testing.T) {
 	checkTCount(t, tb, 6)
 
 	// Test rows masquerading as interfaces.
-	tb, _ = New("1", "2", "3")
+	tb, _ = htable.New("1", "2", "3")
 	if err := tb.Add(interface{}(1), interface{}(2), interface{}(3)); err != nil {
 		t.Error(err)
 	}
@@ -658,7 +660,7 @@ func TestTAdd(t *testing.T) {
 	checkTCount(t, tb, 6)
 
 	// Test rows of functions.
-	tb, _ = New("1", "2", "3")
+	tb, _ = htable.New("1", "2", "3")
 	if err := tb.Add(TestTNew, checkTString, TestTInsert); err != nil {
 		t.Error(err)
 	}
@@ -676,7 +678,7 @@ func TestTAdd(t *testing.T) {
 
 func TestTInsert(t *testing.T) {
 	// Test inserting a row at the beginning.
-	tb, _ := New("1", "2", "3")
+	tb, _ := htable.New("1", "2", "3")
 	tb.Add(1, 2, 3)
 	tb.Add(4, 5, 6)
 	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
@@ -690,7 +692,7 @@ func TestTInsert(t *testing.T) {
 	checkTCount(t, tb, 9)
 
 	// Test inserting a row in the middle.
-	tb, _ = New("1", "2", "3")
+	tb, _ = htable.New("1", "2", "3")
 	tb.Add("a", "b", "c")
 	tb.Add("d", "e", "f")
 	checkTString(t, tb, "{1: a, 2: b, 3: c}, {1: d, 2: e, 3: f}")
@@ -704,7 +706,7 @@ func TestTInsert(t *testing.T) {
 	checkTCount(t, tb, 9)
 
 	// Test inserting a row at the end.
-	tb, _ = New("1", "2", "3")
+	tb, _ = htable.New("1", "2", "3")
 	tb.Add([]int{10, 20}, []int{30, 40}, []int{50, 60})
 	tb.Add([]int{100, 200}, []int{300, 400}, []int{500, 600})
 	checkTString(t, tb, "{1: [10 20], 2: [30 40], 3: [50 60]}, {1: [100 200], 2: [300 400], 3: [500 600]}")
@@ -718,7 +720,7 @@ func TestTInsert(t *testing.T) {
 	checkTCount(t, tb, 9)
 
 	// Test inserting a row beyond the table's current boundaries.
-	tb, _ = New("1", "2", "3")
+	tb, _ = htable.New("1", "2", "3")
 	tb.Add(1.1, "b", []byte{0x03})
 	tb.Add(4.4, "e", []byte{0x06})
 	checkTString(t, tb, "{1: 1.1, 2: b, 3: [3]}, {1: 4.4, 2: e, 3: [6]}")
@@ -732,7 +734,7 @@ func TestTInsert(t *testing.T) {
 	checkTCount(t, tb, 6)
 
 	// Test only inserting instead of appending.
-	tb, _ = New("1", "2", "3")
+	tb, _ = htable.New("1", "2", "3")
 	if err := tb.Insert(0, "before ", "in between", " after"); err != nil {
 		t.Error(err)
 	}
@@ -754,13 +756,13 @@ func TestTInsert(t *testing.T) {
 }
 
 func TestTAddRow(t *testing.T) {
-	tb, _ := New("1", "2", "3")
+	tb, _ := htable.New("1", "2", "3")
 	checkTString(t, tb, "<empty>")
 	checkTCSV(t, tb, "")
 	checkTCount(t, tb, 0)
 
 	// Test adding a row with the correct number of columns.
-	r := NewRow(1, 2, 3)
+	r := htable.NewRow(1, 2, 3)
 	if err := tb.AddRow(r); err != nil {
 		t.Error(err)
 	}
@@ -769,7 +771,7 @@ func TestTAddRow(t *testing.T) {
 	checkTCount(t, tb, 3)
 
 	// Test adding a row with too few columns.
-	r = NewRow(1, 2)
+	r = htable.NewRow(1, 2)
 	if err := tb.AddRow(r); err == nil {
 		t.Error("Unexpectedly passed adding a row with too few columns")
 	}
@@ -778,7 +780,7 @@ func TestTAddRow(t *testing.T) {
 	checkTCount(t, tb, 3)
 
 	// Test adding a row with too many columns.
-	r = NewRow(1, 2, 3, 4)
+	r = htable.NewRow(1, 2, 3, 4)
 	if err := tb.AddRow(r); err == nil {
 		t.Error("Unexpectedly passed adding a row with too many columns")
 	}
@@ -787,7 +789,7 @@ func TestTAddRow(t *testing.T) {
 	checkTCount(t, tb, 3)
 
 	// Test adding a row with the right types.
-	r = NewRow(4, 5, 6)
+	r = htable.NewRow(4, 5, 6)
 	if err := tb.AddRow(r); err != nil {
 		t.Error(err)
 	}
@@ -796,7 +798,7 @@ func TestTAddRow(t *testing.T) {
 	checkTCount(t, tb, 6)
 
 	// Test adding a row with the first value being the wrong type.
-	r = NewRow("7", 8, 9)
+	r = htable.NewRow("7", 8, 9)
 	if err := tb.AddRow(r); err == nil {
 		t.Error("Unexpectedly passed adding a row with the first value being the wrong type")
 	}
@@ -805,7 +807,7 @@ func TestTAddRow(t *testing.T) {
 	checkTCount(t, tb, 6)
 
 	// Test adding a row with the middle value being the wrong type.
-	r = NewRow(7, "8", 9)
+	r = htable.NewRow(7, "8", 9)
 	if err := tb.AddRow(r); err == nil {
 		t.Error("Unexpectedly passed adding a row with the middle value being the wrong type")
 	}
@@ -814,7 +816,7 @@ func TestTAddRow(t *testing.T) {
 	checkTCount(t, tb, 6)
 
 	// Test adding a row with the last value being the wrong type.
-	r = NewRow(7, 8, "9")
+	r = htable.NewRow(7, 8, "9")
 	if err := tb.AddRow(r); err == nil {
 		t.Error("Unexpectedly passed adding a row with the last value being the wrong type")
 	}
@@ -823,7 +825,7 @@ func TestTAddRow(t *testing.T) {
 	checkTCount(t, tb, 6)
 
 	// Test adding a row with all values being the wrong type.
-	r = NewRow("7", "8", "9")
+	r = htable.NewRow("7", "8", "9")
 	if err := tb.AddRow(r); err == nil {
 		t.Error("Unexpectedly passed adding a row with all values being the wrong type")
 	}
@@ -833,13 +835,13 @@ func TestTAddRow(t *testing.T) {
 }
 
 func TestTInsertRow(t *testing.T) {
-	tb, _ := New("1", "2", "3")
+	tb, _ := htable.New("1", "2", "3")
 	checkTString(t, tb, "<empty>")
 	checkTCSV(t, tb, "")
 	checkTCount(t, tb, 0)
 
 	// Test inserting a row with the correct number of columns.
-	r := NewRow(1, 2, 3)
+	r := htable.NewRow(1, 2, 3)
 	if err := tb.InsertRow(0, r); err != nil {
 		t.Error(err)
 	}
@@ -848,7 +850,7 @@ func TestTInsertRow(t *testing.T) {
 	checkTCount(t, tb, 3)
 
 	// Test adding a row with too few columns.
-	r = NewRow(1, 2)
+	r = htable.NewRow(1, 2)
 	if err := tb.InsertRow(0, r); err == nil {
 		t.Error("Unexpectedly passed adding a row with too few columns")
 	}
@@ -857,7 +859,7 @@ func TestTInsertRow(t *testing.T) {
 	checkTCount(t, tb, 3)
 
 	// Test adding a row with too many columns.
-	r = NewRow(1, 2, 3, 4)
+	r = htable.NewRow(1, 2, 3, 4)
 	if err := tb.InsertRow(0, r); err == nil {
 		t.Error("Unexpectedly passed adding a row with too many columns")
 	}
@@ -866,7 +868,7 @@ func TestTInsertRow(t *testing.T) {
 	checkTCount(t, tb, 3)
 
 	// Test inserting a row before the current first row.
-	r = NewRow(-1, -2, -3)
+	r = htable.NewRow(-1, -2, -3)
 	if err := tb.InsertRow(0, r); err != nil {
 		t.Error(err)
 	}
@@ -875,7 +877,7 @@ func TestTInsertRow(t *testing.T) {
 	checkTCount(t, tb, 6)
 
 	// Test inserting a row after the current first row.
-	r = NewRow(0, 0, 0)
+	r = htable.NewRow(0, 0, 0)
 	if err := tb.InsertRow(1, r); err != nil {
 		t.Error(err)
 	}
@@ -884,7 +886,7 @@ func TestTInsertRow(t *testing.T) {
 	checkTCount(t, tb, 9)
 
 	// Test inserting a row at the end.
-	r = NewRow(4, 5, 6)
+	r = htable.NewRow(4, 5, 6)
 	if err := tb.InsertRow(tb.Rows(), r); err != nil {
 		t.Error(err)
 	}
@@ -893,7 +895,7 @@ func TestTInsertRow(t *testing.T) {
 	checkTCount(t, tb, 12)
 
 	// Test inserting a row with the first value being the wrong type.
-	r = NewRow("7", 8, 9)
+	r = htable.NewRow("7", 8, 9)
 	if err := tb.InsertRow(1, r); err == nil {
 		t.Error("Unexpectedly passed inserting a row with the first value being the wrong type")
 	}
@@ -902,7 +904,7 @@ func TestTInsertRow(t *testing.T) {
 	checkTCount(t, tb, 12)
 
 	// Test inserting a row with the middle value being the wrong type.
-	r = NewRow(7, "8", 9)
+	r = htable.NewRow(7, "8", 9)
 	if err := tb.InsertRow(1, r); err == nil {
 		t.Error("Unexpectedly passed inserting a row with the middle value being the wrong type")
 	}
@@ -911,7 +913,7 @@ func TestTInsertRow(t *testing.T) {
 	checkTCount(t, tb, 12)
 
 	// Test inserting a row with the last value being the wrong type.
-	r = NewRow(7, 8, "9")
+	r = htable.NewRow(7, 8, "9")
 	if err := tb.InsertRow(1, r); err == nil {
 		t.Error("Unexpectedly passed inserting a row with the last value being the wrong type")
 	}
@@ -920,7 +922,7 @@ func TestTInsertRow(t *testing.T) {
 	checkTCount(t, tb, 12)
 
 	// Test inserting a row with all values being the wrong type.
-	r = NewRow("7", "8", "9")
+	r = htable.NewRow("7", "8", "9")
 	if err := tb.InsertRow(1, r); err == nil {
 		t.Error("Unexpectedly passed inserting a row with all values being the wrong type")
 	}
@@ -931,7 +933,7 @@ func TestTInsertRow(t *testing.T) {
 
 func TestTRemoveRow(t *testing.T) {
 	// Test removing a row at the beginning.
-	tb, _ := New("1", "2", "3")
+	tb, _ := htable.New("1", "2", "3")
 	tb.Add(-1, -2, -3)
 	tb.Add(1, 2, 3)
 	tb.Add(4, 5, 6)
@@ -946,7 +948,7 @@ func TestTRemoveRow(t *testing.T) {
 	checkTCount(t, tb, 6)
 
 	// Test removing a row in the middle.
-	tb, _ = New("1", "2", "3")
+	tb, _ = htable.New("1", "2", "3")
 	tb.Add("a", "b", "c")
 	tb.Add("x", "y", "z")
 	tb.Add("d", "e", "f")
@@ -961,7 +963,7 @@ func TestTRemoveRow(t *testing.T) {
 	checkTCount(t, tb, 6)
 
 	// Test removing a row at the end.
-	tb, _ = New("1", "2", "3")
+	tb, _ = htable.New("1", "2", "3")
 	tb.Add([]int{10, 20}, []int{30, 40}, []int{50, 60})
 	tb.Add([]int{100, 200}, []int{300, 400}, []int{500, 600})
 	tb.Add([]int{-1, -2, -3}, []int{-4, -5, -6}, []int{-7, -8, -9})
@@ -976,7 +978,7 @@ func TestTRemoveRow(t *testing.T) {
 	checkTCount(t, tb, 6)
 
 	// Test removing a row beyond the table's current boundaries.
-	tb, _ = New("1", "2", "3")
+	tb, _ = htable.New("1", "2", "3")
 	tb.Add(1.1, "b", []byte{0x03})
 	tb.Add(4.4, "e", []byte{0x06})
 	checkTString(t, tb, "{1: 1.1, 2: b, 3: [3]}, {1: 4.4, 2: e, 3: [6]}")
@@ -990,7 +992,7 @@ func TestTRemoveRow(t *testing.T) {
 	checkTCount(t, tb, 6)
 
 	// Test removing when there aren't any rows in the table.
-	tb, _ = New("1", "2", "3")
+	tb, _ = htable.New("1", "2", "3")
 	checkTString(t, tb, "<empty>")
 	checkTCSV(t, tb, "")
 	checkTCount(t, tb, 0)
@@ -1004,7 +1006,7 @@ func TestTRemoveRow(t *testing.T) {
 
 func TestTClear(t *testing.T) {
 	// Try clearing an empty table.
-	tb, _ := New("1", "2", "3")
+	tb, _ := htable.New("1", "2", "3")
 	checkTString(t, tb, "<empty>")
 	checkTCSV(t, tb, "")
 	checkTCount(t, tb, 0)
@@ -1017,7 +1019,7 @@ func TestTClear(t *testing.T) {
 	checkTCount(t, tb, 0)
 
 	// Add some rows and clear again.
-	tb, _ = New("1", "2", "3")
+	tb, _ = htable.New("1", "2", "3")
 	tb.Add(1, 2, 3)
 	tb.Add(4, 5, 6)
 	tb.Add(7, 8, 9)
@@ -1033,7 +1035,7 @@ func TestTClear(t *testing.T) {
 	checkTCount(t, tb, 0)
 
 	// Add some rows, delete one row, and then clear.
-	tb, _ = New("1", "2", "3")
+	tb, _ = htable.New("1", "2", "3")
 	tb.Add(1, 2, 3)
 	tb.Add(4, 5, 6)
 	tb.Add(7, 8, 9)
@@ -1050,7 +1052,7 @@ func TestTClear(t *testing.T) {
 	checkTCount(t, tb, 0)
 
 	// Add some rows, delete all the rows, and then clear.
-	tb, _ = New("1", "2", "3")
+	tb, _ = htable.New("1", "2", "3")
 	tb.Add(1, 2, 3)
 	tb.Add(4, 5, 6)
 	tb.Add(7, 8, 9)
@@ -1069,7 +1071,7 @@ func TestTClear(t *testing.T) {
 	checkTCount(t, tb, 0)
 
 	// Add some rows, disable a couple of rows, and clear the table.
-	tb, _ = New("1", "2", "3")
+	tb, _ = htable.New("1", "2", "3")
 	tb.Add(1, 2, 3)
 	tb.Add(4, 5, 6)
 	tb.Add(7, 8, 9)
@@ -1088,7 +1090,7 @@ func TestTClear(t *testing.T) {
 }
 
 func TestTColumnToIndex(t *testing.T) {
-	tb, _ := New("1", "2", "3")
+	tb, _ := htable.New("1", "2", "3")
 
 	// Make sure each column lines up with the correct index.
 	for i, v := range []string{"1", "2", "3"} {
@@ -1101,7 +1103,7 @@ func TestTColumnToIndex(t *testing.T) {
 }
 
 func TestTSetItem(t *testing.T) {
-	tb, _ := New("1", "2", "3")
+	tb, _ := htable.New("1", "2", "3")
 	checkTString(t, tb, "<empty>")
 	checkTCSV(t, tb, "")
 	checkTCount(t, tb, 0)
@@ -1138,7 +1140,7 @@ func TestTSetItem(t *testing.T) {
 }
 
 func TestTSetHeader(t *testing.T) {
-	tb, _ := New("1", "2", "3")
+	tb, _ := htable.New("1", "2", "3")
 
 	was := []string{"1", "2", "3"}
 	to := []string{"4", "5", "6"}
@@ -1167,7 +1169,7 @@ func TestTSetHeader(t *testing.T) {
 }
 
 func TestTHeaders(t *testing.T) {
-	tb, _ := New("1", "2", "3")
+	tb, _ := htable.New("1", "2", "3")
 
 	exp := []string{"1", "2", "3"}
 	h := tb.Headers()
@@ -1188,7 +1190,7 @@ func TestTHeaders(t *testing.T) {
 }
 
 func TestTRows(t *testing.T) {
-	tb, _ := New("1", "2", "3")
+	tb, _ := htable.New("1", "2", "3")
 	if n := tb.Rows(); n != 0 {
 		t.Error("Row count is incorrect")
 		t.Log("\tExpected:", 0)
@@ -1225,7 +1227,7 @@ func TestTRows(t *testing.T) {
 }
 
 func TestTEnabled(t *testing.T) {
-	tb, _ := New("1", "2", "3")
+	tb, _ := htable.New("1", "2", "3")
 	if n := tb.Enabled(); n != 0 {
 		t.Error("Enabled count is incorrect")
 		t.Log("\tExpected:", 0)
@@ -1276,7 +1278,7 @@ func TestTEnabled(t *testing.T) {
 }
 
 func TestTDisabled(t *testing.T) {
-	tb, _ := New("1", "2", "3")
+	tb, _ := htable.New("1", "2", "3")
 	if n := tb.Disabled(); n != 0 {
 		t.Error("Disabled count is incorrect")
 		t.Log("\tExpected:", 0)
@@ -1334,7 +1336,7 @@ func TestTDisabled(t *testing.T) {
 }
 
 func TestTColumns(t *testing.T) {
-	tb, _ := New("1", "2", "3")
+	tb, _ := htable.New("1", "2", "3")
 	if n := tb.Columns(); n != 3 {
 		t.Error("Column count is incorrect")
 		t.Log("\tExpected:", 3)
@@ -1369,7 +1371,7 @@ func TestTColumns(t *testing.T) {
 		t.Log("\tReceived:", n)
 	}
 
-	tb, _ = New("1")
+	tb, _ = htable.New("1")
 	if n := tb.Columns(); n != 1 {
 		t.Error("Column count is incorrect")
 		t.Log("\tExpected:", 1)
@@ -1392,7 +1394,7 @@ func TestTColumns(t *testing.T) {
 }
 
 func TestTCount(t *testing.T) {
-	tb, _ := New("1", "2", "3")
+	tb, _ := htable.New("1", "2", "3")
 	checkTCount(t, tb, 0)
 
 	tb.Add(1, 2, 3)
@@ -1407,7 +1409,7 @@ func TestTCount(t *testing.T) {
 	tb.Insert(1, 7, 8, 9)
 	checkTCount(t, tb, 6)
 
-	tb, _ = New("1")
+	tb, _ = htable.New("1")
 	checkTCount(t, tb, 0)
 
 	tb.Add(1)
@@ -1419,7 +1421,7 @@ func TestTCount(t *testing.T) {
 
 func TestTSame(t *testing.T) {
 	// Test that the same tables are the same.
-	tb, _ := New("1", "2", "3")
+	tb, _ := htable.New("1", "2", "3")
 	checkTCount(t, tb, 0)
 
 	tb.Add(1, 2, 3)
@@ -1431,11 +1433,11 @@ func TestTSame(t *testing.T) {
 	}
 
 	// Test that identical but not clone tables are not the same.
-	tb, _ = New("1", "2", "3")
+	tb, _ = htable.New("1", "2", "3")
 	tb.Add(1, 2, 3)
 	checkTCount(t, tb, 3)
 
-	tb2, _ = New("1", "2", "3")
+	tb2, _ = htable.New("1", "2", "3")
 	tb2.Add(1, 2, 3)
 	checkTCount(t, tb2, 3)
 
@@ -1444,11 +1446,11 @@ func TestTSame(t *testing.T) {
 	}
 
 	// Test that non-identical tables are not the same.
-	tb, _ = New("1", "2", "3")
+	tb, _ = htable.New("1", "2", "3")
 	tb.Add(1, 2, 3)
 	checkTCount(t, tb, 3)
 
-	tb2, _ = New("a")
+	tb2, _ = htable.New("a")
 	tb2.Add("line")
 	checkTCount(t, tb2, 1)
 
@@ -1459,7 +1461,7 @@ func TestTSame(t *testing.T) {
 
 func TestTRowItem(t *testing.T) {
 	// Set up a new table.
-	tb, _ := New("1", "2", "3")
+	tb, _ := htable.New("1", "2", "3")
 	tb.Add(1, 2, 3)
 	tb.Add(4, 5, 6)
 	tb.Add(7, 8, 9)
@@ -1490,7 +1492,7 @@ func TestTRowItem(t *testing.T) {
 	}
 
 	// Set up a new table.
-	tb, _ = New("name", "left-handed", "age")
+	tb, _ = htable.New("name", "left-handed", "age")
 	tb.Add("Swari", true, 30)
 	tb.Add("Kathy", false, 40)
 	tb.Add("Joe", false, 189)
@@ -1539,7 +1541,7 @@ func TestTRowItem(t *testing.T) {
 	hi := func() string { return "hello" }
 	reply := func() string { return "how are you" }
 
-	tb, _ = New("name", "func")
+	tb, _ = htable.New("name", "func")
 	tb.Add("hi", hi)
 	tb.Add("reply", reply)
 
@@ -1578,7 +1580,7 @@ func TestTRowItem(t *testing.T) {
 
 func TestTMatches(t *testing.T) {
 	// Set up a new table.
-	tb, _ := New("1", "2", "3")
+	tb, _ := htable.New("1", "2", "3")
 	tb.Add(1, 2, 3)
 	tb.Add(4, 5, 6)
 	tb.Add(7, 8, 9)
@@ -1595,7 +1597,7 @@ func TestTMatches(t *testing.T) {
 	}
 
 	// Set up a new table.
-	tb, _ = New("name", "left-handed", "age")
+	tb, _ = htable.New("name", "left-handed", "age")
 	tb.Add("Swari", true, 30)
 	tb.Add("Kathy", false, 40)
 	tb.Add("Joe", false, 189)
@@ -1617,7 +1619,7 @@ func TestTMatches(t *testing.T) {
 }
 
 func TestTToggle(t *testing.T) {
-	tb, _ := New("1", "2", "3")
+	tb, _ := htable.New("1", "2", "3")
 	tb.Add(1, 2, 3)
 	tb.Add(4, 5, 6)
 	tb.Add(7, 8, 9)
@@ -1735,7 +1737,7 @@ func TestTToggle(t *testing.T) {
 // --- Row's Method Tests ---
 
 func TestRSetItem(t *testing.T) {
-	r := NewRow(1, 2, 3)
+	r := htable.NewRow(1, 2, 3)
 	checkRString(t, r, "{1, 2, 3}")
 	checkRCount(t, r, 3)
 
@@ -1781,7 +1783,7 @@ func TestRSetItem(t *testing.T) {
 }
 
 func TestRItem(t *testing.T) {
-	r := NewRow(1, 2, 3)
+	r := htable.NewRow(1, 2, 3)
 	checkRString(t, r, "{1, 2, 3}")
 	checkRCount(t, r, 3)
 
@@ -1805,7 +1807,7 @@ func TestRItem(t *testing.T) {
 }
 
 func TestRMatches(t *testing.T) {
-	r := NewRow(1, 2, 3)
+	r := htable.NewRow(1, 2, 3)
 	checkRString(t, r, "{1, 2, 3}")
 	checkRCount(t, r, 3)
 
@@ -1839,7 +1841,7 @@ func TestRMatches(t *testing.T) {
 
 // --- Helper Functions ---
 
-func checkTString(t *testing.T, tb *Table, want string) {
+func checkTString(t *testing.T, tb *htable.Table, want string) {
 	if s := tb.String(); s != want {
 		t.Error("Table items are incorrect")
 		t.Log("\tExpected:", want)
@@ -1847,7 +1849,7 @@ func checkTString(t *testing.T, tb *Table, want string) {
 	}
 }
 
-func checkTCSV(t *testing.T, tb *Table, want string) {
+func checkTCSV(t *testing.T, tb *htable.Table, want string) {
 	if s := tb.WriteCSV(); s != want {
 		t.Error("CSV is incorrect")
 		t.Log("\tExpected:", want)
@@ -1855,7 +1857,7 @@ func checkTCSV(t *testing.T, tb *Table, want string) {
 	}
 }
 
-func checkTCount(t *testing.T, tb *Table, want int) {
+func checkTCount(t *testing.T, tb *htable.Table, want int) {
 	if n := tb.Count(); n != want {
 		t.Error("Table count is incorrect")
 		t.Log("\tExpected:", want)
@@ -1863,7 +1865,7 @@ func checkTCount(t *testing.T, tb *Table, want int) {
 	}
 }
 
-func checkRString(t *testing.T, r *Row, want string) {
+func checkRString(t *testing.T, r *htable.Row, want string) {
 	if s := r.String(); s != want {
 		t.Error("Table items are incorrect")
 		t.Log("\tExpected:", want)
@@ -1871,7 +1873,7 @@ func checkRString(t *testing.T, r *Row, want string) {
 	}
 }
 
-func checkRCount(t *testing.T, r *Row, want int) {
+func checkRCount(t *testing.T, r *htable.Row, want int) {
 	if n := r.Count(); n != want {
 		t.Error("Table count is incorrect")
 		t.Log("\tExpected:", want)
