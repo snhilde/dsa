@@ -1,13 +1,15 @@
-package hlist
+package hlist_test
 
 import (
 	"reflect"
 	"testing"
+
+	"github.com/snhilde/dsa/data_structures/hlist"
 )
 
 func TestBadPtr(t *testing.T) {
 	// Test that using a non-initialized list is handled correctly.
-	var l *List
+	var l *hlist.List
 
 	// Test String().
 	if s := l.String(); s != "<nil>" {
@@ -67,17 +69,17 @@ func TestBadPtr(t *testing.T) {
 	}
 
 	// Test Same().
-	if l.Same(New()) {
+	if l.Same(hlist.New()) {
 		t.Error("unexpectedly passed Same() test with bad pointer")
 	}
 
 	// Test Twin().
-	if l.Twin(New()) {
+	if l.Twin(hlist.New()) {
 		t.Error("unexpectedly passed Twin() test with bad pointer")
 	}
 
 	// Test Merge().
-	if err := l.Merge(New()); err == nil {
+	if err := l.Merge(hlist.New()); err == nil {
 		t.Error("unexpectedly passed Merge() test with bad pointer")
 	}
 
@@ -114,7 +116,7 @@ func TestBadPtr(t *testing.T) {
 
 func TestBadArgs(t *testing.T) {
 	// Test that passing bad values to methods is handled correctly.
-	l := New()
+	l := hlist.New()
 	checkString(t, l, "<empty>")
 	checkLength(t, l, 0)
 
@@ -222,13 +224,13 @@ func TestBadArgs(t *testing.T) {
 }
 
 func TestNew(t *testing.T) {
-	if l := New(); l == nil {
+	if l := hlist.New(); l == nil {
 		t.Error("Failed to create new list")
 	}
 }
 
 func TestInsert(t *testing.T) {
-	l := New()
+	l := hlist.New()
 
 	// Add an item to the beginning.
 	if err := l.Insert(0, 5); err != nil {
@@ -267,7 +269,7 @@ func TestInsert(t *testing.T) {
 }
 
 func TestAppend(t *testing.T) {
-	l := New()
+	l := hlist.New()
 
 	// Add one item.
 	if err := l.Append(5); err != nil {
@@ -314,7 +316,7 @@ func TestAppend(t *testing.T) {
 }
 
 func TestIndex(t *testing.T) {
-	l := New()
+	l := hlist.New()
 	l.Append("apples", 1, 3, 3.14, []byte{0xEE, 0xFF}, "aardvark")
 	checkString(t, l, "apples, 1, 3, 3.14, [238 255], aardvark")
 	checkLength(t, l, 6)
@@ -371,7 +373,7 @@ func TestIndex(t *testing.T) {
 }
 
 func TestValue(t *testing.T) {
-	l := New()
+	l := hlist.New()
 	l.Append("apples", 1, 3, 3.14, []byte{0xEE, 0xFF}, "aardvark")
 	checkString(t, l, "apples, 1, 3, 3.14, [238 255], aardvark")
 	checkLength(t, l, 6)
@@ -431,7 +433,7 @@ func TestValue(t *testing.T) {
 }
 
 func TestExists(t *testing.T) {
-	l := New()
+	l := hlist.New()
 	l.Append(1, 3, "apples", []byte{0xEE, 0xFF}, 3.14, 4)
 	checkString(t, l, "1, 3, apples, [238 255], 3.14, 4")
 	checkLength(t, l, 6)
@@ -468,7 +470,7 @@ func TestExists(t *testing.T) {
 }
 
 func TestRemove(t *testing.T) {
-	l := New()
+	l := hlist.New()
 
 	l.Append(1, 2, 3, "4", []byte{0x05, 0x06})
 	checkString(t, l, "1, 2, 3, 4, [5 6]")
@@ -531,7 +533,7 @@ func TestRemove(t *testing.T) {
 }
 
 func TestRemoveMatch(t *testing.T) {
-	l := New()
+	l := hlist.New()
 	l.Append(1, "apples", 3, []int{4, 5}, 3.14)
 	checkString(t, l, "1, apples, 3, [4 5], 3.14")
 	checkLength(t, l, 5)
@@ -567,7 +569,7 @@ func TestRemoveMatch(t *testing.T) {
 }
 
 func TestCopy(t *testing.T) {
-	l := New()
+	l := hlist.New()
 
 	// Copy an empty list.
 	nl, err := l.Copy()
@@ -588,40 +590,28 @@ func TestCopy(t *testing.T) {
 	}
 	checkString(t, nl, "sizzle, 100000, 3.1415, 15")
 	checkLength(t, nl, 4)
-	if l.head == nl.head {
-		t.Error("Lists are clones, not copies")
-	}
 
 	// Make sure the two lists are separate.
 	checkString(t, l, "sizzle, 100000, 3.1415, 15")
 	checkLength(t, l, 4)
 	checkString(t, nl, "sizzle, 100000, 3.1415, 15")
 	checkLength(t, nl, 4)
-	if l.head == nl.head {
-		t.Error("Lists are clones, not copies")
-	}
 
 	l.Remove(1)
 	checkString(t, l, "sizzle, 3.1415, 15")
 	checkLength(t, l, 3)
 	checkString(t, nl, "sizzle, 100000, 3.1415, 15")
 	checkLength(t, nl, 4)
-	if l.head == nl.head {
-		t.Error("Lists are clones, not copies")
-	}
 
 	nl.Remove(2)
 	checkString(t, l, "sizzle, 3.1415, 15")
 	checkLength(t, l, 3)
 	checkString(t, nl, "sizzle, 100000, 15")
 	checkLength(t, nl, 3)
-	if l.head == nl.head {
-		t.Error("Lists are clones, not copies")
-	}
 }
 
 func TestSame(t *testing.T) {
-	l1 := New()
+	l1 := hlist.New()
 	l2 := l1
 
 	// Test an empty list.
@@ -710,9 +700,9 @@ func TestSame(t *testing.T) {
 	}
 
 	// Make two lists that have the same contents but are not the same underlying lists.
-	l1 = New()
+	l1 = hlist.New()
 	l1.Append("apple", "banana", "carrot")
-	l2 = New()
+	l2 = hlist.New()
 	l2.Append("apple", "banana", "carrot")
 	if l1.Same(l2) {
 		t.Error("Lists are unexpectedly the same (test #15)")
@@ -724,9 +714,9 @@ func TestSame(t *testing.T) {
 
 func TestTwin(t *testing.T) {
 	// Make two lists that have the same contents but are not the same underlying lists.
-	l1 := New()
+	l1 := hlist.New()
 	l1.Append("apple", "banana", "carrot")
-	l2 := New()
+	l2 := hlist.New()
 	l2.Append("apple", "banana", "carrot")
 	if !l1.Twin(l2) {
 		t.Error("Lists unexpectedly failed twin test (test #1)")
@@ -754,9 +744,9 @@ func TestTwin(t *testing.T) {
 		i []int
 		n int
 	}
-	l1 = New()
+	l1 = hlist.New()
 	l1.Append("apple", []float32{1.23, 2.34, 3.45}, s{'a', []int{8, 9}, 1e3})
-	l2 = New()
+	l2 = hlist.New()
 	l2.Append("apple", []float32{1.23, 2.34, 3.45}, s{'a', []int{8, 9}, 1e3})
 	if !l1.Twin(l2) {
 		t.Error("Lists unexpectedly failed twin test (test #5)")
@@ -766,7 +756,7 @@ func TestTwin(t *testing.T) {
 	}
 
 	// Tweak l2 a bit.
-	l2 = New()
+	l2 = hlist.New()
 	l2.Append("apple", []float32{1.23, 2.34, 3.45}, s{'a', []int{8, 999}, 1e3})
 	if l1.Twin(l2) {
 		t.Error("Lists are twins but should not be (test #7)")
@@ -778,12 +768,12 @@ func TestTwin(t *testing.T) {
 
 func TestMerge(t *testing.T) {
 	// Test merging two good lists togther.
-	l := New()
+	l := hlist.New()
 	l.Append(0, 1, 2, 3, 4)
 	checkString(t, l, "0, 1, 2, 3, 4")
 	checkLength(t, l, 5)
 
-	nl := New()
+	nl := hlist.New()
 	nl.Append(5, 6, 7, 8, 9)
 	checkString(t, nl, "5, 6, 7, 8, 9")
 	checkLength(t, nl, 5)
@@ -802,7 +792,7 @@ func TestMerge(t *testing.T) {
 	checkString(t, l, "0, 1, 2, 3, 4")
 	checkLength(t, l, 5)
 
-	var lp *List
+	var lp *hlist.List
 	checkString(t, lp, "<nil>")
 	checkLength(t, lp, -1)
 
@@ -825,7 +815,7 @@ func TestMerge(t *testing.T) {
 }
 
 func TestClear(t *testing.T) {
-	l := New()
+	l := hlist.New()
 
 	// Add some items to the list.
 	l.Append(5, "bronto", "stego", 65e6, "t. rex", 0x0C)
@@ -856,7 +846,7 @@ func TestClear(t *testing.T) {
 }
 
 func TestYield(t *testing.T) {
-	l := New()
+	l := hlist.New()
 	l.Append(1, "2", 3.14)
 	checkString(t, l, "1, 2, 3.14")
 	checkLength(t, l, 3)
@@ -1166,7 +1156,7 @@ func TestYield(t *testing.T) {
 }
 
 func TestYieldAll(t *testing.T) {
-	l := New()
+	l := hlist.New()
 	l.Append(1, "2", 3.14)
 	checkString(t, l, "1, 2, 3.14")
 	checkLength(t, l, 3)
@@ -1294,7 +1284,7 @@ func TestYieldAll(t *testing.T) {
 }
 
 func TestSort(t *testing.T) {
-	l := New()
+	l := hlist.New()
 
 	// Test floats.
 	cmp := func(l, r interface{}) bool {
@@ -1343,7 +1333,7 @@ func TestSort(t *testing.T) {
 
 func TestSortInt(t *testing.T) {
 	// Test a power of two.
-	l := New()
+	l := hlist.New()
 	l.Append(8, 7, 6, 5, 4, 3, 2, 1)
 	checkString(t, l, "8, 7, 6, 5, 4, 3, 2, 1")
 	checkLength(t, l, 8)
@@ -1409,7 +1399,7 @@ func TestSortInt(t *testing.T) {
 
 func TestSortStr(t *testing.T) {
 	// Test uniform length and no same characters.
-	l := New()
+	l := hlist.New()
 	l.Append("ccc", "aaa", "bbb")
 	checkString(t, l, "ccc, aaa, bbb")
 	checkLength(t, l, 3)
@@ -1488,7 +1478,7 @@ func TestSortStr(t *testing.T) {
 	checkLength(t, l, 7)
 }
 
-func checkString(t *testing.T, l *List, want string) {
+func checkString(t *testing.T, l *hlist.List, want string) {
 	if l.String() != want {
 		t.Error("List contents are incorrect")
 		t.Log("\tExpected:", want)
@@ -1496,7 +1486,7 @@ func checkString(t *testing.T, l *List, want string) {
 	}
 }
 
-func checkLength(t *testing.T, l *List, want int) {
+func checkLength(t *testing.T, l *hlist.List, want int) {
 	if l.Length() != want {
 		t.Error("Incorrect length")
 		t.Log("\tExpected:", want)
