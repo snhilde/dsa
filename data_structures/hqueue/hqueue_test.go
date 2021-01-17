@@ -1,12 +1,14 @@
-package hqueue
+package hqueue_test
 
 import (
 	"reflect"
 	"testing"
+
+	"github.com/snhilde/dsa/data_structures/hqueue"
 )
 
 func TestBadPtr(t *testing.T) {
-	var q *Queue
+	var q *hqueue.Queue
 	checkString(t, q, "<nil>")
 	checkCount(t, q, -1)
 
@@ -35,7 +37,7 @@ func TestBadPtr(t *testing.T) {
 	}
 
 	// Test Merge().
-	if err := q.Merge(New()); err == nil {
+	if err := q.Merge(hqueue.New()); err == nil {
 		t.Error("unexpectedly passed Merge() test with bad pointer")
 	}
 
@@ -45,7 +47,7 @@ func TestBadPtr(t *testing.T) {
 	}
 
 	// Test Same().
-	if q.Same(New()) {
+	if q.Same(hqueue.New()) {
 		t.Error("unexpectedly passed Same() test with bad pointer")
 	}
 
@@ -58,7 +60,7 @@ func TestBadPtr(t *testing.T) {
 }
 
 func TestNew(t *testing.T) {
-	q := New()
+	q := hqueue.New()
 	if q == nil {
 		t.Error("new queue unexpectedly nil")
 	}
@@ -68,7 +70,7 @@ func TestNew(t *testing.T) {
 }
 
 func TestAdd(t *testing.T) {
-	q := New()
+	q := hqueue.New()
 
 	// Testing adding an int.
 	if err := q.Add(5); err != nil {
@@ -106,14 +108,14 @@ func TestAdd(t *testing.T) {
 	checkCount(t, q, 7)
 
 	// Testing adding an empty queue.
-	if err := q.Add(New()); err != nil {
+	if err := q.Add(hqueue.New()); err != nil {
 		t.Error(err)
 	}
 	checkString(t, q, "5, kangaroo, 3.1415, a, b, 3, [1 2 3], <empty>")
 	checkCount(t, q, 8)
 
 	// Test adding a non-empty queue.
-	a := New()
+	a := hqueue.New()
 	a.Add("orange, apple, banana")
 	if err := q.Add(a); err != nil {
 		t.Error(err)
@@ -130,7 +132,7 @@ func TestAdd(t *testing.T) {
 }
 
 func TestPop(t *testing.T) {
-	q := New()
+	q := hqueue.New()
 
 	// Add some items first.
 	q.Add("sizzle")
@@ -197,13 +199,13 @@ func TestPop(t *testing.T) {
 	checkCount(t, q, 0)
 
 	// Test popping a queue.
-	a := New()
+	a := hqueue.New()
 	a.Add("orange, apple, banana")
 	q.Add(a)
 	checkString(t, q, "orange, apple, banana")
 	checkCount(t, q, 1)
 
-	if val := q.Pop(); val.(*Queue) != a {
+	if val := q.Pop(); val.(*hqueue.Queue) != a {
 		t.Error("Incorrect value from pop")
 		t.Log("\tExpected:", a)
 		t.Log("\tExpected:", val)
@@ -213,7 +215,7 @@ func TestPop(t *testing.T) {
 }
 
 func TestCopy(t *testing.T) {
-	q := New()
+	q := hqueue.New()
 
 	// Copy an empty queue.
 	nq, err := q.Copy()
@@ -243,12 +245,12 @@ func TestCopy(t *testing.T) {
 
 func TestMerge(t *testing.T) {
 	// Create two queues and merge them.
-	q := New()
+	q := hqueue.New()
 	q.Add("monkey", "gazelle", 131)
 	checkString(t, q, "monkey, gazelle, 131")
 	checkCount(t, q, 3)
 
-	tmp := New()
+	tmp := hqueue.New()
 	tmp.Add(3.1415, 16, []uint{5, 6, 7})
 	checkString(t, tmp, "3.1415, 16, [5 6 7]")
 	checkCount(t, tmp, 3)
@@ -263,7 +265,7 @@ func TestMerge(t *testing.T) {
 	checkCount(t, tmp, 0)
 
 	// Test merging an invalid queue on top of a good one. Merge should succeed, but everything should remain untouched.
-	var nq *Queue
+	var nq *hqueue.Queue
 	checkString(t, nq, "<nil>")
 	checkCount(t, nq, -1)
 
@@ -286,7 +288,7 @@ func TestMerge(t *testing.T) {
 }
 
 func TestClear(t *testing.T) {
-	q := New()
+	q := hqueue.New()
 
 	// Add some items first.
 	q.Add("kangaroo", 5, 3.1415)
@@ -309,7 +311,7 @@ func TestClear(t *testing.T) {
 }
 
 func TestSame(t *testing.T) {
-	q1 := New()
+	q1 := hqueue.New()
 	q2 := q1
 
 	// Test checking against nothing.
@@ -403,9 +405,9 @@ func TestSame(t *testing.T) {
 	}
 
 	// Make two Queues that have the same contents but are not the same underlying Queues.
-	q1 = New()
+	q1 = hqueue.New()
 	q1.Add("apple", "banana", "carrot")
-	q2 = New()
+	q2 = hqueue.New()
 	q2.Add("apple", "banana", "carrot")
 	if q1.Same(q2) {
 		t.Error("Queues are unexpectedly the same (test #15)")
@@ -415,7 +417,7 @@ func TestSame(t *testing.T) {
 	}
 }
 
-func checkString(t *testing.T, q *Queue, want string) {
+func checkString(t *testing.T, q *hqueue.Queue, want string) {
 	if q.String() != want {
 		t.Error("queue contents are incorrect")
 		t.Log("\tExpected:", want)
@@ -423,7 +425,7 @@ func checkString(t *testing.T, q *Queue, want string) {
 	}
 }
 
-func checkCount(t *testing.T, q *Queue, want int) {
+func checkCount(t *testing.T, q *hqueue.Queue, want int) {
 	if q.Count() != want {
 		t.Error("Incorrect length")
 		t.Log("\tExpected:", want)
