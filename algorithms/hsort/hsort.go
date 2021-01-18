@@ -675,7 +675,7 @@ func BinaryInt(list []int) error {
 // 3. A function that will compare the two Values, return M_TRUE if the first is greater and M_FALSE
 //    if the second is greater.
 // 4. A function that will swap the two Values at the given indices.
-// 5. Any error that occurred along the way, or nil if no error occurred
+// 5. Any error that occurred along the way, or nil if no error occurred.
 func initSort(list interface{}) (length int, at func(int) reflect.Value, greater func(i, j reflect.Value) bool, swap func(i, j int), err error) {
 	// Pull out the underlying Value, and make sure it's a slice.
 	v := reflect.ValueOf(list)
