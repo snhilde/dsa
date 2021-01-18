@@ -3,22 +3,24 @@ package hsort
 
 import (
 	"fmt"
-	"github.com/snhilde/dsa/data_structures/htree"
 	"math"
 	"math/rand"
 	"reflect"
+
+	"github.com/snhilde/dsa/data_structures/htree"
 )
 
 // errBadLength is the error message for an invalid list size.
 var errBadLength = fmt.Errorf("invalid list size")
 
-// Insertion sorts the list using an insertion algorithm. The list must be a slice of a uniform data type.
+// Insertion sorts the list using an insertion algorithm. The list must be a slice of a uniform data
+// type.
 func Insertion(list interface{}) error {
 	// We're going to follow this sequence for each item in the list:
 	// 1. Get the value at the current index.
 	// 2. While the value is less than the value to the left of it, swap the two values.
-	// 3. When the value is greater than the value to the left, it will also be greater than the value to the right and
-	//    therefore in sorted order for this portion of the list.
+	// 3. When the value is greater than the value to the left, it will also be greater than the
+	//    value to the right and therefore in sorted order for this portion of the list.
 	length, at, greater, swap, err := initSort(list)
 	if err != nil {
 		return err
@@ -125,16 +127,16 @@ func SelectionInt(list []int) error {
 
 // Bubble sorts the list using a bubble algorithm. The list must be a slice of a uniform data type.
 func Bubble(list interface{}) error {
-	// For this function, we're going to iterate through every item in the list. If an item has a greater value than its
-	// neighbor to the right, then we'll swap them. When we get to the end, we'll start again at the beginning and keep
-	// doing this until we have one pass with no swaps.
+	// For this function, we're going to iterate through every item in the list. If an item has a
+	// greater value than its neighbor to the right, then we'll swap them. When we get to the end,
+	// we'll start again at the beginning and keep doing this until we have one pass with no swaps.
 	length, at, greater, swap, err := initSort(list)
 	if err != nil {
 		return err
 	}
 
-	// At the beginning of every pass, we'll set clean to true. If we perform any operation during the pass, we'll
-	// toggle it false. When clean stays true the entire pass, everything is sorted.
+	// At the beginning of every pass, we'll set clean to true. If we perform any operation during
+	// the pass, we'll toggle it false. When clean stays true the entire pass, everything is sorted.
 	clean := false
 	for !clean {
 		clean = true
@@ -156,16 +158,16 @@ func Bubble(list interface{}) error {
 
 // BubbleInt sorts the list of ints using a bubble algorithm.
 func BubbleInt(list []int) error {
-	// For this function, we're going to iterate through every item in the list. If an item has a greater value than its
-	// neighbor to the right, then we'll swap them. When we get to the end, we'll start again at the beginning and keep
-	// doing this until we have one pass with no swaps.
+	// For this function, we're going to iterate through every item in the list. If an item has a
+	// greater value than its neighbor to the right, then we'll swap them. When we get to the end,
+	// we'll start again at the beginning and keep doing this until we have one pass with no swaps.
 	length := len(list)
 	if length < 1 {
 		return errBadLength
 	}
 
-	// At the beginning of every pass, we'll set clean to true. If we perform any operation during the pass, we'll
-	// toggle it false. When clean stays true the entire pass, everything is sorted.
+	// At the beginning of every pass, we'll set clean to true. If we perform any operation during
+	// the pass, we'll toggle it false. When clean stays true the entire pass, everything is sorted.
 	clean := false
 	for !clean {
 		clean = true
@@ -185,16 +187,18 @@ func BubbleInt(list []int) error {
 
 // Merge sorts the list using a merging algorithm. The list must be a slice of a uniform data type.
 func Merge(list interface{}) error {
-	// For this sorting function, we're going to focus on a stack of blocks. A block is a subsection of the total list.
-	// First, we're going to create a block for the entire list. Then we're going to follow this sequence for each sub-block:
+	// For this sorting function, we're going to focus on a stack of blocks. A block is a subsection
+	// of the total list. First, we're going to create a block for the entire list. Then we're going
+	// to follow this sequence for each sub-block:
 	// - Look at the top block on the stack.
 	//     - If it hasn't been split yet, then make two blocks out of each half and add them to the stack.
 	//     - If it has already been split, then merge its two halves together and throw away the block.
-	// Typically, on the merging step, you would use a temporary array to handle sorting the stacks together.
-	// Unfortunately, we will not know the necessary underlying type beforehand, so we can't create this temporary
-	// array. Instead of moving items to another list and then moving them back in sorted order, we're going to keep
-	// track of where each item should be. After we calculate each item's required index for sorting, we'll start
-	// swapping each item into its correct position.
+	// Typically, on the merging step, you would use a temporary array to handle sorting the stacks
+	// together. Unfortunately, we will not know the necessary underlying type beforehand, so we
+	// can't create this temporary array. Instead of moving items to another list and then moving
+	// them back in sorted order, we're going to keep track of where each item should be. After we
+	// calculate each item's required index for sorting, we'll start swapping each item into its
+	// correct position.
 	type block struct {
 		index  int
 		length int
@@ -206,7 +210,8 @@ func Merge(list interface{}) error {
 		return err
 	}
 
-	// This list will track where the item at each index needs to be moved to in order to sort the list properly.
+	// This list will track where the item at each index needs to be moved to in order to sort the
+	// list properly.
 	moveTo := make([]int, length)
 
 	b := block{0, length, false}
@@ -256,7 +261,6 @@ func Merge(list interface{}) error {
 					moveTo[to] = to
 				}
 			}
-
 		} else {
 			// We're still on the splitting phase.
 			b.merge = true
@@ -277,8 +281,9 @@ func Merge(list interface{}) error {
 
 // MergeInt sorts the list of ints using a merging algorithm.
 func MergeInt(list []int) error {
-	// For this sorting function, we're going to focus on a stack of blocks. A block is a subsection of the total list.
-	// First, we're going to create a block for the entire list. Then we're going to follow this sequence for each sub-block:
+	// For this sorting function, we're going to focus on a stack of blocks. A block is a subsection
+	// of the total list. First, we're going to create a block for the entire list. Then we're going
+	// to follow this sequence for each sub-block:
 	// - Look at the top block on the stack.
 	//     - If it hasn't been split yet, then make two blocks out of each half and add them to the stack.
 	//     - If it has already been split, then merge its two halves together and throw away the block.
@@ -348,28 +353,31 @@ func MergeInt(list []int) error {
 	return nil
 }
 
-// MergeOptimized sorts the list using a merging algorithm that is optimized for low memory use. The list must be a
-// slice of a uniform data type.
+// MergeOptimized sorts the list using a merging algorithm that is optimized for low memory use. The
+// list must be a slice of a uniform data type.
 func MergeOptimized(list interface{}) error {
-	// While the standard merging algorithm first divides the list to be sorted into iteratively smaller blocks and then
-	// merges back up the tree, this implementation starts at the bottom and merges upward immediately. This reduces
-	// the memory overhead, as there is no tree allocation/construction.
-	// We're going to focus on stacks and blocks here. Stacks are already-sorted sublists, and blocks are two stacks
-	// that are being merged. The algorithm starts with a stack size of 1, meaning at the bottom level of individual
-	// items. It will form blocks by merging two stacks together, working through the entire list. It will then make
-	// stacks out of those blocks and continuing operating in this manner until the stack size consumes the entire list
-	// and everything is sorted.
-	// Typically, you would use a temporary array to handle sorting the stacks together. Unfortunately, we will not know
-	// the necessary underlying type beforehand, so we can't create this temporary array. Instead of moving items to
-	// another list and then moving them back in sorted order, we're going to keep track of where each item should be.
-	// After we calculate each item's required index for sorting, we'll start swapping each item into its correct
-	// position.
+	// While the standard merging algorithm first divides the list to be sorted into iteratively
+	// smaller blocks and then merges back up the tree, this implementation starts at the bottom and
+	// merges upward immediately. This reduces the memory overhead, as there is no tree
+	// allocation/construction.
+	// We're going to focus on stacks and blocks here. Stacks are already-sorted sublists, and
+	// blocks are two stacks that are being merged. The algorithm starts with a stack size of 1,
+	// meaning at the bottom level of individual items. It will form blocks by merging two stacks
+	// together, working through the entire list. It will then make stacks out of those blocks and
+	// continuing operating in this manner until the stack size consumes the entire list and
+	// everything is sorted.
+	// Typically, you would use a temporary array to handle sorting the stacks together.
+	// Unfortunately, we will not know the necessary underlying type beforehand, so we can't create
+	// this temporary array. Instead of moving items to another list and then moving them back in
+	// sorted order, we're going to keep track of where each item should be. After we calculate each
+	// item's required index for sorting, we'll start swapping each item into its correct position.
 	length, at, greater, swap, err := initSort(list)
 	if err != nil {
 		return err
 	}
 
-	// This list will track where the item at each index needs to be moved to in order to sort the list properly.
+	// This list will track where the item at each index needs to be moved to in order to sort the
+	// list properly.
 	moveTo := make([]int, length)
 
 	// Progressively work from smallest stack size up.
@@ -381,7 +389,8 @@ func MergeOptimized(list interface{}) error {
 		// Operate on each individual block.
 		for i := 0; i < numBlocks; i++ {
 			index := blockSize * i
-			// If this is the last block in the row, we have to compensate for potentially not having a full block.
+			// If this is the last block in the row, we have to compensate for potentially not
+			// having a full block.
 			if i == numBlocks-1 {
 				blockSize = length - index
 				if blockSize <= stackSize {
@@ -436,16 +445,19 @@ func MergeOptimized(list interface{}) error {
 	return nil
 }
 
-// MergeIntOptimized sorts the list of ints using a merging algorithm that is optimized for low memory use.
+// MergeIntOptimized sorts the list of ints using a merging algorithm that is optimized for low
+// memory use.
 func MergeIntOptimized(list []int) error {
-	// While the standard merging algorithm first divides the list to be sorted into iteratively smaller blocks and then
-	// merges back up the tree, this implementation starts at the bottom and merges upward immediately. This reduces
-	// the memory overhead, as there is no tree allocation/construction.
-	// We're going to focus on stacks and blocks here. Stacks are already-sorted sublists, and blocks are two stacks
-	// that are being merged. The algorithm starts with a stack size of 1, meaning at the bottom level of individual
-	// items. It will form blocks by merging two stacks together, working through the entire list. It will then make
-	// stacks out of those blocks and continuing operating in this manner until the stack size consumes the entire list
-	// and everything is sorted.
+	// While the standard merging algorithm first divides the list to be sorted into iteratively
+	// smaller blocks and then merges back up the tree, this implementation starts at the bottom and
+	// merges upward immediately. This reduces the memory overhead, as there is no tree
+	// allocation/construction.
+	// We're going to focus on stacks and blocks here. Stacks are already-sorted sublists, and
+	// blocks are two stacks that are being merged. The algorithm starts with a stack size of 1,
+	// meaning at the bottom level of individual items. It will form blocks by merging two stacks
+	// together, working through the entire list. It will then make stacks out of those blocks and
+	// continuing operating in this manner until the stack size consumes the entire list and
+	// everything is sorted.
 	length := len(list)
 	if length < 1 {
 		return errBadLength
@@ -463,7 +475,8 @@ func MergeIntOptimized(list []int) error {
 		// Operate on each individual block.
 		for i := 0; i < numBlocks; i++ {
 			index := blockSize * i
-			// If this is the last block in the row, we have to compensate for potentially not having a full block.
+			// If this is the last block in the row, we have to compensate for potentially not
+			// having a full block.
 			if i == numBlocks-1 {
 				blockSize = length - index
 				if blockSize <= stackSize {
@@ -509,14 +522,16 @@ func MergeIntOptimized(list []int) error {
 // Note: The efficiency of this algorithm decreases as the range of possible values in the list increases.
 func HashInt(list []int) error {
 	// We're going to follow this sequence:
-	// 1. Build a hash table and populate it with every item in the list. Because we do not have any prior knowledge of
-	//    value range, our hash function is a simple value mod length. This gives distribution in the array equal to the
-	//    value distribution in the list. We're going to handle collisions with chaining.
+	// 1. Build a hash table and populate it with every item in the list. Because we do not have any
+	//    prior knowledge of value range, our hash function is a simple value mod length. This gives
+	//    distribution in the array equal to the value distribution in the list. We're going to
+	//    hanle collisions with chaining.
 	// 2. As we are populating the table, we are also going to find the lowest and highest values.
-	// 3. Iterate through every value from the lowest to the highest. If the value exists in the table, put it in the
-	//    list at the current index and increment the index.
-	// Note: Due to the low-to-high value iteration and table lookup, this algorithm is only efficient for low value
-	// ranges. The time complexity is linear for input size AND linear for value range.
+	// 3. Iterate through every value from the lowest to the highest. If the value exists in the
+	//    table, put it in the list at the current index and increment the index.
+	// Note: Due to the low-to-high value iteration and table lookup, this algorithm is only
+	// efficient for low value ranges. The time complexity is linear for input size AND linear for
+	// value range.
 	length := len(list)
 	if length < 1 {
 		return errBadLength
@@ -540,7 +555,8 @@ func HashInt(list []int) error {
 		table[hash] = append(table[hash], v)
 	}
 
-	// Iterate through our value range. If a value exists in the table, then we'll add it back to the list in now-sorted order.
+	// Iterate through our value range. If a value exists in the table, then we'll add it back to
+	// the list in now-sorted order.
 	index := 0
 	for i := low; i <= high; i++ {
 		hash := int(math.Abs(float64(i % length)))
@@ -652,11 +668,12 @@ func BinaryInt(list []int) error {
 	return nil
 }
 
-// Helper function that will set up all the variables and functions necessary for determining the list's underlying type
-// and acting on that type appropriately. It will return these values:
+// Helper function that will set up all the variables and functions necessary for determining the
+// list's underlying type and acting on that type appropriately. It will return these values:
 // 1. The length of the list
 // 2. A function that will get the Value at the given index
-// 3. A function that will compare the two Values, return M_TRUE if the first is greater and M_FALSE if the second is greater.
+// 3. A function that will compare the two Values, return M_TRUE if the first is greater and M_FALSE
+//    if the second is greater.
 // 4. A function that will swap the two Values at the given indices.
 // 5. Any error that occurred along the way, or nil if no error occurred
 func initSort(list interface{}) (length int, at func(int) reflect.Value, greater func(i, j reflect.Value) bool, swap func(i, j int), err error) {
@@ -679,8 +696,8 @@ func initSort(list interface{}) (length int, at func(int) reflect.Value, greater
 		return v.Index(i)
 	}
 
-	// Construct the function that will compare the two Values (and make sure we have a type we can work with).
-	// Returns true if i is greater than j and items need to be swapped.
+	// Construct the function that will compare the two Values (and make sure we have a type we can
+	// work with). Returns true if i is greater than j and items need to be swapped.
 	switch k := v.Index(0).Kind(); k {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		greater = func(i, j reflect.Value) bool {

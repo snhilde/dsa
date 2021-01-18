@@ -27,7 +27,8 @@ func New() *List {
 	return new(List)
 }
 
-// String returns a comma-separated list of the string representations of all of the items in the linked list.
+// String returns a comma-separated list of the string representations of all of the items in the
+// linked list.
 func (l *List) String() string {
 	if l == nil {
 		return "<nil>"
@@ -120,7 +121,8 @@ func (l *List) Item(index int) interface{} {
 		return nil
 	}
 
-	// If there isn't a node before the specified index, then that means either the index is 0 or this list is empty.
+	// If there isn't a node before the specified index, then that means either the index is 0 or
+	// this list is empty.
 	if node == nil {
 		if l.head == nil {
 			return nil
@@ -128,7 +130,8 @@ func (l *List) Item(index int) interface{} {
 		return l.head.item
 	}
 
-	// Because we asked for the previous node, we need to move to the next one, which has the correct item.
+	// Because we asked for the previous node, we need to move to the next one, which has the
+	// correct item.
 	return node.next.item
 }
 
@@ -150,7 +153,8 @@ func (l *List) Remove(index int) interface{} {
 		return nil
 	}
 
-	// If there isn't a node before the specified index, then that means either the index is 0 or this list is empty.
+	// If there isn't a node before the specified index, then that means either the index is 0 or
+	// this list is empty.
 	var pop *hnode
 	if node == nil {
 		if l.head == nil {
@@ -181,8 +185,8 @@ func (l *List) Copy() (*List, error) {
 		return nil, errBadList
 	}
 
-	// We're going to build an identical chain of nodes here, and then we'll create a new List and link in the chain
-	// afterwards.
+	// We're going to build an identical chain of nodes here, and then we'll create a new List and
+	// link in the chain afterwards.
 	cp := New()
 	cp.head = newNode(nil)
 	for node1, node2 := l.head, cp.head; node1 != nil; node1, node2 = node1.next, node2.next {
@@ -228,7 +232,8 @@ func (l *List) Twin(list2 *List) bool {
 
 	for node1, node2 := l.head, list2.head; node1 != nil; node1, node2 = node1.next, node2.next {
 		if node2 == nil {
-			// Shouldn't ever be possible because the lists are the same length, but need to check for safety.
+			// Shouldn't ever be possible because the lists are the same length, but need to check
+			// for safety.
 			return false
 		}
 
@@ -241,8 +246,8 @@ func (l *List) Twin(list2 *List) bool {
 	return true
 }
 
-// Merge appends the list to the current list, preserving order. This will take ownership of and clear the provided
-// list.
+// Merge appends the list to the current list, preserving order. This will take ownership of and
+// clear the provided list.
 func (l *List) Merge(list2 *List) error {
 	if l == nil {
 		return errBadList
@@ -286,11 +291,12 @@ func (l *List) Clear() error {
 	return nil
 }
 
-// Yield provides an unbuffered channel that will continually pass successive items until the list is exhausted. The
-// channel quit is used to communicate when iteration should be stopped. Send an empty struct (struct{}{}) on the
-// channel to break the communication. This will happen automatically if the list is exhausted. If this is not needed,
-// pass nil as the argument. Use Yield if you are concerned about memory usage or don't know how far through the list
-// you will iterate; otherwise, use YieldAll.
+// Yield provides an unbuffered channel that will continually pass successive items until the list
+// is exhausted. The channel quit is used to communicate when iteration should be stopped. Send an
+// empty struct (struct{}{}) on the channel to break the communication. This will happen
+// automatically if the list is exhausted. If this is not needed, pass nil as the argument. Use
+// Yield if you are concerned about memory usage or don't know how far through the list you will
+// iterate; otherwise, use YieldAll.
 func (l *List) Yield(quit <-chan struct{}) <-chan interface{} {
 	if l == nil || l.head == nil {
 		return nil
@@ -300,8 +306,8 @@ func (l *List) Yield(quit <-chan struct{}) <-chan interface{} {
 	go func() {
 		defer close(ch)
 		for node := l.head; node != nil; node = node.next {
-			// Either block on sending this node's item back on the channel, or break out of the loop if the caller is
-			// done receiving items.
+			// Either block on sending this node's item back on the channel, or break out of the
+			// loop if the caller is done receiving items.
 			select {
 			case ch <- node.item:
 			case <-quit:
@@ -313,8 +319,8 @@ func (l *List) Yield(quit <-chan struct{}) <-chan interface{} {
 	return ch
 }
 
-// YieldAll provides a buffered channel that will pass successive items until the list is exhausted. Use this if you
-// don't care greatly about memory usage and for convenience.
+// YieldAll provides a buffered channel that will pass successive items until the list is exhausted.
+// Use this if you don't care greatly about memory usage and for convenience.
 func (l *List) YieldAll() <-chan interface{} {
 	if l == nil || l.head == nil {
 		return nil
@@ -329,12 +335,13 @@ func (l *List) YieldAll() <-chan interface{} {
 	return ch
 }
 
-// Sort sorts the list using a modified merge algorithm. cmp should return true if left should be sorted first or false
-// if right should be sorted first.
+// Sort sorts the list using a modified merge algorithm. cmp should return true if left should be
+// sorted first or false if right should be sorted first.
 func (l *List) Sort(cmp func(left, right interface{}) bool) error {
-	// We are going to use the merge sort algorithm here. However, because length operations are not constant-time, we
-	// are not going to divide the list into progressively smaller blocks. Instead, we are going to assume a block size
-	// of 2 and iteratively merge-sort blocks of greater and greater size until the list is fully sorted.
+	// We are going to use the merge sort algorithm here. However, because length operations are not
+	// constant-time, we are not going to divide the list into progressively smaller blocks.
+	// Instead, we are going to assume a block size of 2 and iteratively merge-sort blocks of
+	// greater and greater size until the list is fully sorted.
 	if l == nil {
 		return errBadList
 	} else if cmp == nil {
@@ -347,10 +354,10 @@ func (l *List) Sort(cmp func(left, right interface{}) bool) error {
 		return nil
 	}
 
-	// Two stacks make up a block. Before each loop, both stacks in a block are sorted. Merging them together in sorted
-	// order will yield a sorted block. The smallest stack size of already-sorted nodes is 1. We'll begin to merge
-	// stacks from there and work up. When the stack size is at least as big as the entire list, then everything must be
-	// sorted.
+	// Two stacks make up a block. Before each loop, both stacks in a block are sorted. Merging them
+	// together in sorted order will yield a sorted block. The smallest stack size of already-sorted
+	// nodes is 1. We'll begin to merge stacks from there and work up. When the stack size is at
+	// least as big as the entire list, then everything must be sorted.
 	for stackLen := 1; stackLen < listLen; stackLen *= 2 {
 		blockLen := stackLen * 2
 		tmpList := New()
@@ -367,7 +374,8 @@ func (l *List) Sort(cmp func(left, right interface{}) bool) error {
 				rightStack = rightStack.next
 			}
 
-			// If this is the last block and it's not a full block, then we'll have to handle some special conditions.
+			// If this is the last block and it's not a full block, then we'll have to handle some
+			// special conditions.
 			if i+1 == numBlocks && listLen%blockLen != 0 {
 				nodesLeft := listLen - (i * blockLen)
 				// If we don't even have a full stack, then this block is already in sorted order.
@@ -420,14 +428,16 @@ func (l *List) Sort(cmp func(left, right interface{}) bool) error {
 	return nil
 }
 
-// SortInt sorts the list using a modified merge algorithm. Note: all items in the list must be of type int.
+// SortInt sorts the list using a modified merge algorithm. Note: all items in the list must be of
+// type int.
 func (l *List) SortInt() error {
 	return l.Sort(func(left, right interface{}) bool {
 		return left.(int) < right.(int)
 	})
 }
 
-// SortStr sorts the list using a modified merge algorithm. Note: all items in the list must be of type string.
+// SortStr sorts the list using a modified merge algorithm. Note: all items in the list must be of
+// type string.
 func (l *List) SortStr() error {
 	return l.Sort(func(l, r interface{}) bool {
 		return l.(string) < r.(string)
@@ -442,15 +452,16 @@ func newNode(item interface{}) *hnode {
 	return node
 }
 
-// buildChain strings together a new chain of linked nodes with the items provided. It returns the first and last nodes
-// in the chain as well as the number of nodes.
+// buildChain strings together a new chain of linked nodes with the items provided. It returns the
+// first and last nodes in the chain as well as the number of nodes.
 func buildChain(items []interface{}) (*hnode, *hnode, int) {
 	if len(items) == 0 {
 		return nil, nil, 0
 	}
 
-	// We're going to start by creating an anchor node, and then we'll build out the chain of nodes from that. When
-	// we're done adding nodes, we'll move forward past the anchor node to get to the real start of the chain.
+	// We're going to start by creating an anchor node, and then we'll build out the chain of nodes
+	// from that. When we're done adding nodes, we'll move forward past the anchor node to get to
+	// the real start of the chain.
 	anchor := newNode(nil)
 	tail := anchor
 	num := 0

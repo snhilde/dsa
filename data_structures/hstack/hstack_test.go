@@ -300,7 +300,8 @@ func TestMerge(t *testing.T) {
 	checkString(t, tmp, "<empty>")
 	checkCount(t, tmp, 0)
 
-	// Test merging an invalid stack on top of a good one. Merge should succeed, but everything should remain untouched.
+	// Test merging an invalid stack on top of a good one. Merge should succeed, but everything
+	// should remain untouched.
 	var ns *hstack.Stack
 	checkString(t, ns, "<nil>")
 	checkCount(t, ns, -1)
@@ -313,7 +314,8 @@ func TestMerge(t *testing.T) {
 	checkString(t, ns, "<nil>")
 	checkCount(t, ns, -1)
 
-	// Test merging a good stack on top of a bad one. Merge should fail, and everything should remain untouched.
+	// Test merging a good stack on top of a bad one. Merge should fail, and everything should
+	// remain untouched.
 	if err := ns.Merge(s); err == nil {
 		t.Error("unexpectedly passed merge on top of bad stack test")
 	}

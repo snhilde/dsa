@@ -24,8 +24,8 @@ type Converter struct {
 	encCharSet CharSet
 }
 
-// NewConverter creates a new Converter object with the provided character sets. If a character set is not needed (such
-// as when doing only encoding or only decoding), pass `CharSet{}`.
+// NewConverter creates a new Converter object with the provided character sets. If a character set
+// is not needed (such as when doing only encoding or only decoding), pass `CharSet{}`.
 func NewConverter(decode CharSet, encode CharSet) Converter {
 	c := new(Converter)
 
@@ -35,7 +35,8 @@ func NewConverter(decode CharSet, encode CharSet) Converter {
 	return *c
 }
 
-// Decode decodes s using the decoding character set and returns the binary data or any error encountered.
+// Decode decodes s using the decoding character set and returns the binary data or any error
+// encountered.
 func (c *Converter) Decode(s string) ([]byte, error) {
 	if c == nil {
 		return nil, errBadConverter
@@ -44,8 +45,8 @@ func (c *Converter) Decode(s string) ([]byte, error) {
 	return DecodeWith(s, c.decCharSet)
 }
 
-// DecodeFrom reads encoded data from r until EOF, decodes the data using the decoding character set, and stores it
-// internally.
+// DecodeFrom reads encoded data from r until EOF, decodes the data using the decoding character
+// set, and stores it internally.
 func (c *Converter) DecodeFrom(r io.Reader) error {
 	if c == nil {
 		return errBadConverter
@@ -66,7 +67,8 @@ func (c *Converter) DecodeFrom(r io.Reader) error {
 	return nil
 }
 
-// DecodeWith decodes s with the provided character set and returns the binary data or any error encountered.
+// DecodeWith decodes s with the provided character set and returns the binary data or any error
+// encountered.
 func DecodeWith(s string, charSet CharSet) ([]byte, error) {
 	if charSet.Len() <= 0 {
 		return nil, errNoCharSet
@@ -110,7 +112,8 @@ func DecodeWith(s string, charSet CharSet) ([]byte, error) {
 	return binary.Bytes(), nil
 }
 
-// Encode encodes p using the encoding character set and returns the encoded data or any error encountered.
+// Encode encodes p using the encoding character set and returns the encoded data or any error
+// encountered.
 func (c *Converter) Encode(p []byte) (string, error) {
 	if c == nil {
 		return "", errBadConverter
@@ -143,7 +146,8 @@ func (c *Converter) EncodeTo(w io.Writer) error {
 	return nil
 }
 
-// EncodeWith encodes p with the provided character set and returns the encoded data or any error encountered.
+// EncodeWith encodes p with the provided character set and returns the encoded data or any error
+// encountered.
 func EncodeWith(p []byte, charSet CharSet) (string, error) {
 	if charSet.Len() <= 0 {
 		return "", errNoCharSet

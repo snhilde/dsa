@@ -133,16 +133,16 @@ func (b *Buffer) String() string {
 	return b.stringInt(false)
 }
 
-// Display returns a string representation of the binary data in the buffer, with a single space between nibbles and a
-// double space between bytes.
+// Display returns a string representation of the binary data in the buffer, with a single space
+// between nibbles and a double space between bytes.
 func (b *Buffer) Display() string {
 	return b.stringInt(true)
 }
 
-// Read reads len(p) bytes of bits from the buffer into p. It will return the number of bytes read into p, or io.EOF if
-// the buffer is empty. io.EOF will only be returned if the buffer is empty before any bytes have been read into p. If
-// there are not enough bits to fill all of the last byte, then the rest of the byte will be false bits. This advances
-// the buffer.
+// Read reads len(p) bytes of bits from the buffer into p. It will return the number of bytes read
+// into p, or io.EOF if the buffer is empty. io.EOF will only be returned if the buffer is empty
+// before any bytes have been read into p. If there are not enough bits to fill all of the last
+// byte, then the rest of the byte will be false bits. This advances the buffer.
 func (b *Buffer) Read(p []byte) (int, error) {
 	if b == nil {
 		return 0, errBadBuf
@@ -172,19 +172,20 @@ func (b *Buffer) Read(p []byte) (int, error) {
 			}
 			node = node.next
 
-			// Even though we're returning a count of bytes read, we need to keep track of the number of bits read so we
-			// can properly advance the buffer later.
+			// Even though we're returning a count of bytes read, we need to keep track of the
+			// number of bits read so we can properly advance the buffer later.
 			cnt++
 		}
 	}
 
-	// Note: The calculation (cnt+7)/8 ensures that we account for untouched (and therefore false) bits in the last byte.
+	// Note: The calculation (cnt+7)/8 ensures that we account for untouched (and therefore false)
+	// bits in the last byte.
 	_, err := b.Advance(cnt)
 	return (cnt + 7) / 8, err
 }
 
-// ReadByte reads out one byte of bits at the index. If there are not enough bits to fill all of the byte, then the rest
-// of the byte will be false bits. This does not advance the buffer.
+// ReadByte reads out one byte of bits at the index. If there are not enough bits to fill all of the
+// byte, then the rest of the byte will be false bits. This does not advance the buffer.
 func (b *Buffer) ReadByte(index int) (byte, error) {
 	node, err := b.getNode(index)
 	if err != nil {
@@ -206,8 +207,9 @@ func (b *Buffer) ReadByte(index int) (byte, error) {
 	return bt, nil
 }
 
-// ReadInt reads out the 32-bit decimal representation of the bits at the index. If there are not enough bits to fill
-// all of the 32 bits, then the rest of the bits will be false bits. This does not advance the buffer.
+// ReadInt reads out the 32-bit decimal representation of the bits at the index. If there are not
+// enough bits to fill all of the 32 bits, then the rest of the bits will be false bits. This does
+// not advance the buffer.
 func (b *Buffer) ReadInt(index int) (int, error) {
 	node, err := b.getNode(index)
 	if err != nil {
@@ -229,8 +231,9 @@ func (b *Buffer) ReadInt(index int) (int, error) {
 	return int(n), nil
 }
 
-// ReadFrom reads from r and appends the bytes to the buffer. It will return the number of bytes read, and possibly an
-// error. If r is nil, this will return io.EOF. If nothing is read, this will return io.ErrNoProgress.
+// ReadFrom reads from r and appends the bytes to the buffer. It will return the number of bytes
+// read, and possibly an error. If r is nil, this will return io.EOF. If nothing is read, this will
+// return io.ErrNoProgress.
 func (b *Buffer) ReadFrom(r io.Reader) (int, error) {
 	if b == nil {
 		return 0, errBadBuf
@@ -254,7 +257,8 @@ func (b *Buffer) Write(p []byte) (int, error) {
 
 	skip := false
 	if end == nil {
-		// This means the buffer is empty. We'll create a node now to make setup easy and then skip past it later.
+		// This means the buffer is empty. We'll create a node now to make setup easy and then skip
+		// past it later.
 		b.head = new(bnode)
 		end = b.head
 		skip = true
@@ -401,7 +405,8 @@ func (b *Buffer) RemoveBits(index, n int) error {
 	return nil
 }
 
-// Advance moves the start of the buffer forward a number of bits. It will return the number of bits moved.
+// Advance moves the start of the buffer forward a number of bits. It will return the number of bits
+// moved.
 func (b *Buffer) Advance(n int) (int, error) {
 	if b == nil {
 		return 0, errBadBuf
@@ -432,8 +437,8 @@ func (b *Buffer) Advance(n int) (int, error) {
 	return n, nil
 }
 
-// Rewind moves the start of the buffer back a number of bits, or to the initial start. It will return the number of
-// bits moved.
+// Rewind moves the start of the buffer back a number of bits, or to the initial start. It will
+// return the number of bits moved.
 func (b *Buffer) Rewind(n int) (int, error) {
 	if b == nil {
 		return 0, errBadBuf
@@ -464,8 +469,8 @@ func (b *Buffer) Rewind(n int) (int, error) {
 	return n, nil
 }
 
-// Join appends a different buffer to the end of the current one. For safety, the current buffer will take ownership of
-// the second buffer.
+// Join appends a different buffer to the end of the current one. For safety, the current buffer
+// will take ownership of the second buffer.
 func (b *Buffer) Join(nb *Buffer) error {
 	end, err := b.getEnd()
 	if err != nil {

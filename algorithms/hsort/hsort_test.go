@@ -7,10 +7,11 @@ import (
 	"time"
 )
 
-// sorter is the main interface for this test package. It allows for different types to be used with the same sorting
-// test harness.
+// sorter is the main interface for this test package. It allows for different types to be used with
+// the same sorting test harness.
 type sorter interface {
-	// Build will build a list to sort. If isHash is true, the range of values should be kept low to allow for hash sorting.
+	// Build will build a list to sort. If isHash is true, the range of values should be kept low to
+	// allow for hash sorting.
 	Build(length int, isHash bool)
 
 	// Sort will sort the list using the sorting function in development.
@@ -161,8 +162,8 @@ func TestBogo(t *testing.T) {
 	testBadArg(t, Bogo)
 	testBadList(t, Bogo)
 
-	// Make sure that our functions sort correctly.
-	// We're using extremely small list sizes and only 2 iterations because this algorithm is so comically inefficient.
+	// Make sure that our functions sort correctly. We're using extremely small list sizes and only
+	// 2 iterations because this algorithm is so comically inefficient.
 	i := intSort{sortInt: BogoInt}
 	testSort(t, &i, 2, 10, false, "BogoInt")
 

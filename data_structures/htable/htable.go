@@ -1,6 +1,7 @@
-// Package htable is a data structure of rows and columns, with each row having the same number of items and each column
-// holding the same type of data. The tables provide easy, fast construction and lookup of uniform lists. Following the
-// go convention, all data within a column must have the same static type.
+// Package htable is a data structure of rows and columns, with each row having the same number of
+// items and each column holding the same type of data. The tables provide easy, fast construction
+// and lookup of uniform lists. Following the go convention, all data within a column must have the
+// same static type.
 package htable
 
 import (
@@ -30,7 +31,8 @@ type Table struct {
 	rows    *hlist.List    // Linked list of rows
 }
 
-// New creates a new table. headers denotes the name of each column. Each header names must be unique and not empty.
+// New creates a new table. headers denotes the name of each column. Each header names must be
+// unique and not empty.
 func New(headers ...string) (*Table, error) {
 	if len(headers) == 0 {
 		return nil, fmt.Errorf("missing column headers")
@@ -105,8 +107,8 @@ func (t *Table) RemoveRow(index int) error {
 
 	row := t.rows.Remove(index)
 	if row == nil {
-		// hlist.Remove will return the value at the index. Because our rows can never be nil, if we receive a nil
-		// value, then it means an error occurred.
+		// hlist.Remove will return the value at the index. Because our rows can never be nil, if we
+		// receive a nil value, then it means an error occurred.
 		return fmt.Errorf("failed to remove row %v", index)
 	}
 
@@ -241,7 +243,8 @@ func (t *Table) Headers() []string {
 	return headers
 }
 
-// Rows returns the number of rows in the table, or -1 on error. This includes all rows, regardless of enabled status.
+// Rows returns the number of rows in the table, or -1 on error. This includes all rows, regardless
+// of enabled status.
 func (t *Table) Rows() int {
 	if t == nil {
 		return -1
@@ -303,8 +306,8 @@ func (t *Table) Columns() int {
 	return len(t.headers)
 }
 
-// Count returns the number of items in the table, or -1 on error. This includes all items, regardless of enabled
-// status.
+// Count returns the number of items in the table, or -1 on error. This includes all items,
+// regardless of enabled status.
 func (t *Table) Count() int {
 	c := t.Columns()
 	r := t.Rows()
@@ -329,8 +332,8 @@ func (t *Table) Same(nt *Table) bool {
 	return false
 }
 
-// Row returns the index and Row of the first enabled row that contains the item in the specified column, or -1 and nil
-// if not found or error.
+// Row returns the index and Row of the first enabled row that contains the item in the specified
+// column, or -1 and nil if not found or error.
 func (t *Table) Row(header string, item interface{}) (int, *Row) {
 	if t == nil {
 		return -1, nil
@@ -362,9 +365,9 @@ func (t *Table) Row(header string, item interface{}) (int, *Row) {
 		row := v.(*Row)
 		if row.enabled {
 			if reflect.DeepEqual(item, row.items[c]) {
-				// Break out of the list iteration. If Yield's goroutine has already exited (because the list was fully
-				// traversed), then it won't receive the message to quit. We'll try to send the quit message, and then
-				// we'll exit.
+				// Break out of the list iteration. If Yield's goroutine has already exited (because
+				// the list was fully traversed), then it won't receive the message to quit. We'll
+				// try to send the quit message, and then we'll exit.
 				select {
 				case quit <- struct{}{}:
 				default:
@@ -401,8 +404,8 @@ func (t *Table) Item(header string, index int) interface{} {
 	return row.Item(i)
 }
 
-// Matches returns true if the value matches the item at the specified coordinates or false if there is no match.
-// Matching can occur on disabled rows.
+// Matches returns true if the value matches the item at the specified coordinates or false if there
+// is no match. Matching can occur on disabled rows.
 func (t *Table) Matches(header string, index int, value interface{}) bool {
 	item := t.Item(header, index)
 	if item == nil {
@@ -412,7 +415,8 @@ func (t *Table) Matches(header string, index int, value interface{}) bool {
 	return reflect.DeepEqual(value, item)
 }
 
-// Toggle sets the row at the specified index to either be checked or skipped during table lookups (like Row and Count).
+// Toggle sets the row at the specified index to either be checked or skipped during table lookups
+// (like Row and Count).
 func (t *Table) Toggle(index int, enabled bool) error {
 	if t == nil {
 		return errBadTable
@@ -429,7 +433,8 @@ func (t *Table) Toggle(index int, enabled bool) error {
 	return nil
 }
 
-// WriteCSV converts the table into rows of comma-separated values, with each row delineated by \r\n newlines.
+// WriteCSV converts the table into rows of comma-separated values, with each row delineated by \r\n
+// newlines.
 func (t *Table) WriteCSV() string {
 	if t == nil || t.Rows() < 1 {
 		return ""
@@ -530,8 +535,8 @@ func (r *Row) Item(index int) interface{} {
 	return r.items[index]
 }
 
-// Matches returns true if the value matches the item in the specified column or false if there is no match.
-// Matching can occur on disabled rows.
+// Matches returns true if the value matches the item in the specified column or false if there is
+// no match. Matching can occur on disabled rows.
 func (r *Row) Matches(index int, value interface{}) bool {
 	item := r.Item(index)
 	if item == nil {
@@ -560,7 +565,8 @@ func (t *Table) validateRow(r *Row) error {
 		// Validate the types.
 		typeof := reflect.TypeOf(item)
 		if t.Rows() == 0 {
-			// This is the first row being added to the table. It will set the type of each column in the table.
+			// This is the first row being added to the table. It will set the type of each column
+			// in the table.
 			t.types[i] = typeof
 		} else if typeof != t.types[i] {
 			return fmt.Errorf("item %v's type (%v) does not match column's prototype (%v)", i, typeof, t.types[i])

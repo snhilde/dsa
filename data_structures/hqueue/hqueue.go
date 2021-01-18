@@ -22,7 +22,8 @@ func New() *Queue {
 	return q
 }
 
-// Add adds one or more new items to the back of the queue. The items will be added in the order provided.
+// Add adds one or more new items to the back of the queue. The items will be added in the order
+// provided.
 func (q *Queue) Add(items ...interface{}) error {
 	if q == nil {
 		return errBadQueue
@@ -75,8 +76,8 @@ func (q *Queue) Copy() (*Queue, error) {
 	return nq, nil
 }
 
-// Merge adds a queue behind the current queue, preserving order. This will take ownership of and clear the provided
-// queue.
+// Merge adds a queue behind the current queue, preserving order. This will take ownership of and
+// clear the provided queue.
 func (q *Queue) Merge(nq *Queue) error {
 	if q == nil {
 		return errBadQueue

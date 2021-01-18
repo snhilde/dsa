@@ -35,8 +35,8 @@ func New() Tree {
 	return t
 }
 
-// Add inserts a value into the tree at the provided index. If an item already exists at the index, then it is replaced
-// with the new item.
+// Add inserts a value into the tree at the provided index. If an item already exists at the index,
+// then it is replaced with the new item.
 func (t *Tree) Add(value interface{}, index int) error {
 	if t == nil {
 		return errBadTree
@@ -46,8 +46,8 @@ func (t *Tree) Add(value interface{}, index int) error {
 	return t.AddItems(item)
 }
 
-// AddItems inserts one or more items into the tree. If an item already exists at a given index, then it is replaced
-// with the new item.
+// AddItems inserts one or more items into the tree. If an item already exists at a given index,
+// then it is replaced with the new item.
 func (t *Tree) AddItems(items ...Item) error {
 	if t == nil {
 		return errBadTree
@@ -108,9 +108,9 @@ func (t *Tree) Remove(index int) {
 
 	var swap *tnode
 	if node.left != nil && node.right != nil {
-		// The node we need to remove has two children. We need to find and promote the node with the next highest
-		// index. We'll start by finding the node we need to swap up and keeping track of the path to it for potential
-		// rebalance operations later.
+		// The node we need to remove has two children. We need to find and promote the node with
+		// the next highest index. We'll start by finding the node we need to swap up and keeping
+		// track of the path to it for potential rebalance operations later.
 		substack := hstack.New()
 		for swap = node.right; swap.left != nil; swap = swap.left {
 			substack.Add(swap)
@@ -119,8 +119,8 @@ func (t *Tree) Remove(index int) {
 		// Link in the left side. This won't change anything below the node that we're swapping up.
 		swap.left = node.left
 
-		// Link in the right side (if needed). This can change the sub-branch if the swap node had a node on its right
-		// side, and a rebalance/rotation might be needed.
+		// Link in the right side (if needed). This can change the sub-branch if the swap node had a
+		// node on its right side, and a rebalance/rotation might be needed.
 		if substack.Count() > 0 {
 			parent := substack.Pop().(*tnode)
 			parent.left = swap.right
@@ -130,8 +130,9 @@ func (t *Tree) Remove(index int) {
 
 		index = swap.index()
 	} else {
-		// The node we need to remove has either one child or no children. Either way, the removal process is the same.
-		// First, we need to figure out what node (if any) will replace this node.
+		// The node we need to remove has either one child or no children. Either way, the removal
+		// process is the same. First, we need to figure out what node (if any) will replace this
+		// node.
 		if node.left != nil {
 			swap = node.left
 		} else {
@@ -144,7 +145,8 @@ func (t *Tree) Remove(index int) {
 		// We need to replace the root node.
 		t.root = swap
 	} else {
-		// We need to link in the swapped node by getting its parent and putting it on the appropriate side.
+		// We need to link in the swapped node by getting its parent and putting it on the
+		// appropriate side.
 		parent := stack.Pop().(*tnode)
 		if index < parent.index() {
 			parent.left = swap
@@ -208,8 +210,8 @@ func (t *Tree) Match(value interface{}) bool {
 
 	for item := range itemChan {
 		if reflect.DeepEqual(value, item.value) {
-			// Close the communication and return true. If Yield has finished sending everything, then it won't be
-			// listening on quit anymore.
+			// Close the communication and return true. If Yield has finished sending everything,
+			// then it won't be listening on quit anymore.
 			select {
 			case quit <- struct{}{}:
 			default:
@@ -248,9 +250,10 @@ func (t *Tree) Max() Item {
 	return node.item
 }
 
-// Yield provides an unbuffered channel that will continually pass successive items as the tree is traversed in sorted
-// order. The channel quit is used to communicate when iteration should be stopped. Send an empty struct (struct{}{}) on
-// the channel to break the communication. If this is not needed, pass nil.
+// Yield provides an unbuffered channel that will continually pass successive items as the tree is
+// traversed in sorted order. The channel quit is used to communicate when iteration should be
+// stopped. Send an empty struct (struct{}{}) on the channel to break the communication. If this is
+// not needed, pass nil.
 func (t *Tree) Yield(quit <-chan struct{}) <-chan Item {
 	if t == nil || t.Count() == 0 {
 		return nil
@@ -297,7 +300,8 @@ func (t *Tree) List() []Item {
 		return nil
 	}
 
-	// By using values passed in a channel, we can be sure that the internal values are safe and not modifiable.
+	// By using values passed in a channel, we can be sure that the internal values are safe and not
+	// modifiable.
 	itemChan := t.Yield(nil)
 	if itemChan == nil {
 		return nil
@@ -313,10 +317,11 @@ func (t *Tree) List() []Item {
 	return list
 }
 
-// DFS traverses the tree in a depth-first search pattern and returns all values in the order encountered.
+// DFS traverses the tree in a depth-first search pattern and returns all values in the order
+// encountered.
 func (t *Tree) DFS() []interface{} {
-	// Even though we could use other methods here like List or Yield, we're going to do a direct implementation for
-	// better performance.
+	// Even though we could use other methods here like List or Yield, we're going to do a direct
+	// implementation for better performance.
 	if t == nil || t.Count() == 0 {
 		return nil
 	}
@@ -343,7 +348,8 @@ func (t *Tree) DFS() []interface{} {
 	return values
 }
 
-// BFS traverses the tree in a breadth-first search pattern and returns all values in the order encountered.
+// BFS traverses the tree in a breadth-first search pattern and returns all values in the order
+// encountered.
 func (t *Tree) BFS() []interface{} {
 	if t == nil || t.Count() == 0 {
 		return nil
@@ -369,9 +375,10 @@ func (t *Tree) BFS() []interface{} {
 	return values
 }
 
-// LeftCenterRight traverses the tree in a left-center-right search pattern and returns all values in the order
-// encountered. When a node is reached, this descends to the left first, then reads the value at the current node, then
-// descends to the right. This is equivalent to a depth-first search.
+// LeftCenterRight traverses the tree in a left-center-right search pattern and returns all values
+// in the order encountered. When a node is reached, this descends to the left first, then reads the
+// value at the current node, then descends to the right. This is equivalent to a depth-first
+// search.
 func (t *Tree) LeftCenterRight() []interface{} {
 	if t == nil || t.Count() == 0 {
 		return nil
@@ -398,9 +405,9 @@ func (t *Tree) LeftCenterRight() []interface{} {
 	return values
 }
 
-// CenterLeftRight traverses the tree in a center-left-right search pattern and returns all values in the order
-// encountered. When a node is reached, this reads the value at the current node first, then descends to the left, then
-// descends to the right.
+// CenterLeftRight traverses the tree in a center-left-right search pattern and returns all values
+// in the order encountered. When a node is reached, this reads the value at the current node first,
+// then descends to the left, then descends to the right.
 func (t *Tree) CenterLeftRight() []interface{} {
 	if t == nil || t.Count() == 0 {
 		return nil
@@ -427,9 +434,9 @@ func (t *Tree) CenterLeftRight() []interface{} {
 	return values
 }
 
-// LeftRightCenter traverses the tree in a left-right-center search pattern and returns all values in the order
-// encountered. When a node is reached, this descends to the left first, then descends to the right, then reads the
-// value at the current node.
+// LeftRightCenter traverses the tree in a left-right-center search pattern and returns all values
+// in the order encountered. When a node is reached, this descends to the left first, then descends
+// to the right, then reads the value at the current node.
 func (t *Tree) LeftRightCenter() []interface{} {
 	type wrapper struct {
 		node      *tnode
@@ -468,9 +475,10 @@ func (t *Tree) LeftRightCenter() []interface{} {
 	return values
 }
 
-// RightCenterLeft traverses the tree in a right-center-left search pattern and returns all values in the order
-// encountered. When a node is reached, this descends to the right first, then reads the value at the current node, then
-// descends to the left. This is equivalent to a reverse depth-first search.
+// RightCenterLeft traverses the tree in a right-center-left search pattern and returns all values
+// in the order encountered. When a node is reached, this descends to the right first, then reads
+// the value at the current node, then descends to the left. This is equivalent to a reverse
+// depth-first search.
 func (t *Tree) RightCenterLeft() []interface{} {
 	if t == nil || t.Count() == 0 {
 		return nil
@@ -497,9 +505,9 @@ func (t *Tree) RightCenterLeft() []interface{} {
 	return values
 }
 
-// CenterRightLeft traverses the tree in a center-right-left search pattern and returns all values in the order
-// encountered. When a node is reached, this reads the value at the current node first, then descends to the right, then
-// descends to the left.
+// CenterRightLeft traverses the tree in a center-right-left search pattern and returns all values
+// in the order encountered. When a node is reached, this reads the value at the current node first,
+// then descends to the right, then descends to the left.
 func (t *Tree) CenterRightLeft() []interface{} {
 	if t == nil || t.Count() == 0 {
 		return nil
@@ -526,9 +534,9 @@ func (t *Tree) CenterRightLeft() []interface{} {
 	return values
 }
 
-// RightLeftCenter traverses the tree in a right-left-center search pattern and returns all values in the order
-// encountered. When a node is reached, this descends to the right first, then descends to the left, then reads the
-// value at the current node.
+// RightLeftCenter traverses the tree in a right-left-center search pattern and returns all values
+// in the order encountered. When a node is reached, this descends to the right first, then descends
+// to the left, then reads the value at the current node.
 func (t *Tree) RightLeftCenter() []interface{} {
 	type wrapper struct {
 		node     *tnode
@@ -668,7 +676,8 @@ func (n *tnode) rightCount() int {
 	return 0
 }
 
-// Item is the type for each item in the tree. It holds the value of the item and its index for sorting.
+// Item is the type for each item in the tree. It holds the value of the item and its index for
+// sorting.
 type Item struct {
 	value interface{}
 	index int
@@ -724,8 +733,9 @@ func (i *Item) SetIndex(index int) error {
 	return nil
 }
 
-// findNode will iterate down a tree until it finds a matching index. If no matching index is found, then this returns
-// nil for the node. Additionally, it builds a stack of all the nodes traversed along the way.
+// findNode will iterate down a tree until it finds a matching index. If no matching index is found,
+// then this returns nil for the node. Additionally, it builds a stack of all the nodes traversed
+// along the way.
 func (n *tnode) findNode(index int) (*tnode, *hstack.Stack) {
 	stack := hstack.New()
 
@@ -746,8 +756,8 @@ func (n *tnode) findNode(index int) (*tnode, *hstack.Stack) {
 	return node, stack
 }
 
-// rebalance calculates the balances of the nodes in the path and performs any necessary rotation operations to
-// rebalance the branch.
+// rebalance calculates the balances of the nodes in the path and performs any necessary rotation
+// operations to rebalance the branch.
 func rebalance(stack *hstack.Stack) *tnode {
 	var node *tnode
 	for stack.Count() > 0 {
@@ -760,8 +770,8 @@ func rebalance(stack *hstack.Stack) *tnode {
 			continue
 		}
 
-		// We have an imbalance. Rotate the nodes to fix this. This will change the root node of this sub-branch, so
-		// we'll need to link it back in after the rotation operation is done.
+		// We have an imbalance. Rotate the nodes to fix this. This will change the root node of
+		// this sub-branch, so we'll need to link it back in after the rotation operation is done.
 		rotated := rotate(node)
 		if stack.Count() == 0 {
 			// We're at the top of the tree.
@@ -782,13 +792,15 @@ func rebalance(stack *hstack.Stack) *tnode {
 
 // rotate performs the necessary rotations to rebalance the tree from this node down.
 func rotate(top *tnode) *tnode {
-	// When rebalancing, we only really care about two nodes: the node that first had the -2 or 2 imbalance and the node
-	// directly below it on the insertion side. We'll call these the top node and bottom node. The top node was sent as
-	// the first argument to this function. We'll get the bottom node in a bit.
-	// To rebalance the tree, we're going to rearrange some nodes around a single node, an operation commonly referred
-	// to as a rotation. We'll need to do either a single rotation or a double rotation. If the insertion path is on the
-	// same side of both the top and bottom node, then we need to do only a single rotation. If the sides are different,
-	// then we'll need to do a double rotation.
+	// When rebalancing, we only really care about two nodes: the node that first had the -2 or 2
+	// imbalance and the node directly below it on the insertion side. We'll call these the top node
+	// and bottom node. The top node was sent as the first argument to this function. We'll get the
+	// bottom node in a bit.
+	// To rebalance the tree, we're going to rearrange some nodes around a single node, an operation
+	// commonly referred to as a rotation. We'll need to do either a single rotation or a double
+	// rotation. If the insertion path is on the same side of both the top and bottom node, then we
+	// need to do only a single rotation. If the sides are different, then we'll need to do a double
+	// rotation.
 	var bottom *tnode
 	var left bool
 	var double bool
@@ -808,8 +820,9 @@ func rotate(top *tnode) *tnode {
 	}
 
 	if double {
-		// The insertion path is on different sides of the top and bottom nodes, so we have to do a double rotation.
-		// We'll do the unique part first here, and then we'll do the common part below.
+		// The insertion path is on different sides of the top and bottom nodes, so we have to do a
+		// double rotation. We'll do the unique part first here, and then we'll do the common part
+		// below.
 		oldBottom := bottom
 		if left {
 			newBottom := oldBottom.right

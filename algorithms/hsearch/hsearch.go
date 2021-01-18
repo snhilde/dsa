@@ -20,14 +20,17 @@ func LinearInt(haystack []int, needle int) (int, error) {
 	return -1, fmt.Errorf("not found")
 }
 
-// BinaryInt finds needle's position in haystack (which must be sorted). The search progresses binarily.
+// BinaryInt finds needle's position in haystack (which must be sorted). The search progresses
+// binarily.
 func BinaryInt(haystack []int, needle int) (int, error) {
 	// We're going to follow this sequence:
 	// 1. Calculate start and end indices for the block where we want to search.
 	// 2. Determine where the middle of this block is.
 	//     2a. If the middle is the node we're looking for, return that index.
-	//     2b. If it's greater than the value we're looking for, shift the block down so the end is right before it.
-	//     2c. If it's less than the value we're looking for, shift the block up so the beginning is right after it.
+	//     2b. If it's greater than the value we're looking for, shift the block down so the end is
+	//         right before it.
+	//     2c. If it's less than the value we're looking for, shift the block up so the beginning is
+	//         right after it.
 	if len(haystack) < 1 {
 		return -1, fmt.Errorf("invalid haystack size")
 	}

@@ -15,9 +15,9 @@ type CharSet struct {
 	padding rune
 }
 
-// NewCharSet creates a new CharSet based on the provided character set. The values in the provided set should be
-// organized in ascending order, so that the lowest value is first and the highest value is last. For example, a
-// hexadecimal set would start with '0' and end with 'F'.
+// NewCharSet creates a new CharSet based on the provided character set. The values in the provided
+// set should be organized in ascending order, so that the lowest value is first and the highest
+// value is last. For example, a hexadecimal set would start with '0' and end with 'F'.
 func NewCharSet(set []rune) (CharSet, error) {
 	length := len(set)
 	if length == 0 {

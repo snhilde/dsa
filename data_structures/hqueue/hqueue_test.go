@@ -264,7 +264,8 @@ func TestMerge(t *testing.T) {
 	checkString(t, tmp, "<empty>")
 	checkCount(t, tmp, 0)
 
-	// Test merging an invalid queue on top of a good one. Merge should succeed, but everything should remain untouched.
+	// Test merging an invalid queue on top of a good one. Merge should succeed, but everything
+	// should remain untouched.
 	var nq *hqueue.Queue
 	checkString(t, nq, "<nil>")
 	checkCount(t, nq, -1)
@@ -277,7 +278,8 @@ func TestMerge(t *testing.T) {
 	checkString(t, nq, "<nil>")
 	checkCount(t, nq, -1)
 
-	// Test merging a good queue on top of a bad one. Merge should fail, and everything should remain untouched.
+	// Test merging a good queue on top of a bad one. Merge should fail, and everything should
+	// remain untouched.
 	if err := nq.Merge(q); err == nil {
 		t.Error("unexpectedly passed merge on top of bad queue test")
 	}

@@ -1,6 +1,6 @@
 package htree
-// We want to keep this in the htree package so that we can access the interal nodes in the tree to check balance and
-// height.
+// We want to keep this in the htree package so that we can access the interal nodes in the tree to
+// check balance and height.
 
 import (
 	"fmt"
@@ -190,10 +190,10 @@ func TestAddItems(t *testing.T) {
 	testCount(t, tr, 100000)
 	testHeightBalance(t, tr)
 
-	// Test that setting a new value for an item doesn't affect the tree's value until the item is added to the tree
-	// again. We're going to get a value from the tree, change its value, and then grab it again to make sure nothing's
-	// changed. After that, we're going to add the item again at the same index and then grab it again to make sure the
-	// value has been updated.
+	// Test that setting a new value for an item doesn't affect the tree's value until the item is
+	// added to the tree again. We're going to get a value from the tree, change its value, and then
+	// grab it again to make sure nothing's changed. After that, we're going to add the item again
+	// at the same index and then grab it again to make sure the value has been updated.
 	tr.Clear()
 	tr, items = buildMiscTree(500)
 	testCount(t, tr, 500)
@@ -227,18 +227,18 @@ func TestAddItems(t *testing.T) {
 func TestBalance(t *testing.T) {
 	tr := New()
 
-	// By adding numbers from low to high, we're only going to be performing single left rotations during the
-	// rebalances. This will test specifically that single left rotations properly rebalance the branch. We're going to
-	// test the balance after every addition.
+	// By adding numbers from low to high, we're only going to be performing single left rotations
+	// during the rebalances. This will test specifically that single left rotations properly
+	// rebalance the branch. We're going to test the balance after every addition.
 	for i := 1; i < 1000; i++ {
 		tr.Add(i, i)
 		testCount(t, tr, i)
 		testHeightBalance(t, tr)
 	}
 
-	// By adding numbers from high to low, we're only going to be performing single right rotations during the
-	// rebalances. This will test specifically that single right rotations properly rebalance the branch. We're going to
-	// test the balance after every addition.
+	// By adding numbers from high to low, we're only going to be performing single right rotations
+	// during the rebalances. This will test specifically that single right rotations properly
+	// rebalance the branch. We're going to test the balance after every addition.
 	tr.Clear()
 	for i := 1000; i > 0; i-- {
 		tr.Add(i, i)
@@ -246,8 +246,8 @@ func TestBalance(t *testing.T) {
 		testHeightBalance(t, tr)
 	}
 
-	// Now let's run through trees of increasing size to make sure that all sizes within the range are properly balanced
-	// and have the correct height at each node.
+	// Now let's run through trees of increasing size to make sure that all sizes within the range
+	// are properly balanced and have the correct height at each node.
 	for i := 1; i < 1000; i++ {
 		tr, _ := buildNumTree(i, true)
 		testHeightBalance(t, tr)
@@ -422,9 +422,9 @@ func TestRemove(t *testing.T) {
 	testString(t, tr, "1, 2, 3")
 	testHeightBalance(t, tr)
 
-	// Now that everything looks good, let's set up a large table with non-sequential indexes and remove all nodes from
-	// it. We're going to put all the indexes into a hash table so we can have random look up when deciding which node
-	// to remove next.
+	// Now that everything looks good, let's set up a large table with non-sequential indexes and
+	// remove all nodes from it. We're going to put all the indexes into a hash table so we can have
+	// random look up when deciding which node to remove next.
 	count = 10000
 	indexMap := make(map[int]bool, count)
 	tr, items := buildMiscTree(count)
@@ -566,8 +566,8 @@ func TestMatch(t *testing.T) {
 	tr := New()
 	r := newRand()
 
-	// Make two lists of 500 items each. One list will be added to the tree, and the other won't. We'll then check that
-	// the added ones do match and the not-added ones don't match.
+	// Make two lists of 500 items each. One list will be added to the tree, and the other won't.
+	// We'll then check that the added ones do match and the not-added ones don't match.
 	presentItems := make([]Item, 500)
 	absentItems := make([]Item, 500)
 	for i := 0; i < 1000; i++ {
@@ -595,8 +595,8 @@ func TestMatch(t *testing.T) {
 		}
 	}
 
-	// Make sure that none of these items match. (There's a very low probablity that we'll have a value collision with
-	// r.Int(), and we can just run the tests again if we do).
+	// Make sure that none of these items match. (There's a very low probablity that we'll have a
+	// value collision with r.Int(), and we can just run the tests again if we do).
 	for i, item := range absentItems {
 		if tr.Match(item.GetValue()) {
 			t.Error("Unexpected item at index", i)
@@ -630,8 +630,8 @@ func TestMatch(t *testing.T) {
 		}
 	}
 
-	// Make sure that none of these items match. (There's a very low probablity that we'll have a value collision with
-	// r.Int(), and we can just run the tests again if we do).
+	// Make sure that none of these items match. (There's a very low probablity that we'll have a
+	// value collision with r.Int(), and we can just run the tests again if we do).
 	for i, item := range absentItems {
 		if tr.Match(item.GetValue()) {
 			t.Error("Unexpected item at index", i)
@@ -871,11 +871,12 @@ func TestBFS(t *testing.T) {
 		return
 	}
 
-	// We can use this simple formula to manually build the correct values for a tree whose count is one less than a
-	// power of 2:
+	// We can use this simple formula to manually build the correct values for a tree whose count is
+	// one less than a power of 2:
 	// 1. The first level of the tree is the power of 2 down minus 1.
-	// 2. Build out every level after that by going through the nodes from the previous level and adding and subtracting
-	//    the current step, which is decremented every level to the next power of 2 down.
+	// 2. Build out every level after that by going through the nodes from the previous level and
+	//    adding and subtracting the current step, which is decremented every level to the next power
+	//    of 2 down.
 	// 3. Add each level to the master list.
 	count := 65535
 	root := count / 2
@@ -1267,8 +1268,8 @@ func testHeightBalance(t *testing.T, tr Tree) {
 	}
 }
 
-// testBalance checks whether or not all the nodes in the tree have the correct balance and returns the longest
-// sub-branch at this node.
+// testBalance checks whether or not all the nodes in the tree have the correct balance and returns
+// the longest sub-branch at this node.
 func testBalance(t *testing.T, node *tnode) int {
 	if node == nil {
 		return 0
@@ -1308,8 +1309,8 @@ func testBalance(t *testing.T, node *tnode) int {
 	return height
 }
 
-// testTraversal runs through a tree traversal using the specified Tree method and checks that the output is the same as
-// expected. This uses only int types.
+// testTraversal runs through a tree traversal using the specified Tree method and checks that the
+// output is the same as expected. This uses only int types.
 func testTraversal(t *testing.T, method func(*Tree) []interface{}, expect []int) {
 	tr, _ := buildNumTree(len(expect), false)
 	testCount(t, tr, len(expect))
@@ -1340,8 +1341,8 @@ func newRand() *rand.Rand {
 	return random
 }
 
-// buildNumTree creates a new tree and populates it with count items, either randomly or by iterating from low to high.
-// It returns the new tree as well as the indexes of all the items.
+// buildNumTree creates a new tree and populates it with count items, either randomly or by
+// iterating from low to high. It returns the new tree as well as the indexes of all the items.
 func buildNumTree(count int, random bool) (Tree, []int) {
 	tr := New()
 	indexes := make([]int, count)
@@ -1364,8 +1365,8 @@ func buildNumTree(count int, random bool) (Tree, []int) {
 	return tr, indexes
 }
 
-// buildMiscTree creates a new tree and populates it with count items with random values of various types. It returns
-// the new tree as well as all the items.
+// buildMiscTree creates a new tree and populates it with count items with random values of various
+// types. It returns the new tree as well as all the items.
 func buildMiscTree(count int) (Tree, []Item) {
 	if count < 1 {
 		return Tree{}, nil

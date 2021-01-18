@@ -22,9 +22,9 @@ func New() *Stack {
 	return s
 }
 
-// Add adds one or more new items to the top of the stack. Items are pushed in order, so the first argument is pushed
-// first, and the second, second, and so on. This means that the last argument to Add will be the first item returned
-// with Pop.
+// Add adds one or more new items to the top of the stack. Items are pushed in order, so the first
+// argument is pushed first, and the second, second, and so on. This means that the last argument to
+// Add will be the first item returned with Pop.
 func (s *Stack) Add(items ...interface{}) error {
 	if s == nil {
 		return errBadStack
@@ -83,7 +83,8 @@ func (s *Stack) Copy() (*Stack, error) {
 	return ns, nil
 }
 
-// Merge adds a stack on top of the current stack. This will take ownership of and clear the provided stack.
+// Merge adds a stack on top of the current stack. This will take ownership of and clear the
+// provided stack.
 func (s *Stack) Merge(ns *Stack) error {
 	if s == nil {
 		return errBadStack
@@ -92,7 +93,8 @@ func (s *Stack) Merge(ns *Stack) error {
 		return nil
 	}
 
-	// If we have the same stack, then we need to duplicate it first, or else the stack will get cleared at the end.
+	// If we have the same stack, then we need to duplicate it first, or else the stack will get
+	// cleared at the end.
 	if s.Same(ns) {
 		dup, err := s.Copy()
 		if err != nil {
@@ -132,8 +134,8 @@ func (s *Stack) Same(ns *Stack) bool {
 	return s.list.Same(ns.list)
 }
 
-// String displays the stack's contents, from the top to the bottom, with the top item being at the beginning of the
-// string and the bottom item at the end.
+// String displays the stack's contents, from the top to the bottom, with the top item being at the
+// beginning of the string and the bottom item at the end.
 func (s *Stack) String() string {
 	if s == nil {
 		return "<nil>"

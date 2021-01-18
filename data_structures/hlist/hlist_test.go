@@ -1161,7 +1161,8 @@ func TestYieldAll(t *testing.T) {
 	checkString(t, l, "1, 2, 3.14")
 	checkLength(t, l, 3)
 
-	// Test that YieldAll() returns each item in a buffered channel but does not alter the list in any way.
+	// Test that YieldAll() returns each item in a buffered channel but does not alter the list in
+	// any way.
 	ch := l.YieldAll()
 	if ch == nil {
 		t.Error("Failed to receive channel")
@@ -1465,8 +1466,9 @@ func TestSortStr(t *testing.T) {
 	checkString(t, l, "ᄀ, ᄑ∢, ᄑ∢䑄㌳, 䑄, 䑄㌳")
 	checkLength(t, l, 5)
 
-	// Test Unicode characters and ASCII characters. The following runes will be appended to the list in this order:
-	// "U+4444 U+3333", "U+1111 U+2222", "A U+1111 U+2222 U+4444 U+3333", "U+1111 U+2222 U+4444 U+3333", "U+1100", "U+4444", "U+1111 U+2222 A"
+	// Test Unicode characters and ASCII characters. The following runes will be appended to the
+	// list in this order: "U+4444 U+3333", "U+1111 U+2222", "A U+1111 U+2222 U+4444 U+3333",
+	// "U+1111 U+2222 U+4444 U+3333", "U+1100", "U+4444", "U+1111 U+2222 A"
 	l.Clear()
 	l.Append("䑄㌳", "ᄑ∢", "Aᄑ∢䑄㌳", "ᄑ∢䑄㌳", "ᄀ", "䑄", "ᄑ∢A")
 	checkString(t, l, "䑄㌳, ᄑ∢, Aᄑ∢䑄㌳, ᄑ∢䑄㌳, ᄀ, 䑄, ᄑ∢A")
