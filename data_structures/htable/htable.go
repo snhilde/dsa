@@ -5,9 +5,15 @@ package htable
 
 import (
 	"fmt"
-	"github.com/snhilde/dsa/data_structures/hlist"
 	"reflect"
 	"strings"
+
+	"github.com/snhilde/dsa/data_structures/hlist"
+)
+
+const (
+	nilTableString   = "<nil>"
+	emptyTableString = "<empty>"
 )
 
 var (
@@ -136,15 +142,15 @@ func (t *Table) ColumnToIndex(header string) int {
 // String returns a formatted list of the items in the table, row by row.
 func (t *Table) String() string {
 	if t == nil {
-		return "<nil>"
+		return nilTableString
 	} else if t.Count() == 0 {
-		return "<empty>"
+		return emptyTableString
 	}
 
 	var b strings.Builder
 	rowChan := t.rows.Yield(nil)
 	if rowChan == nil {
-		return "<empty>"
+		return emptyTableString
 	}
 
 	for r := range rowChan {
@@ -163,7 +169,7 @@ func (t *Table) String() string {
 
 	s := b.String()
 	if s == "" {
-		s = "<empty>"
+		s = emptyTableString
 	}
 
 	return strings.TrimSuffix(s, ", ")
@@ -478,9 +484,9 @@ func NewRow(items ...interface{}) *Row {
 // String returns a formatted list of the items in the row.
 func (r *Row) String() string {
 	if r == nil {
-		return "<nil>"
+		return nilTableString
 	} else if len(r.items) == 0 {
-		return "<empty>"
+		return emptyTableString
 	}
 
 	var b strings.Builder
