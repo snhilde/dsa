@@ -9,7 +9,9 @@ env:
 
 install:
     - go mod download
+    - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
 
 script:
     - make fmt-check
+    - make lint-check-source
     - make test
