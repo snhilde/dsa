@@ -10,18 +10,23 @@ fmt-check:
 		exit 1; \
 	fi;
 
-# Run golint across all .go files. A confidence interval of 0.3 will not error out when files in the package don't have
-# a standard package header comment. If any of the files fail the lint test, then we'll exit with a status of 1. We
-# don't want to exit at the first failure, though, because we want all failures to be logged together.
-.PHONY: lint-check
-lint-check:
-	@failed=0; \
-	for file in $(GOFILES); do \
-		golint -min_confidence 0.3 $$file || failed=1; \
-	done; \
-	if [ $$failed -ne 0 ]; then \
+# Run a large number of linters of various types and purposes across all go source files.
+.PHONY: lint-check-source
+lint-check-source:
+	@if [ ! -f .golangci.yml ]; then \
+		echo "Missing .golangci.yml"; \
 		exit 1; \
-	fi;
+	fi; \
+	golangci-lint run --skip-files ".*_test.*";
+
+# Run a large number of linters of various types and purposes across all go files (including test files).
+.PHONY: lint-check-all
+lint-check-all:
+	@if [ ! -f .golangci.yml ]; then \
+		echo "Missing .golangci.yml"; \
+		exit 1; \
+	fi; \
+	golangci-lint run;
 
 # Run the tests on every package. If any of the tests fail, then we'll exit with a status of 1. We don't want to exit at
 # the first failure, though, because we want all failures to be logged together.
