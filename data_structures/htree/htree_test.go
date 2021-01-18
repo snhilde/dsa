@@ -1,4 +1,6 @@
 package htree
+// We want to keep this in the htree package so that we can access the interal nodes in the tree to check balance and
+// height.
 
 import (
 	"fmt"
@@ -1410,7 +1412,11 @@ func buildValues(count int) []interface{} {
 		case 3:
 			value = rune(r.Int31())
 		case 4:
-			value = string([]byte{byte(r.Int31n(94) + 32), byte(r.Int31n(94) + 32), byte(r.Int31n(94) + 32), byte(r.Int31n(94) + 32)})
+			char1 := byte(r.Int31n(94) + 32)
+			char2 := byte(r.Int31n(94) + 32)
+			char3 := byte(r.Int31n(94) + 32)
+			char4 := byte(r.Int31n(94) + 32)
+			value = string([]byte{char1, char2, char3, char4})
 		case 5:
 			value = []int{r.Int(), r.Int(), r.Int(), r.Int(), r.Int(), r.Int(), r.Int()}
 		}
