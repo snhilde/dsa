@@ -9,10 +9,8 @@ import (
 	"reflect"
 )
 
-var (
-	// errBadLength is the error message for an invalid list size.
-	errBadLength = fmt.Errorf("invalid list size")
-)
+// errBadLength is the error message for an invalid list size.
+var errBadLength = fmt.Errorf("invalid list size")
 
 // Insertion sorts the list using an insertion algorithm. The list must be a slice of a uniform data type.
 func Insertion(list interface{}) error {
