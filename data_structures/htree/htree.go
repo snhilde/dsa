@@ -9,6 +9,11 @@ import (
 	"strings"
 )
 
+const (
+	nilTreeString   = "<nil>"
+	emptyTreeString = "<empty>"
+)
+
 var (
 	// This is the standard error message when trying to use an invalid tree.
 	errBadTree = fmt.Errorf("tree must be created with New() first")
@@ -564,14 +569,14 @@ func (t *Tree) RightLeftCenter() []interface{} {
 // String returns a printable representation of the items in the tree in sorted order.
 func (t *Tree) String() string {
 	if t == nil {
-		return "<nil>"
+		return nilTreeString
 	} else if t.Count() == 0 {
-		return "<empty>"
+		return emptyTreeString
 	}
 
 	itemChan := t.Yield(nil)
 	if itemChan == nil {
-		return "<nil>"
+		return nilTreeString
 	}
 
 	var b strings.Builder
@@ -748,23 +753,27 @@ func rebalance(stack *hstack.Stack) *tnode {
 		node = stack.Pop().(*tnode)
 		updateHeight(node)
 		balance := node.balance()
-		if balance < -1 || balance > 1 {
-			// We have an imbalance. Rotate the nodes to fix this. This will change the root node of this sub-branch, so
-			// we'll need to link it back in after the rotation operation is done.
-			rotated := rotate(node)
-			if stack.Count() == 0 {
-				// We're at the top of the tree.
-				node = rotated
-			} else {
-				node = stack.Pop().(*tnode)
-				if rotated.index() < node.index() {
-					node.left = rotated
-				} else {
-					node.right = rotated
-				}
-			}
-			updateHeight(node)
+
+		if balance > -2 && balance < 2 {
+			// Nothing to do. Keep going up.
+			continue
 		}
+
+		// We have an imbalance. Rotate the nodes to fix this. This will change the root node of this sub-branch, so
+		// we'll need to link it back in after the rotation operation is done.
+		rotated := rotate(node)
+		if stack.Count() == 0 {
+			// We're at the top of the tree.
+			node = rotated
+		} else {
+			node = stack.Pop().(*tnode)
+			if rotated.index() < node.index() {
+				node.left = rotated
+			} else {
+				node.right = rotated
+			}
+		}
+		updateHeight(node)
 	}
 
 	return node
