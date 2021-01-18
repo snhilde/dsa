@@ -63,7 +63,6 @@ func (t *Tree) AddItems(items ...Item) error {
 		if t.root == nil {
 			t.root = newNode(item)
 			t.count++
-
 			continue
 		}
 
@@ -72,7 +71,6 @@ func (t *Tree) AddItems(items ...Item) error {
 		if node != nil {
 			// We found a matching index. We only need to update the node's value.
 			node.item = item
-
 			continue
 		}
 
