@@ -1,4 +1,5 @@
 package htree
+
 // We want to keep this in the htree package so that we can access the interal nodes in the tree to
 // check balance and height.
 
