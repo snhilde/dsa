@@ -3,13 +3,12 @@ package hqueue
 
 import (
 	"fmt"
+
 	"github.com/snhilde/dsa/data_structures/hlist"
 )
 
-var (
-	// This is the standard error message when trying to use an invalid queue.
-	errBadQueue = fmt.Errorf("must create queue with New() first")
-)
+// This is the standard error message when trying to use an invalid queue.
+var errBadQueue = fmt.Errorf("must create queue with New() first")
 
 // Queue is the main type for this package. It holds the internal information about the queue.
 type Queue struct {
