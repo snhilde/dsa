@@ -9,10 +9,7 @@ env:
 
 install:
     - go mod download
-    - go get golang.org/x/lint/golint
-    - go install golang.org/x/lint/golint
 
 script:
     - make fmt-check
-    - make lint-check
     - make test
