@@ -7,10 +7,8 @@ import (
 	"strings"
 )
 
-var (
-	// This is the standard error message when trying to use an invalid list.
-	errBadList = fmt.Errorf("list must be created with New() first")
-)
+// This is the standard error message when trying to use an invalid list.
+var errBadList = fmt.Errorf("list must be created with New() first")
 
 // List is the main type for this package. It holds the internal information about the linked list.
 type List struct {
