@@ -3,10 +3,11 @@ package htree
 
 import (
 	"fmt"
-	"github.com/snhilde/dsa/data_structures/hqueue"
-	"github.com/snhilde/dsa/data_structures/hstack"
 	"reflect"
 	"strings"
+
+	"github.com/snhilde/dsa/data_structures/hqueue"
+	"github.com/snhilde/dsa/data_structures/hstack"
 )
 
 const (
@@ -62,6 +63,7 @@ func (t *Tree) AddItems(items ...Item) error {
 		if t.root == nil {
 			t.root = newNode(item)
 			t.count++
+
 			continue
 		}
 
@@ -70,6 +72,7 @@ func (t *Tree) AddItems(items ...Item) error {
 		if node != nil {
 			// We found a matching index. We only need to update the node's value.
 			node.item = item
+
 			continue
 		}
 
@@ -607,7 +610,7 @@ func (t *Tree) Height() int {
 	return t.root.height
 }
 
-// Internal structure of tree nodes
+// tnode is an internal structure for tree nodes.
 type tnode struct {
 	item   Item
 	height int    // Longest height of subtree from this node down
