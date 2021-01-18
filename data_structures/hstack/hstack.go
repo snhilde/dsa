@@ -3,13 +3,12 @@ package hstack
 
 import (
 	"fmt"
+
 	"github.com/snhilde/dsa/data_structures/hlist"
 )
 
-var (
-	// This is the standard error message when trying to use an invalid stack.
-	errBadStack = fmt.Errorf("must create stack with New() first")
-)
+// This is the standard error message when trying to use an invalid stack.
+var errBadStack = fmt.Errorf("must create stack with New() first")
 
 // Stack is the main type for this package. It holds the internal information about the stack.
 type Stack struct {
