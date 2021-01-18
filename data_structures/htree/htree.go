@@ -81,7 +81,7 @@ func (t *Tree) AddItems(items ...Item) error {
 
 		// Add the parent back to the stack and rebalance the tree (if needed).
 		stack.Add(parent)
-		t.root = rebalance(stack, true)
+		t.root = rebalance(stack)
 	}
 
 	return nil
@@ -119,7 +119,7 @@ func (t *Tree) Remove(index int) {
 			parent := substack.Pop().(*tnode)
 			parent.left = swap.right
 			substack.Add(parent)
-			swap.right = rebalance(substack, false)
+			swap.right = rebalance(substack)
 		}
 
 		index = swap.index()
@@ -152,7 +152,7 @@ func (t *Tree) Remove(index int) {
 
 	// Finally, check the rest of the path for any needed rotations.
 	stack.Add(swap)
-	t.root = rebalance(stack, false)
+	t.root = rebalance(stack)
 
 	t.count--
 }
@@ -742,7 +742,7 @@ func (n *tnode) findNode(index int) (*tnode, *hstack.Stack) {
 
 // rebalance calculates the balances of the nodes in the path and performs any necessary rotation operations to
 // rebalance the branch.
-func rebalance(stack *hstack.Stack, added bool) *tnode {
+func rebalance(stack *hstack.Stack) *tnode {
 	var node *tnode
 	for stack.Count() > 0 {
 		node = stack.Pop().(*tnode)
