@@ -297,7 +297,8 @@ func (t *Table) Columns() int {
 	return len(t.headers)
 }
 
-// Count returns the number of items in the table, or -1 on error. This includes all items, regardless of enabled status.
+// Count returns the number of items in the table, or -1 on error. This includes all items, regardless of enabled
+// status.
 func (t *Table) Count() int {
 	c := t.Columns()
 	r := t.Rows()
@@ -516,11 +517,7 @@ func (r *Row) Count() int {
 
 // Item returns the item's value at the specified index in this row, or nil if not found or error.
 func (r *Row) Item(index int) interface{} {
-	if r == nil {
-		return nil
-	} else if index < 0 {
-		return nil
-	} else if index >= len(r.items) {
+	if r == nil || index < 0 || index >= len(r.items) {
 		return nil
 	}
 
@@ -559,11 +556,8 @@ func (t *Table) validateRow(r *Row) error {
 		if t.Rows() == 0 {
 			// This is the first row being added to the table. It will set the type of each column in the table.
 			t.types[i] = typeof
-		} else {
-			// Make sure the type of this element matches the prototype.
-			if typeof != t.types[i] {
-				return fmt.Errorf("item %v's type (%v) does not match column's prototype (%v)", i, typeof, t.types[i])
-			}
+		} else if typeof != t.types[i] {
+			return fmt.Errorf("item %v's type (%v) does not match column's prototype (%v)", i, typeof, t.types[i])
 		}
 	}
 
