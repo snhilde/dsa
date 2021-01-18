@@ -16,7 +16,7 @@ type List struct {
 	length int
 }
 
-// internal type for an individual node in the list
+// hnode is an internal type for an individual node in the list.
 type hnode struct {
 	item interface{}
 	next *hnode
@@ -241,7 +241,8 @@ func (l *List) Twin(list2 *List) bool {
 	return true
 }
 
-// Merge appends the list to the current list, preserving order. This will take ownership of and clear the provided list.
+// Merge appends the list to the current list, preserving order. This will take ownership of and clear the provided
+// list.
 func (l *List) Merge(list2 *List) error {
 	if l == nil {
 		return errBadList
@@ -433,7 +434,7 @@ func (l *List) SortStr() error {
 	})
 }
 
-// internal convenience function for creating a new node
+// newNode is an internal convenience function for creating a new node.
 func newNode(item interface{}) *hnode {
 	node := new(hnode)
 	node.item = item
@@ -466,9 +467,11 @@ func buildChain(items []interface{}) (*hnode, *hnode, int) {
 func (l *List) getPrior(index int) (*hnode, error) {
 	if l == nil {
 		return nil, errBadList
-	} else if index < 0 {
+	}
+	if index < 0 {
 		return nil, fmt.Errorf("invalid index")
-	} else if index > l.length {
+	}
+	if index > l.length {
 		return nil, fmt.Errorf("out of bounds")
 	}
 
