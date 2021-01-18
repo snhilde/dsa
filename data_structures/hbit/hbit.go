@@ -8,10 +8,8 @@ import (
 	"strings"
 )
 
-var (
-	// This is the standard error message when trying to use an invalid buffer.
-	errBadBuf = fmt.Errorf("must create bit buffer with New() first")
-)
+// This is the standard error message when trying to use an invalid buffer.
+var errBadBuf = fmt.Errorf("must create bit buffer with New() first")
 
 // Buffer is the main type for this package. It holds the internal information about the bit buffer.
 type Buffer struct {
