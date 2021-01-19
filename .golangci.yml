@@ -34,7 +34,6 @@ linters:
     - makezero         # Finds slice declarations with non-zero initial length.
     - maligned         # Finds structs that would take less memory if their fields were sorted.
     - misspell         # Finds commonly misspelled English words in comments.
-    - nakedret         # Finds naked returns in functions greater than a specified function length.
     - nestif           # Reports deeply nested if statements.
     - noctx            # Finds http requests without context.Context.
     - nolintlint       # Reports ill-formed or insufficient nolint directives.
@@ -56,6 +55,7 @@ linters:
     - unused           # Finds unused constants, variables, functions, and types
     - varcheck         # Finds unused global variables and constants.
     - whitespace       # Finds leading and trailing whitespace.
+
   disable:
     - errcheck         # Finds unchecked errors.
     - exhaustive       # Checks exhaustiveness of enum switch statements.
@@ -65,6 +65,7 @@ linters:
     - gocritic         # The most opinionated Go source code linter.
     - goerr113         # Checks the errors handling expressions.
     - gomnd            # Detects magic numbers.
+    - nakedret         # Finds naked returns in functions greater than a specified function length.
     - nlreturn         # Checks for a new line before return and branch statements.
     - wrapcheck        # Checks that errors returned from external packages are wrapped.
     - wsl              # Forces you to use empty lines.
@@ -75,3 +76,47 @@ output:
 linters-settings:
   funlen:
     lines: 80 # Increase the maximum allowed lines in a function from 60 to 80.
+
+issues:
+  exclude-rules:
+    # lll: line is NNN characters
+    # (This function definition is necessarily long due to the many named return values.)
+    - path: algorithms/hsort/hsort.go
+      linters: lll
+      source: func initSort
+
+    # gosimple: S1008: should use 'return i >= 0' instead of 'if i < 0 { return false }; return true'
+    # (This is not actually a ternary operation.)
+    - path: data_structures/hlist/hlist.go
+      linters: gosimple
+      source: if i < 0 \{
+
+    # unused: func `(*CharSet).mapEncode` is unused
+    # (This is currently in development.)
+    - path: algorithms/hconvert/charset.go
+      linters: unused
+      source: func \(c \*CharSet\) mapEncode
+
+
+    # -- We are going to ignore these linter warnings because we want to keep the merge algorithm
+    # -- intact so as to increase understandability:
+
+    # nestif: `if b.merge` is deeply nested (complexity: 7)
+    - path: algorithms/hsort/hsort.go
+      linters: nestif
+      source: if b\.merge \{
+
+    # funlen: Function 'Merge' is too long (90 > 80)
+    - path: algorithms/hsort/hsort.go
+      linters: funlen
+      source: func Merge
+
+    # funlen: Function 'Sort' is too long (88 > 80)
+    - path: data_structures/hlist/hlist.go
+      linters: funlen
+      source: func \(l \*List\) Sort
+
+    # gocognit: cognitive complexity 37 of func `(*List).Sort` is high (> 30)
+    - path: data_structures/hlist/hlist.go
+      linters: gocognit
+      source: func \(l \*List\) Sort
