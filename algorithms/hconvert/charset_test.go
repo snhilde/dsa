@@ -9,6 +9,8 @@ import (
 
 // Test creating a new CharSet.
 func TestNewCharSet(t *testing.T) {
+	t.Parallel()
+
 	set := []rune{'a', 'b', 'c'}
 	charSet, err := hconvert.NewCharSet(set)
 	if err != nil {
@@ -52,6 +54,8 @@ func TestNewCharSet(t *testing.T) {
 
 // Test setting and getting the padding character.
 func TestPadding(t *testing.T) {
+	t.Parallel()
+
 	charSet := hconvert.Base64CharSet()
 
 	// Base64 defaults to a padding character of '='.
@@ -74,6 +78,8 @@ func TestPadding(t *testing.T) {
 
 // Test that the length is being reported correctly.
 func TestLength(t *testing.T) {
+	t.Parallel()
+
 	// Test a regular set of 36 characters.
 	set := []rune{
 		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
@@ -109,6 +115,8 @@ func TestLength(t *testing.T) {
 
 // Test that the correct character is returned.
 func TestCharacters(t *testing.T) {
+	t.Parallel()
+
 	// Test a regular set of 36 characters.
 	set := []rune{
 		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
@@ -144,6 +152,8 @@ func TestCharacters(t *testing.T) {
 
 // Test that the string representation of the character set is correct.
 func TestString(t *testing.T) {
+	t.Parallel()
+
 	// Test a regular set of 36 characters.
 	set := []rune{
 		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
@@ -179,6 +189,8 @@ func TestString(t *testing.T) {
 
 // Test that the constant character sets have not changed.
 func TestConsts(t *testing.T) {
+	t.Parallel()
+
 	ascii := hconvert.ASCIICharSet()
 	asciiTest := []rune{
 		0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
