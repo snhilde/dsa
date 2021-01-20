@@ -36,17 +36,14 @@ func TestNewCharSet(t *testing.T) {
 			t.Error("Difference at index", i, ":", v, "!=", newSet[i])
 		}
 	}
-}
 
-// Test creating a character set that is longer than the max.
-func TestCharSetLength(t *testing.T) {
-	set := make([]rune, maxChars+1)
-	for i := range set {
-		set[i] = rune(i)
+	// Test creating a character set that is longer than the max.
+	longSet := make([]rune, maxChars+1)
+	for i := range longSet {
+		longSet[i] = rune(i)
 	}
 
-	_, err := NewCharSet(set)
-	if err == nil {
+	if _, err := NewCharSet(longSet); err == nil {
 		t.Error("Exceeded maximum CharSet length")
 	}
 }
