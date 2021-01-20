@@ -5,8 +5,8 @@ import (
 )
 
 const (
-	// We are currently only accepting character sets up to 256 in length.
-	maxChars int = 256
+	// MaxNumChars is the maximum number of characters in a character set.
+	MaxNumChars int = 256
 )
 
 // CharSet holds a character set for encoding/decoding.
@@ -22,8 +22,8 @@ func NewCharSet(set []rune) (CharSet, error) {
 	length := len(set)
 	if length == 0 {
 		return CharSet{}, fmt.Errorf("missing character set")
-	} else if length > maxChars {
-		return CharSet{}, fmt.Errorf("maximum of %d characters allowed", maxChars)
+	} else if length > MaxNumChars {
+		return CharSet{}, fmt.Errorf("maximum of %d characters allowed", MaxNumChars)
 	}
 
 	charSet := make([]rune, length)
