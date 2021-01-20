@@ -23,7 +23,7 @@ func NewCharSet(set []rune) (CharSet, error) {
 	if length == 0 {
 		return CharSet{}, fmt.Errorf("missing character set")
 	} else if length > maxChars {
-		return CharSet{}, fmt.Errorf("maximum of 256 characters allowed")
+		return CharSet{}, fmt.Errorf("maximum of %d characters allowed", maxChars)
 	}
 
 	charSet := make([]rune, length)
@@ -53,6 +53,7 @@ func (c *CharSet) Len() int {
 	if c == nil {
 		return -1
 	}
+
 	return len(c.charSet)
 }
 
