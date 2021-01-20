@@ -27,6 +27,8 @@ type sorter interface {
 // --- SORT TESTS ---
 
 func TestInsertion(t *testing.T) {
+	t.Parallel()
+
 	// Make sure that we can only pass a slice of certain types.
 	testBadArg(t, Insertion)
 	testBadList(t, Insertion)
@@ -52,6 +54,8 @@ func TestInsertion(t *testing.T) {
 }
 
 func TestSelection(t *testing.T) {
+	t.Parallel()
+
 	// Make sure that we can only pass a slice of certain types.
 	testBadArg(t, Selection)
 	testBadList(t, Selection)
@@ -77,6 +81,8 @@ func TestSelection(t *testing.T) {
 }
 
 func TestBubble(t *testing.T) {
+	t.Parallel()
+
 	// Make sure that we can only pass a slice of certain types.
 	testBadArg(t, Bubble)
 	testBadList(t, Bubble)
@@ -102,6 +108,8 @@ func TestBubble(t *testing.T) {
 }
 
 func TestMerge(t *testing.T) {
+	t.Parallel()
+
 	// Make sure that we can only pass a slice of certain types.
 	testBadArg(t, Merge)
 	testBadList(t, Merge)
@@ -127,6 +135,8 @@ func TestMerge(t *testing.T) {
 }
 
 func TestMergeOptimized(t *testing.T) {
+	t.Parallel()
+
 	// Make sure that we can only pass a slice of certain types.
 	testBadArg(t, MergeOptimized)
 	testBadList(t, MergeOptimized)
@@ -152,12 +162,16 @@ func TestMergeOptimized(t *testing.T) {
 }
 
 func TestHashInt(t *testing.T) {
+	t.Parallel()
+
 	// Make sure that our function sorts correctly.
 	i := intSort{sortInt: HashInt}
 	testSort(t, &i, 100, 10000, true, "HashInt")
 }
 
 func TestBogo(t *testing.T) {
+	t.Parallel()
+
 	// Make sure that we can only pass a slice of certain types.
 	testBadArg(t, Bogo)
 	testBadList(t, Bogo)
@@ -184,6 +198,8 @@ func TestBogo(t *testing.T) {
 }
 
 func TestBinaryInt(t *testing.T) {
+	t.Parallel()
+
 	// Make sure that our functions sort correctly.
 	i := intSort{sortInt: BinaryInt}
 	testSort(t, &i, 100, 10000, false, "BinaryInt")
