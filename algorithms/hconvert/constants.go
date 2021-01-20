@@ -10,6 +10,7 @@ func ASCIICharSet() CharSet {
 	}
 
 	charSet, _ := NewCharSet(c)
+
 	return charSet
 }
 
@@ -20,6 +21,7 @@ func Base2CharSet() CharSet {
 	}
 
 	charSet, _ := NewCharSet(c)
+
 	return charSet
 }
 
@@ -30,6 +32,7 @@ func Base8CharSet() CharSet {
 	}
 
 	charSet, _ := NewCharSet(c)
+
 	return charSet
 }
 
@@ -40,6 +43,7 @@ func Base10CharSet() CharSet {
 	}
 
 	charSet, _ := NewCharSet(c)
+
 	return charSet
 }
 
@@ -50,6 +54,7 @@ func Base16CharSet() CharSet {
 	}
 
 	charSet, _ := NewCharSet(c)
+
 	return charSet
 }
 
@@ -75,6 +80,7 @@ func Base36CharSet() CharSet {
 	}
 
 	charSet, _ := NewCharSet(c)
+
 	return charSet
 }
 
@@ -88,6 +94,7 @@ func Base58CharSet() CharSet {
 	}
 
 	charSet, _ := NewCharSet(c)
+
 	return charSet
 }
 
@@ -101,6 +108,7 @@ func Base62CharSet() CharSet {
 	}
 
 	charSet, _ := NewCharSet(c)
+
 	return charSet
 }
 
@@ -146,6 +154,7 @@ func ASCII85CharSet() CharSet {
 	}
 
 	charSet, _ := NewCharSet(c)
+
 	return charSet
 }
 
@@ -161,5 +170,6 @@ func Z85CharSet() CharSet {
 	}
 
 	charSet, _ := NewCharSet(c)
+
 	return charSet
 }
