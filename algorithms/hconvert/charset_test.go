@@ -1,14 +1,16 @@
-package hconvert
+package hconvert_test
 
 import (
 	"reflect"
 	"testing"
+
+	"github.com/snhilde/dsa/algorithms/hconvert"
 )
 
 // Test creating a new CharSet.
 func TestNewCharSet(t *testing.T) {
 	set := []rune{'a', 'b', 'c'}
-	charSet, err := NewCharSet(set)
+	charSet, err := hconvert.NewCharSet(set)
 	if err != nil {
 		t.Error(err)
 		return
@@ -38,19 +40,19 @@ func TestNewCharSet(t *testing.T) {
 	}
 
 	// Test creating a character set that is longer than the max.
-	longSet := make([]rune, maxChars+1)
+	longSet := make([]rune, hconvert.MaxNumChars+1)
 	for i := range longSet {
 		longSet[i] = rune(i)
 	}
 
-	if _, err := NewCharSet(longSet); err == nil {
+	if _, err := hconvert.NewCharSet(longSet); err == nil {
 		t.Error("Exceeded maximum CharSet length")
 	}
 }
 
 // Test setting and getting the padding character.
 func TestPadding(t *testing.T) {
-	charSet := Base64CharSet()
+	charSet := hconvert.Base64CharSet()
 
 	// Base64 defaults to a padding character of '='.
 	if charSet.Padding() != '=' {
@@ -78,7 +80,7 @@ func TestLength(t *testing.T) {
 		'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
 		'W', 'X', 'Y', 'Z',
 	}
-	charSet, _ := NewCharSet(set)
+	charSet, _ := hconvert.NewCharSet(set)
 	if charSet.Len() != len(set) {
 		t.Error("Incorrect length (ASCII set)")
 	}
@@ -88,7 +90,7 @@ func TestLength(t *testing.T) {
 		'😂', '😇', '😌', '😗', '😜', 'ė', 'ɦ', 'Ͷ', 'ֆ', 'ࢷ', '௵', 'ລ', 'ጧ', 'ᓶ', 'ᡊ',
 		'ᨖ', 'ᮗ', '₽', '℅', 'Ⅷ', 'ↇ', '⏏', '⏹', '▙', '☪', '☶',
 	}
-	charSet, _ = NewCharSet(set)
+	charSet, _ = hconvert.NewCharSet(set)
 	if charSet.Len() != len(set) {
 		t.Error("Incorrect length (unicode set)")
 	}
@@ -99,7 +101,7 @@ func TestLength(t *testing.T) {
 		'S', '㙇', 'r', '#', '🌼', 'r', '8', 'ㆩ', '☫', '4', '✚', ' ', '❸', '⡇', 'o', '⪴',
 		'3', 'J', '⽗', 'f', '㏙', 'a', '㤪', '䷷', '🌎', 'd', '🌱', '🦉', '🌗',
 	}
-	charSet, _ = NewCharSet(set)
+	charSet, _ = hconvert.NewCharSet(set)
 	if charSet.Len() != len(set) {
 		t.Error("Incorrect length (mixed set)")
 	}
@@ -113,7 +115,7 @@ func TestCharacters(t *testing.T) {
 		'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
 		'W', 'X', 'Y', 'Z',
 	}
-	charSet, _ := NewCharSet(set)
+	charSet, _ := hconvert.NewCharSet(set)
 	if !reflect.DeepEqual(charSet.Characters(), set) {
 		t.Error("ASCII character set not returned")
 	}
@@ -123,7 +125,7 @@ func TestCharacters(t *testing.T) {
 		'😂', '😇', '😌', '😗', '😜', 'ė', 'ɦ', 'Ͷ', 'ֆ', 'ࢷ', '௵', 'ລ', 'ጧ', 'ᓶ', 'ᡊ',
 		'ᨖ', 'ᮗ', '₽', '℅', 'Ⅷ', 'ↇ', '⏏', '⏹', '▙', '☪', '☶',
 	}
-	charSet, _ = NewCharSet(set)
+	charSet, _ = hconvert.NewCharSet(set)
 	if !reflect.DeepEqual(charSet.Characters(), set) {
 		t.Error("Non-ASCII character set not returned")
 	}
@@ -134,7 +136,7 @@ func TestCharacters(t *testing.T) {
 		'S', '㙇', 'r', '#', '🌼', 'r', '8', 'ㆩ', '☫', '4', '✚', ' ', '❸', '⡇', 'o', '⪴',
 		'3', 'J', '⽗', 'f', '㏙', 'a', '㤪', '䷷', '🌎', 'd', '🌱', '🦉', '🌗',
 	}
-	charSet, _ = NewCharSet(set)
+	charSet, _ = hconvert.NewCharSet(set)
 	if !reflect.DeepEqual(charSet.Characters(), set) {
 		t.Error("Mixed character set not returned")
 	}
@@ -148,7 +150,7 @@ func TestString(t *testing.T) {
 		'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
 		'W', 'X', 'Y', 'Z',
 	}
-	charSet, _ := NewCharSet(set)
+	charSet, _ := hconvert.NewCharSet(set)
 	if charSet.String() != string(set) {
 		t.Error("ASCII character set string incorrect")
 	}
@@ -158,7 +160,7 @@ func TestString(t *testing.T) {
 		'😂', '😇', '😌', '😗', '😜', 'ė', 'ɦ', 'Ͷ', 'ֆ', 'ࢷ', '௵', 'ລ', 'ጧ', 'ᓶ', 'ᡊ',
 		'ᨖ', 'ᮗ', '₽', '℅', 'Ⅷ', 'ↇ', '⏏', '⏹', '▙', '☪', '☶',
 	}
-	charSet, _ = NewCharSet(set)
+	charSet, _ = hconvert.NewCharSet(set)
 	if charSet.String() != string(set) {
 		t.Error("Non-ASCII character set string incorrect")
 	}
@@ -169,7 +171,7 @@ func TestString(t *testing.T) {
 		'S', '㙇', 'r', '#', '🌼', 'r', '8', 'ㆩ', '☫', '4', '✚', ' ', '❸', '⡇', 'o', '⪴',
 		'3', 'J', '⽗', 'f', '㏙', 'a', '㤪', '䷷', '🌎', 'd', '🌱', '🦉', '🌗',
 	}
-	charSet, _ = NewCharSet(set)
+	charSet, _ = hconvert.NewCharSet(set)
 	if charSet.String() != string(set) {
 		t.Error("Mixed character set string incorrect")
 	}
@@ -177,7 +179,7 @@ func TestString(t *testing.T) {
 
 // Test that the constant character sets have not changed.
 func TestConsts(t *testing.T) {
-	ascii := ASCIICharSet()
+	ascii := hconvert.ASCIICharSet()
 	asciiTest := []rune{
 		0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
 		20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
@@ -191,7 +193,7 @@ func TestConsts(t *testing.T) {
 		t.Error("ascii character set has changed")
 	}
 
-	base2 := Base2CharSet()
+	base2 := hconvert.Base2CharSet()
 	base2Test := []rune{
 		'0', '1',
 	}
@@ -199,7 +201,7 @@ func TestConsts(t *testing.T) {
 		t.Error("base2 character set has changed")
 	}
 
-	base8 := Base8CharSet()
+	base8 := hconvert.Base8CharSet()
 	base8Test := []rune{
 		'0', '1', '2', '3', '4', '5', '6', '7',
 	}
@@ -207,7 +209,7 @@ func TestConsts(t *testing.T) {
 		t.Error("base8 character set has changed")
 	}
 
-	base10 := Base10CharSet()
+	base10 := hconvert.Base10CharSet()
 	base10Test := []rune{
 		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
 	}
@@ -215,7 +217,7 @@ func TestConsts(t *testing.T) {
 		t.Error("base10 character set has changed")
 	}
 
-	base16 := Base16CharSet()
+	base16 := hconvert.Base16CharSet()
 	base16Test := []rune{
 		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
 	}
@@ -223,7 +225,7 @@ func TestConsts(t *testing.T) {
 		t.Error("base16 character set has changed")
 	}
 
-	base32 := Base32CharSet()
+	base32 := hconvert.Base32CharSet()
 	base32Test := []rune{
 		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
 		'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '2', '3', '4', '5', '6', '7',
@@ -232,7 +234,7 @@ func TestConsts(t *testing.T) {
 		t.Error("base32 character set has changed")
 	}
 
-	base36 := Base36CharSet()
+	base36 := hconvert.Base36CharSet()
 	base36Test := []rune{
 		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
 		'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
@@ -242,7 +244,7 @@ func TestConsts(t *testing.T) {
 		t.Error("base36 character set has changed")
 	}
 
-	base58 := Base58CharSet()
+	base58 := hconvert.Base58CharSet()
 	base58Test := []rune{
 		'1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G',
 		'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y',
@@ -253,7 +255,7 @@ func TestConsts(t *testing.T) {
 		t.Error("base58 character set has changed")
 	}
 
-	base62 := Base62CharSet()
+	base62 := hconvert.Base62CharSet()
 	base62Test := []rune{
 		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
 		'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
@@ -264,7 +266,7 @@ func TestConsts(t *testing.T) {
 		t.Error("base62 character set has changed")
 	}
 
-	base64 := Base64CharSet()
+	base64 := hconvert.Base64CharSet()
 	base64Test := []rune{
 		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
 		'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
@@ -275,7 +277,7 @@ func TestConsts(t *testing.T) {
 		t.Error("base64 character set has changed")
 	}
 
-	base64url := Base64URLCharSet()
+	base64url := hconvert.Base64URLCharSet()
 	base64urlTest := []rune{
 		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
 		'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
@@ -286,7 +288,7 @@ func TestConsts(t *testing.T) {
 		t.Error("base64url character set has changed")
 	}
 
-	ascii85 := ASCII85CharSet()
+	ascii85 := hconvert.ASCII85CharSet()
 	ascii85Test := []rune{
 		'!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', '0',
 		'1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', '@',
@@ -299,7 +301,7 @@ func TestConsts(t *testing.T) {
 		t.Error("aSCII85 character set has changed")
 	}
 
-	z85 := Z85CharSet()
+	z85 := hconvert.Z85CharSet()
 	z85Test := []rune{
 		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f',
 		'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
