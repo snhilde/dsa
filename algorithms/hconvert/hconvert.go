@@ -1,4 +1,5 @@
-// Package hconvert performs base conversion to and from any arbitrary character set (up to 256 runes in length).
+// Package hconvert performs base conversion to and from any arbitrary character set (up to
+// MaxNumChars runes in length).
 package hconvert
 
 import (
