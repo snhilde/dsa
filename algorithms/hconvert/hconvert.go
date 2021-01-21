@@ -78,7 +78,7 @@ func DecodeWith(s string, charSet CharSet) ([]byte, error) {
 		return nil, errNoCharSet
 	}
 
-	// Get the mapping from rune to int for this character set.
+	// Get the rune->int mapping for this character set.
 	decMap := charSet.mapDecode()
 
 	// Binary data that we will decode to.
