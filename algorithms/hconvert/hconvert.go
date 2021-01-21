@@ -188,7 +188,7 @@ func EncodeWith(p []byte, charSet CharSet) (string, error) {
 func (c *Converter) SetDecodeCharSet(charSet CharSet) error {
 	if c == nil {
 		return errBadConverter
-	} else if len(charSet.charSet) == 0 || charSet == (CharSet{}) {
+	} else if len(charSet.charSet) == 0 {
 		return errNoCharSet
 	}
 
@@ -201,7 +201,7 @@ func (c *Converter) SetDecodeCharSet(charSet CharSet) error {
 func (c *Converter) SetEncodeCharSet(charSet CharSet) error {
 	if c == nil {
 		return errBadConverter
-	} else if len(charSet.charSet) == 0 || charSet == (CharSet{}) {
+	} else if len(charSet.charSet) == 0 {
 		return errNoCharSet
 	}
 
