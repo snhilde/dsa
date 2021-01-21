@@ -91,12 +91,6 @@ issues:
       linters: gosimple
       source: if i < 0 \{
 
-    # unused: func `(*CharSet).mapEncode` is unused
-    # (This is currently in development.)
-    - path: algorithms/hconvert/charset.go
-      linters: unused
-      source: func \(c \*CharSet\) mapEncode
-
 
 
     # -- We are going to ignore the linter warnings below because we want to keep the merge
