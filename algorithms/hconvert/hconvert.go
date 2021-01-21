@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"math/big"
+	"strings"
 )
 
 var (
@@ -162,8 +163,25 @@ func EncodeWith(p []byte, charSet CharSet) (string, error) {
 		return "", errNoCharSet
 	}
 
-	// TODO
-	return "", nil
+	// Get the int->rune mapping for this character set.
+	decMap := charSet.mapEncode()
+
+	// Binary data that we will encode.
+	binary := new(big.Int)
+	binary.SetBytes(p)
+
+	// Numerical base of this character set, for determining the appropriate character at each place
+	// in the output string.
+	base := big.NewInt(int64(charSet.Len()))
+
+	// Create a new buffer. It would be nice to grow it to the approximate size that we need for
+	// buffering the encoded characters, but math/big currently does not support logarithmic
+	// calculations (see https://github.com/golang/go/issues/14102).
+	out := new(strings.Builder)
+
+	// TODO: calculate encodings
+
+	return out.String(), nil
 }
 
 // SetDecodeCharSet sets the character set to use for decoding.
