@@ -10,9 +10,9 @@ import (
 )
 
 var (
-	errBadConverter = fmt.Errorf("bad Converter")
+	errBadConverter = fmt.Errorf("invalid converter")
+	errBadCharSet   = fmt.Errorf("invalid character set")
 	errNoCharSet    = fmt.Errorf("no character set provided")
-	errBadCharSet   = fmt.Errorf("character set mismatch")
 )
 
 // Converter holds information about the conversion process, including the specified character sets.
@@ -171,7 +171,7 @@ func (c *Converter) SetDecodeCharSet(charSet CharSet) error {
 	if c == nil {
 		return errBadConverter
 	} else if len(charSet.charSet) == 0 || charSet == (CharSet{}) {
-		return errBadCharSet
+		return errNoCharSet
 	}
 
 	c.decCharSet = charSet
@@ -184,7 +184,7 @@ func (c *Converter) SetEncodeCharSet(charSet CharSet) error {
 	if c == nil {
 		return errBadConverter
 	} else if len(charSet.charSet) == 0 || charSet == (CharSet{}) {
-		return errBadCharSet
+		return errNoCharSet
 	}
 
 	c.encCharSet = charSet
