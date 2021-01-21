@@ -98,8 +98,9 @@ issues:
       source: func \(c \*CharSet\) mapEncode
 
 
-    # -- We are going to ignore these linter warnings because we want to keep the merge algorithm
-    # -- intact so as to increase understandability:
+
+    # -- We are going to ignore the linter warnings below because we want to keep the merge
+    # -- algorithm intact so as to increase understandability:
 
     # nestif: `if b.merge` is deeply nested (complexity: 7)
     - path: algorithms/hsort/hsort.go
