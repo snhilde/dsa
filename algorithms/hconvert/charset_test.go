@@ -50,6 +50,21 @@ func TestNewCharSet(t *testing.T) {
 	if _, err := hconvert.NewCharSet(longSet); err == nil {
 		t.Error("Exceeded maximum CharSet length")
 	}
+
+	// Test that duplicate characters are not allowed for ASCII-only character sets.
+	dupASCIISet := []rune{'a', 'b', 'c', 'a', 'q', 'w', 'e'}
+	if _, err := hconvert.NewCharSet(dupASCIISet); err == nil {
+		t.Error("Duplicate ASCII characters allowed in new character set")
+	}
+
+	// Test that duplicate characters are not allowed for Unicode character sets.
+	dupUncideSet := []rune{
+		'☛', '⥺', '⮶', '$', 'ⴵ', '㙇', '✚', '🌗', '🌼', '❸', '⡇', '⽗', '🌎', '㏙', '🌗', '㤪',
+		'䷷', '🌱', '☫', '🦉', 'ㆩ', '䷷', '🌱', '☫', '🦉', 'ㆩ',
+	}
+	if _, err := hconvert.NewCharSet(dupUncideSet); err == nil {
+		t.Error("Duplicate Unicode characters allowed in new character set")
+	}
 }
 
 // Test setting and getting the padding character.
@@ -86,8 +101,9 @@ func TestLength(t *testing.T) {
 		'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
 		'W', 'X', 'Y', 'Z',
 	}
-	charSet, _ := hconvert.NewCharSet(set)
-	if charSet.Len() != len(set) {
+	if charSet, err := hconvert.NewCharSet(set); err != nil {
+		t.Error(err)
+	} else if charSet.Len() != len(set) {
 		t.Error("Incorrect length (ASCII set)")
 	}
 
@@ -96,19 +112,21 @@ func TestLength(t *testing.T) {
 		'😂', '😇', '😌', '😗', '😜', 'ė', 'ɦ', 'Ͷ', 'ֆ', 'ࢷ', '௵', 'ລ', 'ጧ', 'ᓶ', 'ᡊ',
 		'ᨖ', 'ᮗ', '₽', '℅', 'Ⅷ', 'ↇ', '⏏', '⏹', '▙', '☪', '☶',
 	}
-	charSet, _ = hconvert.NewCharSet(set)
-	if charSet.Len() != len(set) {
+	if charSet, err := hconvert.NewCharSet(set); err != nil {
+		t.Error(err)
+	} else if charSet.Len() != len(set) {
 		t.Error("Incorrect length (unicode set)")
 	}
 
 	// Test a set of mixed ASCII and non-ASCII characters.
 	set = []rune{
-		'l', '☛', 'i', 'k', 's', '⥺', 'q', '⮶', '$', 'ⴵ', 'i', 'f', 'k', 'd', 'j', 'A',
-		'S', '㙇', 'r', '#', '🌼', 'r', '8', 'ㆩ', '☫', '4', '✚', ' ', '❸', '⡇', 'o', '⪴',
-		'3', 'J', '⽗', 'f', '㏙', 'a', '㤪', '䷷', '🌎', 'd', '🌱', '🦉', '🌗',
+		'l', '☛', 'i', 'k', 's', '⥺', 'q', '⮶', '$', 'ⴵ', 'Y', 'f', '(', 'd', 'j', 'A',
+		'S', '㙇', 'r', '#', '🌼', 'R', '8', 'ㆩ', '☫', '4', '✚', ' ', '❸', '⡇', 'o', '⪴',
+		'3', 'J', '⽗', 'Q', '㏙', 'a', '㤪', '䷷', '🌎', '!', '🌱', '🦉', '🌗',
 	}
-	charSet, _ = hconvert.NewCharSet(set)
-	if charSet.Len() != len(set) {
+	if charSet, err := hconvert.NewCharSet(set); err != nil {
+		t.Error(err)
+	} else if charSet.Len() != len(set) {
 		t.Error("Incorrect length (mixed set)")
 	}
 }
@@ -123,8 +141,9 @@ func TestCharacters(t *testing.T) {
 		'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
 		'W', 'X', 'Y', 'Z',
 	}
-	charSet, _ := hconvert.NewCharSet(set)
-	if !reflect.DeepEqual(charSet.Characters(), set) {
+	if charSet, err := hconvert.NewCharSet(set); err != nil {
+		t.Error(err)
+	} else if !reflect.DeepEqual(charSet.Characters(), set) {
 		t.Error("ASCII character set not returned")
 	}
 
@@ -133,19 +152,21 @@ func TestCharacters(t *testing.T) {
 		'😂', '😇', '😌', '😗', '😜', 'ė', 'ɦ', 'Ͷ', 'ֆ', 'ࢷ', '௵', 'ລ', 'ጧ', 'ᓶ', 'ᡊ',
 		'ᨖ', 'ᮗ', '₽', '℅', 'Ⅷ', 'ↇ', '⏏', '⏹', '▙', '☪', '☶',
 	}
-	charSet, _ = hconvert.NewCharSet(set)
-	if !reflect.DeepEqual(charSet.Characters(), set) {
+	if charSet, err := hconvert.NewCharSet(set); err != nil {
+		t.Error(err)
+	} else if !reflect.DeepEqual(charSet.Characters(), set) {
 		t.Error("Non-ASCII character set not returned")
 	}
 
 	// Test a set of mixed ASCII and non-ASCII characters.
 	set = []rune{
-		'l', '☛', 'i', 'k', 's', '⥺', 'q', '⮶', '$', 'ⴵ', 'i', 'f', 'k', 'd', 'j', 'A',
-		'S', '㙇', 'r', '#', '🌼', 'r', '8', 'ㆩ', '☫', '4', '✚', ' ', '❸', '⡇', 'o', '⪴',
-		'3', 'J', '⽗', 'f', '㏙', 'a', '㤪', '䷷', '🌎', 'd', '🌱', '🦉', '🌗',
+		'l', '☛', 'i', 'k', 's', '⥺', 'q', '⮶', '$', 'ⴵ', ']', 'f', '@', 'd', 'j', 'A',
+		'S', '㙇', 'r', '#', '🌼', '\'', '8', 'ㆩ', '☫', '4', '✚', ' ', '❸', '⡇', 'o', '⪴',
+		'3', 'J', '⽗', '.', '㏙', 'a', '㤪', '䷷', '🌎', '%', '🌱', '🦉', '🌗',
 	}
-	charSet, _ = hconvert.NewCharSet(set)
-	if !reflect.DeepEqual(charSet.Characters(), set) {
+	if charSet, err := hconvert.NewCharSet(set); err != nil {
+		t.Error(err)
+	} else if !reflect.DeepEqual(charSet.Characters(), set) {
 		t.Error("Mixed character set not returned")
 	}
 }
@@ -160,8 +181,9 @@ func TestString(t *testing.T) {
 		'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
 		'W', 'X', 'Y', 'Z',
 	}
-	charSet, _ := hconvert.NewCharSet(set)
-	if charSet.String() != string(set) {
+	if charSet, err := hconvert.NewCharSet(set); err != nil {
+		t.Error(err)
+	} else if charSet.String() != string(set) {
 		t.Error("ASCII character set string incorrect")
 	}
 
@@ -170,19 +192,21 @@ func TestString(t *testing.T) {
 		'😂', '😇', '😌', '😗', '😜', 'ė', 'ɦ', 'Ͷ', 'ֆ', 'ࢷ', '௵', 'ລ', 'ጧ', 'ᓶ', 'ᡊ',
 		'ᨖ', 'ᮗ', '₽', '℅', 'Ⅷ', 'ↇ', '⏏', '⏹', '▙', '☪', '☶',
 	}
-	charSet, _ = hconvert.NewCharSet(set)
-	if charSet.String() != string(set) {
+	if charSet, err := hconvert.NewCharSet(set); err != nil {
+		t.Error(err)
+	} else if charSet.String() != string(set) {
 		t.Error("Non-ASCII character set string incorrect")
 	}
 
 	// Test a set of mixed ASCII and non-ASCII characters.
 	set = []rune{
-		'l', '☛', 'i', 'k', 's', '⥺', 'q', '⮶', '$', 'ⴵ', 'i', 'f', 'k', 'd', 'j', 'A',
-		'S', '㙇', 'r', '#', '🌼', 'r', '8', 'ㆩ', '☫', '4', '✚', ' ', '❸', '⡇', 'o', '⪴',
-		'3', 'J', '⽗', 'f', '㏙', 'a', '㤪', '䷷', '🌎', 'd', '🌱', '🦉', '🌗',
+		'l', '☛', 'i', '_', 's', '⥺', 'q', '⮶', '$', 'ⴵ', 'z', 'f', 'k', '7', 'j', 'A',
+		'S', '㙇', 'r', '#', '🌼', 'p', '8', 'ㆩ', '☫', '4', '✚', ' ', '❸', '⡇', 'o', '⪴',
+		'3', 'J', '⽗', 'm', '㏙', 'a', '㤪', '䷷', '🌎', 'd', '🌱', '🦉', '🌗',
 	}
-	charSet, _ = hconvert.NewCharSet(set)
-	if charSet.String() != string(set) {
+	if charSet, err := hconvert.NewCharSet(set); err != nil {
+		t.Error(err)
+	} else if charSet.String() != string(set) {
 		t.Error("Mixed character set string incorrect")
 	}
 }

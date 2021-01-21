@@ -17,13 +17,23 @@ type CharSet struct {
 
 // NewCharSet creates a new CharSet based on the provided character set. The values in the provided
 // set should be organized in ascending order, so that the lowest value is first and the highest
-// value is last. For example, a hexadecimal set would start with '0' and end with 'F'.
+// value is last. For example, a hexadecimal set would start with '0' and end with 'F'. Duplicate
+// characters are not allowed.
 func NewCharSet(set []rune) (CharSet, error) {
 	length := len(set)
 	if length == 0 {
 		return CharSet{}, fmt.Errorf("missing character set")
 	} else if length > MaxNumChars {
 		return CharSet{}, fmt.Errorf("maximum of %d characters allowed", MaxNumChars)
+	}
+
+	// Make sure there are no duplicate characters.
+	dupCheckMap := make(map[rune]bool)
+	for _, c := range set {
+		if dupCheckMap[c] {
+			return CharSet{}, fmt.Errorf("duplicate character in set (%s)", string(c))
+		}
+		dupCheckMap[c] = true
 	}
 
 	charSet := make([]rune, length)
