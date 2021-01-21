@@ -25,6 +25,17 @@ func Base2CharSet() CharSet {
 	return charSet
 }
 
+// Base4CharSet creates a new CharSet with the base4 (quaternary) character set.
+func Base4CharSet() CharSet {
+	c := []rune{
+		'0', '1', '2', '3',
+	}
+
+	charSet, _ := NewCharSet(c)
+
+	return charSet
+}
+
 // Base8CharSet creates a new CharSet with the base8 (octal) character set.
 func Base8CharSet() CharSet {
 	c := []rune{

@@ -237,6 +237,14 @@ func TestConsts(t *testing.T) {
 		t.Error("base2 character set has changed")
 	}
 
+	base4 := hconvert.Base4CharSet()
+	base4Test := []rune{
+		'0', '1', '2', '3',
+	}
+	if !reflect.DeepEqual(base4.Characters(), base4Test) {
+		t.Error("base4 character set has changed")
+	}
+
 	base8 := hconvert.Base8CharSet()
 	base8Test := []rune{
 		'0', '1', '2', '3', '4', '5', '6', '7',
