@@ -17,10 +17,10 @@ var (
 
 // Converter holds information about the conversion process, including the specified character sets.
 type Converter struct {
-	// binary representation of the data
+	// Binary representation of the data.
 	buf []byte
 
-	// character sets to use for decoding and encoding
+	// Character sets to use for decoding and encoding.
 	decCharSet CharSet
 	encCharSet CharSet
 }
@@ -71,25 +71,29 @@ func (c *Converter) DecodeFrom(r io.Reader) error {
 // DecodeWith decodes s with the provided character set and returns the binary data or any error
 // encountered.
 func DecodeWith(s string, charSet CharSet) ([]byte, error) {
-	if charSet.Len() <= 0 {
-		return nil, errNoCharSet
-	} else if s == "" {
+	if s == "" {
 		return []byte{}, nil
+	} else if charSet.Len() == 0 {
+		return nil, errNoCharSet
 	}
 
 	// Get the mapping from rune to int for this character set.
 	decMap := charSet.mapDecode()
 
-	// This is the binary data that we will decode to.
-	binary := big.NewInt(0)
+	// Binary data that we will decode to.
+	binary := new(big.Int)
 
-	// This is the base of this character set and the current index in the string.
+	// Numerical base of this character set, for calculating the value of each character at its
+	// place in the string.
 	base := big.NewInt(int64(charSet.Len()))
-	index := big.NewInt(1)
-	index.Exp(base, big.NewInt(int64(len(s)-1)), big.NewInt(0))
 
-	// This is the decoded value of the current digit.
-	value := big.NewInt(0)
+	// We'll use this to calculate the value of each character at its place in the string. Because
+	// range reads the string from left to right, we have to start with the highest place and move
+	// down to 1. For example, if we have a string of "489" representing a base10 number, then the
+	// starting place is 100, the next place is 10, and the last place is 1. This givs a total value
+	// of (100 * 4) + (10 * 8) + (1 * 9) = 489.
+	place := new(big.Int)
+	place.Exp(base, big.NewInt(int64(len(s)-1)), nil)
 
 	padding := charSet.Padding()
 	for _, r := range s {
@@ -97,17 +101,19 @@ func DecodeWith(s string, charSet CharSet) ([]byte, error) {
 			continue
 		}
 
+		// Figure out the value of this character in the character set.
 		v, ok := decMap[r]
 		if !ok {
 			return nil, errBadCharSet
 		}
 
 		// Add this value to the total sum according to its overall place in the string.
-		value.SetInt64(int64(v))
-		binary.Add(binary, value.Mul(value, index))
+		value := big.NewInt(int64(v))
+		value.Mul(value, place)
+		binary.Add(binary, value)
 
 		// Move down to the next position.
-		index.Mul(index, base)
+		place.Div(place, base)
 	}
 
 	return binary.Bytes(), nil
@@ -150,27 +156,40 @@ func (c *Converter) EncodeTo(w io.Writer) error {
 // EncodeWith encodes p with the provided character set and returns the encoded data or any error
 // encountered.
 func EncodeWith(p []byte, charSet CharSet) (string, error) {
-	if charSet.Len() <= 0 {
-		return "", errNoCharSet
-	} else if len(p) == 0 {
+	if len(p) == 0 {
 		return "", nil
+	} else if charSet.Len() == 0 {
+		return "", errNoCharSet
 	}
 
+	// TODO
 	return "", nil
 }
 
 // SetDecodeCharSet sets the character set to use for decoding.
-func (c *Converter) SetDecodeCharSet(charSet CharSet) {
-	if c != nil {
-		c.decCharSet = charSet
+func (c *Converter) SetDecodeCharSet(charSet CharSet) error {
+	if c == nil {
+		return errBadConverter
+	} else if len(charSet.charSet) == 0 || charSet == (CharSet{}) {
+		return errBadCharSet
 	}
+
+	c.decCharSet = charSet
+
+	return nil
 }
 
 // SetEncodeCharSet sets the character set to use for encoding.
-func (c *Converter) SetEncodeCharSet(charSet CharSet) {
-	if c != nil {
-		c.encCharSet = charSet
+func (c *Converter) SetEncodeCharSet(charSet CharSet) error {
+	if c == nil {
+		return errBadConverter
+	} else if len(charSet.charSet) == 0 || charSet == (CharSet{}) {
+		return errBadCharSet
 	}
+
+	c.encCharSet = charSet
+
+	return nil
 }
 
 // DecodeCharSet returns the CharSet used for decoding.
