@@ -8,6 +8,8 @@ import (
 	"io/ioutil"
 	"math/big"
 	"strings"
+
+	"github.com/snhilde/dsa/data_structures/hstack"
 )
 
 var (
@@ -157,13 +159,22 @@ func (c *Converter) EncodeTo(w io.Writer) error {
 // EncodeWith encodes p with the provided character set and returns the encoded data or any error
 // encountered.
 func EncodeWith(p []byte, charSet CharSet) (string, error) {
+	// Basic strategy:
+	// 1. Set up all the values we need.
+	// 2. While there is data in the buffer:
+	//     a. Calculate the modulus of the current buffer.
+	//     b. Divide the buffer by the base. This effectively "pops" the modulus from the buffer.
+	//     c. Add the modulus to the stack, according to its rune mapping.
+	// 3. Because the modulo operation removes the last character from the buffer, the string is
+	//    going to be reversed. To solve this, we'll pop the values from the stack one-by-one and
+	//    add them to the output buffer, which will reverse the string back to the correct order.
 	if len(p) == 0 {
 		return "", nil
 	} else if charSet.Len() == 0 {
 		return "", errNoCharSet
 	}
 
-	// Get the int->rune mapping for this character set.
+	// int->rune mapping for this character set.
 	decMap := charSet.mapEncode()
 
 	// Binary data that we will encode.
@@ -174,12 +185,28 @@ func EncodeWith(p []byte, charSet CharSet) (string, error) {
 	// in the output string.
 	base := big.NewInt(int64(charSet.Len()))
 
-	// Create a new buffer. It would be nice to grow it to the approximate size that we need for
-	// buffering the encoded characters, but math/big currently does not support logarithmic
-	// calculations (see https://github.com/golang/go/issues/14102).
-	out := new(strings.Builder)
+	// Container to hold the mod value as it's calculated.
+	mod := new(big.Int)
 
-	// TODO: calculate encodings
+	// Stack to hold the string as it's created in reverse order.
+	stack := hstack.New()
+
+	zero := big.NewInt(0)
+	for binary.Cmp(zero) > 0 {
+		// Calculate this position's value (mod) and move down to the next position (divide).
+		binary.DivMod(binary, base, mod)
+
+		// Add the character for this position.
+		// Note: mod can never be greater than base, which is the length of the character set.
+		value := int(mod.Int64())
+		stack.Add(decMap[value])
+	}
+
+	// Write out the string in stack order to reverse it back to the correct order.
+	out := new(strings.Builder)
+	for stack.Count() > 0 {
+		out.WriteRune(stack.Pop().(rune))
+	}
 
 	return out.String(), nil
 }
