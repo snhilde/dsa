@@ -8,6 +8,8 @@ import (
 )
 
 func TestNewConverter(t *testing.T) {
+	t.Parallel()
+
 	// We should be able to create a Converter with any combination of valid or invalid character
 	// sets.
 	enc := hconvert.CharSet{}
@@ -36,31 +38,41 @@ func TestNewConverter(t *testing.T) {
 }
 
 func TestSetDecodeCharSet(t *testing.T) {
+	t.Parallel()
 }
 
 func TestSetEncodeCharSet(t *testing.T) {
+	t.Parallel()
 }
 
 func TestDecodeCharSet(t *testing.T) {
+	t.Parallel()
 }
 
 func TestEncodeCharSet(t *testing.T) {
+	t.Parallel()
 }
 
 func TestDecode(t *testing.T) {
+	t.Parallel()
 }
 
 func TestDecodeFrom(t *testing.T) {
+	t.Parallel()
 }
 
 func TestDecodeWith(t *testing.T) {
+	t.Parallel()
 }
 
 func TestEncode(t *testing.T) {
+	t.Parallel()
 }
 
 func TestEncodeTo(t *testing.T) {
+	t.Parallel()
 }
 
 func TestEncodeWith(t *testing.T) {
+	t.Parallel()
 }
