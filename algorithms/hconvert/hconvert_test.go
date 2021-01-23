@@ -23,30 +23,32 @@ type testSet struct {
 	encodeMe []byte
 }
 
-var (
+const (
 	// This character is not in any of the standard character sets. Decoding with this should fail.
 	invalidChar = "∞"
+)
 
-	// This is the binary equivalent of base10 1,000,000,000. We're going to use this as a common
-	// check for encoding and decoding tests.
-	billion = []byte{59, 154, 202, 0}
-
+var (
 	// These are the common tests for decoding/encoding using the standard characer sets.
+	data = []byte{
+		0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF, 0x00, 0x11, 0x22, 0x33,
+		0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF,
+	}
 	standardTests = []testSet{
-		{hconvert.ASCIICharSet(), "ASCII", string([]byte{3, 92, 107, 20, 0}), billion},
-		{hconvert.Base2CharSet(), "Base2", "111011100110101100101000000000", billion},
-		{hconvert.Base4CharSet(), "Base4", "323212230220000", billion},
-		{hconvert.Base8CharSet(), "Base8", "7346545000", billion},
-		{hconvert.Base10CharSet(), "Base10", "1000000000", billion},
-		{hconvert.Base16CharSet(), "Base16", "3B9ACA00", billion},
-		{hconvert.Base32CharSet(), "Base32", "5ZVSQA", billion},
-		{hconvert.Base36CharSet(), "Base36", "GJDGXS", billion},
-		{hconvert.Base58CharSet(), "Base58", "2XNGAK", billion},
-		{hconvert.Base62CharSet(), "Base62", "BFp3qQ", billion},
-		{hconvert.Base64CharSet(), "Base64", "7msoA", billion},
-		{hconvert.Base64URLCharSet(), "Base64URL", "7msoA", billion},
-		{hconvert.ASCII85CharSet(), "ASCII85", "4.=:l", billion},
-		{hconvert.Z85CharSet(), "Z85", "jdsp(", billion},
+		{hconvert.ASCIICharSet(), "ASCII", string([]byte{4, 70, 69, 51, 98, 53, 60, 111, 60, 0, 17, 17, 12, 104, 69, 43, 25, 111, 8, 76, 106, 87, 60, 102, 119, 93, 127}), data},
+		{hconvert.Base2CharSet(), "Base2", "10010001101000101011001111000100110101011110011011110111100000000000100010010001000110011010001000101010101100110011101111000100010011001101010101011101111001100110111011110111011111111", data},
+		{hconvert.Base4CharSet(), "Base4", "102031011121320212223303132330000010102020303101011111212131320202121222223233030313132323333", data},
+		{hconvert.Base8CharSet(), "Base8", "22150531704653633674000422106321052546357042315253571467367377", data},
+		{hconvert.Base10CharSet(), "Base10", "27898229935051914141545580467023890909217686409246011135", data},
+		{hconvert.Base16CharSet(), "Base16", "123456789ABCDEF00112233445566778899AABBCCDDEEFF", data},
+		{hconvert.Base32CharSet(), "Base32", "SGRLHRGV433YACERDGRCVMZ3YRGNKXPGN33X7", data},
+		{hconvert.Base36CharSet(), "Base36", "9FUQ0DSPUFM2T5124ZH3E11TSLYK2Z12BQ4F", data},
+		{hconvert.Base58CharSet(), "Base58", "71vsZ3PsK9vVJkUU7G7iY1oJSVcoXxFg", data},
+		{hconvert.Base62CharSet(), "Base62", "vLmUeMmpma4rHo3dGSdqrq39w4gK4D1", data},
+		{hconvert.Base64CharSet(), "Base64", "SNFZ4mrze8AESIzRFVmd4iZqrvM3e7/", data},
+		{hconvert.Base64URLCharSet(), "Base64URL", "SNFZ4mrze8AESIzRFVmd4iZqrvM3e7_", data},
+		{hconvert.ASCII85CharSet(), "ASCII85", ";D6Y_Nm?3dN9r21pY8F'SiQu,n`^:", data},
+		{hconvert.Z85CharSet(), "Z85", "qzlU.J)ui^Jo@hg{UnB6O&M#b[-Zp", data},
 	}
 )
 
@@ -306,7 +308,7 @@ func TestDecodeFrom(t *testing.T) {
 		if err != nil {
 			t.Error(test.setName, "-", err)
 		} else if !reflect.DeepEqual(b, test.encodeMe) {
-			t.Error(test.setName, "- Decode failed")
+			t.Error(test.setName, "- DecodeFrom failed")
 			t.Log("Expected:", test.encodeMe)
 			t.Log("Received:", b)
 		}
@@ -317,7 +319,7 @@ func TestDecodeFrom(t *testing.T) {
 		converter.SetDecodeCharSet(test.charSet)
 		reader := strings.NewReader(invalidChar)
 		if _, err := converter.DecodeFrom(reader); err == nil {
-			t.Error(test.setName, "- Decode invalid character passed")
+			t.Error(test.setName, "- DecodeFrom invalid character passed")
 		}
 	}
 }
@@ -331,7 +333,7 @@ func TestDecodeWith(t *testing.T) {
 		if err != nil {
 			t.Error(test.setName, "-", err)
 		} else if !reflect.DeepEqual(b, test.encodeMe) {
-			t.Error(test.setName, "- Decode failed")
+			t.Error(test.setName, "- DecodeWith failed")
 			t.Log("Expected:", test.encodeMe)
 			t.Log("Received:", b)
 		}
@@ -340,7 +342,7 @@ func TestDecodeWith(t *testing.T) {
 	// Test that we can't decode characters not in the character set.
 	for _, test := range standardTests {
 		if _, err := hconvert.DecodeWith(invalidChar, test.charSet); err == nil {
-			t.Error(test.setName, "- Decode invalid character passed")
+			t.Error(test.setName, "- DecodeWith invalid character passed")
 		}
 	}
 }
@@ -378,7 +380,7 @@ func TestEncodeTo(t *testing.T) {
 		}
 
 		if writer.String() != test.decodeMe {
-			t.Error(test.setName, "- Encode failed")
+			t.Error(test.setName, "- EncodeTo failed")
 			t.Log("Expected:", test.encodeMe)
 			t.Log("Received:", writer.String())
 		}
@@ -388,14 +390,13 @@ func TestEncodeTo(t *testing.T) {
 func TestEncodeWith(t *testing.T) {
 	t.Parallel()
 
-	// Test that we can properly encode the binary equivalent of one billion in base10 using the
-	// standard character sets.
+	// Test that we can properly encode the data using the standard character sets.
 	for _, test := range standardTests {
 		s, err := hconvert.EncodeWith(test.encodeMe, test.charSet)
 		if err != nil {
 			t.Error(test.setName, "-", err)
 		} else if s != test.decodeMe {
-			t.Error(test.setName, "- Encode failed")
+			t.Error(test.setName, "- EncodeWith failed")
 			t.Log("Expected:", test.decodeMe)
 			t.Log("Received:", s)
 		}
