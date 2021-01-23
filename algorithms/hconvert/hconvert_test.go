@@ -340,6 +340,23 @@ func TestEncode(t *testing.T) {
 
 func TestEncodeTo(t *testing.T) {
 	t.Parallel()
+
+	// Test that we can properly encode data and write it to the provided io.Writer using a
+	// converter with each of the const character sets
+	converter := new(hconvert.Converter)
+	for _, test := range constTests {
+		converter.SetEncodeCharSet(test.charSet)
+		writer := new(strings.Builder)
+		if err := converter.EncodeTo(test.encodeMe, writer); err != nil {
+			t.Error(test.setName, "-", err)
+		}
+
+		if writer.String() != test.decodeMe {
+			t.Error(test.setName, "- Encode failed")
+			t.Log("Expected:", test.encodeMe)
+			t.Log("Received:", writer.String())
+		}
+	}
 }
 
 func TestEncodeWith(t *testing.T) {
