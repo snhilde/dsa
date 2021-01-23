@@ -74,20 +74,20 @@ func TestPadding(t *testing.T) {
 	charSet := hconvert.Base64CharSet()
 
 	// Base64 defaults to a padding character of '='.
-	if charSet.Padding() != '=' {
-		t.Error("Unset padding character wrong:", string(charSet.Padding()))
+	if charSet.Padding() != "=" {
+		t.Error("Unset padding character wrong:", charSet.Padding())
 	}
 
 	// Let's set it to '&' and try again.
-	charSet.SetPadding('&')
-	if charSet.Padding() != '&' {
-		t.Error("New padding character wrong:", string(charSet.Padding()))
+	charSet.SetPadding("&")
+	if charSet.Padding() != "&" {
+		t.Error("New padding character wrong:", charSet.Padding())
 	}
 
 	// Let's try setting it to an emoji character.
-	charSet.SetPadding('😁')
-	if charSet.Padding() != '😁' {
-		t.Error("Emoji padding character wrong:", string(charSet.Padding()))
+	charSet.SetPadding("😁")
+	if charSet.Padding() != "😁" {
+		t.Error("Emoji padding character wrong:", charSet.Padding())
 	}
 }
 
@@ -227,6 +227,9 @@ func TestConsts(t *testing.T) {
 	if !reflect.DeepEqual(ascii.Characters(), asciiTest) {
 		t.Error("ascii character set has changed")
 	}
+	if ascii.Padding() != "" {
+		t.Error("ascii padding has changed")
+	}
 
 	base2 := hconvert.Base2CharSet()
 	base2Test := []rune{
@@ -234,6 +237,9 @@ func TestConsts(t *testing.T) {
 	}
 	if !reflect.DeepEqual(base2.Characters(), base2Test) {
 		t.Error("base2 character set has changed")
+	}
+	if base2.Padding() != "" {
+		t.Error("base2 padding has changed")
 	}
 
 	base4 := hconvert.Base4CharSet()
@@ -243,6 +249,9 @@ func TestConsts(t *testing.T) {
 	if !reflect.DeepEqual(base4.Characters(), base4Test) {
 		t.Error("base4 character set has changed")
 	}
+	if base4.Padding() != "" {
+		t.Error("base4 padding has changed")
+	}
 
 	base8 := hconvert.Base8CharSet()
 	base8Test := []rune{
@@ -250,6 +259,9 @@ func TestConsts(t *testing.T) {
 	}
 	if !reflect.DeepEqual(base8.Characters(), base8Test) {
 		t.Error("base8 character set has changed")
+	}
+	if base8.Padding() != "" {
+		t.Error("base8 padding has changed")
 	}
 
 	base10 := hconvert.Base10CharSet()
@@ -259,6 +271,9 @@ func TestConsts(t *testing.T) {
 	if !reflect.DeepEqual(base10.Characters(), base10Test) {
 		t.Error("base10 character set has changed")
 	}
+	if base10.Padding() != "" {
+		t.Error("base10 padding has changed")
+	}
 
 	base16 := hconvert.Base16CharSet()
 	base16Test := []rune{
@@ -266,6 +281,9 @@ func TestConsts(t *testing.T) {
 	}
 	if !reflect.DeepEqual(base16.Characters(), base16Test) {
 		t.Error("base16 character set has changed")
+	}
+	if base16.Padding() != "" {
+		t.Error("base16 padding has changed")
 	}
 
 	base32 := hconvert.Base32CharSet()
@@ -276,6 +294,9 @@ func TestConsts(t *testing.T) {
 	if !reflect.DeepEqual(base32.Characters(), base32Test) {
 		t.Error("base32 character set has changed")
 	}
+	if base32.Padding() != "=" {
+		t.Error("base32 padding has changed")
+	}
 
 	base36 := hconvert.Base36CharSet()
 	base36Test := []rune{
@@ -285,6 +306,9 @@ func TestConsts(t *testing.T) {
 	}
 	if !reflect.DeepEqual(base36.Characters(), base36Test) {
 		t.Error("base36 character set has changed")
+	}
+	if base36.Padding() != "" {
+		t.Error("base36 padding has changed")
 	}
 
 	base58 := hconvert.Base58CharSet()
@@ -297,6 +321,9 @@ func TestConsts(t *testing.T) {
 	if !reflect.DeepEqual(base58.Characters(), base58Test) {
 		t.Error("base58 character set has changed")
 	}
+	if base58.Padding() != "" {
+		t.Error("base58 padding has changed")
+	}
 
 	base62 := hconvert.Base62CharSet()
 	base62Test := []rune{
@@ -307,6 +334,9 @@ func TestConsts(t *testing.T) {
 	}
 	if !reflect.DeepEqual(base62.Characters(), base62Test) {
 		t.Error("base62 character set has changed")
+	}
+	if base62.Padding() != "" {
+		t.Error("base62 padding has changed")
 	}
 
 	base64 := hconvert.Base64CharSet()
@@ -319,6 +349,9 @@ func TestConsts(t *testing.T) {
 	if !reflect.DeepEqual(base64.Characters(), base64Test) {
 		t.Error("base64 character set has changed")
 	}
+	if base64.Padding() != "=" {
+		t.Error("base64 padding has changed")
+	}
 
 	base64url := hconvert.Base64URLCharSet()
 	base64urlTest := []rune{
@@ -329,6 +362,9 @@ func TestConsts(t *testing.T) {
 	}
 	if !reflect.DeepEqual(base64url.Characters(), base64urlTest) {
 		t.Error("base64url character set has changed")
+	}
+	if base64url.Padding() != "=" {
+		t.Error("base64url padding has changed")
 	}
 
 	ascii85 := hconvert.ASCII85CharSet()
@@ -343,6 +379,9 @@ func TestConsts(t *testing.T) {
 	if !reflect.DeepEqual(ascii85.Characters(), ascii85Test) {
 		t.Error("aSCII85 character set has changed")
 	}
+	if ascii85.Padding() != "" {
+		t.Error("ascii85 padding has changed")
+	}
 
 	z85 := hconvert.Z85CharSet()
 	z85Test := []rune{
@@ -355,5 +394,8 @@ func TestConsts(t *testing.T) {
 	}
 	if !reflect.DeepEqual(z85.Characters(), z85Test) {
 		t.Error("z85 character set has changed")
+	}
+	if z85.Padding() != "" {
+		t.Error("z85 padding has changed")
 	}
 }

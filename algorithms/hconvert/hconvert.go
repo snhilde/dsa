@@ -134,7 +134,7 @@ func DecodeWith(s string, charSet CharSet) ([]byte, error) {
 
 	padding := charSet.Padding()
 	for _, r := range s {
-		if r == padding {
+		if padding != "" && string(r) == padding {
 			continue
 		}
 

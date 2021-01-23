@@ -77,7 +77,7 @@ func Base32CharSet() CharSet {
 	}
 
 	charSet, _ := NewCharSet(c)
-	charSet.SetPadding('=')
+	charSet.SetPadding("=")
 
 	return charSet
 }
@@ -133,7 +133,7 @@ func Base64CharSet() CharSet {
 	}
 
 	charSet, _ := NewCharSet(c)
-	charSet.SetPadding('=')
+	charSet.SetPadding("=")
 
 	return charSet
 }
@@ -148,7 +148,7 @@ func Base64URLCharSet() CharSet {
 	}
 
 	charSet, _ := NewCharSet(c)
-	charSet.SetPadding('=')
+	charSet.SetPadding("=")
 
 	return charSet
 }

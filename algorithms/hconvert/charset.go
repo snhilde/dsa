@@ -12,7 +12,7 @@ const (
 // CharSet holds a character set for encoding/decoding.
 type CharSet struct {
 	charSet []rune
-	padding rune
+	padding string // This can't be a rune, because a rune's zero-value is a valid padding character.
 }
 
 // NewCharSet creates a new CharSet based on the provided character set. The values in the provided
@@ -43,16 +43,17 @@ func NewCharSet(set []rune) (CharSet, error) {
 }
 
 // Padding returns the current padding character.
-func (c *CharSet) Padding() rune {
-	var pad rune
+func (c *CharSet) Padding() string {
+	var pad string
 	if c != nil {
 		pad = c.padding
 	}
+
 	return pad
 }
 
 // SetPadding sets the padding character to pad.
-func (c *CharSet) SetPadding(pad rune) {
+func (c *CharSet) SetPadding(pad string) {
 	if c != nil {
 		c.padding = pad
 	}
