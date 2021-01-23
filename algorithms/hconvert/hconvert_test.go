@@ -102,7 +102,7 @@ func TestBad(t *testing.T) {
 		t.Error("Failed bad object test for Encode")
 	}
 
-	if err := converter.EncodeTo(new(strings.Builder)); err == nil {
+	if err := converter.EncodeTo([]byte{0x03, 0x04}, new(strings.Builder)); err == nil {
 		t.Error("Failed bad object test for EncodeTo")
 	}
 }

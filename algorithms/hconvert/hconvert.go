@@ -20,9 +20,6 @@ var (
 
 // Converter holds information about the conversion process, including the specified character sets.
 type Converter struct {
-	// Binary representation of the data.
-	buf []byte
-
 	// Character sets to use for decoding and encoding.
 	decCharSet CharSet
 	encCharSet CharSet
@@ -169,17 +166,13 @@ func (c *Converter) Encode(p []byte) (string, error) {
 	return EncodeWith(p, c.encCharSet)
 }
 
-// EncodeTo encodes the internally stored data using the encoding character set and writes it to w.
-func (c *Converter) EncodeTo(w io.Writer) error {
+// EncodeTo encodes p using the encoding character set and writes it to w.
+func (c *Converter) EncodeTo(p []byte, w io.Writer) error {
 	if c == nil {
 		return errBadConverter
 	}
 
-	if len(c.buf) == 0 {
-		return nil
-	}
-
-	encoded, err := c.Encode(c.buf)
+	encoded, err := c.Encode(p)
 	if err != nil {
 		return err
 	}
