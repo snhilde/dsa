@@ -112,7 +112,7 @@ func TestEncodeCharSet(t *testing.T) {
 	dec = hconvert.Base32CharSet()
 	enc = hconvert.Base2CharSet()
 	converter = hconvert.NewConverter(dec, enc)
-	if encSet := converter.EncodeCharSet(); !reflect.DeepEqual(encSet, hconvert.Base32CharSet()) {
+	if encSet := converter.EncodeCharSet(); !reflect.DeepEqual(encSet, hconvert.Base2CharSet()) {
 		t.Error("Failed to retrieve encoding character set when both are set")
 	}
 }
