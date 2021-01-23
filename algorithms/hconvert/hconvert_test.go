@@ -47,10 +47,74 @@ func TestSetEncodeCharSet(t *testing.T) {
 
 func TestDecodeCharSet(t *testing.T) {
 	t.Parallel()
+
+	// Test getting the decoding character set when nothing is set.
+	dec := hconvert.CharSet{}
+	enc := hconvert.CharSet{}
+	converter := hconvert.NewConverter(dec, enc)
+	if decSet := converter.DecodeCharSet(); !reflect.DeepEqual(decSet, hconvert.CharSet{}) {
+		t.Error("Failed to retrieve decoding character set when nothing is set")
+	}
+
+	// Test getting the decoding character set when only that is set.
+	dec = hconvert.Base2CharSet()
+	enc = hconvert.CharSet{}
+	converter = hconvert.NewConverter(dec, enc)
+	if decSet := converter.DecodeCharSet(); !reflect.DeepEqual(decSet, hconvert.Base2CharSet()) {
+		t.Error("Failed to retrieve decoding character set when only that is set")
+	}
+
+	// Test getting the decoding character set when only the encoding one is set.
+	dec = hconvert.CharSet{}
+	enc = hconvert.Base4CharSet()
+	converter = hconvert.NewConverter(dec, enc)
+	if decSet := converter.DecodeCharSet(); !reflect.DeepEqual(decSet, hconvert.CharSet{}) {
+		t.Error("Failed to retrieve decoding character set when only the encoding one is set")
+	}
+
+	// Test getting the decoding character set when both are set.
+	dec = hconvert.Base10CharSet()
+	enc = hconvert.Base8CharSet()
+	converter = hconvert.NewConverter(dec, enc)
+	if decSet := converter.DecodeCharSet(); !reflect.DeepEqual(decSet, hconvert.Base10CharSet()) {
+		t.Error("Failed to retrieve decoding character set when both are set")
+	}
 }
 
 func TestEncodeCharSet(t *testing.T) {
 	t.Parallel()
+
+	// Test getting the encoding character set when nothing is set.
+	dec := hconvert.CharSet{}
+	enc := hconvert.CharSet{}
+	converter := hconvert.NewConverter(dec, enc)
+	if encSet := converter.EncodeCharSet(); !reflect.DeepEqual(encSet, hconvert.CharSet{}) {
+		t.Error("Failed to retrieve encoding character set when nothing is set")
+	}
+
+	// Test getting the encoding character set when only that is set.
+	dec = hconvert.CharSet{}
+	enc = hconvert.Base58CharSet()
+	converter = hconvert.NewConverter(dec, enc)
+	if encSet := converter.EncodeCharSet(); !reflect.DeepEqual(encSet, hconvert.Base58CharSet()) {
+		t.Error("Failed to retrieve encoding character set when only that is set")
+	}
+
+	// Test getting the encoding character set when only the encoding one is set.
+	dec = hconvert.Base64CharSet()
+	enc = hconvert.CharSet{}
+	converter = hconvert.NewConverter(dec, enc)
+	if encSet := converter.EncodeCharSet(); !reflect.DeepEqual(encSet, hconvert.CharSet{}) {
+		t.Error("Failed to retrieve encoding character set when only the encoding one is set")
+	}
+
+	// Test getting the encoding character set when both are set.
+	dec = hconvert.Base32CharSet()
+	enc = hconvert.Base2CharSet()
+	converter = hconvert.NewConverter(dec, enc)
+	if encSet := converter.EncodeCharSet(); !reflect.DeepEqual(encSet, hconvert.Base32CharSet()) {
+		t.Error("Failed to retrieve encoding character set when both are set")
+	}
 }
 
 func TestDecode(t *testing.T) {
