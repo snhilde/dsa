@@ -24,12 +24,15 @@ type testSet struct {
 }
 
 var (
+	// This character is not in any of the standard character sets. Decoding with this should fail.
+	invalidChar = "∞"
+
 	// This is the binary equivalent of base10 1,000,000,000. We're going to use this as a common
 	// check for encoding and decoding tests.
 	billion = []byte{59, 154, 202, 0}
 
-	// These are the common tests for decoding/encoding using the const characer sets.
-	constTests = []testSet{
+	// These are the common tests for decoding/encoding using the standard characer sets.
+	standardTests = []testSet{
 		{hconvert.ASCIICharSet(), "ASCII", string([]byte{3, 92, 107, 20, 0}), billion},
 		{hconvert.Base2CharSet(), "Base2", "111011100110101100101000000000", billion},
 		{hconvert.Base4CharSet(), "Base4", "323212230220000", billion},
@@ -266,10 +269,10 @@ func TestEncodeCharSet(t *testing.T) {
 func TestDecode(t *testing.T) {
 	t.Parallel()
 
-	// Test that we can properly decode the data using a converter with each of the const character
-	// sets.
+	// Test that we can properly decode the data using a converter with each of the standard
+	// character sets.
 	converter := new(hconvert.Converter)
-	for _, test := range constTests {
+	for _, test := range standardTests {
 		converter.SetDecodeCharSet(test.charSet)
 		b, err := converter.Decode(test.decodeMe)
 		if err != nil {
@@ -280,15 +283,23 @@ func TestDecode(t *testing.T) {
 			t.Log("Received:", b)
 		}
 	}
+
+	// Test that we can't decode characters not in the character set.
+	for _, test := range standardTests {
+		converter.SetDecodeCharSet(test.charSet)
+		if _, err := converter.Decode(invalidChar); err == nil {
+			t.Error(test.setName, "- Decode invalid character passed")
+		}
+	}
 }
 
 func TestDecodeFrom(t *testing.T) {
 	t.Parallel()
 
 	// Test that we can properly read and decode data from the provided io.Reader using a converter
-	// with each of the const character sets
+	// with each of the standard character sets
 	converter := new(hconvert.Converter)
-	for _, test := range constTests {
+	for _, test := range standardTests {
 		converter.SetDecodeCharSet(test.charSet)
 		reader := strings.NewReader(test.decodeMe)
 		b, err := converter.DecodeFrom(reader)
@@ -300,13 +311,22 @@ func TestDecodeFrom(t *testing.T) {
 			t.Log("Received:", b)
 		}
 	}
+
+	// Test that we can't decode characters not in the character set.
+	for _, test := range standardTests {
+		converter.SetDecodeCharSet(test.charSet)
+		reader := strings.NewReader(invalidChar)
+		if _, err := converter.DecodeFrom(reader); err == nil {
+			t.Error(test.setName, "- Decode invalid character passed")
+		}
+	}
 }
 
 func TestDecodeWith(t *testing.T) {
 	t.Parallel()
 
-	// Test that we can properly decode the data using the const character sets.
-	for _, test := range constTests {
+	// Test that we can properly decode the data using the standard character sets.
+	for _, test := range standardTests {
 		b, err := hconvert.DecodeWith(test.decodeMe, test.charSet)
 		if err != nil {
 			t.Error(test.setName, "-", err)
@@ -316,15 +336,22 @@ func TestDecodeWith(t *testing.T) {
 			t.Log("Received:", b)
 		}
 	}
+
+	// Test that we can't decode characters not in the character set.
+	for _, test := range standardTests {
+		if _, err := hconvert.DecodeWith(invalidChar, test.charSet); err == nil {
+			t.Error(test.setName, "- Decode invalid character passed")
+		}
+	}
 }
 
 func TestEncode(t *testing.T) {
 	t.Parallel()
 
-	// Test that we can properly encode the data using a converter with each of the const character
-	// sets.
+	// Test that we can properly encode the data using a converter with each of the standard
+	// character sets.
 	converter := new(hconvert.Converter)
-	for _, test := range constTests {
+	for _, test := range standardTests {
 		converter.SetEncodeCharSet(test.charSet)
 		s, err := converter.Encode(test.encodeMe)
 		if err != nil {
@@ -341,9 +368,9 @@ func TestEncodeTo(t *testing.T) {
 	t.Parallel()
 
 	// Test that we can properly encode data and write it to the provided io.Writer using a
-	// converter with each of the const character sets
+	// converter with each of the standard character sets
 	converter := new(hconvert.Converter)
-	for _, test := range constTests {
+	for _, test := range standardTests {
 		converter.SetEncodeCharSet(test.charSet)
 		writer := new(strings.Builder)
 		if err := converter.EncodeTo(test.encodeMe, writer); err != nil {
@@ -362,8 +389,8 @@ func TestEncodeWith(t *testing.T) {
 	t.Parallel()
 
 	// Test that we can properly encode the binary equivalent of one billion in base10 using the
-	// const character sets.
-	for _, test := range constTests {
+	// standard character sets.
+	for _, test := range standardTests {
 		s, err := hconvert.EncodeWith(test.encodeMe, test.charSet)
 		if err != nil {
 			t.Error(test.setName, "-", err)
