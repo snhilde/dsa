@@ -8,6 +8,45 @@ import (
 	"github.com/snhilde/dsa/algorithms/hconvert"
 )
 
+// testSet holds the information for running decoding/encoding tests.
+type testSet struct {
+	// Character set to use for the conversion.
+	charSet hconvert.CharSet
+
+	// Name of the character set.
+	setName string
+
+	// String to decode.
+	decodeMe string
+
+	// Data to encode.
+	encodeMe []byte
+}
+
+var (
+	// This is the binary equivalent of base10 1,000,000,000. We're going to use this as a common
+	// check for encoding and decoding tests.
+	billion = []byte{59, 154, 202, 0}
+
+	// These are the common tests for decoding/encoding using the const characer sets.
+	constTests = []testSet{
+		{hconvert.ASCIICharSet(), "ASCII", string([]byte{3, 92, 107, 20, 0}), billion},
+		{hconvert.Base2CharSet(), "Base2", "111011100110101100101000000000", billion},
+		{hconvert.Base4CharSet(), "Base4", "323212230220000", billion},
+		{hconvert.Base8CharSet(), "Base8", "7346545000", billion},
+		{hconvert.Base10CharSet(), "Base10", "1000000000", billion},
+		{hconvert.Base16CharSet(), "Base16", "3B9ACA00", billion},
+		{hconvert.Base32CharSet(), "Base32", "5ZVSQA", billion},
+		{hconvert.Base36CharSet(), "Base36", "GJDGXS", billion},
+		{hconvert.Base58CharSet(), "Base58", "2XNGAK", billion},
+		{hconvert.Base62CharSet(), "Base62", "BFp3qQ", billion},
+		{hconvert.Base64CharSet(), "Base64", "7msoA", billion},
+		{hconvert.Base64URLCharSet(), "Base64URL", "7msoA", billion},
+		{hconvert.ASCII85CharSet(), "ASCII85", "4.=:l", billion},
+		{hconvert.Z85CharSet(), "Z85", "jdsp(", billion},
+	}
+)
+
 func TestNewConverter(t *testing.T) {
 	t.Parallel()
 
@@ -39,6 +78,8 @@ func TestNewConverter(t *testing.T) {
 }
 
 func TestBad(t *testing.T) {
+	t.Parallel()
+
 	var converter *hconvert.Converter
 
 	if err := converter.SetDecodeCharSet(hconvert.Base10CharSet()); err == nil {
@@ -232,6 +273,19 @@ func TestDecodeFrom(t *testing.T) {
 
 func TestDecodeWith(t *testing.T) {
 	t.Parallel()
+
+	// Test that we can properly decode to the binary equivalent of one billion in base10 using the
+	// const character sets.
+	for _, test := range constTests {
+		b, err := hconvert.DecodeWith(test.decodeMe, test.charSet)
+		if err != nil {
+			t.Error(test.setName, "-", err)
+		} else if !reflect.DeepEqual(b, test.encodeMe) {
+			t.Error(test.setName, "- Decode failed")
+			t.Log("Expected:", test.encodeMe)
+			t.Log("Received:", b)
+		}
+	}
 }
 
 func TestEncode(t *testing.T) {
@@ -244,4 +298,17 @@ func TestEncodeTo(t *testing.T) {
 
 func TestEncodeWith(t *testing.T) {
 	t.Parallel()
+
+	// Test that we can properly encode the binary equivalent of one billion in base10 using the
+	// const character sets.
+	for _, test := range constTests {
+		s, err := hconvert.EncodeWith(test.encodeMe, test.charSet)
+		if err != nil {
+			t.Error(test.setName, "-", err)
+		} else if s != test.decodeMe {
+			t.Error(test.setName, "- Encode failed")
+			t.Log("Expected:", test.decodeMe)
+			t.Log("Received:", s)
+		}
+	}
 }
