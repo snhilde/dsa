@@ -2,6 +2,7 @@ package hconvert_test
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/snhilde/dsa/algorithms/hconvert"
@@ -34,6 +35,34 @@ func TestNewConverter(t *testing.T) {
 	enc = hconvert.Base16CharSet()
 	if converter := hconvert.NewConverter(dec, enc); reflect.DeepEqual(converter, hconvert.Converter{}) {
 		t.Error("Failed to create converter with both encoding and decoding character sets")
+	}
+}
+
+func TestBad(t *testing.T) {
+	var converter *hconvert.Converter
+
+	if err := converter.SetDecodeCharSet(hconvert.Base10CharSet()); err == nil {
+		t.Error("Failed bad object test for SetDecodeCharSet")
+	}
+
+	if err := converter.SetEncodeCharSet(hconvert.Base10CharSet()); err == nil {
+		t.Error("Failed bad object test for SetEncodeCharSet")
+	}
+
+	if b, err := converter.Decode("abc"); b != nil || err == nil {
+		t.Error("Failed bad object test for Decode")
+	}
+
+	if err := converter.DecodeFrom(strings.NewReader("1234")); err == nil {
+		t.Error("Failed bad object test for DecodeFrom")
+	}
+
+	if s, err := converter.Encode([]byte{0x01, 0x02}); s != "" || err == nil {
+		t.Error("Failed bad object test for Encode")
+	}
+
+	if err := converter.EncodeTo(new(strings.Builder)); err == nil {
+		t.Error("Failed bad object test for EncodeTo")
 	}
 }
 
