@@ -39,6 +39,50 @@ func NewConverter(decode CharSet, encode CharSet) Converter {
 	return *c
 }
 
+// SetDecodeCharSet sets the character set to use for decoding.
+func (c *Converter) SetDecodeCharSet(charSet CharSet) error {
+	if c == nil {
+		return errBadConverter
+	} else if len(charSet.charSet) == 0 {
+		return errNoCharSet
+	}
+
+	c.decCharSet = charSet
+
+	return nil
+}
+
+// SetEncodeCharSet sets the character set to use for encoding.
+func (c *Converter) SetEncodeCharSet(charSet CharSet) error {
+	if c == nil {
+		return errBadConverter
+	} else if len(charSet.charSet) == 0 {
+		return errNoCharSet
+	}
+
+	c.encCharSet = charSet
+
+	return nil
+}
+
+// DecodeCharSet returns the CharSet used for decoding.
+func (c *Converter) DecodeCharSet() CharSet {
+	if c == nil {
+		return CharSet{}
+	}
+
+	return c.decCharSet
+}
+
+// EncodeCharSet returns the CharSet used for encoding.
+func (c *Converter) EncodeCharSet() CharSet {
+	if c == nil {
+		return CharSet{}
+	}
+
+	return c.encCharSet
+}
+
 // Decode decodes s using the decoding character set and returns the binary data or any error
 // encountered.
 func (c *Converter) Decode(s string) ([]byte, error) {
@@ -209,48 +253,4 @@ func EncodeWith(p []byte, charSet CharSet) (string, error) {
 	}
 
 	return out.String(), nil
-}
-
-// SetDecodeCharSet sets the character set to use for decoding.
-func (c *Converter) SetDecodeCharSet(charSet CharSet) error {
-	if c == nil {
-		return errBadConverter
-	} else if len(charSet.charSet) == 0 {
-		return errNoCharSet
-	}
-
-	c.decCharSet = charSet
-
-	return nil
-}
-
-// SetEncodeCharSet sets the character set to use for encoding.
-func (c *Converter) SetEncodeCharSet(charSet CharSet) error {
-	if c == nil {
-		return errBadConverter
-	} else if len(charSet.charSet) == 0 {
-		return errNoCharSet
-	}
-
-	c.encCharSet = charSet
-
-	return nil
-}
-
-// DecodeCharSet returns the CharSet used for decoding.
-func (c *Converter) DecodeCharSet() CharSet {
-	if c == nil {
-		return CharSet{}
-	}
-
-	return c.decCharSet
-}
-
-// EncodeCharSet returns the CharSet used for encoding.
-func (c *Converter) EncodeCharSet() CharSet {
-	if c == nil {
-		return CharSet{}
-	}
-
-	return c.encCharSet
 }
