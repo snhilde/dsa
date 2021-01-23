@@ -265,10 +265,41 @@ func TestEncodeCharSet(t *testing.T) {
 
 func TestDecode(t *testing.T) {
 	t.Parallel()
+
+	// Test that we can properly decode to the binary equivalent of one billion in base10 using a
+	// converter with each of the const character sets.
+	converter := new(hconvert.Converter)
+	for _, test := range constTests {
+		converter.SetDecodeCharSet(test.charSet)
+		b, err := converter.Decode(test.decodeMe)
+		if err != nil {
+			t.Error(test.setName, "-", err)
+		} else if !reflect.DeepEqual(b, test.encodeMe) {
+			t.Error(test.setName, "- Decode failed")
+			t.Log("Expected:", test.encodeMe)
+			t.Log("Received:", b)
+		}
+	}
 }
 
 func TestDecodeFrom(t *testing.T) {
 	t.Parallel()
+
+	// Test that we can properly read and decode data from the provided io.Reader using a converter
+	// with each of the const character sets
+	converter := new(hconvert.Converter)
+	for _, test := range constTests {
+		converter.SetDecodeCharSet(test.charSet)
+		reader := strings.NewReader(test.decodeMe)
+		b, err := converter.DecodeFrom(reader)
+		if err != nil {
+			t.Error(test.setName, "-", err)
+		} else if !reflect.DeepEqual(b, test.encodeMe) {
+			t.Error(test.setName, "- Decode failed")
+			t.Log("Expected:", test.encodeMe)
+			t.Log("Received:", b)
+		}
+	}
 }
 
 func TestDecodeWith(t *testing.T) {
@@ -290,6 +321,21 @@ func TestDecodeWith(t *testing.T) {
 
 func TestEncode(t *testing.T) {
 	t.Parallel()
+
+	// Test that we can properly encode the binary equivalent of one billion in base10 using a
+	// converter with each of the const character sets.
+	converter := new(hconvert.Converter)
+	for _, test := range constTests {
+		converter.SetEncodeCharSet(test.charSet)
+		s, err := converter.Encode(test.encodeMe)
+		if err != nil {
+			t.Error(test.setName, "-", err)
+		} else if s != test.decodeMe {
+			t.Error(test.setName, "- Encode failed")
+			t.Log("Expected:", test.decodeMe)
+			t.Log("Received:", s)
+		}
+	}
 }
 
 func TestEncodeTo(t *testing.T) {
