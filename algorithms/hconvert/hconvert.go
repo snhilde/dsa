@@ -94,25 +94,18 @@ func (c *Converter) Decode(s string) ([]byte, error) {
 }
 
 // DecodeFrom reads encoded data from r until EOF, decodes the data using the decoding character
-// set, and stores it internally.
-func (c *Converter) DecodeFrom(r io.Reader) error {
+// set, and returns the binary data or any error encountered.
+func (c *Converter) DecodeFrom(r io.Reader) ([]byte, error) {
 	if c == nil {
-		return errBadConverter
+		return nil, errBadConverter
 	}
 
 	encoded, err := ioutil.ReadAll(r)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	binary, err := c.Decode(string(encoded))
-	if err != nil {
-		return err
-	}
-
-	c.buf = binary
-
-	return nil
+	return c.Decode(string(encoded))
 }
 
 // DecodeWith decodes s with the provided character set and returns the binary data or any error

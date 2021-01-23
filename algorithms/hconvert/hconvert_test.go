@@ -94,7 +94,7 @@ func TestBad(t *testing.T) {
 		t.Error("Failed bad object test for Decode")
 	}
 
-	if err := converter.DecodeFrom(strings.NewReader("1234")); err == nil {
+	if b, err := converter.DecodeFrom(strings.NewReader("1234")); b != nil || err == nil {
 		t.Error("Failed bad object test for DecodeFrom")
 	}
 
