@@ -14,6 +14,18 @@ func ASCIICharSet() CharSet {
 	return charSet
 }
 
+// BinaryCharSet creates a new character set with all 256 binary values.
+func BinaryCharSet() CharSet {
+	c := make([]rune, 256)
+	for i := range c {
+		c[i] = rune(i)
+	}
+
+	charSet, _ := NewCharSet(c)
+
+	return charSet
+}
+
 // Base2CharSet creates a new character set with the base2 (binary) characters.
 //	Ordered characters in this set:
 //	'0', '1'
