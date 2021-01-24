@@ -108,20 +108,12 @@ func TestBad(t *testing.T) {
 		t.Error("Failed bad object test for SetEncodeCharSet")
 	}
 
-	if b, err := converter.Decode("abc"); b != nil || err == nil {
-		t.Error("Failed bad object test for Decode")
+	if s, err := converter.Convert("abc"); s != "" || err == nil {
+		t.Error("Failed bad object test for Convert")
 	}
 
-	if b, err := converter.DecodeFrom(strings.NewReader("1234")); b != nil || err == nil {
-		t.Error("Failed bad object test for DecodeFrom")
-	}
-
-	if s, err := converter.Encode([]byte{0x01, 0x02}); s != "" || err == nil {
-		t.Error("Failed bad object test for Encode")
-	}
-
-	if err := converter.EncodeTo([]byte{0x03, 0x04}, new(strings.Builder)); err == nil {
-		t.Error("Failed bad object test for EncodeTo")
+	if s, err := converter.ConvertFrom(strings.NewReader("abc")); s != "" || err == nil {
+		t.Error("Failed bad object test for ConvertFrom")
 	}
 }
 
@@ -281,137 +273,8 @@ func TestEncodeCharSet(t *testing.T) {
 	}
 }
 
-func TestDecode(t *testing.T) {
-	t.Parallel()
-
-	// Test that we can properly decode the data using a converter with each of the standard
-	// character sets.
-	converter := new(hconvert.Converter)
-	for _, test := range standardTests {
-		converter.SetDecodeCharSet(test.charSet)
-		b, err := converter.Decode(test.decodeMe)
-		if err != nil {
-			t.Error(test.setName, "-", err)
-		} else if !reflect.DeepEqual(b, test.encodeMe) {
-			t.Error(test.setName, "- Decode failed")
-			t.Log("Expected:", test.encodeMe)
-			t.Log("Received:", b)
-		}
-	}
-
-	// Test that we can't decode characters not in the character set.
-	for _, test := range standardTests {
-		converter.SetDecodeCharSet(test.charSet)
-		if _, err := converter.Decode(invalidChar); err == nil {
-			t.Error(test.setName, "- Decode invalid character passed")
-		}
-	}
+func TestConvert(t *testing.T) {
 }
 
-func TestDecodeFrom(t *testing.T) {
-	t.Parallel()
-
-	// Test that we can properly read and decode data from the provided io.Reader using a converter
-	// with each of the standard character sets
-	converter := new(hconvert.Converter)
-	for _, test := range standardTests {
-		converter.SetDecodeCharSet(test.charSet)
-		reader := strings.NewReader(test.decodeMe)
-		b, err := converter.DecodeFrom(reader)
-		if err != nil {
-			t.Error(test.setName, "-", err)
-		} else if !reflect.DeepEqual(b, test.encodeMe) {
-			t.Error(test.setName, "- DecodeFrom failed")
-			t.Log("Expected:", test.encodeMe)
-			t.Log("Received:", b)
-		}
-	}
-
-	// Test that we can't decode characters not in the character set.
-	for _, test := range standardTests {
-		converter.SetDecodeCharSet(test.charSet)
-		reader := strings.NewReader(invalidChar)
-		if _, err := converter.DecodeFrom(reader); err == nil {
-			t.Error(test.setName, "- DecodeFrom invalid character passed")
-		}
-	}
-}
-
-func TestDecodeWith(t *testing.T) {
-	t.Parallel()
-
-	// Test that we can properly decode the data using the standard character sets.
-	for _, test := range standardTests {
-		b, err := hconvert.DecodeWith(test.decodeMe, test.charSet)
-		if err != nil {
-			t.Error(test.setName, "-", err)
-		} else if !reflect.DeepEqual(b, test.encodeMe) {
-			t.Error(test.setName, "- DecodeWith failed")
-			t.Log("Expected:", test.encodeMe)
-			t.Log("Received:", b)
-		}
-	}
-
-	// Test that we can't decode characters not in the character set.
-	for _, test := range standardTests {
-		if _, err := hconvert.DecodeWith(invalidChar, test.charSet); err == nil {
-			t.Error(test.setName, "- DecodeWith invalid character passed")
-		}
-	}
-}
-
-func TestEncode(t *testing.T) {
-	t.Parallel()
-
-	// Test that we can properly encode the data using a converter with each of the standard
-	// character sets.
-	converter := new(hconvert.Converter)
-	for _, test := range standardTests {
-		converter.SetEncodeCharSet(test.charSet)
-		s, err := converter.Encode(test.encodeMe)
-		if err != nil {
-			t.Error(test.setName, "-", err)
-		} else if s != test.decodeMe {
-			t.Error(test.setName, "- Encode failed")
-			t.Log("Expected:", test.decodeMe)
-			t.Log("Received:", s)
-		}
-	}
-}
-
-func TestEncodeTo(t *testing.T) {
-	t.Parallel()
-
-	// Test that we can properly encode data and write it to the provided io.Writer using a
-	// converter with each of the standard character sets
-	converter := new(hconvert.Converter)
-	for _, test := range standardTests {
-		converter.SetEncodeCharSet(test.charSet)
-		writer := new(strings.Builder)
-		if err := converter.EncodeTo(test.encodeMe, writer); err != nil {
-			t.Error(test.setName, "-", err)
-		}
-
-		if writer.String() != test.decodeMe {
-			t.Error(test.setName, "- EncodeTo failed")
-			t.Log("Expected:", test.encodeMe)
-			t.Log("Received:", writer.String())
-		}
-	}
-}
-
-func TestEncodeWith(t *testing.T) {
-	t.Parallel()
-
-	// Test that we can properly encode the data using the standard character sets.
-	for _, test := range standardTests {
-		s, err := hconvert.EncodeWith(test.encodeMe, test.charSet)
-		if err != nil {
-			t.Error(test.setName, "-", err)
-		} else if s != test.decodeMe {
-			t.Error(test.setName, "- EncodeWith failed")
-			t.Log("Expected:", test.decodeMe)
-			t.Log("Received:", s)
-		}
-	}
+func TestConvertFrom(t *testing.T) {
 }
