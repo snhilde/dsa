@@ -23,10 +23,15 @@ type Converter struct {
 	// Character sets to use for decoding and encoding.
 	decCharSet CharSet
 	encCharSet CharSet
+
+	// The original, encoded string.
+	orig string
+
+	// Internal buffer for storing decoded data.
+	data []byte
 }
 
-// NewConverter creates a new Converter object with the provided character sets. If a character set
-// is not needed (such as when doing only encoding or only decoding), pass `CharSet{}`.
+// NewConverter creates a new Converter object with the provided character sets.
 func NewConverter(decode CharSet, encode CharSet) Converter {
 	c := new(Converter)
 
@@ -62,7 +67,7 @@ func (c *Converter) SetEncodeCharSet(charSet CharSet) error {
 	return nil
 }
 
-// DecodeCharSet returns the CharSet used for decoding.
+// DecodeCharSet returns the character set used for decoding.
 func (c *Converter) DecodeCharSet() CharSet {
 	if c == nil {
 		return CharSet{}
@@ -71,7 +76,7 @@ func (c *Converter) DecodeCharSet() CharSet {
 	return c.decCharSet
 }
 
-// EncodeCharSet returns the CharSet used for encoding.
+// EncodeCharSet returns the character set used for encoding.
 func (c *Converter) EncodeCharSet() CharSet {
 	if c == nil {
 		return CharSet{}
@@ -80,49 +85,58 @@ func (c *Converter) EncodeCharSet() CharSet {
 	return c.encCharSet
 }
 
-// Decode decodes s using the decoding character set and returns the binary data or any error
-// encountered.
-func (c *Converter) Decode(s string) ([]byte, error) {
-	if c == nil {
-		return nil, errBadConverter
+// Convert converts the string from the decode character set to the encode character set.
+func (c *Converter) Convert(s string) (string, error) {
+	switch {
+	case c == nil:
+		return "", errBadConverter
+	case c.decCharSet.Len() == 0:
+		return "", errNoCharSet
+	case c.encCharSet.Len() == 0:
+		return "", errNoCharSet
+	case s == "":
+		return "", nil
 	}
 
-	return DecodeWith(s, c.decCharSet)
+	c.orig = s
+
+	// Decode the data to binary.
+	p, err := c.decode()
+	if err != nil {
+		return "", err
+	}
+	c.data = p
+
+	// Encode the binary to the converted string.
+	out, err := c.encode()
+	if err != nil {
+		return "", err
+	}
+
+	return out, nil
 }
 
-// DecodeFrom reads encoded data from r until EOF, decodes the data using the decoding character
-// set, and returns the binary data or any error encountered.
-func (c *Converter) DecodeFrom(r io.Reader) ([]byte, error) {
-	if c == nil {
-		return nil, errBadConverter
-	}
-
+// ConvertFrom reads an encoded string from r until EOF and converts it from the decode character
+// set to the encode character set.
+func (c *Converter) ConvertFrom(r io.Reader) (string, error) {
 	encoded, err := ioutil.ReadAll(r)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	return c.Decode(string(encoded))
+	return c.Convert(string(encoded))
 }
 
-// DecodeWith decodes s with the provided character set and returns the binary data or any error
-// encountered.
-func DecodeWith(s string, charSet CharSet) ([]byte, error) {
-	if s == "" {
-		return []byte{}, nil
-	} else if charSet.Len() == 0 {
-		return nil, errNoCharSet
-	}
-
+func (c *Converter) decode() ([]byte, error) {
 	// Get the rune->int mapping for this character set.
-	decMap := charSet.mapDecode()
+	decMap := c.decCharSet.mapDecode()
 
 	// Binary data that we will decode to.
 	binary := new(big.Int)
 
 	// Numerical base of this character set, for calculating the value of each character at its
 	// place in the string.
-	base := big.NewInt(int64(charSet.Len()))
+	base := big.NewInt(int64(c.decCharSet.Len()))
 
 	// We'll use this to calculate the value of each character at its place in the string. Because
 	// range reads the string from left to right, we have to start with the highest place and move
@@ -130,16 +144,16 @@ func DecodeWith(s string, charSet CharSet) ([]byte, error) {
 	// starting place is 100, the next place is 10, and the last place is 1. This givs a total value
 	// of (100 * 4) + (10 * 8) + (1 * 9) = 489.
 	place := new(big.Int)
-	place.Exp(base, big.NewInt(int64(len(s)-1)), nil)
+	place.Exp(base, big.NewInt(int64(len(c.orig)-1)), nil)
 
-	padding := charSet.Padding()
-	for _, r := range s {
-		if padding != "" && string(r) == padding {
+	padding := c.decCharSet.Padding()
+	for _, b := range c.orig {
+		if padding != "" && string(b) == padding {
 			continue
 		}
 
 		// Figure out the value of this character in the character set.
-		v, ok := decMap[r]
+		v, ok := decMap[b]
 		if !ok {
 			return nil, errBadCharSet
 		}
@@ -156,64 +170,35 @@ func DecodeWith(s string, charSet CharSet) ([]byte, error) {
 	return binary.Bytes(), nil
 }
 
-// Encode encodes p using the encoding character set and returns the encoded data or any error
-// encountered.
-func (c *Converter) Encode(p []byte) (string, error) {
-	if c == nil {
-		return "", errBadConverter
-	}
-
-	return EncodeWith(p, c.encCharSet)
-}
-
-// EncodeTo encodes p using the encoding character set and writes it to w.
-func (c *Converter) EncodeTo(p []byte, w io.Writer) error {
-	if c == nil {
-		return errBadConverter
-	}
-
-	encoded, err := c.Encode(p)
-	if err != nil {
-		return err
-	}
-
-	if n, err := w.Write([]byte(encoded)); err != nil {
-		return err
-	} else if n != len(encoded) {
-		return io.ErrShortWrite
-	}
-
-	return nil
-}
-
-// EncodeWith encodes p with the provided character set and returns the encoded data or any error
-// encountered.
-func EncodeWith(p []byte, charSet CharSet) (string, error) {
+func (c *Converter) encode() (string, error) {
 	// Basic strategy:
 	// 1. Set up all the values we need.
 	// 2. While there is data in the buffer:
 	//     a. Calculate the modulus of the current buffer.
 	//     b. Divide the buffer by the base. This effectively "pops" the modulus from the buffer.
 	//     c. Add the modulus to the stack, according to its rune mapping.
-	// 3. Because the modulo operation removes the last character from the buffer, the string is
+	// 3. If the original string began with one or more characters that have a 0-value (according to
+	//    their place in the character set), then we need to add an equivalent amount of 0-value
+	//    characters in the new character set to the beginning of the string.
+	// 4. Because the modulo operation removes the last character from the buffer, the string is
 	//    going to be reversed. To solve this, we'll pop the values from the stack one-by-one and
 	//    add them to the output buffer, which will reverse the string back to the correct order.
-	if len(p) == 0 {
+	if len(c.data) == 0 {
 		return "", nil
-	} else if charSet.Len() == 0 {
+	} else if c.encCharSet.Len() == 0 {
 		return "", errNoCharSet
 	}
 
 	// int->rune mapping for this character set.
-	decMap := charSet.mapEncode()
+	decMap := c.encCharSet.mapEncode()
 
 	// Binary data that we will encode.
 	binary := new(big.Int)
-	binary.SetBytes(p)
+	binary.SetBytes(c.data)
 
 	// Numerical base of this character set, for determining the appropriate character at each place
 	// in the output string.
-	base := big.NewInt(int64(charSet.Len()))
+	base := big.NewInt(int64(c.encCharSet.Len()))
 
 	// Container to hold the mod value as it's calculated.
 	mod := new(big.Int)
@@ -230,6 +215,24 @@ func EncodeWith(p []byte, charSet CharSet) (string, error) {
 		// Note: mod can never be greater than base, which is the length of the character set.
 		value := int(mod.Int64())
 		stack.Add(decMap[value])
+	}
+
+	// Add leading 0-value characters back in.
+	zeroChar := c.decCharSet.Characters()[0]
+	leadingZeroes := 0
+	for _, char := range c.orig {
+		if char == zeroChar {
+			leadingZeroes++
+		} else {
+			break
+		}
+	}
+
+	// Calculate the total value of all the leading zero-values, add back in the appropriate number
+	// of zero-value characters for this character set.
+	zeroValue := leadingZeroes * c.decCharSet.Len()
+	for i := 0; i < zeroValue/c.encCharSet.Len(); i++ {
+		stack.Add(decMap[0])
 	}
 
 	// Write out the string in stack order to reverse it back to the correct order.
