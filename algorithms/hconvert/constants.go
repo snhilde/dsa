@@ -2,7 +2,7 @@
 
 package hconvert
 
-// ASCIICharSet creates a new CharSet with all 128 ASCII characters.
+// ASCIICharSet creates a new character set with all 128 ASCII characters.
 func ASCIICharSet() CharSet {
 	c := make([]rune, 128)
 	for i := range c {
@@ -14,7 +14,9 @@ func ASCIICharSet() CharSet {
 	return charSet
 }
 
-// Base2CharSet creates a new CharSet with the base2 (binary) character set.
+// Base2CharSet creates a new character set with the base2 (binary) characters.
+//	Ordered characters in this set:
+//	'0', '1'
 func Base2CharSet() CharSet {
 	c := []rune{
 		'0', '1',
@@ -25,7 +27,9 @@ func Base2CharSet() CharSet {
 	return charSet
 }
 
-// Base4CharSet creates a new CharSet with the base4 (quaternary) character set.
+// Base4CharSet creates a new character set with the base4 (quaternary) characters.
+//	Ordered characters in this set:
+//	'0', '1', '2', '3'
 func Base4CharSet() CharSet {
 	c := []rune{
 		'0', '1', '2', '3',
@@ -36,7 +40,9 @@ func Base4CharSet() CharSet {
 	return charSet
 }
 
-// Base8CharSet creates a new CharSet with the base8 (octal) character set.
+// Base8CharSet creates a new character set with the base8 (octal) characters.
+//	Ordered characters in this set:
+//	'0', '1', '2', '3', '4', '5', '6', '7'
 func Base8CharSet() CharSet {
 	c := []rune{
 		'0', '1', '2', '3', '4', '5', '6', '7',
@@ -47,7 +53,9 @@ func Base8CharSet() CharSet {
 	return charSet
 }
 
-// Base10CharSet creates a new CharSet with the base10 (decimal) character set.
+// Base10CharSet creates a new character set with the base10 (decimal) characters.
+//	Ordered characters in this set:
+//	'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
 func Base10CharSet() CharSet {
 	c := []rune{
 		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
@@ -58,7 +66,9 @@ func Base10CharSet() CharSet {
 	return charSet
 }
 
-// Base16CharSet creates a new CharSet with the base16 (hexadecimal) character set.
+// Base16CharSet creates a new character set with the base16 (hexadecimal) characters.
+//	Ordered characters in this set:
+//	'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
 func Base16CharSet() CharSet {
 	c := []rune{
 		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
@@ -69,7 +79,10 @@ func Base16CharSet() CharSet {
 	return charSet
 }
 
-// Base32CharSet creates a new CharSet with the base32 character set.
+// Base32CharSet creates a new character set with the base32 characters.
+//	Ordered characters in this set:
+//	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+//	'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '2', '3', '4', '5', '6', '7'
 func Base32CharSet() CharSet {
 	c := []rune{
 		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
@@ -82,7 +95,11 @@ func Base32CharSet() CharSet {
 	return charSet
 }
 
-// Base36CharSet creates a new CharSet with the base36 character set.
+// Base36CharSet creates a new character set with the base36 characters.
+//	Ordered characters in this set:
+//	'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
+//	'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
+//	'W', 'X', 'Y', 'Z'
 func Base36CharSet() CharSet {
 	c := []rune{
 		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
@@ -95,7 +112,12 @@ func Base36CharSet() CharSet {
 	return charSet
 }
 
-// Base58CharSet creates a new CharSet with the base58 (bitcoin) character set.
+// Base58CharSet creates a new character set with the base58 (bitcoin) characters.
+//	Ordered characters in this set:
+//	'1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G',
+//	'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y',
+//	'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'm', 'n', 'o', 'p',
+//	'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
 func Base58CharSet() CharSet {
 	c := []rune{
 		'1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G',
@@ -109,7 +131,12 @@ func Base58CharSet() CharSet {
 	return charSet
 }
 
-// Base62CharSet creates a new CharSet with the base62 (alphanumeric) character set.
+// Base62CharSet creates a new character set with the base62 (alphanumeric) characters.
+//	Ordered characters in this set:
+//	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+//	'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
+//	'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+//	'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
 func Base62CharSet() CharSet {
 	c := []rune{
 		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
@@ -123,7 +150,12 @@ func Base62CharSet() CharSet {
 	return charSet
 }
 
-// Base64CharSet creates a new CharSet with the base64 character set.
+// Base64CharSet creates a new character set with the base64 characters.
+//	Ordered characters in this set:
+//	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+//	'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
+//	'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+//	'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'
 func Base64CharSet() CharSet {
 	c := []rune{
 		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
@@ -138,7 +170,12 @@ func Base64CharSet() CharSet {
 	return charSet
 }
 
-// Base64URLCharSet creates a new CharSet with the base64url character set.
+// Base64URLCharSet creates a new character set with the base64url characters.
+//	Ordered characters in this set:
+//	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+//	'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
+//	'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+//	'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '_'
 func Base64URLCharSet() CharSet {
 	c := []rune{
 		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
@@ -153,7 +190,14 @@ func Base64URLCharSet() CharSet {
 	return charSet
 }
 
-// ASCII85CharSet creates a new CharSet with the ASCII85 character set.
+// ASCII85CharSet creates a new character set with the ASCII85 characters.
+//	Ordered characters in this set:
+//	'!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', '0',
+//	'1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', '@',
+//	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+//	'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', '\\', ']', '^', '_', '`',
+//	'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p',
+//	'q', 'r', 's', 't', 'u'
 func ASCII85CharSet() CharSet {
 	c := []rune{
 		'!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', '0',
@@ -169,7 +213,14 @@ func ASCII85CharSet() CharSet {
 	return charSet
 }
 
-// Z85CharSet creates a new CharSet with the Z85 character set.
+// Z85CharSet creates a new character set with the Z85 characters.
+//	Ordered characters in this set:
+//	'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f',
+//	'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+//	'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+//	'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '.', '-',
+//	':', '+', '=', '^', '!', '/', '*', '?', '&', '<', '>', '(', ')', '[', ']', '{',
+//	'}', '@', '%', '$', '#'
 func Z85CharSet() CharSet {
 	c := []rune{
 		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f',
