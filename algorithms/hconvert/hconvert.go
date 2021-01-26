@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"math/big"
 	"strings"
+	"unicode"
 
 	"github.com/snhilde/dsa/data_structures/hstack"
 )
@@ -33,12 +34,12 @@ type Converter struct {
 
 // NewConverter creates a new Converter object with the provided character sets.
 func NewConverter(decode CharSet, encode CharSet) Converter {
-	c := new(Converter)
+	var c Converter
 
 	c.decCharSet = decode
 	c.encCharSet = encode
 
-	return *c
+	return c
 }
 
 // SetDecodeCharSet sets the character set to use for decoding.
@@ -91,9 +92,11 @@ func (c *Converter) Convert(s string) (string, error) {
 	case c == nil:
 		return "", errBadConverter
 	case c.decCharSet.Len() == 0:
-		return "", errNoCharSet
+		return "", fmt.Errorf("no decode character set provided")
 	case c.encCharSet.Len() == 0:
-		return "", errNoCharSet
+		return "", fmt.Errorf("no encode character set provided")
+	case !isPrintable(s):
+		return "", fmt.Errorf("not printable text")
 	}
 
 	c.orig = s
@@ -188,8 +191,6 @@ func (c *Converter) encode() (string, error) {
 	//    add them to the output buffer, which will reverse the string back to the correct order.
 	if len(c.num.Bytes()) == 0 {
 		return "", nil
-	} else if c.encCharSet.Len() == 0 {
-		return "", errNoCharSet
 	}
 
 	// int->rune mapping for this character set.
@@ -242,4 +243,14 @@ func (c *Converter) encode() (string, error) {
 	}
 
 	return out.String(), nil
+}
+
+func isPrintable(s string) bool {
+	for _, r := range s {
+		if !unicode.IsGraphic(r) {
+			return false
+		}
+	}
+
+	return true
 }

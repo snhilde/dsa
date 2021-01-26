@@ -78,6 +78,15 @@ func TestNewConverter(t *testing.T) {
 	if converter := hconvert.NewConverter(dec, enc); reflect.DeepEqual(converter, hconvert.Converter{}) {
 		t.Error("Failed to create converter with both encoding and decoding character sets")
 	}
+
+	// A zero-value converter should not have any character sets.
+	var c hconvert.Converter
+	if !reflect.DeepEqual(c.DecodeCharSet(), (hconvert.CharSet{})) {
+		t.Error("Zero-value converter does not have empty decode character set")
+	}
+	if !reflect.DeepEqual(c.EncodeCharSet(), (hconvert.CharSet{})) {
+		t.Error("Zero-value converter does not have empty encode character set")
+	}
 }
 
 func TestBad(t *testing.T) {
@@ -273,7 +282,22 @@ func TestConvert(t *testing.T) {
 			t.Log("Received:", s)
 		}
 	}
+
+	// Test that we can't convert characters from a different character set.
+
+
+	// Test that only the zero value in the input string results in only the zero value in the
+	// output string.
 }
 
 func TestConvertFrom(t *testing.T) {
+}
+
+func TestNonprintable(t *testing.T) {
+	// Test that non-printable input is not allowed.
+	s := string([]byte{0, 1, 2, 3})
+	converter := hconvert.NewConverter(hconvert.BinaryCharSet(), hconvert.Base16CharSet())
+	if s, err := converter.Convert(s); s != "" || err == nil {
+		t.Error("Non-printable text allowed")
+	}
 }
