@@ -180,37 +180,39 @@ func (c *Converter) decode() error {
 	return nil
 }
 
-func (c *Converter) encode() (string, error) {
+func (c *Converter) encode() error {
 	// Basic strategy:
 	// 1. Set up all the values we need.
 	// 2. While there is data in the buffer:
-	//     a. Calculate the modulus of the current buffer.
-	//     b. Divide the buffer by the base. This effectively "pops" the modulus from the buffer.
-	//     c. Add the modulus to the stack, according to its rune mapping.
+	//     a. Calculate the modulus of the current buffer according to our base. This tells us the
+	//        value of the next encoding character.
+	//     b. Divide the buffer by the base. This effectively "pops" the character from the buffer.
+	//     c. Add the value to the stack, according to its rune mapping.
 	// 3. If the original string began with one or more characters that have a 0-value (according to
 	//    their place in the character set), then we need to add an equivalent amount of 0-value
 	//    characters in the new character set to the beginning of the string.
-	// 4. Because the modulo operation removes the last character from the buffer, the string is
-	//    going to be reversed. To solve this, we'll pop the values from the stack one-by-one and
-	//    add them to the output buffer, which will reverse the string back to the correct order.
+	// 4. Because the modulo operation calculates the characters from smallest to largest, the
+	//    string is going to be reversed. To solve this, we'll pop the values from the stack
+	//    one-by-one and add them to the output buffer, which will reverse the string back to the
+	//    correct order.
 	if len(c.num.Bytes()) == 0 {
-		return "", nil
+		return nil
 	}
 
-	// int->rune mapping for this character set.
+	// Get the int->rune mapping for this character set.
 	encMap := c.encCharSet.mapEncode()
 
-	// Binary data that we will encode.
+	// Grab the binary data that we will encode.
 	binary := c.num
 
-	// Numerical base of this character set, for determining the appropriate character at each place
-	// in the output string.
+	// Calculate the numerical base of this character set, which we'll use to determine the
+	// appropriate character at each position in the output string.
 	base := big.NewInt(int64(c.encCharSet.Len()))
 
-	// Container to hold the mod value as it's calculated.
+	// Make a container to hold the mod value as it's calculated.
 	mod := new(big.Int)
 
-	// Stack to hold the string as it's created in reverse order.
+	// Make a stack to hold the string as it's created in reverse order.
 	stack := hstack.New()
 
 	zero := big.NewInt(0)
@@ -224,7 +226,7 @@ func (c *Converter) encode() (string, error) {
 		stack.Add(encMap[value])
 	}
 
-	// Calculate how many leading 0-value characters the original string has.
+	// Calculate the number of leading 0-value characters in the original string.
 	zeroChar := c.decCharSet.Characters()[0]
 	leadingZeroes := 0
 	for _, char := range c.input {
@@ -246,7 +248,9 @@ func (c *Converter) encode() (string, error) {
 		out.WriteRune(stack.Pop().(rune))
 	}
 
-	return out.String(), nil
+	c.output = out.String()
+
+	return nil
 }
 
 func isPrintable(s string) bool {
