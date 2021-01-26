@@ -137,18 +137,19 @@ func (c *Converter) decode() error {
 	// Get the rune->int mapping for this character set.
 	decMap := c.decCharSet.mapDecode()
 
-	// Binary data that we will decode to.
+	// Make a new big number to hold the binary data as we decode.
 	binary := new(big.Int)
 
-	// Numerical base of this character set, for calculating the value of each character at its
-	// place in the string.
+	// Figure out the umerical base of this character set, which we'll use for calculating the value
+	// of each character at its position in the string.
 	base := big.NewInt(int64(c.decCharSet.Len()))
 
-	// We'll use this to calculate the value of each character at its place in the string. Because
-	// range reads the string from left to right, we have to start with the highest place and move
-	// down to 1. For example, if we have a string of "489" representing a base10 number, then the
-	// starting place is 100, the next place is 10, and the last place is 1. This gives a total
-	// value of (100 * 4) + (10 * 8) + (1 * 9) = 489.
+	// Figure out the significance of the first character in the string. We'll use this to calculate
+	// the value of each character at its position in the string. Because range reads the string
+	// from left to right, we have to start with the highest position and move down to 1. For
+	// example, if we have a string of "489" representing a base10 number, then the starting
+	// significance is 100, the next significance is 10, and the last significance is 1. This gives
+	// a total value of (100 * 4) + (10 * 8) + (1 * 9) = 489.
 	significance := new(big.Int)
 	significance.Exp(base, big.NewInt(int64(len(c.input)-1)), nil)
 
