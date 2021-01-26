@@ -46,7 +46,7 @@ func NewConverter(decode CharSet, encode CharSet) Converter {
 func (c *Converter) SetDecodeCharSet(charSet CharSet) error {
 	if c == nil {
 		return errBadConverter
-	} else if len(charSet.charSet) == 0 {
+	} else if charSet.isEmpty() {
 		return errNoCharSet
 	}
 
@@ -59,7 +59,7 @@ func (c *Converter) SetDecodeCharSet(charSet CharSet) error {
 func (c *Converter) SetEncodeCharSet(charSet CharSet) error {
 	if c == nil {
 		return errBadConverter
-	} else if len(charSet.charSet) == 0 {
+	} else if charSet.isEmpty() {
 		return errNoCharSet
 	}
 
@@ -91,9 +91,9 @@ func (c *Converter) Convert(s string) (string, error) {
 	switch {
 	case c == nil:
 		return "", errBadConverter
-	case c.decCharSet.Len() == 0:
+	case c.decCharSet.isEmpty():
 		return "", fmt.Errorf("no decode character set provided")
-	case c.encCharSet.Len() == 0:
+	case c.encCharSet.isEmpty():
 		return "", fmt.Errorf("no encode character set provided")
 	case !isPrintable(s):
 		return "", fmt.Errorf("not printable text")

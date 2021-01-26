@@ -109,3 +109,8 @@ func (c *CharSet) mapDecode() map[rune]int {
 
 	return m
 }
+
+// isEmpty checks whether or not the character set is empty.
+func (c *CharSet) isEmpty() bool {
+	return len(c.charSet) == 0
+}
