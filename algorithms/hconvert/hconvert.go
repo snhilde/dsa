@@ -3,6 +3,7 @@
 package hconvert
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -25,11 +26,14 @@ type Converter struct {
 	decCharSet CharSet
 	encCharSet CharSet
 
-	// The original, encoded string.
-	orig string
+	// The original encoded string.
+	input string
 
 	// Internal buffer for storing decoded data.
 	num *big.Int
+
+	// The converter encoded string.
+	output string
 }
 
 // NewConverter creates a new Converter object with the provided character sets.
@@ -88,52 +92,48 @@ func (c *Converter) EncodeCharSet() CharSet {
 
 // Convert converts the string from the decode character set to the encode character set.
 func (c *Converter) Convert(s string) (string, error) {
-	switch {
-	case c == nil:
+	if c == nil {
 		return "", errBadConverter
-	case c.decCharSet.isEmpty():
+	} else if c.decCharSet.isEmpty() {
 		return "", fmt.Errorf("no decode character set provided")
-	case c.encCharSet.isEmpty():
+	} else if c.encCharSet.isEmpty() {
 		return "", fmt.Errorf("no encode character set provided")
-	case !isPrintable(s):
+	} else if !isPrintable(s) {
 		return "", fmt.Errorf("not printable text")
 	}
 
-	c.orig = s
+	c.input = s
 
 	// Decode the data to binary.
-	num, err := c.decode()
-	if err != nil {
+	if err := c.decode(); err != nil {
 		return "", err
 	}
-	c.num = num
 
 	// Encode the binary to the converted string.
-	out, err := c.encode()
-	if err != nil {
+	if err := c.encode(); err != nil {
 		return "", err
 	}
 
 	// If there wasn't any data in the buffer, then we can just return the zero-value character.
-	if out == "" {
-		out = string(c.encCharSet.Characters()[0])
+	if c.output == "" {
+		c.output = string(c.encCharSet.Characters()[0])
 	}
 
-	return out, nil
+	return c.output, nil
 }
 
 // ConvertFrom reads an encoded string from r until EOF and converts it from the decode character
 // set to the encode character set.
 func (c *Converter) ConvertFrom(r io.Reader) (string, error) {
 	encoded, err := ioutil.ReadAll(r)
-	if err != nil {
+	if err != nil && !errors.Is(err, io.EOF) {
 		return "", err
 	}
 
 	return c.Convert(string(encoded))
 }
 
-func (c *Converter) decode() (*big.Int, error) {
+func (c *Converter) decode() error {
 	// Get the rune->int mapping for this character set.
 	decMap := c.decCharSet.mapDecode()
 
@@ -150,10 +150,10 @@ func (c *Converter) decode() (*big.Int, error) {
 	// starting place is 100, the next place is 10, and the last place is 1. This gives a total
 	// value of (100 * 4) + (10 * 8) + (1 * 9) = 489.
 	significance := new(big.Int)
-	significance.Exp(base, big.NewInt(int64(len(c.orig)-1)), nil)
+	significance.Exp(base, big.NewInt(int64(len(c.input)-1)), nil)
 
 	padding := c.decCharSet.Padding()
-	for _, b := range c.orig {
+	for _, b := range c.input {
 		if padding != "" && string(b) == padding {
 			continue
 		}
@@ -161,7 +161,7 @@ func (c *Converter) decode() (*big.Int, error) {
 		// Figure out the value of this character in the character set.
 		v, ok := decMap[b]
 		if !ok {
-			return nil, errBadCharSet
+			return errBadCharSet
 		}
 
 		// Add this value to the total sum according to its overall significance in the string.
@@ -173,7 +173,10 @@ func (c *Converter) decode() (*big.Int, error) {
 		significance.Div(significance, base)
 	}
 
-	return binary, nil
+	// Store the raw data for encoding.
+	c.num = binary
+
+	return nil
 }
 
 func (c *Converter) encode() (string, error) {
@@ -223,7 +226,7 @@ func (c *Converter) encode() (string, error) {
 	// Calculate how many leading 0-value characters the original string has.
 	zeroChar := c.decCharSet.Characters()[0]
 	leadingZeroes := 0
-	for _, char := range c.orig {
+	for _, char := range c.input {
 		if char == zeroChar {
 			leadingZeroes++
 		} else {
