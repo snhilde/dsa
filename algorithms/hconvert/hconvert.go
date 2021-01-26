@@ -28,7 +28,7 @@ type Converter struct {
 	orig string
 
 	// Internal buffer for storing decoded data.
-	data []byte
+	num *big.Int
 }
 
 // NewConverter creates a new Converter object with the provided character sets.
@@ -94,23 +94,26 @@ func (c *Converter) Convert(s string) (string, error) {
 		return "", errNoCharSet
 	case c.encCharSet.Len() == 0:
 		return "", errNoCharSet
-	case s == "":
-		return "", nil
 	}
 
 	c.orig = s
 
 	// Decode the data to binary.
-	p, err := c.decode()
+	num, err := c.decode()
 	if err != nil {
 		return "", err
 	}
-	c.data = p
+	c.num = num
 
 	// Encode the binary to the converted string.
 	out, err := c.encode()
 	if err != nil {
 		return "", err
+	}
+
+	// If there wasn't any data in the buffer, then we can just return the zero-value character.
+	if out == "" {
+		out = string(c.encCharSet.Characters()[0])
 	}
 
 	return out, nil
@@ -127,7 +130,7 @@ func (c *Converter) ConvertFrom(r io.Reader) (string, error) {
 	return c.Convert(string(encoded))
 }
 
-func (c *Converter) decode() ([]byte, error) {
+func (c *Converter) decode() (*big.Int, error) {
 	// Get the rune->int mapping for this character set.
 	decMap := c.decCharSet.mapDecode()
 
@@ -141,10 +144,10 @@ func (c *Converter) decode() ([]byte, error) {
 	// We'll use this to calculate the value of each character at its place in the string. Because
 	// range reads the string from left to right, we have to start with the highest place and move
 	// down to 1. For example, if we have a string of "489" representing a base10 number, then the
-	// starting place is 100, the next place is 10, and the last place is 1. This givs a total value
-	// of (100 * 4) + (10 * 8) + (1 * 9) = 489.
-	place := new(big.Int)
-	place.Exp(base, big.NewInt(int64(len(c.orig)-1)), nil)
+	// starting place is 100, the next place is 10, and the last place is 1. This gives a total
+	// value of (100 * 4) + (10 * 8) + (1 * 9) = 489.
+	significance := new(big.Int)
+	significance.Exp(base, big.NewInt(int64(len(c.orig)-1)), nil)
 
 	padding := c.decCharSet.Padding()
 	for _, b := range c.orig {
@@ -158,16 +161,16 @@ func (c *Converter) decode() ([]byte, error) {
 			return nil, errBadCharSet
 		}
 
-		// Add this value to the total sum according to its overall place in the string.
+		// Add this value to the total sum according to its overall significance in the string.
 		value := big.NewInt(int64(v))
-		value.Mul(value, place)
+		value.Mul(value, significance)
 		binary.Add(binary, value)
 
 		// Move down to the next position.
-		place.Div(place, base)
+		significance.Div(significance, base)
 	}
 
-	return binary.Bytes(), nil
+	return binary, nil
 }
 
 func (c *Converter) encode() (string, error) {
@@ -183,18 +186,17 @@ func (c *Converter) encode() (string, error) {
 	// 4. Because the modulo operation removes the last character from the buffer, the string is
 	//    going to be reversed. To solve this, we'll pop the values from the stack one-by-one and
 	//    add them to the output buffer, which will reverse the string back to the correct order.
-	if len(c.data) == 0 {
+	if len(c.num.Bytes()) == 0 {
 		return "", nil
 	} else if c.encCharSet.Len() == 0 {
 		return "", errNoCharSet
 	}
 
 	// int->rune mapping for this character set.
-	decMap := c.encCharSet.mapEncode()
+	encMap := c.encCharSet.mapEncode()
 
 	// Binary data that we will encode.
-	binary := new(big.Int)
-	binary.SetBytes(c.data)
+	binary := c.num
 
 	// Numerical base of this character set, for determining the appropriate character at each place
 	// in the output string.
@@ -214,10 +216,10 @@ func (c *Converter) encode() (string, error) {
 		// Add the character for this position.
 		// Note: mod can never be greater than base, which is the length of the character set.
 		value := int(mod.Int64())
-		stack.Add(decMap[value])
+		stack.Add(encMap[value])
 	}
 
-	// Add leading 0-value characters back in.
+	// Calculate how many leading 0-value characters the original string has.
 	zeroChar := c.decCharSet.Characters()[0]
 	leadingZeroes := 0
 	for _, char := range c.orig {
@@ -228,11 +230,9 @@ func (c *Converter) encode() (string, error) {
 		}
 	}
 
-	// Calculate the total value of all the leading zero-values, add back in the appropriate number
-	// of zero-value characters for this character set.
-	zeroValue := leadingZeroes * c.decCharSet.Len()
-	for i := 0; i < zeroValue/c.encCharSet.Len(); i++ {
-		stack.Add(decMap[0])
+	// Add back in the appropriate number of zero-value characters for this character set.
+	for i := leadingZeroes * c.decCharSet.Len(); i > 0; i /= c.encCharSet.Len() {
+		stack.Add(encMap[0])
 	}
 
 	// Write out the string in stack order to reverse it back to the correct order.
