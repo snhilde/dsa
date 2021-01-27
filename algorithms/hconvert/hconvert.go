@@ -94,12 +94,6 @@ func (c *Converter) EncodeCharSet() CharSet {
 func (c *Converter) Convert(s string) (string, error) {
 	if c == nil {
 		return "", errBadConverter
-	} else if c.decCharSet.isEmpty() {
-		return "", fmt.Errorf("no decode character set provided")
-	} else if c.encCharSet.isEmpty() {
-		return "", fmt.Errorf("no encode character set provided")
-	} else if !isPrintable(s) {
-		return "", fmt.Errorf("not printable text")
 	}
 
 	c.input = s
@@ -134,8 +128,25 @@ func (c *Converter) ConvertFrom(r io.Reader) (string, error) {
 }
 
 func (c *Converter) decode() error {
-	// Get the rune->int mapping for this character set.
-	decMap := c.decCharSet.mapDecode()
+	// Basic strategy:
+	// 1. Set up all the values we need.
+	// 2. Iterate through every character in the encoded input string and perform these actions:
+	//     a. Get the value of the character according to its place in the character set.
+	//     b. Multiply that by the position of the character in the string (its significance).
+	//     c. Add that value to the buffer.
+	// 3. The buffer will now hold the value of the encode input string.
+	if c == nil {
+		return errBadConverter
+	}
+
+	c.num = nil
+	if c.decCharSet.isEmpty() {
+		return fmt.Errorf("no decode character set provided")
+	} else if c.input == "" {
+		return nil
+	} else if !isPrintable(c.input) {
+		return fmt.Errorf("not printable text")
+	}
 
 	// Make a new big number to hold the binary data as we decode.
 	binary := new(big.Int)
@@ -143,6 +154,9 @@ func (c *Converter) decode() error {
 	// Figure out the umerical base of this character set, which we'll use for calculating the value
 	// of each character at its position in the string.
 	base := big.NewInt(int64(c.decCharSet.Len()))
+
+	// Get the rune->int mapping for this character set.
+	decMap := c.decCharSet.mapDecode()
 
 	// Figure out the significance of the first character in the string. We'll use this to calculate
 	// the value of each character at its position in the string. Because range reads the string
@@ -195,12 +209,18 @@ func (c *Converter) encode() error {
 	//    string is going to be reversed. To solve this, we'll pop the values from the stack
 	//    one-by-one and add them to the output buffer, which will reverse the string back to the
 	//    correct order.
-	if len(c.num.Bytes()) == 0 {
-		return nil
+	if c == nil {
+		return errBadConverter
 	}
 
-	// Get the int->rune mapping for this character set.
-	encMap := c.encCharSet.mapEncode()
+	c.output = ""
+	if c.num == nil || len(c.num.Bytes()) == 0 {
+		return nil
+	} else if c.encCharSet.isEmpty() {
+		return fmt.Errorf("no encode character set provided")
+	} else if c.decCharSet.isEmpty() {
+		return fmt.Errorf("no decode character set provided")
+	}
 
 	// Grab the binary data that we will encode.
 	binary := c.num
@@ -208,6 +228,9 @@ func (c *Converter) encode() error {
 	// Calculate the numerical base of this character set, which we'll use to determine the
 	// appropriate character at each position in the output string.
 	base := big.NewInt(int64(c.encCharSet.Len()))
+
+	// Get the int->rune mapping for this character set.
+	encMap := c.encCharSet.mapEncode()
 
 	// Make a container to hold the mod value as it's calculated.
 	mod := new(big.Int)
@@ -253,6 +276,7 @@ func (c *Converter) encode() error {
 	return nil
 }
 
+// isPrintable determines whether or not the string has only printable runes.
 func isPrintable(s string) bool {
 	for _, r := range s {
 		if !unicode.IsGraphic(r) {
