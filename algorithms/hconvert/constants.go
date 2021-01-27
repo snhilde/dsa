@@ -91,6 +91,21 @@ func Base16CharSet() CharSet {
 	return charSet
 }
 
+// Base26CharSet creates a new character set with the base26 (alphabetic) characters.
+//	Ordered characters in this set:
+//	'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p',
+//	'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
+func Base26CharSet() CharSet {
+	c := []rune{
+		'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p',
+		'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+	}
+
+	charSet, _ := NewCharSet(c)
+
+	return charSet
+}
+
 // Base32CharSet creates a new character set with the base32 characters.
 //	Ordered characters in this set:
 //	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
