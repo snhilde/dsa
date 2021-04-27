@@ -118,9 +118,9 @@ func TestTBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad pointer test for Toggle()")
 	}
 
-	// Test WriteCSV().
-	if s := tb.WriteCSV(); s != "" {
-		t.Error("Unexpectedly passed bad pointer test for WriteCSV()")
+	// Test CSV().
+	if s := tb.CSV(); s != "" {
+		t.Error("Unexpectedly passed bad pointer test for CSV()")
 	}
 }
 
@@ -1850,7 +1850,7 @@ func checkTString(t *testing.T, tb *htable.Table, want string) {
 }
 
 func checkTCSV(t *testing.T, tb *htable.Table, want string) {
-	if s := tb.WriteCSV(); s != want {
+	if s := tb.CSV(); s != want {
 		t.Error("CSV is incorrect")
 		t.Log("\tExpected:", want)
 		t.Log("\tReceived:", s)

@@ -433,9 +433,9 @@ func (t *Table) Toggle(index int, enabled bool) error {
 	return nil
 }
 
-// WriteCSV converts the table into rows of comma-separated values, with each row delineated by \r\n
-// newlines.
-func (t *Table) WriteCSV() string {
+// CSV returns a representation of the table as rows of comma-separated values, with each row
+// delineated by \r\n newlines.
+func (t *Table) CSV() string {
 	if t == nil || t.Rows() < 1 {
 		return ""
 	}
