@@ -464,11 +464,16 @@ func (t *Table) CSV() string {
 	}
 
 	var b strings.Builder
+
+	// Add the headers.
+	b.WriteString(strings.Join(t.headers, ","))
+	b.WriteString("\r\n")
+
+	// Add the rows.
 	rowChan := t.rows.YieldAll()
 	if rowChan == nil {
 		return ""
 	}
-
 	for r := range rowChan {
 		row := r.(*Row)
 		if row.enabled {
