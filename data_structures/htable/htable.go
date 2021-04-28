@@ -433,6 +433,29 @@ func (t *Table) Toggle(index int, enabled bool) error {
 	return nil
 }
 
+// Sort sorts the table on the specified column. cmp should return true if left should be sorted
+// first or false if right should be sorted first.
+func (t *Table) Sort(header string, cmp func(left, right interface{}) bool) error {
+	if t == nil {
+		return errBadTable
+	}
+
+	// Figure out the index of the column.
+	i := t.ColumnToIndex(header)
+	if i < 0 || i > len(t.headers) {
+		return fmt.Errorf("invalid column")
+	}
+
+	// Sort the rows.
+	err := t.rows.Sort(func(leftRow, rightRow interface{}) bool {
+		leftItem := leftRow.(*Row).Item(i)
+		rightItem := rightRow.(*Row).Item(i)
+		return cmp(leftItem, rightItem)
+	})
+
+	return err
+}
+
 // CSV returns a representation of the table as rows of comma-separated values, with each row
 // delineated by \r\n newlines.
 func (t *Table) CSV() string {
