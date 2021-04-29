@@ -31,8 +31,8 @@ type Table struct {
 	rows    *hlist.List    // Linked list of rows
 }
 
-// New creates a new table. headers denotes the name of each column. Each header names must be
-// unique and not empty.
+// New creates a new table. headers denotes the name of each column. Each header must be unique and
+// not empty.
 func New(headers ...string) (*Table, error) {
 	if len(headers) == 0 {
 		return nil, fmt.Errorf("missing column headers")
@@ -47,7 +47,7 @@ func New(headers ...string) (*Table, error) {
 		}
 		// Make sure none of the columns match each other.
 		if c, found := headerMap[header]; found {
-			return nil, fmt.Errorf("columns %v and %v have the same header", c, i)
+			return nil, fmt.Errorf("columns %v and %v have the same header", c+1, i+1)
 		}
 		headerMap[header] = i
 	}
