@@ -149,7 +149,7 @@ func (t *Table) String() string {
 		return emptyTableString
 	}
 
-	var b strings.Builder
+	b := new(strings.Builder)
 	rowChan := t.rows.Yield(nil)
 	if rowChan == nil {
 		return emptyTableString
@@ -158,7 +158,7 @@ func (t *Table) String() string {
 	for r := range rowChan {
 		row := r.(*Row)
 		if row.enabled {
-			var tmp strings.Builder
+			tmp := new(strings.Builder)
 			for i, item := range row.items {
 				tmp.WriteString(fmt.Sprintf("%v: %v, ", t.headers[i], item))
 			}
@@ -463,7 +463,7 @@ func (t *Table) CSV() string {
 		return ""
 	}
 
-	var b strings.Builder
+	b := new(strings.Builder)
 
 	// Add the headers.
 	b.WriteString(strings.Join(t.headers, ","))
@@ -522,7 +522,7 @@ func (r *Row) String() string {
 		return emptyTableString
 	}
 
-	var b strings.Builder
+	b := new(strings.Builder)
 	for _, item := range r.items {
 		b.WriteString(fmt.Sprintf("%v, ", item))
 	}
