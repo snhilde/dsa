@@ -31,7 +31,6 @@ func TestInsertion(t *testing.T) {
 
 	// Make sure that we can only pass a slice of certain types.
 	testBadArg(t, Insertion)
-	testBadList(t, Insertion)
 
 	// Make sure that our functions sort correctly.
 	i := intSort{sort: Insertion}
@@ -55,7 +54,6 @@ func TestSelection(t *testing.T) {
 
 	// Make sure that we can only pass a slice of certain types.
 	testBadArg(t, Selection)
-	testBadList(t, Selection)
 
 	// Make sure that our functions sort correctly.
 	i := intSort{sort: Selection}
@@ -79,7 +77,6 @@ func TestBubble(t *testing.T) {
 
 	// Make sure that we can only pass a slice of certain types.
 	testBadArg(t, Bubble)
-	testBadList(t, Bubble)
 
 	// Make sure that our functions sort correctly.
 	i := intSort{sort: Bubble}
@@ -103,7 +100,6 @@ func TestMerge(t *testing.T) {
 
 	// Make sure that we can only pass a slice of certain types.
 	testBadArg(t, Merge)
-	testBadList(t, Merge)
 
 	// Make sure that our functions sort correctly.
 	i := intSort{sort: Merge}
@@ -127,7 +123,6 @@ func TestMergeOptimized(t *testing.T) {
 
 	// Make sure that we can only pass a slice of certain types.
 	testBadArg(t, MergeOptimized)
-	testBadList(t, MergeOptimized)
 
 	// Make sure that our functions sort correctly.
 	i := intSort{sort: MergeOptimized}
@@ -159,7 +154,6 @@ func TestBogo(t *testing.T) {
 
 	// Make sure that we can only pass a slice of certain types.
 	testBadArg(t, Bogo)
-	testBadList(t, Bogo)
 
 	// Make sure that our functions sort correctly. We're using extremely small list sizes and only
 	// 2 iterations because this algorithm is so inefficient.
@@ -747,61 +741,6 @@ func testBadArg(t *testing.T, sort func(interface{}, func(int, int) bool) error)
 	st1 := st{}
 	if err := sort(st1, func(i, j int) bool { return true }); err == nil {
 		t.Error("Sort function accepted a struct")
-	}
-}
-
-func testBadList(t *testing.T, sort func(interface{}, func(int, int) bool) error) {
-	// Make sure the function won't accept a slice of any of the types below.
-
-	// complex number
-	var c complex64
-	if err := sort(c, func(i, j int) bool { return true }); err == nil {
-		t.Error("Sort function accepted a slice of complex numbers")
-	}
-
-	// slice
-	var is [][]int
-	if err := sort(is, func(i, j int) bool { return true }); err == nil {
-		t.Error("Sort function accepted a slice of slices")
-	}
-
-	// array
-	var ia [][64]int
-	if err := sort(ia, func(i, j int) bool { return true }); err == nil {
-		t.Error("Sort function accepted a slice of arrays")
-	}
-
-	// channel
-	var ch []chan int
-	if err := sort(ch, func(i, j int) bool { return true }); err == nil {
-		t.Error("Sort function accepted a slice of channels")
-	}
-
-	// function
-	var fn []func()
-	if err := sort(fn, func(i, j int) bool { return true }); err == nil {
-		t.Error("Sort function accepted a slice of functions")
-	}
-
-	// interface
-	var iface []interface{}
-	if err := sort(iface, func(i, j int) bool { return true }); err == nil {
-		t.Error("Sort function accepted a slice of interfaces")
-	}
-
-	// map
-	var m []map[int]int
-	if err := sort(m, func(i, j int) bool { return true }); err == nil {
-		t.Error("Sort function accepted a slice of maps")
-	}
-
-	// struct
-	type st struct {
-		i int
-	}
-	var sta []st
-	if err := sort(sta, func(i, j int) bool { return true }); err == nil {
-		t.Error("Sort function accepted a slice of structs")
 	}
 }
 
