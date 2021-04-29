@@ -758,14 +758,13 @@ func (b *Buffer) opBuf(ref *Buffer, tok token.Token) error {
 
 // Print string from data.
 func (b *Buffer) stringInt(pretty bool) string {
-	var sb strings.Builder
-
 	if b == nil {
 		return "<nil>"
 	} else if b.head == nil {
 		return "<empty>"
 	}
 
+	sb := new(strings.Builder)
 	cnt := 1
 	for node := b.head; node != nil; node = node.next {
 		if node.bit {
