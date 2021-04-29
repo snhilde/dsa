@@ -34,10 +34,7 @@ func TestInsertion(t *testing.T) {
 	testBadList(t, Insertion)
 
 	// Make sure that our functions sort correctly.
-	i := intSort{sortInt: InsertionInt}
-	testSort(t, &i, 100, 1000, false, "InsertionInt")
-
-	i = intSort{sort: Insertion}
+	i := intSort{sort: Insertion}
 	testSort(t, &i, 100, 1000, false, "Insertion (int)")
 
 	u := uintSort{sort: Insertion}
@@ -61,10 +58,7 @@ func TestSelection(t *testing.T) {
 	testBadList(t, Selection)
 
 	// Make sure that our functions sort correctly.
-	i := intSort{sortInt: SelectionInt}
-	testSort(t, &i, 100, 1000, false, "SelectionInt")
-
-	i = intSort{sort: Selection}
+	i := intSort{sort: Selection}
 	testSort(t, &i, 100, 1000, false, "Selection (int)")
 
 	u := uintSort{sort: Selection}
@@ -88,10 +82,7 @@ func TestBubble(t *testing.T) {
 	testBadList(t, Bubble)
 
 	// Make sure that our functions sort correctly.
-	i := intSort{sortInt: BubbleInt}
-	testSort(t, &i, 100, 1000, false, "BubbleInt")
-
-	i = intSort{sort: Bubble}
+	i := intSort{sort: Bubble}
 	testSort(t, &i, 100, 1000, false, "Bubble (int)")
 
 	u := uintSort{sort: Bubble}
@@ -115,10 +106,7 @@ func TestMerge(t *testing.T) {
 	testBadList(t, Merge)
 
 	// Make sure that our functions sort correctly.
-	i := intSort{sortInt: MergeInt}
-	testSort(t, &i, 100, 10000, false, "MergeInt")
-
-	i = intSort{sort: Merge}
+	i := intSort{sort: Merge}
 	testSort(t, &i, 100, 10000, false, "Merge (int)")
 
 	u := uintSort{sort: Merge}
@@ -142,10 +130,7 @@ func TestMergeOptimized(t *testing.T) {
 	testBadList(t, MergeOptimized)
 
 	// Make sure that our functions sort correctly.
-	i := intSort{sortInt: MergeIntOptimized}
-	testSort(t, &i, 100, 10000, false, "MergeIntOptimized")
-
-	i = intSort{sort: MergeOptimized}
+	i := intSort{sort: MergeOptimized}
 	testSort(t, &i, 100, 10, false, "MergeOptimized (int)")
 
 	u := uintSort{sort: MergeOptimized}
@@ -161,12 +146,12 @@ func TestMergeOptimized(t *testing.T) {
 	testSort(t, &s, 100, 10000, false, "MergeOptimized (string)")
 }
 
-func TestHashInt(t *testing.T) {
+func TestHash(t *testing.T) {
 	t.Parallel()
 
 	// Make sure that our function sorts correctly.
-	i := intSort{sortInt: HashInt}
-	testSort(t, &i, 100, 10000, true, "HashInt")
+	i := intSort{sortInt: Hash}
+	testSort(t, &i, 100, 10000, true, "Hash")
 }
 
 func TestBogo(t *testing.T) {
@@ -177,11 +162,8 @@ func TestBogo(t *testing.T) {
 	testBadList(t, Bogo)
 
 	// Make sure that our functions sort correctly. We're using extremely small list sizes and only
-	// 2 iterations because this algorithm is so comically inefficient.
-	i := intSort{sortInt: BogoInt}
-	testSort(t, &i, 2, 10, false, "BogoInt")
-
-	i = intSort{sort: Bogo}
+	// 2 iterations because this algorithm is so inefficient.
+	i := intSort{sort: Bogo}
 	testSort(t, &i, 2, 10, false, "Bogo (int)")
 
 	u := uintSort{sort: Bogo}
@@ -197,30 +179,15 @@ func TestBogo(t *testing.T) {
 	testSort(t, &s, 2, 10, false, "Bogo (string)")
 }
 
-func TestBinaryInt(t *testing.T) {
+func TestBinary(t *testing.T) {
 	t.Parallel()
 
 	// Make sure that our functions sort correctly.
-	i := intSort{sortInt: BinaryInt}
-	testSort(t, &i, 100, 10000, false, "BinaryInt")
+	i := intSort{sortInt: Binary}
+	testSort(t, &i, 100, 10000, false, "Binary")
 }
 
 // --- SORT BENCHMARKS ---
-
-func BenchmarkInsertionInt100(b *testing.B) {
-	i := intSort{sortInt: InsertionInt}
-	benchmarkSort(b, &i, 100, false)
-}
-
-func BenchmarkInsertionInt1000(b *testing.B) {
-	i := intSort{sortInt: InsertionInt}
-	benchmarkSort(b, &i, 1000, false)
-}
-
-func BenchmarkInsertionInt10000(b *testing.B) {
-	i := intSort{sortInt: InsertionInt}
-	benchmarkSort(b, &i, 10000, false)
-}
 
 func BenchmarkInsertion100_int(b *testing.B) {
 	i := intSort{sort: Insertion}
@@ -295,21 +262,6 @@ func BenchmarkInsertion1000_string(b *testing.B) {
 func BenchmarkInsertion10000_string(b *testing.B) {
 	s := stringSort{sort: Insertion}
 	benchmarkSort(b, &s, 10000, false)
-}
-
-func BenchmarkSelectionInt100(b *testing.B) {
-	i := intSort{sortInt: SelectionInt}
-	benchmarkSort(b, &i, 100, false)
-}
-
-func BenchmarkSelectionInt1000(b *testing.B) {
-	i := intSort{sortInt: SelectionInt}
-	benchmarkSort(b, &i, 1000, false)
-}
-
-func BenchmarkSelectionInt10000(b *testing.B) {
-	i := intSort{sortInt: SelectionInt}
-	benchmarkSort(b, &i, 10000, false)
 }
 
 func BenchmarkSelection100_int(b *testing.B) {
@@ -387,21 +339,6 @@ func BenchmarkSelection10000_string(b *testing.B) {
 	benchmarkSort(b, &s, 10000, false)
 }
 
-func BenchmarkBubbleInt100(b *testing.B) {
-	i := intSort{sortInt: BubbleInt}
-	benchmarkSort(b, &i, 100, false)
-}
-
-func BenchmarkBubbleInt1000(b *testing.B) {
-	i := intSort{sortInt: BubbleInt}
-	benchmarkSort(b, &i, 1000, false)
-}
-
-func BenchmarkBubbleInt10000(b *testing.B) {
-	i := intSort{sortInt: BubbleInt}
-	benchmarkSort(b, &i, 10000, false)
-}
-
 func BenchmarkBubble100_int(b *testing.B) {
 	i := intSort{sort: Bubble}
 	benchmarkSort(b, &i, 100, false)
@@ -475,21 +412,6 @@ func BenchmarkBubble1000_string(b *testing.B) {
 func BenchmarkBubble10000_string(b *testing.B) {
 	s := stringSort{sort: Bubble}
 	benchmarkSort(b, &s, 10000, false)
-}
-
-func BenchmarkMergeInt100(b *testing.B) {
-	i := intSort{sortInt: MergeInt}
-	benchmarkSort(b, &i, 100, false)
-}
-
-func BenchmarkMergeInt1000(b *testing.B) {
-	i := intSort{sortInt: MergeInt}
-	benchmarkSort(b, &i, 1000, false)
-}
-
-func BenchmarkMergeInt10000(b *testing.B) {
-	i := intSort{sortInt: MergeInt}
-	benchmarkSort(b, &i, 10000, false)
 }
 
 func BenchmarkMerge100_int(b *testing.B) {
@@ -567,21 +489,6 @@ func BenchmarkMerge10000_string(b *testing.B) {
 	benchmarkSort(b, &s, 10000, false)
 }
 
-func BenchmarkMergeIntOptimized100(b *testing.B) {
-	i := intSort{sortInt: MergeIntOptimized}
-	benchmarkSort(b, &i, 100, false)
-}
-
-func BenchmarkMergeIntOptimized1000(b *testing.B) {
-	i := intSort{sortInt: MergeIntOptimized}
-	benchmarkSort(b, &i, 1000, false)
-}
-
-func BenchmarkMergeIntOptimized10000(b *testing.B) {
-	i := intSort{sortInt: MergeIntOptimized}
-	benchmarkSort(b, &i, 10000, false)
-}
-
 func BenchmarkMergeOptimized100_int(b *testing.B) {
 	i := intSort{sort: MergeOptimized}
 	benchmarkSort(b, &i, 100, false)
@@ -657,34 +564,19 @@ func BenchmarkMergeOptimized10000_string(b *testing.B) {
 	benchmarkSort(b, &s, 10000, false)
 }
 
-func BenchmarkHashInt100(b *testing.B) {
-	i := intSort{sortInt: HashInt}
+func BenchmarkHash100(b *testing.B) {
+	i := intSort{sortInt: Hash}
 	benchmarkSort(b, &i, 100, true)
 }
 
-func BenchmarkHashInt1000(b *testing.B) {
-	i := intSort{sortInt: HashInt}
+func BenchmarkHash1000(b *testing.B) {
+	i := intSort{sortInt: Hash}
 	benchmarkSort(b, &i, 1000, true)
 }
 
-func BenchmarkHashInt10000(b *testing.B) {
-	i := intSort{sortInt: HashInt}
+func BenchmarkHash10000(b *testing.B) {
+	i := intSort{sortInt: Hash}
 	benchmarkSort(b, &i, 10000, true)
-}
-
-func BenchmarkBogoInt2(b *testing.B) {
-	i := intSort{sortInt: BogoInt}
-	benchmarkSort(b, &i, 2, false)
-}
-
-func BenchmarkBogoInt4(b *testing.B) {
-	i := intSort{sortInt: BogoInt}
-	benchmarkSort(b, &i, 4, false)
-}
-
-func BenchmarkBogoInt8(b *testing.B) {
-	i := intSort{sortInt: BogoInt}
-	benchmarkSort(b, &i, 8, false)
 }
 
 func BenchmarkBogo2_int(b *testing.B) {
@@ -762,89 +654,89 @@ func BenchmarkBogo8_string(b *testing.B) {
 	benchmarkSort(b, &s, 8, false)
 }
 
-func BenchmarkBinaryInt100(b *testing.B) {
-	i := intSort{sortInt: BinaryInt}
+func BenchmarkBinary100(b *testing.B) {
+	i := intSort{sortInt: Binary}
 	benchmarkSort(b, &i, 100, false)
 }
 
-func BenchmarkBinaryInt1000(b *testing.B) {
-	i := intSort{sortInt: BinaryInt}
+func BenchmarkBinary1000(b *testing.B) {
+	i := intSort{sortInt: Binary}
 	benchmarkSort(b, &i, 1000, false)
 }
 
-func BenchmarkBinaryInt10000(b *testing.B) {
-	i := intSort{sortInt: BinaryInt}
+func BenchmarkBinary10000(b *testing.B) {
+	i := intSort{sortInt: Binary}
 	benchmarkSort(b, &i, 10000, false)
 }
 
 // --- HELPER FUNCTIONS ---
 
-func testBadArg(t *testing.T, sort func(interface{}) error) {
+func testBadArg(t *testing.T, sort func(interface{}, func(int, int) bool) error) {
 	// Make sure the function won't accept any of the types below.
 
 	// int
 	var i int
-	if err := sort(i); err == nil {
+	if err := sort(i, func(i, j int) bool { return true }); err == nil {
 		t.Error("Sort function accepted an int")
 	}
 
 	// uint
 	var u uint
-	if err := sort(u); err == nil {
+	if err := sort(u, func(i, j int) bool { return true }); err == nil {
 		t.Error("Sort function accepted a uint")
 	}
 
 	// float
 	var f float32
-	if err := sort(f); err == nil {
+	if err := sort(f, func(i, j int) bool { return true }); err == nil {
 		t.Error("Sort function accepted a float")
 	}
 
 	// complex number
 	var c complex64
-	if err := sort(c); err == nil {
+	if err := sort(c, func(i, j int) bool { return true }); err == nil {
 		t.Error("Sort function accepted a complex number")
 	}
 
 	// bool
 	var b bool
-	if err := sort(b); err == nil {
+	if err := sort(b, func(i, j int) bool { return true }); err == nil {
 		t.Error("Sort function accepted a bool")
 	}
 
 	// string
 	var s string
-	if err := sort(s); err == nil {
+	if err := sort(s, func(i, j int) bool { return true }); err == nil {
 		t.Error("Sort function accepted a string")
 	}
 
 	// array
 	var arr [64]int
-	if err := sort(arr); err == nil {
+	if err := sort(arr, func(i, j int) bool { return true }); err == nil {
 		t.Error("Sort function accepted an array")
 	}
 
 	// channel
 	ch := make(chan int)
-	if err := sort(ch); err == nil {
+	if err := sort(ch, func(i, j int) bool { return true }); err == nil {
 		t.Error("Sort function accepted a channel")
 	}
 
 	// function
 	fn := func() {}
-	if err := sort(fn); err == nil {
+	if err := sort(fn, func(i, j int) bool { return true }); err == nil {
 		t.Error("Sort function accepted a function")
 	}
 
 	// interface
 	var iface interface{}
-	if err := sort(iface); err == nil {
+	if err := sort(iface, func(i, j int) bool { return true }); err == nil {
 		t.Error("Sort function accepted an interface")
 	}
 
 	// map
 	m := make(map[int]int)
-	if err := sort(m); err == nil {
+	if err := sort(m, func(i, j int) bool { return true }); err == nil {
 		t.Error("Sort function accepted a map")
 	}
 
@@ -853,53 +745,53 @@ func testBadArg(t *testing.T, sort func(interface{}) error) {
 		i int
 	}
 	st1 := st{}
-	if err := sort(st1); err == nil {
+	if err := sort(st1, func(i, j int) bool { return true }); err == nil {
 		t.Error("Sort function accepted a struct")
 	}
 }
 
-func testBadList(t *testing.T, sort func(interface{}) error) {
+func testBadList(t *testing.T, sort func(interface{}, func(int, int) bool) error) {
 	// Make sure the function won't accept a slice of any of the types below.
 
 	// complex number
-	var c []complex64
-	if err := sort(c); err == nil {
+	var c complex64
+	if err := sort(c, func(i, j int) bool { return true }); err == nil {
 		t.Error("Sort function accepted a slice of complex numbers")
 	}
 
 	// slice
 	var is [][]int
-	if err := sort(is); err == nil {
+	if err := sort(is, func(i, j int) bool { return true }); err == nil {
 		t.Error("Sort function accepted a slice of slices")
 	}
 
 	// array
 	var ia [][64]int
-	if err := sort(ia); err == nil {
+	if err := sort(ia, func(i, j int) bool { return true }); err == nil {
 		t.Error("Sort function accepted a slice of arrays")
 	}
 
 	// channel
 	var ch []chan int
-	if err := sort(ch); err == nil {
+	if err := sort(ch, func(i, j int) bool { return true }); err == nil {
 		t.Error("Sort function accepted a slice of channels")
 	}
 
 	// function
 	var fn []func()
-	if err := sort(fn); err == nil {
+	if err := sort(fn, func(i, j int) bool { return true }); err == nil {
 		t.Error("Sort function accepted a slice of functions")
 	}
 
 	// interface
 	var iface []interface{}
-	if err := sort(iface); err == nil {
+	if err := sort(iface, func(i, j int) bool { return true }); err == nil {
 		t.Error("Sort function accepted a slice of interfaces")
 	}
 
 	// map
 	var m []map[int]int
-	if err := sort(m); err == nil {
+	if err := sort(m, func(i, j int) bool { return true }); err == nil {
 		t.Error("Sort function accepted a slice of maps")
 	}
 
@@ -908,7 +800,7 @@ func testBadList(t *testing.T, sort func(interface{}) error) {
 		i int
 	}
 	var sta []st
-	if err := sort(sta); err == nil {
+	if err := sort(sta, func(i, j int) bool { return true }); err == nil {
 		t.Error("Sort function accepted a slice of structs")
 	}
 }
@@ -953,7 +845,7 @@ func newRand() *rand.Rand {
 type intSort struct {
 	dev     []int
 	std     []int
-	sort    func(interface{}) error
+	sort    func(interface{}, func(int, int) bool) error
 	sortInt func([]int) error
 }
 
@@ -979,7 +871,9 @@ func (s *intSort) Build(length int, isHash bool) {
 
 func (s *intSort) Sort() error {
 	if s.sort != nil {
-		return s.sort(s.dev)
+		return s.sort(s.dev, func(i, j int) bool {
+			return s.dev[i] < s.dev[j]
+		})
 	}
 	return s.sortInt(s.dev)
 }
@@ -1005,7 +899,7 @@ func (s *intSort) Cmp(t *testing.T) bool {
 type uintSort struct {
 	dev  []uint
 	std  []int
-	sort func(interface{}) error
+	sort func(interface{}, func(int, int) bool) error
 }
 
 func (s *uintSort) Build(length int, isHash bool) {
@@ -1026,7 +920,9 @@ func (s *uintSort) Build(length int, isHash bool) {
 }
 
 func (s *uintSort) Sort() error {
-	return s.sort(s.dev)
+	return s.sort(s.dev, func(i, j int) bool {
+		return s.dev[i] < s.dev[j]
+	})
 }
 
 func (s *uintSort) SortStd() {
@@ -1050,7 +946,7 @@ func (s *uintSort) Cmp(t *testing.T) bool {
 type floatSort struct {
 	dev  []float64
 	std  []float64
-	sort func(interface{}) error
+	sort func(interface{}, func(int, int) bool) error
 }
 
 func (s *floatSort) Build(length int, isHash bool) {
@@ -1074,7 +970,9 @@ func (s *floatSort) Build(length int, isHash bool) {
 }
 
 func (s *floatSort) Sort() error {
-	return s.sort(s.dev)
+	return s.sort(s.dev, func(i, j int) bool {
+		return s.dev[i] < s.dev[j]
+	})
 }
 
 func (s *floatSort) SortStd() {
@@ -1098,7 +996,7 @@ func (s *floatSort) Cmp(t *testing.T) bool {
 type boolSort struct {
 	dev  []bool
 	std  []int
-	sort func(interface{}) error
+	sort func(interface{}, func(int, int) bool) error
 }
 
 func (s *boolSort) Build(length int, isHash bool) {
@@ -1120,7 +1018,9 @@ func (s *boolSort) Build(length int, isHash bool) {
 }
 
 func (s *boolSort) Sort() error {
-	return s.sort(s.dev)
+	return s.sort(s.dev, func(i, j int) bool {
+		return !s.dev[i] && s.dev[j]
+	})
 }
 
 func (s *boolSort) SortStd() {
@@ -1148,7 +1048,7 @@ func (s *boolSort) Cmp(t *testing.T) bool {
 type stringSort struct {
 	dev  []string
 	std  []string
-	sort func(interface{}) error
+	sort func(interface{}, func(int, int) bool) error
 }
 
 func (s *stringSort) Build(length int, isHash bool) {
@@ -1174,7 +1074,9 @@ func (s *stringSort) Build(length int, isHash bool) {
 }
 
 func (s *stringSort) Sort() error {
-	return s.sort(s.dev)
+	return s.sort(s.dev, func(i, j int) bool {
+		return s.dev[i] < s.dev[j]
+	})
 }
 
 func (s *stringSort) SortStd() {
