@@ -569,14 +569,14 @@ func TestTAdd(t *testing.T) {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}")
-	checkTCSV(t, tb, "1,2,3")
+	checkTCSV(t, tb, "1,2,3", "1,2,3")
 	checkTCount(t, tb, 3)
 
 	if err := tb.Add(4, 5, 6); err != nil {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
-	checkTCSV(t, tb, "1,2,3\r\n4,5,6")
+	checkTCSV(t, tb, "1,2,3", "1,2,3\r\n4,5,6")
 	checkTCount(t, tb, 6)
 
 	// Test rows of characters.
@@ -585,14 +585,14 @@ func TestTAdd(t *testing.T) {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: 97, 2: 98, 3: 99}")
-	checkTCSV(t, tb, "97,98,99")
+	checkTCSV(t, tb, "1,2,3", "97,98,99")
 	checkTCount(t, tb, 3)
 
 	if err := tb.Add('d', 'e', 'f'); err != nil {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: 97, 2: 98, 3: 99}, {1: 100, 2: 101, 3: 102}")
-	checkTCSV(t, tb, "97,98,99\r\n100,101,102")
+	checkTCSV(t, tb, "1,2,3", "97,98,99\r\n100,101,102")
 	checkTCount(t, tb, 6)
 
 	// Test rows of int slices.
@@ -601,14 +601,14 @@ func TestTAdd(t *testing.T) {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: [10 20], 2: [30 40], 3: [50 60]}")
-	checkTCSV(t, tb, "[10 20],[30 40],[50 60]")
+	checkTCSV(t, tb, "1,2,3", "[10 20],[30 40],[50 60]")
 	checkTCount(t, tb, 3)
 
 	if err := tb.Add([]int{100, 200}, []int{300, 400}, []int{500, 600}); err != nil {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: [10 20], 2: [30 40], 3: [50 60]}, {1: [100 200], 2: [300 400], 3: [500 600]}")
-	checkTCSV(t, tb, "[10 20],[30 40],[50 60]\r\n[100 200],[300 400],[500 600]")
+	checkTCSV(t, tb, "1,2,3", "[10 20],[30 40],[50 60]\r\n[100 200],[300 400],[500 600]")
 	checkTCount(t, tb, 6)
 
 	// Test mixed-value rows.
@@ -617,14 +617,14 @@ func TestTAdd(t *testing.T) {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: 1.1, 2: b, 3: [3]}")
-	checkTCSV(t, tb, "1.1,b,[3]")
+	checkTCSV(t, tb, "1,2,3", "1.1,b,[3]")
 	checkTCount(t, tb, 3)
 
 	if err := tb.Add(4.4, "e", []byte{0x06}); err != nil {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: 1.1, 2: b, 3: [3]}, {1: 4.4, 2: e, 3: [6]}")
-	checkTCSV(t, tb, "1.1,b,[3]\r\n4.4,e,[6]")
+	checkTCSV(t, tb, "1,2,3", "1.1,b,[3]\r\n4.4,e,[6]")
 	checkTCount(t, tb, 6)
 
 	// Test rows of strings with spaces.
@@ -633,14 +633,14 @@ func TestTAdd(t *testing.T) {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: before , 2: in between, 3:  after}")
-	checkTCSV(t, tb, "before ,in between, after")
+	checkTCSV(t, tb, "1,2,3", "before ,in between, after")
 	checkTCount(t, tb, 3)
 
 	if err := tb.Add("AAA", "   ", ""); err != nil {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: before , 2: in between, 3:  after}, {1: AAA, 2:    , 3: }")
-	checkTCSV(t, tb, "before ,in between, after\r\nAAA,   ,")
+	checkTCSV(t, tb, "1,2,3", "before ,in between, after\r\nAAA,   ,")
 	checkTCount(t, tb, 6)
 
 	// Test rows masquerading as interfaces.
@@ -649,14 +649,14 @@ func TestTAdd(t *testing.T) {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}")
-	checkTCSV(t, tb, "1,2,3")
+	checkTCSV(t, tb, "1,2,3", "1,2,3")
 	checkTCount(t, tb, 3)
 
 	if err := tb.Add(4, 5, 6); err != nil {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
-	checkTCSV(t, tb, "1,2,3\r\n4,5,6")
+	checkTCSV(t, tb, "1,2,3", "1,2,3\r\n4,5,6")
 	checkTCount(t, tb, 6)
 
 	// Test rows of functions.
@@ -665,14 +665,14 @@ func TestTAdd(t *testing.T) {
 		t.Error(err)
 	}
 	checkTString(t, tb, fmt.Sprintf("{1: %p, 2: %p, 3: %p}", TestTNew, checkTString, TestTInsert))
-	checkTCSV(t, tb, fmt.Sprintf("%p,%p,%p", TestTNew, checkTString, TestTInsert))
+	checkTCSV(t, tb, "1,2,3", fmt.Sprintf("%p,%p,%p", TestTNew, checkTString, TestTInsert))
 	checkTCount(t, tb, 3)
 
-	if err := tb.Add(TestTAdd, checkTCSV, TestTRows); err != nil {
+	if err := tb.Add(TestTAdd, checkTString, TestTRows); err != nil {
 		t.Error(err)
 	}
-	checkTString(t, tb, fmt.Sprintf("{1: %p, 2: %p, 3: %p}, {1: %p, 2: %p, 3: %p}", TestTNew, checkTString, TestTInsert, TestTAdd, checkTCSV, TestTRows))
-	checkTCSV(t, tb, fmt.Sprintf("%p,%p,%p\r\n%p,%p,%p", TestTNew, checkTString, TestTInsert, TestTAdd, checkTCSV, TestTRows))
+	checkTString(t, tb, fmt.Sprintf("{1: %p, 2: %p, 3: %p}, {1: %p, 2: %p, 3: %p}", TestTNew, checkTString, TestTInsert, TestTAdd, checkTString, TestTRows))
+	checkTCSV(t, tb, "1,2,3", fmt.Sprintf("%p,%p,%p\r\n%p,%p,%p", TestTNew, checkTString, TestTInsert, TestTAdd, checkTString, TestTRows))
 	checkTCount(t, tb, 6)
 }
 
@@ -682,13 +682,13 @@ func TestTInsert(t *testing.T) {
 	tb.Add(1, 2, 3)
 	tb.Add(4, 5, 6)
 	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
-	checkTCSV(t, tb, "1,2,3\r\n4,5,6")
+	checkTCSV(t, tb, "1,2,3", "1,2,3\r\n4,5,6")
 	checkTCount(t, tb, 6)
 	if err := tb.Insert(0, -1, -2, -3); err != nil {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: -1, 2: -2, 3: -3}, {1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
-	checkTCSV(t, tb, "-1,-2,-3\r\n1,2,3\r\n4,5,6")
+	checkTCSV(t, tb, "1,2,3", "-1,-2,-3\r\n1,2,3\r\n4,5,6")
 	checkTCount(t, tb, 9)
 
 	// Test inserting a row in the middle.
@@ -696,13 +696,13 @@ func TestTInsert(t *testing.T) {
 	tb.Add("a", "b", "c")
 	tb.Add("d", "e", "f")
 	checkTString(t, tb, "{1: a, 2: b, 3: c}, {1: d, 2: e, 3: f}")
-	checkTCSV(t, tb, "a,b,c\r\nd,e,f")
+	checkTCSV(t, tb, "1,2,3", "a,b,c\r\nd,e,f")
 	checkTCount(t, tb, 6)
 	if err := tb.Insert(1, "x", "y", "z"); err != nil {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: a, 2: b, 3: c}, {1: x, 2: y, 3: z}, {1: d, 2: e, 3: f}")
-	checkTCSV(t, tb, "a,b,c\r\nx,y,z\r\nd,e,f")
+	checkTCSV(t, tb, "1,2,3", "a,b,c\r\nx,y,z\r\nd,e,f")
 	checkTCount(t, tb, 9)
 
 	// Test inserting a row at the end.
@@ -710,13 +710,13 @@ func TestTInsert(t *testing.T) {
 	tb.Add([]int{10, 20}, []int{30, 40}, []int{50, 60})
 	tb.Add([]int{100, 200}, []int{300, 400}, []int{500, 600})
 	checkTString(t, tb, "{1: [10 20], 2: [30 40], 3: [50 60]}, {1: [100 200], 2: [300 400], 3: [500 600]}")
-	checkTCSV(t, tb, "[10 20],[30 40],[50 60]\r\n[100 200],[300 400],[500 600]")
+	checkTCSV(t, tb, "1,2,3", "[10 20],[30 40],[50 60]\r\n[100 200],[300 400],[500 600]")
 	checkTCount(t, tb, 6)
 	if err := tb.Insert(2, []int{-1, -2, -3}, []int{-4, -5, -6}, []int{-7, -8, -9}); err != nil {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: [10 20], 2: [30 40], 3: [50 60]}, {1: [100 200], 2: [300 400], 3: [500 600]}, {1: [-1 -2 -3], 2: [-4 -5 -6], 3: [-7 -8 -9]}")
-	checkTCSV(t, tb, "[10 20],[30 40],[50 60]\r\n[100 200],[300 400],[500 600]\r\n[-1 -2 -3],[-4 -5 -6],[-7 -8 -9]")
+	checkTCSV(t, tb, "1,2,3", "[10 20],[30 40],[50 60]\r\n[100 200],[300 400],[500 600]\r\n[-1 -2 -3],[-4 -5 -6],[-7 -8 -9]")
 	checkTCount(t, tb, 9)
 
 	// Test inserting a row beyond the table's current boundaries.
@@ -724,13 +724,13 @@ func TestTInsert(t *testing.T) {
 	tb.Add(1.1, "b", []byte{0x03})
 	tb.Add(4.4, "e", []byte{0x06})
 	checkTString(t, tb, "{1: 1.1, 2: b, 3: [3]}, {1: 4.4, 2: e, 3: [6]}")
-	checkTCSV(t, tb, "1.1,b,[3]\r\n4.4,e,[6]")
+	checkTCSV(t, tb, "1,2,3", "1.1,b,[3]\r\n4.4,e,[6]")
 	checkTCount(t, tb, 6)
 	if err := tb.Insert(3, 7.7, "h", []byte{0x09}); err == nil {
 		t.Error("Unexpectedly passed out-of-bounds index test")
 	}
 	checkTString(t, tb, "{1: 1.1, 2: b, 3: [3]}, {1: 4.4, 2: e, 3: [6]}")
-	checkTCSV(t, tb, "1.1,b,[3]\r\n4.4,e,[6]")
+	checkTCSV(t, tb, "1,2,3", "1.1,b,[3]\r\n4.4,e,[6]")
 	checkTCount(t, tb, 6)
 
 	// Test only inserting instead of appending.
@@ -739,26 +739,26 @@ func TestTInsert(t *testing.T) {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: before , 2: in between, 3:  after}")
-	checkTCSV(t, tb, "before ,in between, after")
+	checkTCSV(t, tb, "1,2,3", "before ,in between, after")
 	checkTCount(t, tb, 3)
 	if err := tb.Insert(1, "AAA", "   ", ""); err != nil {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: before , 2: in between, 3:  after}, {1: AAA, 2:    , 3: }")
-	checkTCSV(t, tb, "before ,in between, after\r\nAAA,   ,")
+	checkTCSV(t, tb, "1,2,3", "before ,in between, after\r\nAAA,   ,")
 	checkTCount(t, tb, 6)
 	if err := tb.Insert(0, "first", "second", "third"); err != nil {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: first, 2: second, 3: third}, {1: before , 2: in between, 3:  after}, {1: AAA, 2:    , 3: }")
-	checkTCSV(t, tb, "first,second,third\r\nbefore ,in between, after\r\nAAA,   ,")
+	checkTCSV(t, tb, "1,2,3", "first,second,third\r\nbefore ,in between, after\r\nAAA,   ,")
 	checkTCount(t, tb, 9)
 }
 
 func TestTAddRow(t *testing.T) {
 	tb, _ := htable.New("1", "2", "3")
 	checkTString(t, tb, "<empty>")
-	checkTCSV(t, tb, "")
+	checkTCSV(t, tb, "1,2,3", "")
 	checkTCount(t, tb, 0)
 
 	// Test adding a row with the correct number of columns.
@@ -767,7 +767,7 @@ func TestTAddRow(t *testing.T) {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}")
-	checkTCSV(t, tb, "1,2,3")
+	checkTCSV(t, tb, "1,2,3", "1,2,3")
 	checkTCount(t, tb, 3)
 
 	// Test adding a row with too few columns.
@@ -776,7 +776,7 @@ func TestTAddRow(t *testing.T) {
 		t.Error("Unexpectedly passed adding a row with too few columns")
 	}
 	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}")
-	checkTCSV(t, tb, "1,2,3")
+	checkTCSV(t, tb, "1,2,3", "1,2,3")
 	checkTCount(t, tb, 3)
 
 	// Test adding a row with too many columns.
@@ -785,7 +785,7 @@ func TestTAddRow(t *testing.T) {
 		t.Error("Unexpectedly passed adding a row with too many columns")
 	}
 	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}")
-	checkTCSV(t, tb, "1,2,3")
+	checkTCSV(t, tb, "1,2,3", "1,2,3")
 	checkTCount(t, tb, 3)
 
 	// Test adding a row with the right types.
@@ -794,7 +794,7 @@ func TestTAddRow(t *testing.T) {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
-	checkTCSV(t, tb, "1,2,3\r\n4,5,6")
+	checkTCSV(t, tb, "1,2,3", "1,2,3\r\n4,5,6")
 	checkTCount(t, tb, 6)
 
 	// Test adding a row with the first value being the wrong type.
@@ -803,7 +803,7 @@ func TestTAddRow(t *testing.T) {
 		t.Error("Unexpectedly passed adding a row with the first value being the wrong type")
 	}
 	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
-	checkTCSV(t, tb, "1,2,3\r\n4,5,6")
+	checkTCSV(t, tb, "1,2,3", "1,2,3\r\n4,5,6")
 	checkTCount(t, tb, 6)
 
 	// Test adding a row with the middle value being the wrong type.
@@ -812,7 +812,7 @@ func TestTAddRow(t *testing.T) {
 		t.Error("Unexpectedly passed adding a row with the middle value being the wrong type")
 	}
 	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
-	checkTCSV(t, tb, "1,2,3\r\n4,5,6")
+	checkTCSV(t, tb, "1,2,3", "1,2,3\r\n4,5,6")
 	checkTCount(t, tb, 6)
 
 	// Test adding a row with the last value being the wrong type.
@@ -821,7 +821,7 @@ func TestTAddRow(t *testing.T) {
 		t.Error("Unexpectedly passed adding a row with the last value being the wrong type")
 	}
 	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
-	checkTCSV(t, tb, "1,2,3\r\n4,5,6")
+	checkTCSV(t, tb, "1,2,3", "1,2,3\r\n4,5,6")
 	checkTCount(t, tb, 6)
 
 	// Test adding a row with all values being the wrong type.
@@ -830,14 +830,14 @@ func TestTAddRow(t *testing.T) {
 		t.Error("Unexpectedly passed adding a row with all values being the wrong type")
 	}
 	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
-	checkTCSV(t, tb, "1,2,3\r\n4,5,6")
+	checkTCSV(t, tb, "1,2,3", "1,2,3\r\n4,5,6")
 	checkTCount(t, tb, 6)
 }
 
 func TestTInsertRow(t *testing.T) {
 	tb, _ := htable.New("1", "2", "3")
 	checkTString(t, tb, "<empty>")
-	checkTCSV(t, tb, "")
+	checkTCSV(t, tb, "1,2,3", "")
 	checkTCount(t, tb, 0)
 
 	// Test inserting a row with the correct number of columns.
@@ -846,7 +846,7 @@ func TestTInsertRow(t *testing.T) {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}")
-	checkTCSV(t, tb, "1,2,3")
+	checkTCSV(t, tb, "1,2,3", "1,2,3")
 	checkTCount(t, tb, 3)
 
 	// Test adding a row with too few columns.
@@ -855,7 +855,7 @@ func TestTInsertRow(t *testing.T) {
 		t.Error("Unexpectedly passed adding a row with too few columns")
 	}
 	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}")
-	checkTCSV(t, tb, "1,2,3")
+	checkTCSV(t, tb, "1,2,3", "1,2,3")
 	checkTCount(t, tb, 3)
 
 	// Test adding a row with too many columns.
@@ -864,7 +864,7 @@ func TestTInsertRow(t *testing.T) {
 		t.Error("Unexpectedly passed adding a row with too many columns")
 	}
 	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}")
-	checkTCSV(t, tb, "1,2,3")
+	checkTCSV(t, tb, "1,2,3", "1,2,3")
 	checkTCount(t, tb, 3)
 
 	// Test inserting a row before the current first row.
@@ -873,7 +873,7 @@ func TestTInsertRow(t *testing.T) {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: -1, 2: -2, 3: -3}, {1: 1, 2: 2, 3: 3}")
-	checkTCSV(t, tb, "-1,-2,-3\r\n1,2,3")
+	checkTCSV(t, tb, "1,2,3", "-1,-2,-3\r\n1,2,3")
 	checkTCount(t, tb, 6)
 
 	// Test inserting a row after the current first row.
@@ -882,7 +882,7 @@ func TestTInsertRow(t *testing.T) {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: -1, 2: -2, 3: -3}, {1: 0, 2: 0, 3: 0}, {1: 1, 2: 2, 3: 3}")
-	checkTCSV(t, tb, "-1,-2,-3\r\n0,0,0\r\n1,2,3")
+	checkTCSV(t, tb, "1,2,3", "-1,-2,-3\r\n0,0,0\r\n1,2,3")
 	checkTCount(t, tb, 9)
 
 	// Test inserting a row at the end.
@@ -891,7 +891,7 @@ func TestTInsertRow(t *testing.T) {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: -1, 2: -2, 3: -3}, {1: 0, 2: 0, 3: 0}, {1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
-	checkTCSV(t, tb, "-1,-2,-3\r\n0,0,0\r\n1,2,3\r\n4,5,6")
+	checkTCSV(t, tb, "1,2,3", "-1,-2,-3\r\n0,0,0\r\n1,2,3\r\n4,5,6")
 	checkTCount(t, tb, 12)
 
 	// Test inserting a row with the first value being the wrong type.
@@ -900,7 +900,7 @@ func TestTInsertRow(t *testing.T) {
 		t.Error("Unexpectedly passed inserting a row with the first value being the wrong type")
 	}
 	checkTString(t, tb, "{1: -1, 2: -2, 3: -3}, {1: 0, 2: 0, 3: 0}, {1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
-	checkTCSV(t, tb, "-1,-2,-3\r\n0,0,0\r\n1,2,3\r\n4,5,6")
+	checkTCSV(t, tb, "1,2,3", "-1,-2,-3\r\n0,0,0\r\n1,2,3\r\n4,5,6")
 	checkTCount(t, tb, 12)
 
 	// Test inserting a row with the middle value being the wrong type.
@@ -909,7 +909,7 @@ func TestTInsertRow(t *testing.T) {
 		t.Error("Unexpectedly passed inserting a row with the middle value being the wrong type")
 	}
 	checkTString(t, tb, "{1: -1, 2: -2, 3: -3}, {1: 0, 2: 0, 3: 0}, {1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
-	checkTCSV(t, tb, "-1,-2,-3\r\n0,0,0\r\n1,2,3\r\n4,5,6")
+	checkTCSV(t, tb, "1,2,3", "-1,-2,-3\r\n0,0,0\r\n1,2,3\r\n4,5,6")
 	checkTCount(t, tb, 12)
 
 	// Test inserting a row with the last value being the wrong type.
@@ -918,7 +918,7 @@ func TestTInsertRow(t *testing.T) {
 		t.Error("Unexpectedly passed inserting a row with the last value being the wrong type")
 	}
 	checkTString(t, tb, "{1: -1, 2: -2, 3: -3}, {1: 0, 2: 0, 3: 0}, {1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
-	checkTCSV(t, tb, "-1,-2,-3\r\n0,0,0\r\n1,2,3\r\n4,5,6")
+	checkTCSV(t, tb, "1,2,3", "-1,-2,-3\r\n0,0,0\r\n1,2,3\r\n4,5,6")
 	checkTCount(t, tb, 12)
 
 	// Test inserting a row with all values being the wrong type.
@@ -927,7 +927,7 @@ func TestTInsertRow(t *testing.T) {
 		t.Error("Unexpectedly passed inserting a row with all values being the wrong type")
 	}
 	checkTString(t, tb, "{1: -1, 2: -2, 3: -3}, {1: 0, 2: 0, 3: 0}, {1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
-	checkTCSV(t, tb, "-1,-2,-3\r\n0,0,0\r\n1,2,3\r\n4,5,6")
+	checkTCSV(t, tb, "1,2,3", "-1,-2,-3\r\n0,0,0\r\n1,2,3\r\n4,5,6")
 	checkTCount(t, tb, 12)
 }
 
@@ -938,13 +938,13 @@ func TestTRemoveRow(t *testing.T) {
 	tb.Add(1, 2, 3)
 	tb.Add(4, 5, 6)
 	checkTString(t, tb, "{1: -1, 2: -2, 3: -3}, {1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
-	checkTCSV(t, tb, "-1,-2,-3\r\n1,2,3\r\n4,5,6")
+	checkTCSV(t, tb, "1,2,3", "-1,-2,-3\r\n1,2,3\r\n4,5,6")
 	checkTCount(t, tb, 9)
 	if err := tb.RemoveRow(0); err != nil {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
-	checkTCSV(t, tb, "1,2,3\r\n4,5,6")
+	checkTCSV(t, tb, "1,2,3", "1,2,3\r\n4,5,6")
 	checkTCount(t, tb, 6)
 
 	// Test removing a row in the middle.
@@ -953,13 +953,13 @@ func TestTRemoveRow(t *testing.T) {
 	tb.Add("x", "y", "z")
 	tb.Add("d", "e", "f")
 	checkTString(t, tb, "{1: a, 2: b, 3: c}, {1: x, 2: y, 3: z}, {1: d, 2: e, 3: f}")
-	checkTCSV(t, tb, "a,b,c\r\nx,y,z\r\nd,e,f")
+	checkTCSV(t, tb, "1,2,3", "a,b,c\r\nx,y,z\r\nd,e,f")
 	checkTCount(t, tb, 9)
 	if err := tb.RemoveRow(1); err != nil {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: a, 2: b, 3: c}, {1: d, 2: e, 3: f}")
-	checkTCSV(t, tb, "a,b,c\r\nd,e,f")
+	checkTCSV(t, tb, "1,2,3", "a,b,c\r\nd,e,f")
 	checkTCount(t, tb, 6)
 
 	// Test removing a row at the end.
@@ -968,13 +968,13 @@ func TestTRemoveRow(t *testing.T) {
 	tb.Add([]int{100, 200}, []int{300, 400}, []int{500, 600})
 	tb.Add([]int{-1, -2, -3}, []int{-4, -5, -6}, []int{-7, -8, -9})
 	checkTString(t, tb, "{1: [10 20], 2: [30 40], 3: [50 60]}, {1: [100 200], 2: [300 400], 3: [500 600]}, {1: [-1 -2 -3], 2: [-4 -5 -6], 3: [-7 -8 -9]}")
-	checkTCSV(t, tb, "[10 20],[30 40],[50 60]\r\n[100 200],[300 400],[500 600]\r\n[-1 -2 -3],[-4 -5 -6],[-7 -8 -9]")
+	checkTCSV(t, tb, "1,2,3", "[10 20],[30 40],[50 60]\r\n[100 200],[300 400],[500 600]\r\n[-1 -2 -3],[-4 -5 -6],[-7 -8 -9]")
 	checkTCount(t, tb, 9)
 	if err := tb.RemoveRow(2); err != nil {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: [10 20], 2: [30 40], 3: [50 60]}, {1: [100 200], 2: [300 400], 3: [500 600]}")
-	checkTCSV(t, tb, "[10 20],[30 40],[50 60]\r\n[100 200],[300 400],[500 600]")
+	checkTCSV(t, tb, "1,2,3", "[10 20],[30 40],[50 60]\r\n[100 200],[300 400],[500 600]")
 	checkTCount(t, tb, 6)
 
 	// Test removing a row beyond the table's current boundaries.
@@ -982,25 +982,25 @@ func TestTRemoveRow(t *testing.T) {
 	tb.Add(1.1, "b", []byte{0x03})
 	tb.Add(4.4, "e", []byte{0x06})
 	checkTString(t, tb, "{1: 1.1, 2: b, 3: [3]}, {1: 4.4, 2: e, 3: [6]}")
-	checkTCSV(t, tb, "1.1,b,[3]\r\n4.4,e,[6]")
+	checkTCSV(t, tb, "1,2,3", "1.1,b,[3]\r\n4.4,e,[6]")
 	checkTCount(t, tb, 6)
 	if err := tb.RemoveRow(3); err == nil {
 		t.Error("Unexpectedly passed out-of-bounds index test")
 	}
 	checkTString(t, tb, "{1: 1.1, 2: b, 3: [3]}, {1: 4.4, 2: e, 3: [6]}")
-	checkTCSV(t, tb, "1.1,b,[3]\r\n4.4,e,[6]")
+	checkTCSV(t, tb, "1,2,3", "1.1,b,[3]\r\n4.4,e,[6]")
 	checkTCount(t, tb, 6)
 
 	// Test removing when there aren't any rows in the table.
 	tb, _ = htable.New("1", "2", "3")
 	checkTString(t, tb, "<empty>")
-	checkTCSV(t, tb, "")
+	checkTCSV(t, tb, "1,2,3", "")
 	checkTCount(t, tb, 0)
 	if err := tb.RemoveRow(0); err == nil {
 		t.Error("Unexpectedly passed removing from empty table test")
 	}
 	checkTString(t, tb, "<empty>")
-	checkTCSV(t, tb, "")
+	checkTCSV(t, tb, "1,2,3", "")
 	checkTCount(t, tb, 0)
 }
 
@@ -1008,14 +1008,14 @@ func TestTClear(t *testing.T) {
 	// Try clearing an empty table.
 	tb, _ := htable.New("1", "2", "3")
 	checkTString(t, tb, "<empty>")
-	checkTCSV(t, tb, "")
+	checkTCSV(t, tb, "1,2,3", "")
 	checkTCount(t, tb, 0)
 
 	if err := tb.Clear(); err != nil {
 		t.Error(err)
 	}
 	checkTString(t, tb, "<empty>")
-	checkTCSV(t, tb, "")
+	checkTCSV(t, tb, "1,2,3", "")
 	checkTCount(t, tb, 0)
 
 	// Add some rows and clear again.
@@ -1024,14 +1024,14 @@ func TestTClear(t *testing.T) {
 	tb.Add(4, 5, 6)
 	tb.Add(7, 8, 9)
 	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}, {1: 7, 2: 8, 3: 9}")
-	checkTCSV(t, tb, "1,2,3\r\n4,5,6\r\n7,8,9")
+	checkTCSV(t, tb, "1,2,3", "1,2,3\r\n4,5,6\r\n7,8,9")
 	checkTCount(t, tb, 9)
 
 	if err := tb.Clear(); err != nil {
 		t.Error(err)
 	}
 	checkTString(t, tb, "<empty>")
-	checkTCSV(t, tb, "")
+	checkTCSV(t, tb, "1,2,3", "")
 	checkTCount(t, tb, 0)
 
 	// Add some rows, delete one row, and then clear.
@@ -1041,14 +1041,14 @@ func TestTClear(t *testing.T) {
 	tb.Add(7, 8, 9)
 	tb.RemoveRow(1)
 	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 7, 2: 8, 3: 9}")
-	checkTCSV(t, tb, "1,2,3\r\n7,8,9")
+	checkTCSV(t, tb, "1,2,3", "1,2,3\r\n7,8,9")
 	checkTCount(t, tb, 6)
 
 	if err := tb.Clear(); err != nil {
 		t.Error(err)
 	}
 	checkTString(t, tb, "<empty>")
-	checkTCSV(t, tb, "")
+	checkTCSV(t, tb, "1,2,3", "")
 	checkTCount(t, tb, 0)
 
 	// Add some rows, delete all the rows, and then clear.
@@ -1060,14 +1060,14 @@ func TestTClear(t *testing.T) {
 	tb.RemoveRow(0)
 	tb.RemoveRow(0)
 	checkTString(t, tb, "<empty>")
-	checkTCSV(t, tb, "")
+	checkTCSV(t, tb, "1,2,3", "")
 	checkTCount(t, tb, 0)
 
 	if err := tb.Clear(); err != nil {
 		t.Error(err)
 	}
 	checkTString(t, tb, "<empty>")
-	checkTCSV(t, tb, "")
+	checkTCSV(t, tb, "1,2,3", "")
 	checkTCount(t, tb, 0)
 
 	// Add some rows, disable a couple of rows, and clear the table.
@@ -1078,14 +1078,14 @@ func TestTClear(t *testing.T) {
 	tb.Toggle(1, false)
 	tb.Toggle(2, false)
 	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}")
-	checkTCSV(t, tb, "1,2,3")
+	checkTCSV(t, tb, "1,2,3", "1,2,3")
 	checkTCount(t, tb, 9)
 
 	if err := tb.Clear(); err != nil {
 		t.Error(err)
 	}
 	checkTString(t, tb, "<empty>")
-	checkTCSV(t, tb, "")
+	checkTCSV(t, tb, "1,2,3", "")
 	checkTCount(t, tb, 0)
 }
 
@@ -1105,7 +1105,7 @@ func TestTColumnToIndex(t *testing.T) {
 func TestTSetItem(t *testing.T) {
 	tb, _ := htable.New("1", "2", "3")
 	checkTString(t, tb, "<empty>")
-	checkTCSV(t, tb, "")
+	checkTCSV(t, tb, "1,2,3", "")
 	checkTCount(t, tb, 0)
 
 	// Make sure you can't set any values with an empty table.
@@ -1117,7 +1117,7 @@ func TestTSetItem(t *testing.T) {
 	tb.Add(4, 5, 6)
 	tb.Add(7, 8, 9)
 	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}, {1: 7, 2: 8, 3: 9}")
-	checkTCSV(t, tb, "1,2,3\r\n4,5,6\r\n7,8,9")
+	checkTCSV(t, tb, "1,2,3", "1,2,3\r\n4,5,6\r\n7,8,9")
 	checkTCount(t, tb, 9)
 
 	// Change each value for all three rows.
@@ -1130,7 +1130,7 @@ func TestTSetItem(t *testing.T) {
 		}
 	}
 	checkTString(t, tb, "{1: 10, 2: 20, 3: 30}, {1: 40, 2: 50, 3: 60}, {1: 70, 2: 80, 3: 90}")
-	checkTCSV(t, tb, "10,20,30\r\n40,50,60\r\n70,80,90")
+	checkTCSV(t, tb, "1,2,3", "10,20,30\r\n40,50,60\r\n70,80,90")
 	checkTCount(t, tb, 9)
 
 	// Make sure you can't change an item's type.
@@ -1624,7 +1624,7 @@ func TestTToggle(t *testing.T) {
 	tb.Add(4, 5, 6)
 	tb.Add(7, 8, 9)
 	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}, {1: 7, 2: 8, 3: 9}")
-	checkTCSV(t, tb, "1,2,3\r\n4,5,6\r\n7,8,9")
+	checkTCSV(t, tb, "1,2,3", "1,2,3\r\n4,5,6\r\n7,8,9")
 	checkTCount(t, tb, 9)
 
 	// Disable first row.
@@ -1632,7 +1632,7 @@ func TestTToggle(t *testing.T) {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: 4, 2: 5, 3: 6}, {1: 7, 2: 8, 3: 9}")
-	checkTCSV(t, tb, "4,5,6\r\n7,8,9")
+	checkTCSV(t, tb, "1,2,3", "4,5,6\r\n7,8,9")
 	checkTCount(t, tb, 9)
 
 	// Enable first row.
@@ -1640,7 +1640,7 @@ func TestTToggle(t *testing.T) {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}, {1: 7, 2: 8, 3: 9}")
-	checkTCSV(t, tb, "1,2,3\r\n4,5,6\r\n7,8,9")
+	checkTCSV(t, tb, "1,2,3", "1,2,3\r\n4,5,6\r\n7,8,9")
 	checkTCount(t, tb, 9)
 
 	// Disable middle row.
@@ -1648,7 +1648,7 @@ func TestTToggle(t *testing.T) {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 7, 2: 8, 3: 9}")
-	checkTCSV(t, tb, "1,2,3\r\n7,8,9")
+	checkTCSV(t, tb, "1,2,3", "1,2,3\r\n7,8,9")
 	checkTCount(t, tb, 9)
 
 	// Enable middle row.
@@ -1656,7 +1656,7 @@ func TestTToggle(t *testing.T) {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}, {1: 7, 2: 8, 3: 9}")
-	checkTCSV(t, tb, "1,2,3\r\n4,5,6\r\n7,8,9")
+	checkTCSV(t, tb, "1,2,3", "1,2,3\r\n4,5,6\r\n7,8,9")
 	checkTCount(t, tb, 9)
 
 	// Disable last row.
@@ -1664,7 +1664,7 @@ func TestTToggle(t *testing.T) {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
-	checkTCSV(t, tb, "1,2,3\r\n4,5,6")
+	checkTCSV(t, tb, "1,2,3", "1,2,3\r\n4,5,6")
 	checkTCount(t, tb, 9)
 
 	// Enable last row.
@@ -1672,7 +1672,7 @@ func TestTToggle(t *testing.T) {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}, {1: 7, 2: 8, 3: 9}")
-	checkTCSV(t, tb, "1,2,3\r\n4,5,6\r\n7,8,9")
+	checkTCSV(t, tb, "1,2,3", "1,2,3\r\n4,5,6\r\n7,8,9")
 	checkTCount(t, tb, 9)
 
 	// Enable already-enabled row.
@@ -1680,7 +1680,7 @@ func TestTToggle(t *testing.T) {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}, {1: 7, 2: 8, 3: 9}")
-	checkTCSV(t, tb, "1,2,3\r\n4,5,6\r\n7,8,9")
+	checkTCSV(t, tb, "1,2,3", "1,2,3\r\n4,5,6\r\n7,8,9")
 	checkTCount(t, tb, 9)
 
 	// Disable already-disabled row.
@@ -1691,13 +1691,13 @@ func TestTToggle(t *testing.T) {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: 4, 2: 5, 3: 6}, {1: 7, 2: 8, 3: 9}")
-	checkTCSV(t, tb, "4,5,6\r\n7,8,9")
+	checkTCSV(t, tb, "1,2,3", "4,5,6\r\n7,8,9")
 	checkTCount(t, tb, 9)
 
 	// Remove disabled row.
 	tb.RemoveRow(0)
 	checkTString(t, tb, "{1: 4, 2: 5, 3: 6}, {1: 7, 2: 8, 3: 9}")
-	checkTCSV(t, tb, "4,5,6\r\n7,8,9")
+	checkTCSV(t, tb, "1,2,3", "4,5,6\r\n7,8,9")
 	checkTCount(t, tb, 6)
 
 	// Remove row before disable row, then enable row.
@@ -1705,32 +1705,32 @@ func TestTToggle(t *testing.T) {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: 4, 2: 5, 3: 6}")
-	checkTCSV(t, tb, "4,5,6")
+	checkTCSV(t, tb, "1,2,3", "4,5,6")
 	checkTCount(t, tb, 6)
 
 	tb.RemoveRow(0)
 	checkTString(t, tb, "<empty>")
-	checkTCSV(t, tb, "")
+	checkTCSV(t, tb, "1,2,3", "")
 	checkTCount(t, tb, 3)
 
 	if err := tb.Toggle(0, true); err != nil {
 		t.Error(err)
 	}
 	checkTString(t, tb, "{1: 7, 2: 8, 3: 9}")
-	checkTCSV(t, tb, "7,8,9")
+	checkTCSV(t, tb, "1,2,3", "7,8,9")
 	checkTCount(t, tb, 3)
 
 	// Try to toggle a row in an empty table.
 	tb.RemoveRow(0)
 	checkTString(t, tb, "<empty>")
-	checkTCSV(t, tb, "")
+	checkTCSV(t, tb, "1,2,3", "")
 	checkTCount(t, tb, 0)
 
 	if err := tb.Toggle(0, true); err == nil {
 		t.Error("Unexpectedly toggle nonexistant row")
 	}
 	checkTString(t, tb, "<empty>")
-	checkTCSV(t, tb, "")
+	checkTCSV(t, tb, "1,2,3", "")
 	checkTCount(t, tb, 0)
 }
 
@@ -1849,11 +1849,15 @@ func checkTString(t *testing.T, tb *htable.Table, want string) {
 	}
 }
 
-func checkTCSV(t *testing.T, tb *htable.Table, want string) {
-	if s := tb.CSV(); s != want {
+func checkTCSV(t *testing.T, tb *htable.Table, headers, want string) {
+	all := headers
+	if want != "" {
+		all += "\r\n" + want
+	}
+	if csv := tb.CSV(); csv != all {
 		t.Error("CSV is incorrect")
-		t.Log("\tExpected:", want)
-		t.Log("\tReceived:", s)
+		t.Log("\tExpected:", all)
+		t.Log("\tReceived:", csv)
 	}
 }
 
