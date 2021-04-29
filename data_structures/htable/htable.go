@@ -193,7 +193,7 @@ func (t *Table) SetItem(header string, index int, value interface{}) error {
 
 	// Figure out the index of the column.
 	i := t.ColumnToIndex(header)
-	if i < 0 {
+	if i < 0 || i >= len(t.headers) {
 		return fmt.Errorf("invalid column")
 	}
 
@@ -390,7 +390,7 @@ func (t *Table) Item(header string, index int) interface{} {
 
 	// Figure out the index of the column.
 	i := t.ColumnToIndex(header)
-	if i < 0 {
+	if i < 0 || i >= len(t.headers) {
 		return nil
 	}
 
@@ -459,20 +459,19 @@ func (t *Table) Sort(header string, cmp func(left, right interface{}) bool) erro
 // CSV returns a representation of the table as rows of comma-separated values, with each row
 // delineated by \r\n newlines.
 func (t *Table) CSV() string {
-	if t == nil || t.Rows() < 1 {
+	if t == nil {
 		return ""
 	}
 
 	b := new(strings.Builder)
 
 	// Add the headers.
-	b.WriteString(strings.Join(t.headers, ","))
-	b.WriteString("\r\n")
+	b.WriteString(strings.Join(t.Headers(), ","))
 
 	// Add the rows.
 	rowChan := t.rows.YieldAll()
 	if rowChan == nil {
-		return ""
+		return b.String()
 	}
 	for r := range rowChan {
 		row := r.(*Row)
@@ -481,13 +480,12 @@ func (t *Table) CSV() string {
 			for i, item := range row.items {
 				items[i] = fmt.Sprintf("%v", item)
 			}
-			b.WriteString(strings.Join(items, ","))
 			b.WriteString("\r\n")
+			b.WriteString(strings.Join(items, ","))
 		}
 	}
 
-	// Remove the last newline before returning the string.
-	return strings.TrimSuffix(b.String(), "\r\n")
+	return b.String()
 }
 
 // Row holds all the data for each row in the table.
