@@ -33,23 +33,18 @@ func TestTBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad pointer test for InsertRow()")
 	}
 
-	// Test RemoveRow().
-	if err := tb.RemoveRow(2); err == nil {
-		t.Error("Unexpectedly passed bad pointer test for RemoveRow()")
-	}
-
 	// Test Clear().
 	if err := tb.Clear(); err == nil {
 		t.Error("Unexpectedly passed bad pointer test for Clear()")
 	}
 
 	// Test ColumnToIndex().
-	if n := tb.ColumnToIndex("1"); n != -1 {
+	if tb.ColumnToIndex("1") != -1 {
 		t.Error("Unexpectedly passed bad pointer test for ColumnToIndex()")
 	}
 
 	// Test String().
-	if s := tb.String(); s != "<nil>" {
+	if tb.String() != "<nil>" {
 		t.Error("Unexpectedly passed bad pointer test for String()")
 	}
 
@@ -68,39 +63,49 @@ func TestTBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad pointer test for Headers()")
 	}
 
+	// Test Copy().
+	if tb.Copy() != nil {
+		t.Error("Unexpectedly passed bad pointer test for Copy()")
+	}
+
 	// Test Rows().
-	if n := tb.Rows(); n != -1 {
+	if tb.Rows() != -1 {
 		t.Error("Unexpectedly passed bad pointer test for Rows()")
 	}
 
 	// Test Enabled().
-	if n := tb.Enabled(); n != -1 {
+	if tb.Enabled() != -1 {
 		t.Error("Unexpectedly passed bad pointer test for Enabled()")
 	}
 
 	// Test Disabled().
-	if n := tb.Disabled(); n != -1 {
+	if tb.Disabled() != -1 {
 		t.Error("Unexpectedly passed bad pointer test for Disabled()")
 	}
 
 	// Test Columns().
-	if n := tb.Columns(); n != -1 {
+	if tb.Columns() != -1 {
 		t.Error("Unexpectedly passed bad pointer test for Columns()")
 	}
 
 	// Test Count().
-	if n := tb.Count(); n != -1 {
+	if tb.Count() != -1 {
 		t.Error("Unexpectedly passed bad pointer test for Count()")
 	}
 
 	// Test Same().
-	if ok := tb.Same(nil); ok {
+	if tb.Same(nil) {
 		t.Error("Unexpectedly passed bad pointer test for Same()")
 	}
 
 	// Test Row().
 	if i, r := tb.Row("a", 5); i != -1 || r != nil {
 		t.Error("Unexpectedly passed bad pointer test for Row()")
+	}
+
+	// Test RowByIndex().
+	if tb.RowByIndex(0) != nil {
+		t.Error("Unexpectedly passed bad pointer test for RowByIndex()")
 	}
 
 	// Test Item().
@@ -118,8 +123,18 @@ func TestTBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad pointer test for Toggle()")
 	}
 
+	// Test SortByColumn().
+	if err := tb.SortByColumn("a", func(left, right interface{}) bool { return true }); err == nil {
+		t.Error("Unexpectedly passed bad pointer test for SortByColumn()")
+	}
+
+	// Test SortByRow().
+	if err := tb.SortByRow(func(left, right *htable.Row) bool { return true }); err == nil {
+		t.Error("Unexpectedly passed bad pointer test for SortByRow()")
+	}
+
 	// Test CSV().
-	if s := tb.CSV(); s != "" {
+	if tb.CSV() != "" {
 		t.Error("Unexpectedly passed bad pointer test for CSV()")
 	}
 }
@@ -138,18 +153,33 @@ func TestRBadPtr(t *testing.T) {
 	}
 
 	// Test Count().
-	if n := r.Count(); n != -1 {
+	if r.Count() != -1 {
 		t.Error("Unexpectedly passed bad pointer test for Row's Count()")
 	}
 
 	// Test Item().
-	if v := r.Item(0); v != nil {
+	if r.Item(0) != nil {
 		t.Error("Unexpectedly passed bad pointer test for Row's Item()")
+	}
+
+	// Test Items().
+	if r.Items() != nil {
+		t.Error("Unexpectedly passed bad pointer test for Row's Items()")
+	}
+
+	// Test Enabled().
+	if r.Enabled() {
+		t.Error("Unexpectedly passed bad pointer test for Row's Enabled()")
 	}
 
 	// Test Matches().
 	if r.Matches(0, 1) {
 		t.Error("Unexpectedly passed bad pointer test for Row's Matches()")
+	}
+
+	// Test Copy().
+	if r.Copy() != nil {
+		t.Error("Unexpectedly passed bad pointer test for Row's Copy()")
 	}
 }
 
@@ -287,23 +317,13 @@ func TestTBadArgs(t *testing.T) {
 		t.Error("Unexpectedly passed wrong type (last) test for InsertRow()")
 	}
 
-	// Test RemoveRow() - negative index.
-	if err := tb.RemoveRow(-1); err == nil {
-		t.Error("Unexpectedly passed negative index test for RemoveRow()")
-	}
-
-	// Test RemoveRow() - out-of-bounds index.
-	if err := tb.RemoveRow(100); err == nil {
-		t.Error("Unexpectedly passed out-of-bounds index test for RemoveRow()")
-	}
-
 	// Test ColumnToIndex() - empty column header.
-	if i := tb.ColumnToIndex(""); i != -1 {
+	if tb.ColumnToIndex("") != -1 {
 		t.Error("Unexpectedly passed empty column header test for ColumnToIndex()")
 	}
 
 	// Test ColumnToIndex() - invalid column header.
-	if i := tb.ColumnToIndex("4"); i != -1 {
+	if tb.ColumnToIndex("4") != -1 {
 		t.Error("Unexpectedly passed invalid column header test for ColumnToIndex()")
 	}
 
@@ -357,28 +377,38 @@ func TestTBadArgs(t *testing.T) {
 		t.Error("Unexpectedly passed missing item test for Row()")
 	}
 
+	// Test RowByIndex() - negative index.
+	if tb.RowByIndex(-1) != nil {
+		t.Error("Unexpectedly passed negative index test for RowByIndex()")
+	}
+
+	// Test RowByIndex() - out-of-bounds index.
+	if tb.RowByIndex(100) != nil {
+		t.Error("Unexpectedly passed out-of-bounds index test for RowByIndex()")
+	}
+
 	// Test Item() - negative index.
-	if v := tb.Item("1", -1); v != nil {
+	if tb.Item("1", -1) != nil {
 		t.Error("Unexpectedly passed negative index test for Item()")
 	}
 
 	// Test Item() - out-of-bounds index.
-	if v := tb.Item("1", 100); v != nil {
+	if tb.Item("1", 100) != nil {
 		t.Error("Unexpectedly passed out-of-bounds index test for Item()")
 	}
 
 	// Test Item() - empty column header.
-	if v := tb.Item("", 0); v != nil {
+	if tb.Item("", 0) != nil {
 		t.Error("Unexpectedly passed empty column header test for Item()")
 	}
 
 	// Test Item() - invalid column header.
-	if v := tb.Item("4", 0); v != nil {
+	if tb.Item("4", 0) != nil {
 		t.Error("Unexpectedly passed invalid column header test for Item()")
 	}
 
 	// Test Same() - nil table.
-	if ok := tb.Same(nil); ok {
+	if tb.Same(nil) {
 		t.Error("Unexpectedly passed nil table test for Same()")
 	}
 
@@ -417,6 +447,21 @@ func TestTBadArgs(t *testing.T) {
 		t.Error("Unexpectedly passed out-of-bounds index test for Toggle()")
 	}
 
+	// Test SortByColumn() - invalid column header.
+	if err := tb.SortByColumn("4", func(left, right interface{}) bool { return true }); err == nil {
+		t.Error("Unexpectedly passed invalid column header test for SortByColumn()")
+	}
+
+	// Test SortByColumn() - missing comparison function.
+	if err := tb.SortByColumn("1", nil); err == nil {
+		t.Error("Unexpectedly passed missing comparison function test for SortByColumn()")
+	}
+
+	// Test SortByRow() - missing comparison function.
+	if err := tb.SortByRow(nil); err == nil {
+		t.Error("Unexpectedly passed missing comparison function test for SortByRow()")
+	}
+
 	// Test Add() - adding table to itself.
 	tb, _ = htable.New("1")
 	tb2, _ := htable.New("2")
@@ -452,12 +497,12 @@ func TestRBadArgs(t *testing.T) {
 	}
 
 	// Test Item() - negative index.
-	if v := r.Item(-1); v != nil {
+	if r.Item(-1) != nil {
 		t.Error("Unexpectedly passed negative index test for Item()")
 	}
 
 	// Test Item() - out-of-bounds index.
-	if v := r.Item(100); v != nil {
+	if r.Item(100) != nil {
 		t.Error("Unexpectedly passed out-of-bounds index test for Item()")
 	}
 
@@ -940,9 +985,7 @@ func TestTRemoveRow(t *testing.T) {
 	checkTString(t, tb, "{1: -1, 2: -2, 3: -3}, {1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
 	checkTCSV(t, tb, "1,2,3", "-1,-2,-3\r\n1,2,3\r\n4,5,6")
 	checkTCount(t, tb, 9)
-	if err := tb.RemoveRow(0); err != nil {
-		t.Error(err)
-	}
+	tb.RemoveRow(0)
 	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
 	checkTCSV(t, tb, "1,2,3", "1,2,3\r\n4,5,6")
 	checkTCount(t, tb, 6)
@@ -955,9 +998,7 @@ func TestTRemoveRow(t *testing.T) {
 	checkTString(t, tb, "{1: a, 2: b, 3: c}, {1: x, 2: y, 3: z}, {1: d, 2: e, 3: f}")
 	checkTCSV(t, tb, "1,2,3", "a,b,c\r\nx,y,z\r\nd,e,f")
 	checkTCount(t, tb, 9)
-	if err := tb.RemoveRow(1); err != nil {
-		t.Error(err)
-	}
+	tb.RemoveRow(1)
 	checkTString(t, tb, "{1: a, 2: b, 3: c}, {1: d, 2: e, 3: f}")
 	checkTCSV(t, tb, "1,2,3", "a,b,c\r\nd,e,f")
 	checkTCount(t, tb, 6)
@@ -970,9 +1011,7 @@ func TestTRemoveRow(t *testing.T) {
 	checkTString(t, tb, "{1: [10 20], 2: [30 40], 3: [50 60]}, {1: [100 200], 2: [300 400], 3: [500 600]}, {1: [-1 -2 -3], 2: [-4 -5 -6], 3: [-7 -8 -9]}")
 	checkTCSV(t, tb, "1,2,3", "[10 20],[30 40],[50 60]\r\n[100 200],[300 400],[500 600]\r\n[-1 -2 -3],[-4 -5 -6],[-7 -8 -9]")
 	checkTCount(t, tb, 9)
-	if err := tb.RemoveRow(2); err != nil {
-		t.Error(err)
-	}
+	tb.RemoveRow(2)
 	checkTString(t, tb, "{1: [10 20], 2: [30 40], 3: [50 60]}, {1: [100 200], 2: [300 400], 3: [500 600]}")
 	checkTCSV(t, tb, "1,2,3", "[10 20],[30 40],[50 60]\r\n[100 200],[300 400],[500 600]")
 	checkTCount(t, tb, 6)
@@ -984,9 +1023,7 @@ func TestTRemoveRow(t *testing.T) {
 	checkTString(t, tb, "{1: 1.1, 2: b, 3: [3]}, {1: 4.4, 2: e, 3: [6]}")
 	checkTCSV(t, tb, "1,2,3", "1.1,b,[3]\r\n4.4,e,[6]")
 	checkTCount(t, tb, 6)
-	if err := tb.RemoveRow(3); err == nil {
-		t.Error("Unexpectedly passed out-of-bounds index test")
-	}
+	tb.RemoveRow(3)
 	checkTString(t, tb, "{1: 1.1, 2: b, 3: [3]}, {1: 4.4, 2: e, 3: [6]}")
 	checkTCSV(t, tb, "1,2,3", "1.1,b,[3]\r\n4.4,e,[6]")
 	checkTCount(t, tb, 6)
@@ -996,9 +1033,7 @@ func TestTRemoveRow(t *testing.T) {
 	checkTString(t, tb, "<empty>")
 	checkTCSV(t, tb, "1,2,3", "")
 	checkTCount(t, tb, 0)
-	if err := tb.RemoveRow(0); err == nil {
-		t.Error("Unexpectedly passed removing from empty table test")
-	}
+	tb.RemoveRow(0)
 	checkTString(t, tb, "<empty>")
 	checkTCSV(t, tb, "1,2,3", "")
 	checkTCount(t, tb, 0)
@@ -1187,6 +1222,47 @@ func TestTHeaders(t *testing.T) {
 	if hh[0] == "4" {
 		t.Error("Changed table's column header")
 	}
+}
+
+func TestTCopy(t *testing.T) {
+	tb, _ := htable.New("1", "2", "3")
+	tb.Add(3, 10, 21)
+	tb.Add(2, 11, 23)
+	tb.Add(1, 12, 22)
+	checkTString(t, tb, "{1: 3, 2: 10, 3: 21}, {1: 2, 2: 11, 3: 23}, {1: 1, 2: 12, 3: 22}")
+	checkTCSV(t, tb, "1,2,3", "3,10,21\r\n2,11,23\r\n1,12,22")
+	checkTCount(t, tb, 9)
+
+	// Make a copy of the table and check that everything is the same.
+	tCopy := tb.Copy()
+	checkTString(t, tCopy, "{1: 3, 2: 10, 3: 21}, {1: 2, 2: 11, 3: 23}, {1: 1, 2: 12, 3: 22}")
+	checkTCSV(t, tCopy, "1,2,3", "3,10,21\r\n2,11,23\r\n1,12,22")
+	checkTCount(t, tCopy, 9)
+
+	// Make sure that a change in one table does not affect the other table.
+	tb.Add(0, 0, 0)
+	checkTString(t, tb, "{1: 3, 2: 10, 3: 21}, {1: 2, 2: 11, 3: 23}, {1: 1, 2: 12, 3: 22}, {1: 0, 2: 0, 3: 0}")
+	checkTCSV(t, tb, "1,2,3", "3,10,21\r\n2,11,23\r\n1,12,22\r\n0,0,0")
+	checkTCount(t, tb, 12)
+	checkTString(t, tCopy, "{1: 3, 2: 10, 3: 21}, {1: 2, 2: 11, 3: 23}, {1: 1, 2: 12, 3: 22}")
+	checkTCSV(t, tCopy, "1,2,3", "3,10,21\r\n2,11,23\r\n1,12,22")
+	checkTCount(t, tCopy, 9)
+
+	tCopy.RemoveRow(0)
+	checkTString(t, tb, "{1: 3, 2: 10, 3: 21}, {1: 2, 2: 11, 3: 23}, {1: 1, 2: 12, 3: 22}, {1: 0, 2: 0, 3: 0}")
+	checkTCSV(t, tb, "1,2,3", "3,10,21\r\n2,11,23\r\n1,12,22\r\n0,0,0")
+	checkTCount(t, tb, 12)
+	checkTString(t, tCopy, "{1: 2, 2: 11, 3: 23}, {1: 1, 2: 12, 3: 22}")
+	checkTCSV(t, tCopy, "1,2,3", "2,11,23\r\n1,12,22")
+	checkTCount(t, tCopy, 6)
+
+	tCopy.SetHeader("1", "9")
+	checkTString(t, tb, "{1: 3, 2: 10, 3: 21}, {1: 2, 2: 11, 3: 23}, {1: 1, 2: 12, 3: 22}, {1: 0, 2: 0, 3: 0}")
+	checkTCSV(t, tb, "1,2,3", "3,10,21\r\n2,11,23\r\n1,12,22\r\n0,0,0")
+	checkTCount(t, tb, 12)
+	checkTString(t, tCopy, "{9: 2, 2: 11, 3: 23}, {9: 1, 2: 12, 3: 22}")
+	checkTCSV(t, tCopy, "9,2,3", "2,11,23\r\n1,12,22")
+	checkTCount(t, tCopy, 6)
 }
 
 func TestTRows(t *testing.T) {
@@ -1578,6 +1654,38 @@ func TestTRowItem(t *testing.T) {
 	}
 }
 
+func TestTRowByIndex(t *testing.T) {
+	tb, _ := htable.New("1", "2", "3")
+	tb.Add(1, "a", 1.1)
+	tb.Add(2, "b", 2.2)
+	tb.Add(3, "c", 3.3)
+	checkTString(t, tb, "{1: 1, 2: a, 3: 1.1}, {1: 2, 2: b, 3: 2.2}, {1: 3, 2: c, 3: 3.3}")
+	checkTCSV(t, tb, "1,2,3", "1,a,1.1\r\n2,b,2.2\r\n3,c,3.3")
+	checkTCount(t, tb, 9)
+
+	// Grab some rows and make sure they're correct.
+	row := tb.RowByIndex(0)
+	checkRString(t, row, "{1, a, 1.1}")
+	checkRCount(t, row, 3)
+
+	row = tb.RowByIndex(1)
+	checkRString(t, row, "{2, b, 2.2}")
+	checkRCount(t, row, 3)
+
+	row = tb.RowByIndex(2)
+	checkRString(t, row, "{3, c, 3.3}")
+	checkRCount(t, row, 3)
+
+	// Make sure that modifying the returned row also modifies the row in the table.
+	row = tb.RowByIndex(0)
+	row.SetItem(0, 4)
+	checkRString(t, row, "{4, a, 1.1}")
+	checkRCount(t, row, 3)
+	checkTString(t, tb, "{1: 4, 2: a, 3: 1.1}, {1: 2, 2: b, 3: 2.2}, {1: 3, 2: c, 3: 3.3}")
+	checkTCSV(t, tb, "1,2,3", "4,a,1.1\r\n2,b,2.2\r\n3,c,3.3")
+	checkTCount(t, tb, 9)
+}
+
 func TestTMatches(t *testing.T) {
 	// Set up a new table.
 	tb, _ := htable.New("1", "2", "3")
@@ -1734,6 +1842,234 @@ func TestTToggle(t *testing.T) {
 	checkTCount(t, tb, 0)
 }
 
+func TestTSortByColumn(t *testing.T) {
+	tb, _ := htable.New("1", "2", "3")
+	tb.Add(3, 10, 21)
+	tb.Add(2, 11, 23)
+	tb.Add(1, 12, 22)
+	checkTString(t, tb, "{1: 3, 2: 10, 3: 21}, {1: 2, 2: 11, 3: 23}, {1: 1, 2: 12, 3: 22}")
+	checkTCSV(t, tb, "1,2,3", "3,10,21\r\n2,11,23\r\n1,12,22")
+	checkTCount(t, tb, 9)
+
+	// Make sure that only items in the first column are passed to the comparison function. All
+	// items will have values between 1 and 9.
+	if err := tb.SortByColumn("1", func(l, r interface{}) bool {
+		left := l.(int)
+		right := r.(int)
+		if left < 1 || left > 9 || right < 1 || right > 9 {
+			t.Error("Incorrect column passed to comparison function")
+		}
+		return true
+	}); err != nil {
+		t.Error(err)
+	}
+
+	// Make sure that only items from the second column are passed to the comparison function. All
+	// items will have values between 10 and 19.
+	if err := tb.SortByColumn("2", func(l, r interface{}) bool {
+		left := l.(int)
+		right := r.(int)
+		if left < 10 || left > 19 || right < 10 || right > 19 {
+			t.Error("Incorrect column passed to comparison function")
+		}
+		return true
+	}); err != nil {
+		t.Error(err)
+	}
+
+	// Make sure that only items from the third column are passed to the comparison function. All
+	// items will have values between 20 and 29.
+	if err := tb.SortByColumn("3", func(l, r interface{}) bool {
+		left := l.(int)
+		right := r.(int)
+		if left < 20 || left > 29 || right < 20 || right > 29 {
+			t.Error("Incorrect column passed to comparison function")
+		}
+		return true
+	}); err != nil {
+		t.Error(err)
+	}
+
+	// Make sure the table is sorted correctly by the first column.
+	tb, _ = htable.New("1", "2", "3")
+	tb.Add(3, 10, 21)
+	tb.Add(2, 11, 23)
+	tb.Add(1, 12, 22)
+	checkTString(t, tb, "{1: 3, 2: 10, 3: 21}, {1: 2, 2: 11, 3: 23}, {1: 1, 2: 12, 3: 22}")
+	checkTCSV(t, tb, "1,2,3", "3,10,21\r\n2,11,23\r\n1,12,22")
+	checkTCount(t, tb, 9)
+
+	if err := tb.SortByColumn("1", func(left, right interface{}) bool {
+		return left.(int) < right.(int)
+	}); err != nil {
+		t.Error(err)
+	}
+	checkTString(t, tb, "{1: 1, 2: 12, 3: 22}, {1: 2, 2: 11, 3: 23}, {1: 3, 2: 10, 3: 21}")
+	checkTCSV(t, tb, "1,2,3", "1,12,22\r\n2,11,23\r\n3,10,21")
+	checkTCount(t, tb, 9)
+
+	// Make sure the table is sorted correctly by the second column.
+	tb, _ = htable.New("1", "2", "3")
+	tb.Add(3, 10, 21)
+	tb.Add(2, 11, 23)
+	tb.Add(1, 12, 22)
+	checkTString(t, tb, "{1: 3, 2: 10, 3: 21}, {1: 2, 2: 11, 3: 23}, {1: 1, 2: 12, 3: 22}")
+	checkTCSV(t, tb, "1,2,3", "3,10,21\r\n2,11,23\r\n1,12,22")
+	checkTCount(t, tb, 9)
+
+	if err := tb.SortByColumn("2", func(left, right interface{}) bool {
+		return left.(int) < right.(int)
+	}); err != nil {
+		t.Error(err)
+	}
+	checkTString(t, tb, "{1: 3, 2: 10, 3: 21}, {1: 2, 2: 11, 3: 23}, {1: 1, 2: 12, 3: 22}")
+	checkTCSV(t, tb, "1,2,3", "3,10,21\r\n2,11,23\r\n1,12,22")
+	checkTCount(t, tb, 9)
+
+	// Make sure the table is sorted correctly by the third column.
+	tb, _ = htable.New("1", "2", "3")
+	tb.Add(3, 10, 21)
+	tb.Add(2, 11, 23)
+	tb.Add(1, 12, 22)
+	checkTString(t, tb, "{1: 3, 2: 10, 3: 21}, {1: 2, 2: 11, 3: 23}, {1: 1, 2: 12, 3: 22}")
+	checkTCSV(t, tb, "1,2,3", "3,10,21\r\n2,11,23\r\n1,12,22")
+	checkTCount(t, tb, 9)
+
+	if err := tb.SortByColumn("3", func(left, right interface{}) bool {
+		return left.(int) < right.(int)
+	}); err != nil {
+		t.Error(err)
+	}
+	checkTString(t, tb, "{1: 3, 2: 10, 3: 21}, {1: 1, 2: 12, 3: 22}, {1: 2, 2: 11, 3: 23}")
+	checkTCSV(t, tb, "1,2,3", "3,10,21\r\n1,12,22\r\n2,11,23")
+	checkTCount(t, tb, 9)
+}
+
+func TestTSortByRow(t *testing.T) {
+	tb, _ := htable.New("1", "2", "3")
+	tb.Add(3, 10, 21)
+	tb.Add(2, 11, 23)
+	tb.Add(1, 12, 22)
+	checkTString(t, tb, "{1: 3, 2: 10, 3: 21}, {1: 2, 2: 11, 3: 23}, {1: 1, 2: 12, 3: 22}")
+	checkTCSV(t, tb, "1,2,3", "3,10,21\r\n2,11,23\r\n1,12,22")
+	checkTCount(t, tb, 9)
+
+	// Make sure that the rows passed to the comparison function are copies and do not affect the
+	// rows in the table.
+	if err := tb.SortByRow(func(left, right *htable.Row) bool {
+		left.SetItem(0, 100)
+		left.SetItem(1, 101)
+		left.SetItem(2, 102)
+		right.SetItem(0, 200)
+		right.SetItem(1, 201)
+		right.SetItem(2, 202)
+		return true
+	}); err != nil {
+		t.Error(err)
+	}
+	checkTString(t, tb, "{1: 3, 2: 10, 3: 21}, {1: 2, 2: 11, 3: 23}, {1: 1, 2: 12, 3: 22}")
+	checkTCSV(t, tb, "1,2,3", "3,10,21\r\n2,11,23\r\n1,12,22")
+	checkTCount(t, tb, 9)
+
+	// Make sure the table is sorted correctly by the first column.
+	tb, _ = htable.New("1", "2", "3")
+	tb.Add(3, 10, 21)
+	tb.Add(2, 11, 23)
+	tb.Add(1, 12, 22)
+	checkTString(t, tb, "{1: 3, 2: 10, 3: 21}, {1: 2, 2: 11, 3: 23}, {1: 1, 2: 12, 3: 22}")
+	checkTCSV(t, tb, "1,2,3", "3,10,21\r\n2,11,23\r\n1,12,22")
+	checkTCount(t, tb, 9)
+
+	if err := tb.SortByRow(func(left, right *htable.Row) bool {
+		leftItem := left.Item(0)
+		rightItem := right.Item(0)
+		return leftItem.(int) < rightItem.(int)
+	}); err != nil {
+		t.Error(err)
+	}
+	checkTString(t, tb, "{1: 1, 2: 12, 3: 22}, {1: 2, 2: 11, 3: 23}, {1: 3, 2: 10, 3: 21}")
+	checkTCSV(t, tb, "1,2,3", "1,12,22\r\n2,11,23\r\n3,10,21")
+	checkTCount(t, tb, 9)
+
+	// Make sure the table is sorted correctly by the second column.
+	tb, _ = htable.New("1", "2", "3")
+	tb.Add(3, 10, 21)
+	tb.Add(2, 11, 23)
+	tb.Add(1, 12, 22)
+	checkTString(t, tb, "{1: 3, 2: 10, 3: 21}, {1: 2, 2: 11, 3: 23}, {1: 1, 2: 12, 3: 22}")
+	checkTCSV(t, tb, "1,2,3", "3,10,21\r\n2,11,23\r\n1,12,22")
+	checkTCount(t, tb, 9)
+
+	if err := tb.SortByRow(func(left, right *htable.Row) bool {
+		leftItem := left.Item(1)
+		rightItem := right.Item(1)
+		return leftItem.(int) < rightItem.(int)
+	}); err != nil {
+		t.Error(err)
+	}
+	checkTString(t, tb, "{1: 3, 2: 10, 3: 21}, {1: 2, 2: 11, 3: 23}, {1: 1, 2: 12, 3: 22}")
+	checkTCSV(t, tb, "1,2,3", "3,10,21\r\n2,11,23\r\n1,12,22")
+	checkTCount(t, tb, 9)
+
+	// Make sure the table is sorted correctly by the third column.
+	tb, _ = htable.New("1", "2", "3")
+	tb.Add(3, 10, 21)
+	tb.Add(2, 11, 23)
+	tb.Add(1, 12, 22)
+	checkTString(t, tb, "{1: 3, 2: 10, 3: 21}, {1: 2, 2: 11, 3: 23}, {1: 1, 2: 12, 3: 22}")
+	checkTCSV(t, tb, "1,2,3", "3,10,21\r\n2,11,23\r\n1,12,22")
+	checkTCount(t, tb, 9)
+
+	if err := tb.SortByRow(func(left, right *htable.Row) bool {
+		leftItem := left.Item(2)
+		rightItem := right.Item(2)
+		return leftItem.(int) < rightItem.(int)
+	}); err != nil {
+		t.Error(err)
+	}
+	checkTString(t, tb, "{1: 3, 2: 10, 3: 21}, {1: 1, 2: 12, 3: 22}, {1: 2, 2: 11, 3: 23}")
+	checkTCSV(t, tb, "1,2,3", "3,10,21\r\n1,12,22\r\n2,11,23")
+	checkTCount(t, tb, 9)
+
+	// Make sure that we can sort a table according to multiple factors.
+	tb, _ = htable.New("1", "2", "3")
+	tb.Add(3, 11, 22)
+	tb.Add(3, 10, 23)
+	tb.Add(3, 11, 21)
+	tb.Add(1, 20, 22)
+	tb.Add(2, 30, 22)
+	tb.Add(2, 31, 22)
+	checkTString(t, tb, "{1: 3, 2: 11, 3: 22}, {1: 3, 2: 10, 3: 23}, {1: 3, 2: 11, 3: 21}, {1: 1, 2: 20, 3: 22}, {1: 2, 2: 30, 3: 22}, {1: 2, 2: 31, 3: 22}")
+	checkTCSV(t, tb, "1,2,3", "3,11,22\r\n3,10,23\r\n3,11,21\r\n1,20,22\r\n2,30,22\r\n2,31,22")
+	checkTCount(t, tb, 18)
+
+	if err := tb.SortByRow(func(left, right *htable.Row) bool {
+		// Try to sort on the first column first.
+		leftItem := left.Item(0).(int)
+		rightItem := right.Item(0).(int)
+		if leftItem != rightItem {
+			return leftItem < rightItem
+		}
+
+		// Next, try to sort on the second column.
+		leftItem = left.Item(1).(int)
+		rightItem = right.Item(1).(int)
+		if leftItem != rightItem {
+			return leftItem < rightItem
+		}
+
+		// Finally, sort on the third column.
+		leftItem = left.Item(2).(int)
+		rightItem = right.Item(2).(int)
+		return leftItem < rightItem
+	}); err != nil {
+		t.Error(err)
+	}
+	checkTString(t, tb, "{1: 1, 2: 20, 3: 22}, {1: 2, 2: 30, 3: 22}, {1: 2, 2: 31, 3: 22}, {1: 3, 2: 10, 3: 23}, {1: 3, 2: 11, 3: 21}, {1: 3, 2: 11, 3: 22}")
+	checkTCSV(t, tb, "1,2,3", "1,20,22\r\n2,30,22\r\n2,31,22\r\n3,10,23\r\n3,11,21\r\n3,11,22")
+	checkTCount(t, tb, 18)
+}
+
 // --- Row's Method Tests ---
 
 func TestRSetItem(t *testing.T) {
@@ -1806,6 +2142,134 @@ func TestRItem(t *testing.T) {
 	}
 }
 
+func TestRItems(t *testing.T) {
+	r := htable.NewRow(1, 2, 3)
+	checkRString(t, r, "{1, 2, 3}")
+	checkRCount(t, r, 3)
+
+	// Make sure that the returned items are correct.
+	items := r.Items()
+	check := []interface{}{1, 2, 3}
+	if !reflect.DeepEqual(items, check) {
+		t.Error("Items are incorrect")
+		t.Log("\tExpected:", check)
+		t.Log("\tReceived:", items)
+	}
+
+	// Make sure that a change to the row does not affect the items already returned.
+	r.SetItem(0, 4)
+	checkRString(t, r, "{4, 2, 3}")
+	checkRCount(t, r, 3)
+	if !reflect.DeepEqual(items, check) {
+		t.Error("Items are incorrect")
+		t.Log("\tExpected:", check)
+		t.Log("\tReceived:", items)
+	}
+
+	// Make sure that the previous change to the row is reflect in the new items.
+	items = r.Items()
+	check = []interface{}{4, 2, 3}
+	if !reflect.DeepEqual(items, check) {
+		t.Error("Items are incorrect")
+		t.Log("\tExpected:", check)
+		t.Log("\tReceived:", items)
+	}
+}
+
+func TestREnabledToggleRow(t *testing.T) {
+	r := htable.NewRow(1, 2, 3)
+	checkRString(t, r, "{1, 2, 3}")
+	checkRCount(t, r, 3)
+
+	// Make sure that the row is enabled by default.
+	if !r.Enabled() {
+		t.Error("Row is not marked as enabled by default")
+	}
+
+	// Make sure that toggling the row to disabled works.
+	r.ToggleRow(false)
+	if r.Enabled() {
+		t.Error("Row was not toggled to disabled")
+	}
+
+	// Toggle is back now.
+	r.ToggleRow(true)
+	if !r.Enabled() {
+		t.Error("Row was not toggled to enabled")
+	}
+
+	// Make sure that we can set it to enabled when it's already enabled.
+	r.ToggleRow(true)
+	r.ToggleRow(true)
+	if !r.Enabled() {
+		t.Error("Row did not stay enabled")
+	}
+
+	// Make sure that we can set it to disabled when it's already disabled.
+	r.ToggleRow(false)
+	r.ToggleRow(false)
+	if r.Enabled() {
+		t.Error("Row did not stay disabled")
+	}
+
+	// Test that we can toggle rows in a table and have that value reflected correctly in the row
+	// itself.
+	tb, _ := htable.New("1", "2", "3")
+	tb.Add(1, 2, 3)
+	tb.Add(4, 5, 6)
+
+	// Right now, both rows should be enabled.
+	if row := tb.RowByIndex(0); !row.Enabled() {
+		t.Error("Row 0 is not marked as enabled by default")
+	}
+	if row := tb.RowByIndex(1); !row.Enabled() {
+		t.Error("Row 1 is not marked as enabled by default")
+	}
+
+	// Make sure that disabling a row in the table is reflected correctly in the row itself.
+	tb.Toggle(0, false)
+	if row := tb.RowByIndex(0); row.Enabled() {
+		t.Error("Row 0 was not toggled to disabled")
+	}
+
+	// Make sure that disabling again keeps the value as disabled.
+	tb.Toggle(0, false)
+	if row := tb.RowByIndex(0); row.Enabled() {
+		t.Error("Row 0 did not stay disabled")
+	}
+
+	// Make sure that double enabling works.
+	tb.Toggle(0, true)
+	tb.Toggle(0, true)
+	if row := tb.RowByIndex(0); !row.Enabled() {
+		t.Error("Row 0 did not stay enabled")
+	}
+
+	// Make sure that removing a row does not affect the enabled/disabled status of other rows.
+	tb.Toggle(1, false)
+	tb.RemoveRow(0)
+	if row := tb.RowByIndex(0); row.Enabled() {
+		t.Error("Row 0 did not stay disabled after deletion")
+	}
+
+	// Make sure that inserting a row does not affect the enabled/disabled status of other rows.
+	tb.Insert(0, 7, 8, 9)
+	tb.Insert(1, 10, 11, 12)
+	if row := tb.RowByIndex(0); !row.Enabled() {
+		t.Error("Row 1 did not stay enabled after insertion")
+	}
+	if row := tb.RowByIndex(2); row.Enabled() {
+		t.Error("Row 2 did not stay disabled after insertion")
+	}
+
+	// Make sure that pulling out a row and changing its value does affect the row still in the table.
+	row := tb.RowByIndex(0)
+	row.ToggleRow(false)
+	if r := tb.RowByIndex(0); r.Enabled() {
+		t.Error("Row 0 was not toggled manually")
+	}
+}
+
 func TestRMatches(t *testing.T) {
 	r := htable.NewRow(1, 2, 3)
 	checkRString(t, r, "{1, 2, 3}")
@@ -1839,6 +2303,30 @@ func TestRMatches(t *testing.T) {
 	}
 }
 
+func TestRCopy(t *testing.T) {
+	r := htable.NewRow(1, 2, 3)
+	checkRString(t, r, "{1, 2, 3}")
+	checkRCount(t, r, 3)
+
+	// Make a copy and check that the new row is identical to the original row.
+	nr := r.Copy()
+	checkRString(t, nr, "{1, 2, 3}")
+	checkRCount(t, nr, 3)
+
+	// Make sure that a change in one row doesn't affect the other row.
+	r.SetItem(0, 4)
+	checkRString(t, r, "{4, 2, 3}")
+	checkRCount(t, r, 3)
+	checkRString(t, nr, "{1, 2, 3}")
+	checkRCount(t, nr, 3)
+
+	nr.SetItem(1, 9)
+	checkRString(t, r, "{4, 2, 3}")
+	checkRCount(t, r, 3)
+	checkRString(t, nr, "{1, 9, 3}")
+	checkRCount(t, nr, 3)
+}
+
 // --- Helper Functions ---
 
 func checkTString(t *testing.T, tb *htable.Table, want string) {
@@ -1856,8 +2344,8 @@ func checkTCSV(t *testing.T, tb *htable.Table, headers, want string) {
 	}
 	if csv := tb.CSV(); csv != all {
 		t.Error("CSV is incorrect")
-		t.Log("\tExpected:", all)
-		t.Log("\tReceived:", csv)
+		t.Log("\tExpected:\n" + all)
+		t.Log("\tReceived:\n" + csv)
 	}
 }
 

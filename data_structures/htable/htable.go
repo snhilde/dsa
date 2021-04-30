@@ -100,20 +100,12 @@ func (t *Table) InsertRow(index int, r *Row) error {
 }
 
 // RemoveRow deletes the row at the index from the table.
-func (t *Table) RemoveRow(index int) error {
-	if t == nil {
-		return errBadTable
+func (t *Table) RemoveRow(index int) {
+	// We don't care if there are any problems with this operation. If the table is good and the row
+	// exists, then it will be removed. That's all we really care about.
+	if t != nil {
+		t.rows.Remove(index)
 	}
-
-	row := t.rows.Remove(index)
-	if row == nil {
-		// hlist.Remove will return the value at the index. Because our rows can never be nil, if we
-		// receive a nil value, then it means an error occurred.
-		return fmt.Errorf("failed to remove row %v", index)
-	}
-
-	// All good
-	return nil
 }
 
 // Clear erases the rows in the table but leaves the column headers and column types.
@@ -157,7 +149,7 @@ func (t *Table) String() string {
 
 	for r := range rowChan {
 		row := r.(*Row)
-		if row.enabled {
+		if row.Enabled() {
 			tmp := new(strings.Builder)
 			for i, item := range row.items {
 				tmp.WriteString(fmt.Sprintf("%v: %v, ", t.headers[i], item))
@@ -202,14 +194,8 @@ func (t *Table) SetItem(header string, index int, value interface{}) error {
 	nr.SetItem(i, value)
 
 	// Add the row back in to the table, which will also validate the new value.
-	if err := t.RemoveRow(index); err != nil {
-		return err
-	}
-	if err := t.InsertRow(index, nr); err != nil {
-		return err
-	}
-
-	return nil
+	t.RemoveRow(index)
+	return t.InsertRow(index, nr)
 }
 
 // SetHeader changes the specified column's header.
@@ -243,6 +229,24 @@ func (t *Table) Headers() []string {
 	return headers
 }
 
+// Copy makes an exact and separate copy of the table. If the table to copy is nil, it returns nil.
+func (t *Table) Copy() *Table {
+	if t == nil {
+		return nil
+	}
+
+	// Make a new table and copy over the headers.
+	nt, _ := New(t.Headers()...)
+
+	// Copy over the column types. The slice was already made in New.
+	copy(nt.types, t.types)
+
+	// Copy over the rows. We'll discard the list already created.
+	nt.rows, _ = t.rows.Copy()
+
+	return nt
+}
+
 // Rows returns the number of rows in the table, or -1 on error. This includes all rows, regardless
 // of enabled status.
 func (t *Table) Rows() int {
@@ -267,7 +271,7 @@ func (t *Table) Enabled() int {
 	numEnabled := 0
 	for r := range rowChan {
 		row := r.(*Row)
-		if row.enabled {
+		if row.Enabled() {
 			numEnabled++
 		}
 	}
@@ -289,7 +293,7 @@ func (t *Table) Disabled() int {
 	numDisabled := 0
 	for r := range rowChan {
 		row := r.(*Row)
-		if !row.enabled {
+		if !row.Enabled() {
 			numDisabled++
 		}
 	}
@@ -363,7 +367,7 @@ func (t *Table) Row(header string, item interface{}) (int, *Row) {
 
 	for v := range rowChan {
 		row := v.(*Row)
-		if row.enabled {
+		if row.Enabled() {
 			if reflect.DeepEqual(item, row.items[c]) {
 				// Break out of the list iteration. If Yield's goroutine has already exited (because
 				// the list was fully traversed), then it won't receive the message to quit. We'll
@@ -380,6 +384,20 @@ func (t *Table) Row(header string, item interface{}) (int, *Row) {
 
 	// If we're here, then we didn't find anything.
 	return -1, nil
+}
+
+// RowByIndex returns the Row at the specified index, or nil if not found or error.
+func (t *Table) RowByIndex(index int) *Row {
+	if t == nil {
+		return nil
+	}
+
+	// Grab our row.
+	row := t.rows.Item(index)
+	if row == nil {
+		return nil
+	}
+	return row.(*Row)
 }
 
 // Item returns the item at the specified coordinates, or nil if there is no item at the coordinates.
@@ -428,16 +446,19 @@ func (t *Table) Toggle(index int, enabled bool) error {
 	}
 
 	row := r.(*Row)
-	row.enabled = enabled
+	row.ToggleRow(enabled)
 
 	return nil
 }
 
-// Sort sorts the table on the specified column. cmp should return true if left should be sorted
-// first or false if right should be sorted first.
-func (t *Table) Sort(header string, cmp func(left, right interface{}) bool) error {
+// SortByColumn sorts the table on the specified column. The comparison function less is given the
+// values of two different items in a column and should return true only if the left item should be
+// sorted before the right item.
+func (t *Table) SortByColumn(header string, less func(interface{}, interface{}) bool) error {
 	if t == nil {
 		return errBadTable
+	} else if less == nil {
+		return fmt.Errorf("missing comparison callback")
 	}
 
 	// Figure out the index of the column.
@@ -447,10 +468,34 @@ func (t *Table) Sort(header string, cmp func(left, right interface{}) bool) erro
 	}
 
 	// Sort the rows.
-	err := t.rows.Sort(func(leftRow, rightRow interface{}) bool {
-		leftItem := leftRow.(*Row).Item(i)
-		rightItem := rightRow.(*Row).Item(i)
-		return cmp(leftItem, rightItem)
+	err := t.rows.Sort(func(left, right interface{}) bool {
+		leftRow := left.(*Row)
+		rightRow := right.(*Row)
+		return less(leftRow.Item(i), rightRow.Item(i))
+	})
+
+	return err
+}
+
+// SortByRow sorts the table by rows. The comparison function less is given pointers to two Row
+// objects and should return true only if the left row should be sorted before the right row.
+func (t *Table) SortByRow(less func(*Row, *Row) bool) error {
+	if t == nil {
+		return errBadTable
+	} else if less == nil {
+		return fmt.Errorf("missing comparison callback")
+	}
+
+	// Sort the rows.
+	err := t.rows.Sort(func(left, right interface{}) bool {
+		leftRow := left.(*Row)
+		rightRow := right.(*Row)
+
+		// Return copies of the rows to prevent changes from affecting the table.
+		leftCopy := leftRow.Copy()
+		rightCopy := rightRow.Copy()
+
+		return less(leftCopy, rightCopy)
 	})
 
 	return err
@@ -475,7 +520,7 @@ func (t *Table) CSV() string {
 	}
 	for r := range rowChan {
 		row := r.(*Row)
-		if row.enabled {
+		if row.Enabled() {
 			items := make([]string, len(row.items))
 			for i, item := range row.items {
 				items[i] = fmt.Sprintf("%v", item)
@@ -561,6 +606,34 @@ func (r *Row) Item(index int) interface{} {
 	return r.items[index]
 }
 
+// Items returns a copy of the items in the row.
+func (r *Row) Items() []interface{} {
+	if r == nil {
+		return nil
+	}
+
+	items := make([]interface{}, len(r.items))
+	copy(items, r.items)
+
+	return items
+}
+
+// Enabled returns true if the row is enabled, otherwise false.
+func (r *Row) Enabled() bool {
+	if r == nil {
+		return false
+	}
+
+	return r.enabled
+}
+
+// ToggleRow sets the row as either enabled or disabled.
+func (r *Row) ToggleRow(enabled bool) {
+	if r != nil {
+		r.enabled = enabled
+	}
+}
+
 // Matches returns true if the value matches the item in the specified column or false if there is
 // no match. Matching can occur on disabled rows.
 func (r *Row) Matches(index int, value interface{}) bool {
@@ -570,6 +643,18 @@ func (r *Row) Matches(index int, value interface{}) bool {
 	}
 
 	return reflect.DeepEqual(value, item)
+}
+
+// Copy makes a complete and separate copy of the row. If the row to copy is nil, it returns nil.
+func (r *Row) Copy() *Row {
+	if r == nil {
+		return nil
+	}
+
+	nr := NewRow(r.Items()...)
+	nr.ToggleRow(r.Enabled())
+
+	return nr
 }
 
 func (t *Table) validateRow(r *Row) error {

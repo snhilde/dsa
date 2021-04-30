@@ -588,7 +588,7 @@ func (t *Tree) String() string {
 		return nilTreeString
 	}
 
-	var b strings.Builder
+	b := new(strings.Builder)
 	for item := range itemChan {
 		b.WriteString(fmt.Sprintf("%v, ", item.value))
 	}
