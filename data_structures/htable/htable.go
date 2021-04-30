@@ -157,7 +157,7 @@ func (t *Table) String() string {
 
 	for r := range rowChan {
 		row := r.(*Row)
-		if row.enabled {
+		if row.Enabled() {
 			tmp := new(strings.Builder)
 			for i, item := range row.items {
 				tmp.WriteString(fmt.Sprintf("%v: %v, ", t.headers[i], item))
@@ -285,7 +285,7 @@ func (t *Table) Enabled() int {
 	numEnabled := 0
 	for r := range rowChan {
 		row := r.(*Row)
-		if row.enabled {
+		if row.Enabled() {
 			numEnabled++
 		}
 	}
@@ -307,7 +307,7 @@ func (t *Table) Disabled() int {
 	numDisabled := 0
 	for r := range rowChan {
 		row := r.(*Row)
-		if !row.enabled {
+		if !row.Enabled() {
 			numDisabled++
 		}
 	}
@@ -381,7 +381,7 @@ func (t *Table) Row(header string, item interface{}) (int, *Row) {
 
 	for v := range rowChan {
 		row := v.(*Row)
-		if row.enabled {
+		if row.Enabled() {
 			if reflect.DeepEqual(item, row.items[c]) {
 				// Break out of the list iteration. If Yield's goroutine has already exited (because
 				// the list was fully traversed), then it won't receive the message to quit. We'll
@@ -446,7 +446,7 @@ func (t *Table) Toggle(index int, enabled bool) error {
 	}
 
 	row := r.(*Row)
-	row.enabled = enabled
+	row.ToggleRow(enabled)
 
 	return nil
 }
@@ -520,7 +520,7 @@ func (t *Table) CSV() string {
 	}
 	for r := range rowChan {
 		row := r.(*Row)
-		if row.enabled {
+		if row.Enabled() {
 			items := make([]string, len(row.items))
 			for i, item := range row.items {
 				items[i] = fmt.Sprintf("%v", item)
@@ -606,6 +606,34 @@ func (r *Row) Item(index int) interface{} {
 	return r.items[index]
 }
 
+// Items returns a copy of the items in the row.
+func (r *Row) Items() []interface{} {
+	if r == nil {
+		return nil
+	}
+
+	items := make([]interface{}, len(r.items))
+	copy(items, r.items)
+
+	return items
+}
+
+// Enabled returns true if the row is enabled, otherwise false.
+func (r *Row) Enabled() bool {
+	if r == nil {
+		return false
+	}
+
+	return r.enabled
+}
+
+// ToggleRow sets the row as either enabled or disabled.
+func (r *Row) ToggleRow(enabled bool) {
+	if r != nil {
+		r.enabled = enabled
+	}
+}
+
 // Matches returns true if the value matches the item in the specified column or false if there is
 // no match. Matching can occur on disabled rows.
 func (r *Row) Matches(index int, value interface{}) bool {
@@ -615,6 +643,18 @@ func (r *Row) Matches(index int, value interface{}) bool {
 	}
 
 	return reflect.DeepEqual(value, item)
+}
+
+// Copy makes a complete and separate copy of the row. If the row to copy is nil, it returns nil.
+func (r *Row) Copy() *Row {
+	if r == nil {
+		return nil
+	}
+
+	nr := NewRow(r.Items()...)
+	nr.ToggleRow(r.Enabled())
+
+	return nr
 }
 
 func (t *Table) validateRow(r *Row) error {
