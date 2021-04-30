@@ -243,6 +243,24 @@ func (t *Table) Headers() []string {
 	return headers
 }
 
+// Copy makes an exact and separate copy of the table. If the table to copy is nil, it returns nil.
+func (t *Table) Copy() *Table {
+	if t == nil {
+		return nil
+	}
+
+	// Make a new table and copy over the headers.
+	nt, _ := New(t.Headers()...)
+
+	// Copy over the column types. The slice was already made in New.
+	copy(nt.types, t.types)
+
+	// Copy over the rows. We'll discard the list already created.
+	nt.rows, _ = t.rows.Copy()
+
+	return nt
+}
+
 // Rows returns the number of rows in the table, or -1 on error. This includes all rows, regardless
 // of enabled status.
 func (t *Table) Rows() int {
