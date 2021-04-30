@@ -400,6 +400,20 @@ func (t *Table) Row(header string, item interface{}) (int, *Row) {
 	return -1, nil
 }
 
+// RowByIndex returns the Row at the specified index, or nil if not found or error.
+func (t *Table) RowByIndex(index int) *Row {
+	if t == nil {
+		return nil
+	}
+
+	// Grab our row.
+	row := t.rows.Item(index)
+	if row == nil {
+		return nil
+	}
+	return row.(*Row)
+}
+
 // Item returns the item at the specified coordinates, or nil if there is no item at the coordinates.
 func (t *Table) Item(header string, index int) interface{} {
 	if t == nil {
