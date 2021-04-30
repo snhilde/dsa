@@ -100,20 +100,12 @@ func (t *Table) InsertRow(index int, r *Row) error {
 }
 
 // RemoveRow deletes the row at the index from the table.
-func (t *Table) RemoveRow(index int) error {
-	if t == nil {
-		return errBadTable
+func (t *Table) RemoveRow(index int) {
+	// We don't care if there are any problems with this operation. If the table is good and the row
+	// exists, then it will be removed. That's all we really care about.
+	if t != nil {
+		t.rows.Remove(index)
 	}
-
-	row := t.rows.Remove(index)
-	if row == nil {
-		// hlist.Remove will return the value at the index. Because our rows can never be nil, if we
-		// receive a nil value, then it means an error occurred.
-		return fmt.Errorf("failed to remove row %v", index)
-	}
-
-	// All good
-	return nil
 }
 
 // Clear erases the rows in the table but leaves the column headers and column types.
@@ -202,14 +194,8 @@ func (t *Table) SetItem(header string, index int, value interface{}) error {
 	nr.SetItem(i, value)
 
 	// Add the row back in to the table, which will also validate the new value.
-	if err := t.RemoveRow(index); err != nil {
-		return err
-	}
-	if err := t.InsertRow(index, nr); err != nil {
-		return err
-	}
-
-	return nil
+	t.RemoveRow(index)
+	return t.InsertRow(index, nr)
 }
 
 // SetHeader changes the specified column's header.

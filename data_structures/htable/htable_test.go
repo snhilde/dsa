@@ -33,11 +33,6 @@ func TestTBadPtr(t *testing.T) {
 		t.Error("Unexpectedly passed bad pointer test for InsertRow()")
 	}
 
-	// Test RemoveRow().
-	if err := tb.RemoveRow(2); err == nil {
-		t.Error("Unexpectedly passed bad pointer test for RemoveRow()")
-	}
-
 	// Test Clear().
 	if err := tb.Clear(); err == nil {
 		t.Error("Unexpectedly passed bad pointer test for Clear()")
@@ -320,16 +315,6 @@ func TestTBadArgs(t *testing.T) {
 	// Test InsertRow() - wrong type in last position.
 	if err := tb.InsertRow(0, htable.NewRow(4, 5, "item6")); err == nil {
 		t.Error("Unexpectedly passed wrong type (last) test for InsertRow()")
-	}
-
-	// Test RemoveRow() - negative index.
-	if err := tb.RemoveRow(-1); err == nil {
-		t.Error("Unexpectedly passed negative index test for RemoveRow()")
-	}
-
-	// Test RemoveRow() - out-of-bounds index.
-	if err := tb.RemoveRow(100); err == nil {
-		t.Error("Unexpectedly passed out-of-bounds index test for RemoveRow()")
 	}
 
 	// Test ColumnToIndex() - empty column header.
@@ -1000,9 +985,7 @@ func TestTRemoveRow(t *testing.T) {
 	checkTString(t, tb, "{1: -1, 2: -2, 3: -3}, {1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
 	checkTCSV(t, tb, "1,2,3", "-1,-2,-3\r\n1,2,3\r\n4,5,6")
 	checkTCount(t, tb, 9)
-	if err := tb.RemoveRow(0); err != nil {
-		t.Error(err)
-	}
+	tb.RemoveRow(0)
 	checkTString(t, tb, "{1: 1, 2: 2, 3: 3}, {1: 4, 2: 5, 3: 6}")
 	checkTCSV(t, tb, "1,2,3", "1,2,3\r\n4,5,6")
 	checkTCount(t, tb, 6)
@@ -1015,9 +998,7 @@ func TestTRemoveRow(t *testing.T) {
 	checkTString(t, tb, "{1: a, 2: b, 3: c}, {1: x, 2: y, 3: z}, {1: d, 2: e, 3: f}")
 	checkTCSV(t, tb, "1,2,3", "a,b,c\r\nx,y,z\r\nd,e,f")
 	checkTCount(t, tb, 9)
-	if err := tb.RemoveRow(1); err != nil {
-		t.Error(err)
-	}
+	tb.RemoveRow(1)
 	checkTString(t, tb, "{1: a, 2: b, 3: c}, {1: d, 2: e, 3: f}")
 	checkTCSV(t, tb, "1,2,3", "a,b,c\r\nd,e,f")
 	checkTCount(t, tb, 6)
@@ -1030,9 +1011,7 @@ func TestTRemoveRow(t *testing.T) {
 	checkTString(t, tb, "{1: [10 20], 2: [30 40], 3: [50 60]}, {1: [100 200], 2: [300 400], 3: [500 600]}, {1: [-1 -2 -3], 2: [-4 -5 -6], 3: [-7 -8 -9]}")
 	checkTCSV(t, tb, "1,2,3", "[10 20],[30 40],[50 60]\r\n[100 200],[300 400],[500 600]\r\n[-1 -2 -3],[-4 -5 -6],[-7 -8 -9]")
 	checkTCount(t, tb, 9)
-	if err := tb.RemoveRow(2); err != nil {
-		t.Error(err)
-	}
+	tb.RemoveRow(2)
 	checkTString(t, tb, "{1: [10 20], 2: [30 40], 3: [50 60]}, {1: [100 200], 2: [300 400], 3: [500 600]}")
 	checkTCSV(t, tb, "1,2,3", "[10 20],[30 40],[50 60]\r\n[100 200],[300 400],[500 600]")
 	checkTCount(t, tb, 6)
@@ -1044,9 +1023,7 @@ func TestTRemoveRow(t *testing.T) {
 	checkTString(t, tb, "{1: 1.1, 2: b, 3: [3]}, {1: 4.4, 2: e, 3: [6]}")
 	checkTCSV(t, tb, "1,2,3", "1.1,b,[3]\r\n4.4,e,[6]")
 	checkTCount(t, tb, 6)
-	if err := tb.RemoveRow(3); err == nil {
-		t.Error("Unexpectedly passed out-of-bounds index test")
-	}
+	tb.RemoveRow(3)
 	checkTString(t, tb, "{1: 1.1, 2: b, 3: [3]}, {1: 4.4, 2: e, 3: [6]}")
 	checkTCSV(t, tb, "1,2,3", "1.1,b,[3]\r\n4.4,e,[6]")
 	checkTCount(t, tb, 6)
@@ -1056,9 +1033,7 @@ func TestTRemoveRow(t *testing.T) {
 	checkTString(t, tb, "<empty>")
 	checkTCSV(t, tb, "1,2,3", "")
 	checkTCount(t, tb, 0)
-	if err := tb.RemoveRow(0); err == nil {
-		t.Error("Unexpectedly passed removing from empty table test")
-	}
+	tb.RemoveRow(0)
 	checkTString(t, tb, "<empty>")
 	checkTCSV(t, tb, "1,2,3", "")
 	checkTCount(t, tb, 0)
