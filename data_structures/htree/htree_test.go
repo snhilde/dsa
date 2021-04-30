@@ -1251,7 +1251,7 @@ func testSort(t *testing.T, tr Tree, items []Item) {
 	// Build a string of values from the items.
 	b := new(strings.Builder)
 	for _, item := range items {
-		fmt.Fprintf(&b, "%v, ", item.GetValue())
+		fmt.Fprintf(b, "%v, ", item.GetValue())
 	}
 	s := strings.TrimSuffix(b.String(), ", ")
 
