@@ -451,11 +451,14 @@ func (t *Table) Toggle(index int, enabled bool) error {
 	return nil
 }
 
-// Sort sorts the table on the specified column. cmp should return true if left should be sorted
-// first or false if right should be sorted first.
-func (t *Table) Sort(header string, cmp func(left, right interface{}) bool) error {
+// SortByColumn sorts the table on the specified column. The comparison function less is given the
+// values of two different items in a column and should return true only if the left item should be
+// sorted before the right item.
+func (t *Table) SortByColumn(header string, less func(interface{}, interface{}) bool) error {
 	if t == nil {
 		return errBadTable
+	} else if less == nil {
+		return fmt.Errorf("missing comparison callback")
 	}
 
 	// Figure out the index of the column.
@@ -465,10 +468,34 @@ func (t *Table) Sort(header string, cmp func(left, right interface{}) bool) erro
 	}
 
 	// Sort the rows.
-	err := t.rows.Sort(func(leftRow, rightRow interface{}) bool {
-		leftItem := leftRow.(*Row).Item(i)
-		rightItem := rightRow.(*Row).Item(i)
-		return cmp(leftItem, rightItem)
+	err := t.rows.Sort(func(left, right interface{}) bool {
+		leftRow := left.(*Row)
+		rightRow := right.(*Row)
+		return less(leftRow.Item(i), rightRow.Item(i))
+	})
+
+	return err
+}
+
+// SortByRow sorts the table by rows. The comparison function less is given pointers to two Row
+// objects and should return true only if the left row should be sorted before the right row.
+func (t *Table) SortByRow(less func(*Row, *Row) bool) error {
+	if t == nil {
+		return errBadTable
+	} else if less == nil {
+		return fmt.Errorf("missing comparison callback")
+	}
+
+	// Sort the rows.
+	err := t.rows.Sort(func(left, right interface{}) bool {
+		leftRow := left.(*Row)
+		rightRow := right.(*Row)
+
+		// Return copies of the rows to prevent changes from affecting the table.
+		leftCopy := leftRow.Copy()
+		rightCopy := rightRow.Copy()
+
+		return less(leftCopy, rightCopy)
 	})
 
 	return err
