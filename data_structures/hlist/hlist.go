@@ -335,17 +335,17 @@ func (l *List) YieldAll() <-chan interface{} {
 	return ch
 }
 
-// Sort sorts the list using a modified merge algorithm. cmp should return true if left should be
-// sorted first or false if right should be sorted first.
-func (l *List) Sort(cmp func(left, right interface{}) bool) error {
+// Sort sorts the list using a modified merge algorithm. The comparison function less should return
+// true only if left should be sorted before right.
+func (l *List) Sort(less func(left, right interface{}) bool) error {
 	// We are going to use the merge sort algorithm here. However, because length operations are not
 	// constant-time, we are not going to divide the list into progressively smaller blocks.
 	// Instead, we are going to assume a block size of 2 and iteratively merge-sort blocks of
 	// greater and greater size until the list is fully sorted.
 	if l == nil {
 		return errBadList
-	} else if cmp == nil {
-		return fmt.Errorf("missing equality comparison callback")
+	} else if less == nil {
+		return fmt.Errorf("missing comparison callback")
 	}
 
 	listLen := l.Length()
@@ -404,7 +404,7 @@ func (l *List) Sort(cmp func(left, right interface{}) bool) error {
 					tmpList.Append(leftStack.item)
 					leftStack = leftStack.next
 					leftLen--
-				} else if cmp(leftStack.item, rightStack.item) {
+				} else if less(leftStack.item, rightStack.item) {
 					tmpList.Append(leftStack.item)
 					leftStack = leftStack.next
 					leftLen--
