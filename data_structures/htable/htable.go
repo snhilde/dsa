@@ -514,19 +514,20 @@ func (t *Table) CSV() string {
 	b.WriteString(strings.Join(t.Headers(), ","))
 
 	// Add the rows.
-	rowChan := t.rows.YieldAll()
-	if rowChan == nil {
+	rows := t.rows.Items()
+	if rows == nil {
 		return b.String()
 	}
-	for r := range rowChan {
+	for _, r := range rows {
 		row := r.(*Row)
 		if row.Enabled() {
-			items := make([]string, len(row.items))
-			for i, item := range row.items {
-				items[i] = fmt.Sprintf("%v", item)
+			items := row.Items()
+			itemValues := make([]string, len(items))
+			for i, item := range items {
+				itemValues[i] = fmt.Sprintf("%v", item)
 			}
 			b.WriteString("\r\n")
-			b.WriteString(strings.Join(items, ","))
+			b.WriteString(strings.Join(itemValues, ","))
 		}
 	}
 
