@@ -135,6 +135,22 @@ func (l *List) Item(index int) interface{} {
 	return node.next.item
 }
 
+// Items returns a slice of all items in the list in order of insertion.
+func (l *List) Items() []interface{} {
+	if l == nil || l.head == nil {
+		return nil
+	}
+
+	i := 0
+	items := make([]interface{}, l.Length())
+	for node := l.head; node != nil; node = node.next {
+		items[i] = node.item
+		i++
+	}
+
+	return items
+}
+
 // Exists checks whether or not the item exists in the list.
 func (l *List) Exists(item interface{}) bool {
 	i := l.Index(item)
@@ -294,9 +310,7 @@ func (l *List) Clear() error {
 // Yield provides an unbuffered channel that will continually pass successive items until the list
 // is exhausted. The channel quit is used to communicate when iteration should be stopped. Send an
 // empty struct (struct{}{}) on the channel to break the communication. This will happen
-// automatically if the list is exhausted. If this is not needed, pass nil as the argument. Use
-// Yield if you are concerned about memory usage or don't know how far through the list you will
-// iterate; otherwise, use YieldAll.
+// automatically if the list is exhausted. If this is not needed, pass nil as the argument.
 func (l *List) Yield(quit <-chan struct{}) <-chan interface{} {
 	if l == nil || l.head == nil {
 		return nil
@@ -315,22 +329,6 @@ func (l *List) Yield(quit <-chan struct{}) <-chan interface{} {
 			}
 		}
 	}()
-
-	return ch
-}
-
-// YieldAll provides a buffered channel that will pass successive items until the list is exhausted.
-// Use this if you don't care greatly about memory usage and for convenience.
-func (l *List) YieldAll() <-chan interface{} {
-	if l == nil || l.head == nil {
-		return nil
-	}
-
-	ch := make(chan interface{}, l.Length())
-	for node := l.head; node != nil; node = node.next {
-		ch <- node.item
-	}
-	close(ch)
 
 	return ch
 }

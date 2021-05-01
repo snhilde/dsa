@@ -49,6 +49,13 @@ func TestBadPtr(t *testing.T) {
 		t.Log("\tReceived:", v)
 	}
 
+	// Test Items().
+	if v := l.Items(); v != nil {
+		t.Error("unexpectedly passed Items() test with bad pointer")
+		t.Log("\tExpected: nil")
+		t.Log("\tReceived:", v)
+	}
+
 	// Test Exists().
 	if b := l.Exists("item"); b != false {
 		t.Error("unexpectedly passed Exists() test with bad pointer")
@@ -91,11 +98,6 @@ func TestBadPtr(t *testing.T) {
 	// Test Yield().
 	if ch := l.Yield(nil); ch != nil {
 		t.Error("unexpectedly passed Yield() test with bad pointer")
-	}
-
-	// Test YieldAll().
-	if ch := l.YieldAll(); ch != nil {
-		t.Error("unexpectedly passed YieldAll() test with bad pointer")
 	}
 
 	// Test Sort().
@@ -372,7 +374,7 @@ func TestIndex(t *testing.T) {
 	}
 }
 
-func TestValue(t *testing.T) {
+func TestItem(t *testing.T) {
 	l := hlist.New()
 	l.Append("apples", 1, 3, 3.14, []byte{0xEE, 0xFF}, "aardvark")
 	checkString(t, l, "apples, 1, 3, 3.14, [238 255], aardvark")
@@ -429,6 +431,128 @@ func TestValue(t *testing.T) {
 		t.Error("Unexpectedly passed no-match test")
 		t.Log("\tExpected: nil")
 		t.Log("\tReceived:", v)
+	}
+}
+
+func TestItems(t *testing.T) {
+	l := hlist.New()
+	l.Append(1, "2", 3.14)
+	checkString(t, l, "1, 2, 3.14")
+	checkLength(t, l, 3)
+
+	// Test that Items() returns each item but does not alter the list in any way.
+	items := l.Items()
+	if items == nil {
+		t.Error("Failed to receive items")
+	} else if len(items) != 3 {
+		t.Error("Did not receive all items in list")
+		t.Log("\tExpected: 3")
+		t.Log("\tReceived:", len(items))
+	}
+	checkString(t, l, "1, 2, 3.14")
+	checkLength(t, l, 3)
+
+	// Make sure that all of the items in the slice are correct.
+	for i, v := range items {
+		switch i {
+		case 0:
+			if v != 1 {
+				t.Error("Error receiving 1st item")
+				t.Log("\tExpected: 1")
+				t.Log("\tReceived:", v)
+			}
+		case 1:
+			if v != "2" {
+				t.Error("Error receiving 2nd item")
+				t.Log("\tExpected: 2")
+				t.Log("\tReceived:", v)
+			}
+		case 2:
+			if v != 3.14 {
+				t.Error("Error receiving 3rd item")
+				t.Log("\tExpected: 3.14")
+				t.Log("\tReceived:", v)
+			}
+		}
+	}
+	checkString(t, l, "1, 2, 3.14")
+	checkLength(t, l, 3)
+
+	// Test that modifying list does not affect anything in channel.
+	items = l.Items()
+	if items == nil {
+		t.Error("Failed to receive items")
+	} else if len(items) != 3 {
+		t.Error("Did not receive all items in list")
+		t.Log("\tExpected: 3")
+		t.Log("\tReceived:", len(items))
+	}
+	l.Remove(2)
+	l.Remove(0)
+	checkString(t, l, "2")
+	checkLength(t, l, 1)
+	for i, v := range items {
+		switch i {
+		case 0:
+			if v != 1 {
+				t.Error("Error receiving 1st item")
+				t.Log("\tExpected: 1")
+				t.Log("\tReceived:", v)
+			}
+		case 1:
+			if v != "2" {
+				t.Error("Error receiving 2nd item")
+				t.Log("\tExpected: 2")
+				t.Log("\tReceived:", v)
+			}
+		case 2:
+			if v != 3.14 {
+				t.Error("Error receiving 3rd item")
+				t.Log("\tExpected: 3.14")
+				t.Log("\tReceived:", v)
+			}
+		}
+	}
+
+	// Test that new items are in the new list.
+	l.Append("dd", "ee", "ff")
+	checkString(t, l, "2, dd, ee, ff")
+	checkLength(t, l, 4)
+	items = l.Items()
+	if items == nil {
+		t.Error("Failed to receive items")
+	} else if len(items) != 4 {
+		t.Error("Did not receive all items in list")
+		t.Log("\tExpected: 4")
+		t.Log("\tReceived:", len(items))
+	}
+	for i, v := range items {
+		switch i {
+		case 0:
+			if v != "2" {
+				t.Error("Error receiving 1st item")
+				t.Log("\tExpected: 2")
+				t.Log("\tReceived:", v)
+			}
+		case 1:
+			if v != "dd" {
+				t.Error("Error receiving 2nd item")
+				t.Log("\tExpected: dd")
+				t.Log("\tReceived:", v)
+			}
+		case 2:
+			if v != "ee" {
+				t.Error("Error receiving 3rd item")
+				t.Log("\tExpected: ee")
+				t.Log("\tReceived:", v)
+			}
+		case 3:
+			if v != "ff" {
+				t.Error("Error receiving 4rd item")
+				t.Log("\tExpected: ff")
+				t.Log("\tReceived:", v)
+			}
+		}
 	}
 }
 
@@ -1153,135 +1277,6 @@ func TestYield(t *testing.T) {
 		t.Log("\tExpected: nil")
 		t.Log("\tReceived:", v)
 	}
-}
-
-func TestYieldAll(t *testing.T) {
-	l := hlist.New()
-	l.Append(1, "2", 3.14)
-	checkString(t, l, "1, 2, 3.14")
-	checkLength(t, l, 3)
-
-	// Test that YieldAll() returns each item in a buffered channel but does not alter the list in
-	// any way.
-	ch := l.YieldAll()
-	if ch == nil {
-		t.Error("Failed to receive channel")
-	} else if len(ch) != 3 {
-		t.Error("Channel did not buffer all items in list")
-		t.Log("\tExpected: 3")
-		t.Log("\tReceived:", len(ch))
-	}
-	checkString(t, l, "1, 2, 3.14")
-	checkLength(t, l, 3)
-
-	// Make sure that all the items buffered in the channel are correct.
-	i := 0
-	for v := range ch {
-		switch i {
-		case 0:
-			if v != 1 {
-				t.Error("Error receiving 1st item")
-				t.Log("\tExpected: 1")
-				t.Log("\tReceived:", v)
-			}
-		case 1:
-			if v != "2" {
-				t.Error("Error receiving 2nd item")
-				t.Log("\tExpected: 2")
-				t.Log("\tReceived:", v)
-			}
-		case 2:
-			if v != 3.14 {
-				t.Error("Error receiving 3rd item")
-				t.Log("\tExpected: 3.14")
-				t.Log("\tReceived:", v)
-			}
-		default:
-			t.Error("Still receiving items when list should be exhausted")
-			t.Log("\tReceived:", v)
-		}
-		i++
-	}
-	checkString(t, l, "1, 2, 3.14")
-	checkLength(t, l, 3)
-
-	// Make sure that we received all 3 items.
-	if i != 3 {
-		t.Error("Failed to receive all items in list")
-		t.Log("\tExpected: 3 items")
-		t.Log("\tReceived:", i, "items")
-	}
-
-	// Make sure that the channel is closed after exhausting the list.
-	if v, ok := <-ch; ok {
-		t.Error("Channel is not closed")
-		t.Log("\tReceived:", v)
-	}
-
-	// Test breaking out of loop early and entering back in at same point.
-	ch = l.YieldAll()
-	if ch == nil {
-		t.Error("Failed to receive channel")
-	}
-	for v := range ch {
-		if v != 1 {
-			t.Error("Error receiving 1st item")
-			t.Log("\tExpected: 1")
-			t.Log("\tReceived:", v)
-		}
-		break
-	}
-	checkString(t, l, "1, 2, 3.14")
-	checkLength(t, l, 3)
-
-	for v := range ch {
-		if v != "2" {
-			t.Error("Error receiving 2nd item")
-			t.Log("\tExpected: 2")
-			t.Log("\tReceived:", v)
-		}
-		break
-	}
-	checkString(t, l, "1, 2, 3.14")
-	checkLength(t, l, 3)
-
-	if v := <-ch; v != 3.14 {
-		t.Error("Error receiving 3rd item")
-		t.Log("\tExpected: 3.14")
-		t.Log("\tReceived:", v)
-	}
-	checkString(t, l, "1, 2, 3.14")
-	checkLength(t, l, 3)
-
-	// Test that modifying list does not affect anything in channel.
-	ch = l.YieldAll()
-	if ch == nil {
-		t.Error("Failed to receive channel")
-	}
-	if v := <-ch; v != 1 {
-		t.Error("Error receiving 1st item")
-		t.Log("\tExpected: 1")
-		t.Log("\tReceived:", v)
-	}
-	l.Remove(2)
-	l.Remove(0)
-	if v := <-ch; v != "2" {
-		t.Error("Error receiving 2nd item")
-		t.Log("\tExpected: 2")
-		t.Log("\tReceived:", v)
-	}
-	if v := <-ch; v != 3.14 {
-		t.Error("Error receiving 3rd item")
-		t.Log("\tExpected: 3.14")
-		t.Log("\tReceived:", v)
-	}
-	if len(ch) > 0 {
-		t.Error("Channel is still buffering items")
-		t.Log("\tExpected: 0")
-		t.Log("\tReceived:", len(ch))
-	}
-	checkString(t, l, "2")
-	checkLength(t, l, 1)
 }
 
 func TestSort(t *testing.T) {
