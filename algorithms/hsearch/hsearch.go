@@ -1,4 +1,4 @@
-// Package hsearch provides a proof-of-concept for multiple searching algorithms.
+// Package hsearch provides a proof-of-concept for various searching algorithms.
 package hsearch
 
 import (
