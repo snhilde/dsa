@@ -47,7 +47,7 @@ func Insertion(list interface{}, less func(i, j int) bool) error {
 
 // Selection sorts the list using a selection algorithm. The list must be a slice. The comparison
 // function less should return true only if the item at index i is less than the item at index j.
-func Selection(list interface{}, less func(int, int) bool) error {
+func Selection(list interface{}, less func(i int, j int) bool) error {
 	// We're going to follow this sequence for each item in the list:
 	// 1. Scan the entire list from the current position forward for the lowest value.
 	// 2. Swap the current value and the lowest value.
@@ -74,7 +74,7 @@ func Selection(list interface{}, less func(int, int) bool) error {
 
 // Bubble sorts the list using a bubble algorithm. The list must be a slice. The comparison function
 // less should return true only if the item at index i is less than the item at index j.
-func Bubble(list interface{}, less func(int, int) bool) error {
+func Bubble(list interface{}, less func(i int, j int) bool) error {
 	// For this function, we're going to iterate through every item in the list. If an item has a
 	// greater value than its neighbor to the right, then we'll swap them. When we get to the end,
 	// we'll start again at the beginning and keep doing this until we have one pass with no swaps.
@@ -101,7 +101,7 @@ func Bubble(list interface{}, less func(int, int) bool) error {
 
 // Merge sorts the list using a merging algorithm. The list must be a slice. The comparison function
 // less should return true only if the item at index i is less than the item at index j.
-func Merge(list interface{}, less func(int, int) bool) error {
+func Merge(list interface{}, less func(i int, j int) bool) error {
 	// For this sorting function, we're going to focus on a stack of blocks. A block is a subsection
 	// of the total list. First, we're going to create a block for the entire list. Then we're going
 	// to follow this sequence for each sub-block:
@@ -198,7 +198,7 @@ func Merge(list interface{}, less func(int, int) bool) error {
 // MergeOptimized sorts the list using a merging algorithm that is optimized for low memory use. The
 // list must be a slice. The comparison function less should return true only if the item at index i
 // is less than the item at index j.
-func MergeOptimized(list interface{}, less func(int, int) bool) error {
+func MergeOptimized(list interface{}, less func(i int, j int) bool) error {
 	// While the standard merging algorithm first divides the list to be sorted into iteratively
 	// smaller blocks and then merges back up the tree, this implementation starts at the bottom and
 	// merges upward immediately. This reduces the memory overhead, as there is no tree
@@ -344,7 +344,7 @@ func Hash(list []int) error {
 // Bogo sorts the list using a bogo algorithm. The list must be a slice. The comparison function
 // less should return true only if the item at index i is less than the item at index j.
 // Note: This is a bogus algorithm intended to be highly inefficient.
-func Bogo(list interface{}, less func(int, int) bool) error {
+func Bogo(list interface{}, less func(i int, j int) bool) error {
 	// The loop for this process is simple:
 	// 1. Make sure the list is not currently sorted.
 	// 2. Randomize the items in the list.
@@ -401,7 +401,7 @@ func Binary(list []int) error {
 // 1. The length of the list
 // 2. A function that will swap the two Values at the given indices.
 // 3. Any error that occurred along the way, or nil if no error occurred.
-func initSort(list interface{}, cmp func(int, int) bool) (int, func(i, j int), error) {
+func initSort(list interface{}, cmp func(int, int) bool) (int, func(int, int), error) {
 	// Pull out the underlying Value, and make sure it's a slice.
 	v := reflect.ValueOf(list)
 	if v.Kind() != reflect.Slice {
