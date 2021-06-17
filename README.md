@@ -8,7 +8,7 @@
 
 Data Structures and Algorithms
 
-These are example modules for increasing knowledge and practicing.
+These are example modules for learning and practicing.
 
 
 ## Current Packages
